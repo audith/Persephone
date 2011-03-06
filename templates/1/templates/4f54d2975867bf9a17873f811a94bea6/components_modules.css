@@ -1,0 +1,54 @@
+UL.actions
+{
+	float:right;
+	clear:right;
+	margin-left:7px;
+	height:100%;
+	width:auto;
+	max-width:64px;
+	display:none; 
+}
+
+TD:hover > UL.actions
+{
+	display:block;
+}
+
+	UL.actions > LI
+	{
+		float:left;
+		clear:none;
+	}
+	
+		UL.actions > LI > A
+		{
+			float:left;
+			clear:both;
+			width:100%;
+			height:100%;
+			
+			text-indent:-99999px;
+		}
+
+SPAN.name
+{
+	height:inherit;
+	width:543px;
+	float:left;
+	clear:left;
+	overflow:hidden;
+	white-space:nowrap;
+	vertical-align:middle;
+
+	line-height:18px;
+}
+
+TD:hover > SPAN.name
+{
+	width:470px;
+}
+
+	SPAN.name STRONG
+	{
+		color:#0085BF;
+	}

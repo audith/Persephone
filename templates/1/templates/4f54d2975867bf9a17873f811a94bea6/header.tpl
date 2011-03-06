@@ -1,0 +1,1 @@
+<div id="header" style="background-image: url('{{$STYLE_IMAGES_URL}}/header_image_{{math equation="rand(1,14)"}}.jpg');"></div>

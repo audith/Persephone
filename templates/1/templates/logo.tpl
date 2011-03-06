@@ -1,0 +1,1 @@
+<h1><a href="{{$SITE_URL}}">{{$SITE_NAME}}{{if $SITE_MOTTO neq ''}} - {{$SITE_MOTTO}}{{/if}}</a></h1>

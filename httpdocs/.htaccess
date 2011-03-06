@@ -1,0 +1,28 @@
+### AUDITH CMS ###
+
+# Internal Clock: <-MD5->
+
+<FilesMatch "^\.ht">
+	Order Deny,Allow
+	Deny from all
+</FilesMatch>
+
+<FilesMatch "\.log$">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
+
+<FilesMatch "\.[a-zA-Z0-9]+$">
+	# @see http://php.net/manual/en/function.readfile.php
+	SetEnv no-gzip dont-vary
+</FilesMatch>
+
+Options -MultiViews
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule . /index.php [L,NC,QSA]
+</IfModule>

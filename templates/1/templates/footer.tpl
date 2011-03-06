@@ -1,0 +1,1 @@
+<span id="links"><a href="#">forums</a> | <a href="#">disclaimer</a> | <a href="#">terms &amp; guidelines</a></span>
