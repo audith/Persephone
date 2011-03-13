@@ -42,7 +42,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__file__allowed_filetypes__do_fe
 Acp_ComponentsViewmodule.prototype.registry = {
 	'alphanumeric' : {
 		'_label' : "Alphanumeric",
-		'subtypes' : {
+		'_subtypes' : {
 			'string' : {
 				'_label' : "General String",
 				'options' : {
@@ -246,7 +246,7 @@ Acp_ComponentsViewmodule.prototype.registry = {
 				'_label' : "Numeric: Signed Decimal (Fixed-Point)",
 				'options' : {
 					'maxlength' : "10,0",
-					'default_value' : "0.0",
+					'default_value' : "0",
 					'@connector_enabled' : false,
 					'is_required' : false,
 					'is_unique' : false,
@@ -264,7 +264,7 @@ Acp_ComponentsViewmodule.prototype.registry = {
 				'_label' : "Numeric: Unsigned Decimal (Fixed-Point)",
 				'options' : {
 					'maxlength' : "10,0",
-					'default_value' : "0.0",
+					'default_value' : "0",
 					'@connector_enabled' : false,
 					'is_required' : false,
 					'is_unique' : false,
@@ -301,7 +301,7 @@ Acp_ComponentsViewmodule.prototype.registry = {
 	},
 	'file' : {
 		'_label' : "File",
-		'subtypes' : {
+		'_subtypes' : {
 			'image' : {
 				'_label' : "Image files",
 				'options' : {
@@ -375,9 +375,7 @@ Acp_ComponentsViewmodule.prototype.registry = {
 	},
 	'link' : {
 		'_label' : "Link with other module",
-		'links' : {
-			'links_with__e_data_definition' : {}
-		},
+		'_links' : {},
 		'value__for' : {}
 	}
 
@@ -388,13 +386,16 @@ Acp_ComponentsViewmodule.prototype.registry = {
  *            Object that triggers this method
  * @return boolean TRUE on success, FALSE otherwise
  */
-Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( obj /* , customRegistry */ )
+Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( obj /* , customRegistry , doNotRePopulateSubType */ )
 {
 	/* Working form element */
 	acp__components_viewmodule.Form.self = jQuery("#forms__components__ddl__alter_add");
 
 	/* Registry */
 	var registry = ( arguments[1] ) ? arguments[1] : acp__components_viewmodule.registry;
+
+	/* 'doNotRePopulateSubType' - Defaults to FALSE */
+	var doNotRePopulateSubType = ( arguments[2] ) ? arguments[2] : false;
 
 	/* Initializing this.obj */
 	this.obj = obj;
@@ -433,21 +434,25 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 
 		node_to_populate = registry[this.obj.val()];
 
-		if ( 'subtypes' in node_to_populate )
+		if ( '_subtypes' in node_to_populate )
 		{
-			/* Populate "subtype" */
-			jQuery("#forms__components__ddl__alter_add [name='subtype']").empty();
-			jQuery.each(node_to_populate['subtypes'], function ( key , value )
+			if ( doNotRePopulateSubType === false )
 			{
-				jQuery("#forms__components__ddl__alter_add .subtype.ondemand > [name='subtype']").append("<option value='" + key + "'>" + value['_label'] + "</option");
-			});
+				/* Populate "subtype" */
+				jQuery("#forms__components__ddl__alter_add [name='subtype']").empty();
+				var _subtype_options = "";
+				jQuery.each(node_to_populate['_subtypes'], function ( key , value )
+				{
+					_subtype_options += "<option value='" + key + "'>" + value['_label'] + "</option>";
+				});
+				jQuery("#forms__components__ddl__alter_add .subtype.ondemand > [name='subtype']").append( _subtype_options );
+			}
 			acp__components_viewmodule.Form.enableOnDemandElement("#forms__components__ddl__alter_add .subtype.ondemand");
 
 			/* Populate the subtype-configuration, by recursively-calling this method */
 			arguments.callee("#forms__components__ddl__alter_add [name='subtype']", registry);
 		}
-		// else if ( 'links' in node_to_populate )
-		else if ( 'links' in node_to_populate )
+		else if ( '_links' in node_to_populate )
 		{
 			/* Reveal 'Links with ...' */
 			acp__components_viewmodule.Form.enableOnDemandElement("#forms__components__ddl__alter_add .links_with.ondemand");
@@ -457,6 +462,14 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 			{
 				jQuery("#forms__components__ddl__alter_add [name='links_with']").prepend("<option value=\"\" disabled=\"disabled\">-- no modules found --</option>");
 				return false;
+			}
+			else
+			{
+				/* Do we have a module-name which needs to be "selected"? */
+				if ( 'links_with' in node_to_populate['_links'] && node_to_populate['_links']['links_with'] != '' )
+				{
+					jQuery("#forms__components__ddl__alter_add [name='links_with']").children("OPTION[value='" + node_to_populate['_links']['links_with'] + "']").not(":disabled").get(0).selected = true;
+				}
 			}
 
 			/* Populate the link-configuration, by recursively-calling this method */
@@ -475,10 +488,13 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 			}
 			else if ( field_obj.is("SELECT") )
 			{
-				field_value = field_value.split(",");
+				if ( !( field_value instanceof Array ) )
+				{
+					field_value = field_value.split(",");
+				}
 				for ( var _key in field_value )
 				{
-					field_obj.children("OPTION[value='" + field_value[ _key ] + "']").get(0).selected = true;
+					field_obj.val( field_value );
 				}
 			}
 		}
@@ -494,7 +510,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 		}
 
 		var _what_is_type = jQuery("#forms__components__ddl__alter_add [name='type']").val();
-		node_to_populate = registry[_what_is_type]['subtypes'][this.obj.val()];
+		node_to_populate = registry[_what_is_type]['_subtypes'][this.obj.val()];
 		jQuery.each(node_to_populate['options'], function ( key , value )
 		{
 			/**
@@ -537,6 +553,9 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 					}
 				}
 			}
+
+			/* Reveal the element */
+			acp__components_viewmodule.Form.enableOnDemandElement("#forms__components__ddl__alter_add ." + key + ".ondemand");
 
 			/**
 			 * @var object Form fields
@@ -595,9 +614,6 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 					}
 				});
 			}
-
-			/* Reveal the element */
-			acp__components_viewmodule.Form.enableOnDemandElement("#forms__components__ddl__alter_add ." + key + ".ondemand");
 
 			/* Self-recursion */
 			if ( _self_recursion != false )
@@ -695,14 +711,26 @@ jQuery(document).ready(function ( event )
 	 */
 	jQuery("#forms__components__ddl__alter_add").bind("reset", function ( event )
 	{
+		/* Prelim */
 		var whoami = acp__components_viewmodule.Form.self = jQuery("#forms__components__ddl__alter_add");
-		whoami.find(".error").removeClass("error"); // Resetting errors
+		var typeElement = whoami.find("[name='type']");
+
+		/* Reset errors and close consoles */
+		whoami.find(".error").removeClass("error");
 		acp__components_viewmodule.Form.closeConsoles(true);
 
-		/* Cleanup */
-		whoami.find("INPUT[type='text']").val(""); // Clear all INPUT text-fields
-		var typeElement = whoami.find("[name='type']").val("alphanumeric"); // Set type=alphanumeric
-		acp__components_viewmodule.ddl__register__apply_registry(typeElement); // Apply Registry
+		/* Show hidden elements */
+		whoami.find("[name='name']").removeAttr("disabled");
+		whoami.find(".type").show();
+
+		/* Reset values */
+		whoami.find("INPUT[type='text']").val(null); // Reset all INPUT text-fields
+		whoami.find("SELECT > OPTION:eq(0)").attr("selected","selected"); // Reset all SELECTs
+		whoami.find("[name='do']").val("ddl_alter__add"); // 'do'
+		whoami.find("[type='submit']").val("Register New Data-field");
+
+		/* Apply Registry */
+		acp__components_viewmodule.ddl__register__apply_registry(typeElement);
 
 		/* Scroll to global Console */
 		var currentConsole = acp__components_viewmodule.Form.scrollToConsole(true);
@@ -739,13 +767,10 @@ jQuery(document).ready(function ( event )
 	 */
 	jQuery("#forms__components__ddl__alter_add .js__trigger_on_change").filter("LABEL,:radio,:checkbox").click(function ( event )
 	{
-		if ( jQuery(this).is("LABEL") )
+		var what_is_being_triggered = ( jQuery(this).is("LABEL") ) ? jQuery("#" + jQuery(this).attr("for")) : jQuery(this);
+		if ( !( what_is_being_triggered.is(":disabled") ) )
 		{
-			acp__components_viewmodule.ddl__register__apply_registry("#" + jQuery(this).attr("for"));
-		}
-		else
-		{
-			acp__components_viewmodule.ddl__register__apply_registry(jQuery(this));
+			acp__components_viewmodule.ddl__register__apply_registry(what_is_being_triggered);
 		}
 	});
 
@@ -767,12 +792,13 @@ jQuery(document).ready(function ( event )
 	jQuery("#forms__components__ddl__list A.ddl_alter__edit").click(function ( event )
 	{
 		event.preventDefault();
-		jQuery("#forms__components__ddl__list [name='do']").val("ddl_alter__edit");
-		jQuery("#forms__components__ddl__list [name='ddl_checklist']").val(jQuery(this).attr("href").replace(/\?/,""));
 		var whoami = acp__components_viewmodule.Form.self = jQuery("#forms__components__ddl__list");
+		whoami.find("[name='do']").val("ddl_alter__pre_edit");
+		whoami.find("[name='ddl_checklist']").val(jQuery(this).attr("href").replace(/\?/,""));
 		jQuery.ajax({
 			data : whoami.serialize(),
 			cache : false,
+			async : false,
 			success : function ( data )
 			{
 				if ( typeof data != 'object' )
@@ -785,25 +811,36 @@ jQuery(document).ready(function ( event )
 
 				/* Continue... */
 				jQuery("#forms__components__ddl__list [type='button']:eq(0)").trigger("click"); // Click "Create New DDL" button to open form and reset it
-				var typeElement = jQuery("#forms__components__ddl__alter_add").find("[name='type']");
+				var typeElement = jQuery("#forms__components__ddl__alter_add [name='type']");
 
 				/* Populate data into Registry (part 1) */
 				registry[ data['type'] ]['value__for'] = {
 					'name' : data['name'],
-					'label' : data['label'],
-					'connector_length_cap' : data['connector_length_cap']
+					'label' : data['label']
 				};
+				if ( data['connector_length_cap'] !== null )
+				{
+					registry[ data['type'] ]['value__for']['connector_length_cap'] = data['connector_length_cap'];
+				}
+				if ( data['links_with'] !== null )
+				{
+					registry[ data['type'] ]['_links']['links_with'] = data['links_with'].replace(/[^0-9a-z]/gi, "").toLowerCase();
+				}
+				if ( data['links_with__e_data_definition'] !== null )
+				{
+					registry[ data['type'] ]['value__for']['links_with__e_data_definition'] = data['links_with__e_data_definition'];
+				}
 
 				typeElement.val( data['type'] ).trigger("change"); // Trigger change() event handler for 'type' field
 
 				/* Further clean-up on types which deal with 'subtype' field */
-				if ( 'subtype' in data )
+				if ( data['subtype'] !== null )
 				{
-					var subTypeElement = jQuery("#forms__components__ddl__alter_add").find("[name='subtype']");
+					var subTypeElement = jQuery("#forms__components__ddl__alter_add [name='subtype']");
 					subTypeElement.val( data['subtype'] ).trigger("change");
 
 					/* Populate data into Registry (part 2) */
-					for ( option in registry[ data['type'] ]['subtypes'][ data['subtype'] ]['options'] )
+					for ( option in registry[ data['type'] ]['_subtypes'][ data['subtype'] ]['options'] )
 					{
 						if ( option == 'allowed_filetypes' )
 						{
@@ -813,18 +850,32 @@ jQuery(document).ready(function ( event )
 						var option__as_appears_in_data = option.replace(/^@/, "");
 						if ( option__as_appears_in_data in data )
 						{
-							registry[ data['type'] ]['subtypes'][ data['subtype'] ]['options'][ option ] = data[ option__as_appears_in_data ];
+							registry[ data['type'] ]['_subtypes'][ data['subtype'] ]['options'][ option ] = data[ option__as_appears_in_data ];
 						}
 					}
 				}
 
-				acp__components_viewmodule.ddl__register__apply_registry(typeElement, registry); // Apply Registry
+				acp__components_viewmodule.ddl__register__apply_registry(typeElement, registry, true); // Apply Registry, BUT do not re-populate sub-type (third argument = true); otherwise, it will empty SELECT.subtype and we will lose our current value!!!
 				jQuery("#forms__components__ddl__alter_add [type='reset']").attr("disabled", "disabled"); // Disable 'Reset' button
+
+				/* Some values */
+				jQuery("#forms__components__ddl__alter_add [name='do']").val("ddl_alter__edit");
+				jQuery("#forms__components__ddl__alter_add [name='name__old']").val( data['name'] );
+				jQuery("#forms__components__ddl__alter_add [type='submit']").val("Alter Data-field");
+
+				/* Lock elements which shouldn't be changed */
+				jQuery("#forms__components__ddl__alter_add [name='name']").attr("disabled", "disabled"); // 'name'
+				jQuery("#forms__components__ddl__alter_add .type").hide(); // 'type'
+				jQuery("#forms__components__ddl__alter_add .subtype").hide(); // 'subtype'
+				jQuery("#forms__components__ddl__alter_add .links_with").hide(); // 'links_with'
+				jQuery("#forms__components__ddl__alter_add .default_options").hide(); // 'default_options'
+				jQuery("#forms__components__ddl__alter_add .maxlength").hide(); // 'maxlength'
+				jQuery("#forms__components__ddl__alter_add .connector_enabled").hide(); // 'connector_enabled'
+				jQuery("#forms__components__ddl__alter_add .connector_length_cap").hide(); // 'connector_length_cap'
 
 				return true;
 			}
 		});
-
 	});
 
 	/**

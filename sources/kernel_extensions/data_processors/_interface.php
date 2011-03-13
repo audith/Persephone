@@ -18,7 +18,7 @@ abstract class Data_Processor
 	/**
 	 * Constructor
 	 *
-	 * @param  object  API reference
+	 * @param  object  API reference.
 	 */
 	public function __construct ( API $API )
 	{
@@ -33,29 +33,29 @@ abstract class Data_Processor
 
 
 	/**
-	 * Content fetch - Processor
+	 * Content fetch - Processor.
 	 * This method DOES NOT "get" anything, it justs preps the data for servicing!!!
 	 *
-	 * @param   array   Data to be processed
-	 * @return  array   Final data
+	 * @param   array   Data to be processed.
+	 * @return  array   Final data.
 	 */
 	abstract public function get__do_process ( $data );
 
 
 	/**
-	 * Content put - Processor
+	 * Content put - Processor.
 	 * This method DOES NOT "put" anything, it justs preps the data for servicing!!!
 	 *
-	 * @return   mixed   (boolean) TRUE on success; (boolean) FALSE or (array) fault-code-message otherwise
+	 * @return   mixed   (boolean) TRUE on success; (boolean) FALSE or (array) fault-code-message otherwise.
 	 */
 	abstract public function put__do_process ();
 
 
 	/**
-	 * Content delete - Processor
+	 * Content delete - Processor.
 	 * This method DOES NOT "delete" anything, it justs preps the data for servicing!!!
 	 *
-	 * @return   mixed   (boolean) TRUE on success; (boolean) FALSE or (array) fault-code-message otherwise
+	 * @return   mixed   (boolean) TRUE on success; (boolean) FALSE or (array) fault-code-message otherwise.
 	 */
 	abstract public function delete__do_process ();
 
@@ -63,17 +63,19 @@ abstract class Data_Processor
 	/**
 	 * Validates incoming new DDL creation request
 	 *
-	 * @param   array      Clean input via POST
-	 * @param   array      Module info
-	 * @return  boolean    TRUE on success, FALSE otherwise
+	 * @param   array      Clean input via POST.
+	 * @param   array      Module info.
+	 * @param   array      Validated DDL-configuration. Used on return. Defaults to empty array.
+	 * @param   array      Array of errors occured. Used on return. Defaults to empty array.
+	 * @return  boolean    TRUE on success, FALSE otherwise.
 	 */
-	abstract public function modules__ddl__do_validate( &$input, &$m );
+	abstract public function modules__ddl__do_validate( &$input , &$m , &$ddl_config__validated , &$faults );
 
 	/**
-	 * Checks whether the chosen data-field is eligible to be a Title-field or not
+	 * Checks whether the chosen data-field is eligible to be a Title-field or not.
 	 *
-	 * @param    array     DDL-information of the field
-	 * @return   boolean   TRUE if yes, FALSE otherwise
+	 * @param    array     DDL-information of the field.
+	 * @return   boolean   TRUE if yes, FALSE otherwise.
 	 */
 	abstract public function modules__ddl__is_eligible_for_title ( &$ddl_information );
 }

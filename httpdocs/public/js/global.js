@@ -366,9 +366,9 @@ Persephone.prototype.Form = {
 	/**
 	 * Hides all .ondemand elements
 	 *
-	 * @param string
+	 * @param {String}
 	 *            Optional: What to exclude (DOM elements)
-	 * @return boolean TRUE on success, FALSE otherwise
+	 * @return {Boolean} TRUE on success, FALSE otherwise
 	 * @uses jQuery
 	 */
 	resetOnDemandObjects : function ( exceptions )
@@ -396,10 +396,12 @@ Persephone.prototype.Form = {
 		{
 			_obj = _obj.not(exceptions);
 		}
-		_obj.hide();
 
 		/* Disable form elements within those containers */
 		_obj.find("INPUT,TEXTAREA,BUTTON,SELECT").attr("disabled","disabled");
+
+		/* Hide the container(s) [fieldsets] */
+		_obj.hide();
 
 		return true;
 	},
@@ -409,7 +411,7 @@ Persephone.prototype.Form = {
 	 *
 	 * @param jQuery
 	 *            Requested object
-	 * @return boolean TRUE on success, FALSE otherwise
+	 * @return {Boolean} TRUE on success, FALSE otherwise
 	 * @uses jQuery
 	 */
 	enableOnDemandElement : function ( obj )
@@ -425,11 +427,11 @@ Persephone.prototype.Form = {
 			obj = jQuery(obj);
 		}
 
-		/* First enable the disabled form elements within the container(s) [fieldsets] */
-		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").attr("disabled","");
-
-		/* Then show those containers */
+		/* First show those containers */
 		obj.show();
+
+		/* Then enable the disabled form elements within the container(s) [fieldsets] */
+		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").removeAttr("disabled");
 
 		return true;
 	},
@@ -439,7 +441,7 @@ Persephone.prototype.Form = {
 	 *
 	 * @param jQuery
 	 *            Requested object
-	 * @return boolean TRUE on success, FALSE otherwise
+	 * @return {Boolean} TRUE on success, FALSE otherwise
 	 * @uses jQuery
 	 */
 	resetOnDemandElement : function ( obj )
@@ -455,11 +457,11 @@ Persephone.prototype.Form = {
 			obj = jQuery(obj);
 		}
 
-		/* First hide the container(s) [fieldsets] */
-		obj.hide();
-
-		/* Then disable the form elements within those containers */
+		/* First disable the form elements within those containers */
 		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").attr("disabled","disabled");
+
+		/* Then hide the container(s) [fieldsets] */
+		obj.hide();
 
 		return true;
 	},
@@ -481,6 +483,7 @@ Persephone.prototype.Form = {
 			obj = obj.replace("&#34;", "\"");
 			obj = obj.replace("&#39;", "'");
 			obj = obj.replace("&#33;", "!");
+			obj = obj.replace("&#36;", "$");
 			obj = obj.replace("&#46;&#46;/", "../");
 			obj = obj.replace("&lt;", "<");
 			obj = obj.replace("&gt;", ">");
@@ -742,6 +745,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 				axis : 'y',
 				// containment: 'parent',
 				cursor : 'move',
+				delay : 300,
 				helper : function ( e , tr )
 				{
 					var _originals = tr.children();

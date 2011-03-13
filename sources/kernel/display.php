@@ -480,8 +480,6 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 
 		if
 		(
-			! $total_nr_of_items >= 1
-			or
 			! $current_page >= 1
 			or
 			! $nr_of_items_per_page >= 1
@@ -497,12 +495,24 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		//---------------
 
 		# Total number of pages
-		$total_nr_of_pages =
-			$total_nr_of_items % $nr_of_items_per_page == 0
-			?
-			floor( $total_nr_of_items / $nr_of_items_per_page )
-			:
-			ceil( $total_nr_of_items / $nr_of_items_per_page );
+		$total_nr_of_pages = 1;
+		if ( $total_nr_of_items % $nr_of_items_per_page == 0 )
+		{
+			if ( ( $_total_nr_of_pages = $total_nr_of_items / $nr_of_items_per_page ) != 0 )
+			{
+				$total_nr_of_pages = floor( $_total_nr_of_pages );
+				unset( $_total_nr_of_pages );
+			}
+			else
+			{
+				// Blind-spot: Do nothing here, $total_nr_of_pages = 1 already :)
+			}
+		}
+		else
+		{
+			$total_nr_of_pages = ceil( $total_nr_of_items / $nr_of_items_per_page );
+		}
+
 
 		# Is left, or right side off-the-range?
 		$_left_side_is_off_range = false;
@@ -693,10 +703,10 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		$this->smarty->right_delimiter        = '}}';
 
 		# Smarty Dirs
-		$this->smarty->template_dir           = PATH_ROOT_VHOST . "/templates/"  . $skin['set_id'] . "/templates";
-		$this->smarty->compile_dir            = PATH_ROOT_VHOST . "/templates/"  . $skin['set_id'] . "/templates_c";
-		$this->smarty->config_dir             = PATH_ROOT_VHOST . "/templates/"  . $skin['set_id'] . "/config";
-		$this->smarty->cache_dir              = PATH_ROOT_VHOST . "/templates/"  . $skin['set_id'] . "/cache";
+		$this->smarty->template_dir           = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates";
+		$this->smarty->compile_dir            = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates_c";
+		$this->smarty->config_dir             = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/config";
+		$this->smarty->cache_dir              = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/cache";
 
 		# Skin URLs
 		$this->smarty->style_url              = array(
@@ -826,7 +836,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		//-------------------------------------------------------
 
 		# TOTAL_NR_OF_ITEMS [required]
-		if ( ! isset( $params['total_nr_of_items'] ) or ! $params['total_nr_of_items'] >= 1 )
+		if ( ! isset( $params['total_nr_of_items'] ) )
 		{
 			throw new Exception ("Display Engine: Missing argument - \$total_nr_of_items");
 			return false;

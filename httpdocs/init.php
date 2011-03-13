@@ -23,6 +23,7 @@ define( 'MAGIC_QUOTES_GPC_ON'  , get_magic_quotes_gpc()        ? 1 : 0 );
 # Paths
 define( "PATH_ROOT_WEB"     , str_replace( "\\", "\/", getenv( "DOCUMENT_ROOT" ) )   );   # Compat: For Windows Environments
 define( "PATH_ROOT_VHOST"   , dirname( PATH_ROOT_WEB )                    );
+define( "PATH_CACHE"        , PATH_ROOT_VHOST . "/cache"                  );
 define( "PATH_DATA"         , PATH_ROOT_VHOST . "/data"                   );
 define( "PATH_LOGS"         , PATH_ROOT_VHOST . "/logs"                   );
 define( "PATH_SOURCES"      , PATH_ROOT_VHOST . "/sources"                );

@@ -37,12 +37,6 @@ class Data_Processor__File extends Data_Processor
 	public $data;
 
 	/**
-	 * Validated DDL configuration [ACP > COMPONENTS > DDL management]
-	 * @var array
-	 */
-	public $ddl_config__validated = array();
-
-	/**
 	 * Image library the script uses - Imagick or GD
 	 * @var string
 	 */
@@ -241,59 +235,15 @@ class Data_Processor__File extends Data_Processor
 	/**
 	 * Validates incoming new DDL creation request
 	 *
-	 * @see Data_Processor::modules__ddl__do_validate()
-	 * @param   array      Clean input via POST
-	 * @param   array      Module info
-	 * @return  boolean    TRUE on success, FALSE otherwise
+	 * @param   array      Clean input via POST.
+	 * @param   array      Module info.
+	 * @param   array      Validated DDL-configuration. Used on return. Defaults to empty array.
+	 * @param   array      Array of errors occured. Used on return. Defaults to empty array.
+	 * @return  boolean    TRUE on success, FALSE otherwise.
 	 */
-	public function modules__ddl__do_validate ( &$input, &$m )
+	public function modules__ddl__do_validate ( &$input , &$m , &$ddl_config__validated = array() , &$faults = array() )
 	{
-		$this->faults = array();
-		$this->ddl_config__validated = array();
-
-		//---------------------------------------------------------------
-		// Parameters of less importance : Name, Label, "Is Required?"
-		//---------------------------------------------------------------
-
-		$_list_of_reserved_names = array( "id" , "tags" , "timestamp" , "submitted_by" , "status_published" , "status_locked" );
-		$dft_name         =  strtolower( $input['name'] );
-		$dft_label        =  $input['label'];
-		$dft_is_required  =  $input['is_required'] ? 1 : 0;
-
-		# Clean-up
-		if ( empty( $dft_name ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_REQUIRED" );
-			// "<em>Field Name</em> is a required field!"
-		}
-		elseif ( in_array( $dft_name, $_list_of_reserved_names ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_A_RESERVED_KEYWORD" );
-			// "<em>Field Name</em> cannot have one of the following reserved values - change your entry:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_list_of_reserved_names ) .  "</em>"
-		}
-		elseif ( ! preg_match( "#^[a-z][a-z0-9_]+$#" , $dft_name ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_INVALID" );
-			// "<em>Field Name</em> must contain only a lowercase alphanumeric and underscore characters, and must not start with any numerical!"
-		}
-		elseif ( array_key_exists( $dft_name, $m['m_data_definition'] ) or array_key_exists( $dft_name, $m['m_data_definition_bak'] ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__NOT_AVAILABLE" );
-			// "<em>Field Name</em> not available; either already registered, or exists in backups!"
-		}
-		if ( empty( $dft_label ) )
-		{
-			$this->faults[] = array( 'faultCode' => 702, 'faultMessage' => "LABEL__IS_REQUIRED" );
-			// "<em>Field Label</em> is a required field!"
-		}
-
-		//------------------------------------------------------------------
-		// Parameters of great importance (from security point of view) :
-		// Maxlength, Regex, Default Options and Value, Unique-ness
-		//------------------------------------------------------------------
-
 		# SKELETON
-
 		$skel = array(
 				'image'                    =>  array(
 						'title'                =>  "image",
@@ -365,7 +315,7 @@ class Data_Processor__File extends Data_Processor
 
 		if ( ! array_key_exists( $_skel_subtype_key, $skel ) )
 		{
-			$this->faults[] = array( 'faultCode' => 706, 'faultMessage' => "SUBTYPE__IS_INVALID" );
+			$faults[] = array( 'faultCode' => 706, 'faultMessage' => "SUBTYPE__IS_INVALID" );
 			// "No such data-subtype is defined: <em>" . $input[ $_form_field_name ] . "</em> (for data-type: <em>file</em>)!"
 		}
 		else
@@ -377,9 +327,9 @@ class Data_Processor__File extends Data_Processor
 
 
 		# Return of Critical Faults - Level 1
-		if ( count( $this->faults ) )
+		if ( count( $faults ) )
 		{
-			return false;
+			return $faults;
 		}
 
 		# ALLOWED-FILETYPES: Validation...
@@ -391,7 +341,7 @@ class Data_Processor__File extends Data_Processor
 			{
 				if ( ! array_key_exists( $_ft, $_mimelist_cache['by_ext'] ) )
 				{
-					$this->faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_INVALID" );
+					$faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_INVALID" );
 					// "One or more of the selected file-types appear to be invalid! Please try again for possible configuration updates..."
 					continue;
 				}
@@ -400,7 +350,7 @@ class Data_Processor__File extends Data_Processor
 		}
 		else
 		{
-			$this->faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_REQUIRED" );
+			$faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_REQUIRED" );
 			// &quot;Allowed File-types&quot; is a required field.
 		}
 
@@ -411,7 +361,7 @@ class Data_Processor__File extends Data_Processor
 		{
 			if ( false === $dft_maxlength = $this->API->Input->file__filesize__do_parse( $input['maxlength'] ) )
 			{
-				$this->faults[] = array( 'faultCode' => 709, 'faultMessage' => "MAXFILESIZE__INVALID_SYNTAX" );
+				$faults[] = array( 'faultCode' => 709, 'faultMessage' => "MAXFILESIZE__INVALID_SYNTAX" );
 				// Invalid syntax for &quot;Maximum Filesize&quot; field! At least, enter &quot;0&quot; to disable the setting.
 			}
 		}
@@ -435,9 +385,9 @@ class Data_Processor__File extends Data_Processor
 		// Errors?
 		//-----------
 
-		if ( count( $this->faults ) )
+		if ( count( $faults ) )
 		{
-			return false;
+			return $faults;
 		}
 
 		//--------------------------------------------------------------
@@ -445,17 +395,17 @@ class Data_Processor__File extends Data_Processor
 		// Updating Module-records and Altering Module content-tables
 		//--------------------------------------------------------------
 
-		$this->ddl_config__validated = array(
-				'm_unique_id'          =>  $m['m_unique_id'],
-				'name'                 =>  $dft_name,
-				'label'                =>  $dft_label,
-				'type'                 =>  "file",
-				'subtype'              =>  $dft_subtype,
-				'allowed_filetypes'    =>  $dft_allowed_filetypes,
-				'maxlength'            =>  $dft_maxlength,
-				'connector_enabled'    =>  $dft_connector_enabled,
-				'connector_length_cap' =>  $dft_connector_length_cap,
-				'is_required'          =>  $dft_is_required,
+		$ddl_config__validated = array_merge(
+				$ddl_config__validated,
+				array(
+						'm_unique_id'          =>  $m['m_unique_id'],
+						'type'                 =>  "file",
+						'subtype'              =>  $dft_subtype,
+						'allowed_filetypes'    =>  $dft_allowed_filetypes,
+						'maxlength'            =>  $dft_maxlength,
+						'connector_enabled'    =>  $dft_connector_enabled,
+						'connector_length_cap' =>  $dft_connector_length_cap,
+					)
 			);
 
 		return true;
@@ -569,7 +519,7 @@ class Data_Processor__File extends Data_Processor
 
 		# _f_location, _f_dirname - Folder the file is residing
 		$file_info['_f_location'] =
-			PATH_ROOT_VHOST . "/data/"
+			PATH_DATA . "/"
 			. ( $file_info['_f_dirname'] = "monthly_for_" . date( "Y_m", $file_info['f_timestamp'] ) )
 			. "/" . $file_info['f_hash'] . "." . $file_info['f_extension'];
 		if ( file_exists( $file_info['_f_location'] ) and is_file( $file_info['_f_location'] ) )
@@ -811,7 +761,7 @@ class Data_Processor__File extends Data_Processor
 
 		if ( ! $file_resource['_diagnostics']['file_exists'] )
 		{
-			$this->logger__do_log( "Media ['" . $file_resource['_f_location'] . "'] not exists or inaccessible!" , "ERROR" );
+			$this->API->logger__do_log( "Media ['" . $file_resource['_f_location'] . "'] not exists or inaccessible!" , "ERROR" );
 			return false;
 		}
 
@@ -821,7 +771,7 @@ class Data_Processor__File extends Data_Processor
 
 		if ( $file_resource['_f_type'] != 'image' )
 		{
-			$this->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
+			$this->API->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
 			return false;
 		}
 
@@ -903,7 +853,7 @@ class Data_Processor__File extends Data_Processor
 
 		if ( $file_resource['_f_type'] != 'image' )
 		{
-			$this->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
+			$this->API->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
 			return false;
 		}
 

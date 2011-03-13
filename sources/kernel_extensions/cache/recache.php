@@ -478,8 +478,29 @@ class Recache
 											$row__['e_data_definition'] = $__e_data_definition;
 										}
 
-										$row_['c_data_definition'][ $row__['name'] ] = $row__;
-										$_m_data_definition_merged[ $row_['name'] . ucwords( $row__['name'] ) ] = $row__;
+										# The rest...
+										if ( ! empty( $row__['default_options'] ) )
+										{
+											$row__['default_options'] = unserialize( $row__['default_options'] );
+										}
+										if ( empty( $row__['request_regex'] ) or is_null( $row__['request_regex'] ) )
+										{
+											$row__['request_regex'] = FALSE;
+										}
+										if ( empty( $row__['input_regex'] ) or is_null( $row__['input_regex'] ) )
+										{
+											$row__['input_regex'] = FALSE;
+										}
+										if ( ! $row__['is_backup'] )
+										{
+											$row_['c_data_definition'][ $row__['name'] ] = $row__;
+										}
+										else
+										{
+											$row_['c_data_definition_bak'][ $row__['name'] ] = $row__;
+										}
+
+										// $_m_data_definition_merged[ $row_['name'] . ucwords( $row__['name'] ) ] = $row__;
 									}
 								}
 							}
@@ -494,6 +515,11 @@ class Recache
 								$row_['e_data_definition'] = $_e_data_definition;
 							}
 
+							# The rest...
+							if ( ! empty( $row_['default_options'] ) )
+							{
+								$row_['default_options'] = unserialize( $row_['default_options'] );
+							}
 							if ( empty( $row_['request_regex'] ) or is_null( $row_['request_regex'] ) )
 							{
 								$row_['request_regex'] = FALSE;

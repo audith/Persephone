@@ -1,29 +1,29 @@
 <samp id="system_console" class="full_size"></samp>
 <ul class="data_container full_size">
 	<li id="components__ddl__alter_add" class="ondemand">
-		<h2 class="full_size">Data Definition Management - Create New
+		<h2 class="full_size">Data Definition Management
 			<span class="description"></span>
 		</h2>
 		<form id="forms__components__ddl__alter_add" action="" method="post" class="js__go_ajax">
 			<fieldset class="name onload">
-				<label title="Field Name" for="register__name"><strong>Field Name:</strong><em>Alphanumeric + underscore chars only, in format: ^[a-z][a-z0-9_]*$ meaning first letter can't be numeric.</em></label>
-				<input type="text" class="text required _701" id="register__name" name="name" value="" maxlength="64" style="text-transform: lowercase;" />
+				<label title="Field Name" for="name"><strong>Field Name:</strong><em>Alphanumeric + underscore chars only, in format: ^[a-z][a-z0-9_]*$ meaning first letter can't be numeric.</em></label>
+				<input type="text" class="text required _701" id="name" name="name" value="" maxlength="64" style="text-transform: lowercase;" />
 			</fieldset>
 			<fieldset class="label onload">
-				<label title="Field Label" for="register__label"><strong>Field Label:</strong><em>A form-label [e.g. &quot;Article heading&quot;, &quot;Hotel name&quot; etc]. It will be used in the front-end content management interface. <b>Alphanumeric + underscore chars only!</b></em></label>
-				<input type="text" class="text required _702" id="register__label" name="label" value="" maxlength="64" />
+				<label title="Field Label" for="label"><strong>Field Label:</strong><em>A form-label [e.g. &quot;Article heading&quot;, &quot;Hotel name&quot; etc]. It will be used in the front-end content management interface. <b>Alphanumeric + underscore chars only!</b></em></label>
+				<input type="text" class="text required _702" id="label" name="label" value="" maxlength="64" />
 			</fieldset>
 			<fieldset class="type">
-				<label title="Data-Type" for="register__type"><strong>Data-Type:</strong><em>Select one from the list.</em></label>
-				<select class="required js__trigger_on_change _703" id="register__type" name="type">
+				<label title="Data-Type" for="type"><strong>Data-Type:</strong><em>Select one from the list.</em></label>
+				<select class="required js__trigger_on_change _703" id="type" name="type">
 					<option value="alphanumeric">Alphanumeric</option>
 					<option value="file">File</option>
 					<option value="link">Link with other module</option>
 				</select>
 			</fieldset>
 			<fieldset class="links_with ondemand">
-				<label title="Link with ..." for="register__links_with"><strong>Link with ...</strong><em>Links this module with some other module.</em></label>
-				<select name="links_with" id="register__links_with" class="js__trigger_on_change _704">
+				<label title="Link with ..." for="links_with"><strong>Link with ...</strong><em>Links this module with some other module.</em></label>
+				<select name="links_with" id="links_with" class="js__trigger_on_change _704">
 					<option value="">-- select a module --</option>
 					{{foreach from=$CONTENT.others item=MODULE}}
 					{{if $MODULE.m_type neq 'built-in'}}
@@ -33,34 +33,34 @@
 				</select>
 			</fieldset>
 			<fieldset class="links_with__e_data_definition ondemand">
-				<label title="Link via ..." for="register__links_with__e_data_definition"><strong>Link via ...</strong><em>Using CTRL (CMD on Mac) key, select one or more data-fields to fetch a data from.</em></label>
-				<select class="required _705" id="register__links_with__e_data_definition" name="links_with__e_data_definition[]" multiple="multiple" size="5">
+				<label title="Link via ..." for="links_with__e_data_definition"><strong>Link via ...</strong><em>Using CTRL (CMD on Mac) key, select one or more data-fields to fetch a data from.</em></label>
+				<select class="required _705" id="links_with__e_data_definition" name="links_with__e_data_definition[]" multiple="multiple" size="5">
 					<option></option>
 				</select>
 			</fieldset>
 			<fieldset class="subtype ondemand">
-				<label title="Data-Subtype" for="register__subtype"><strong>Data-Subtype:</strong><em>Select one from the list.</em></label>
-				<select class="required js__trigger_on_change _706" id="register__subtype" name="subtype">
+				<label title="Data-Subtype" for="subtype"><strong>Data-Subtype:</strong><em>Select one from the list.</em></label>
+				<select class="required js__trigger_on_change _706" id="subtype" name="subtype">
 					<option></option>
 				</select>
 			</fieldset>
 			<fieldset class="allowed_filetypes ondemand">
-				<label title="Allowed File-types" for="register__allowed_filetypes"><strong>Allowed File-types:</strong><em>The list of file-types allowed for file-uploads.</em></label>
-				<select class="required _707" id="register__allowed_filetypes" name="allowed_filetypes[]" multiple="multiple" size="5">
+				<label title="Allowed File-types" for="allowed_filetypes"><strong>Allowed File-types:</strong><em>The list of file-types allowed for file-uploads.</em></label>
+				<select class="required _707" id="allowed_filetypes" name="allowed_filetypes[]" multiple="multiple" size="5">
 					<option></option>
 				</select>
 			</fieldset>
 			<fieldset class="default_options ondemand">
-				<label title="Default Options" for="register__default_options"><strong>Default Options:</strong><em>'<b><i>key</i></b>'='<b><i>value</i></b>' pairs, in sets, one set per line; e.g.:<br />'m=Male<br />f=Female<br />u=Not Telling'<br />'<i><b>key</b></i>'s can only contain alphanumeric, underscore (_) and dash (-).</em></label>
-				<textarea class="required _708" name="default_options" id="register__default_options" style="height: 80px" cols="" rows=""></textarea>
+				<label title="Default Options" for="default_options"><strong>Default Options:</strong><em>'<b><i>key</i></b>'='<b><i>value</i></b>' pairs, one per line; e.g.:<br />'m=Male<br />f=Female<br />u=Not Telling'<br />'<i><b>key</b></i>'s can only contain alphanumeric, underscore (_) and dash (-).</em></label>
+				<textarea class="required _708" name="default_options" id="default_options" style="height: 80px" cols="" rows=""></textarea>
 			</fieldset>
 			<fieldset class="maxlength ondemand">
-				<label title="" for="register__maxlength"><strong></strong><em></em></label>
-				<input type="text" class="text _709" id="register__maxlength" name="maxlength" value="" />
+				<label title="" for="maxlength"><strong></strong><em></em></label>
+				<input type="text" class="text _709" id="maxlength" name="maxlength" value="" />
 			</fieldset>
 			<fieldset class="default_value ondemand">
-				<label title="Default Value" for="register__default_value"><strong>Default Value:</strong><em>Default value(s) (more than one for '<b><i>Multiple Select</i></b>'). Separate multiple values with comma or space. Leave empty for no defaults.</em></label>
-				<input type="text" class="text _710" id="register__default_value" name="default_value" value="" />
+				<label title="Default Value" for="default_value"><strong>Default Value:</strong><em>Default value(s) (more than one for '<b><i>Multiple Select</i></b>'). Separate multiple values with comma or space. Leave empty for no defaults.</em></label>
+				<input type="text" class="text _710" id="default_value" name="default_value" value="" />
 			</fieldset>
 			<fieldset class="connector_enabled ondemand">
 				<label title="Enable Connector?"><strong>Enable Connector?</strong><em>Whether to enable Connector feature (multiple entries for this field, per row), or not.</em></label>
@@ -72,8 +72,8 @@
 				</span>
 			</fieldset>
 			<fieldset class="connector_length_cap ondemand">
-				<label title="Maximum Number of Items" for="register__connector_length_cap"><strong>Maximum Number of Items:</strong><em>Maximum number of items allowed. Enter &quot;0&quot; to disable this restriction.</em></label>
-				<input type="text" class="text" id="register__connector_length_cap" name="connector_length_cap" value="0" />
+				<label title="Maximum Number of Items" for="connector_length_cap"><strong>Maximum Number of Items:</strong><em>Maximum number of items allowed. Enter &quot;0&quot; to disable this restriction.</em></label>
+				<input type="text" class="text" id="connector_length_cap" name="connector_length_cap" value="0" />
 			</fieldset>
 			<fieldset class="is_html_allowed ondemand">
 				<label title="Allow HTML Input?"><strong>Allow HTML Input?</strong><em>Whether to allow HTML input in this field or not.<br />Works for <i>String</i> sub-types and only when Max-Length&gt;255.</em></label>
@@ -106,8 +106,9 @@
 			<div class="system_console"></div>
 			<fieldset class="buttons">
 				<input type="hidden" name="do" value="ddl_alter__add" />
+				<input type="hidden" name="name__old" value="" />
 				<input type="hidden" name="m_unique_id" value="{{$CONTENT.me.m_unique_id}}" />
-				<input type="submit" value="Register a Data-Field" />
+				<input type="submit" value="Register New Data-field" />
 				<input type="reset" value="Clear Form" />
 				<input type="button" value="Cancel &amp; Close Form" />
 			</fieldset>
@@ -352,7 +353,7 @@
 		</h2>
 
 		<form id="forms__components__ddl__list" class="js__go_ajax" method="post" action="">
-		<table class="full_size" id="tables__components__ddl__list"{{if count($CONTENT.me.m_data_definition)}} class="tablesorter {sortlist: [[0,0]]}"{{/if}}>
+		<table class="full_size{{if count($CONTENT.me.m_data_definition)}} tablesorter {sortlist: [[0,0]]}{{/if}}" id="tables__components__ddl__list">
 			<thead>
 				<tr>
 					<th style="width:7%; white-space:nowrap;">Pos.</th>

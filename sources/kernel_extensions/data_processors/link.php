@@ -37,12 +37,6 @@ class Data_Processor__Link extends Data_Processor
 	public $data;
 
 	/**
-	 * Validated DDL configuration [ACP > COMPONENTS > DDL management]
-	 * @var array
-	 */
-	public $ddl_config__validated = array();
-
-	/**
 	 * Image library the script uses - Imagick or GD
 	 * @var string
 	 */
@@ -115,61 +109,23 @@ class Data_Processor__Link extends Data_Processor
 	/**
 	 * Validates incoming new DDL creation request
 	 *
-	 * @see Data_Processor::modules__ddl__do_validate()
-	 * @param   array      Clean input via POST
-	 * @param   array      Module info
-	 * @return  boolean    TRUE on success, FALSE otherwise
+	 * @param   array      Clean input via POST.
+	 * @param   array      Module info.
+	 * @param   array      Validated DDL-configuration. Used on return. Defaults to empty array.
+	 * @param   array      Array of errors occured. Used on return. Defaults to empty array.
+	 * @return  boolean    TRUE on success, FALSE otherwise.
 	 */
-	public function modules__ddl__do_validate ( &$input, &$m )
+	public function modules__ddl__do_validate ( &$input , &$m , &$ddl_config__validated = array() , &$faults = array() )
 	{
-		$this->faults = array();
-		$this->ddl_config__validated = array();
-
-		//---------------------------------------------------------------
-		// Parameters of less importance : Name, Label, "Is Required?"
-		//---------------------------------------------------------------
-
-		$_list_of_reserved_names = array( "id" , "tags" , "timestamp" , "submitted_by" , "status_published" , "status_locked" );
-		$dft_name         =  strtolower( $input['name'] );
-		$dft_label        =  $input['label'];
-		$dft_is_required  =  $input['is_required'] ? 1 : 0;
-
-		# Clean-up
-		if ( empty( $dft_name ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_REQUIRED" );
-			// "<em>Field Name</em> is a required field!"
-		}
-		elseif ( in_array( $dft_name, $_list_of_reserved_names ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_A_RESERVED_KEYWORD" );
-			// "<em>Field Name</em> cannot have one of the following reserved values - change your entry:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_list_of_reserved_names ) .  "</em>"
-		}
-		elseif ( ! preg_match( "#^[a-z][a-z0-9_]+$#" , $dft_name ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_INVALID" );
-			// "<em>Field Name</em> must contain only a lowercase alphanumeric and underscore characters, and must not start with any numerical!"
-		}
-		elseif ( array_key_exists( $dft_name, $m['m_data_definition'] ) or array_key_exists( $dft_name, $m['m_data_definition_bak'] ) )
-		{
-			$this->faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__NOT_AVAILABLE" );
-			// "<em>Field Name</em> not available; either already registered, or exists in backups!"
-		}
-		if ( empty( $dft_label ) )
-		{
-			$this->faults[] = array( 'faultCode' => 702, 'faultMessage' => "LABEL__IS_REQUIRED" );
-			// "<em>Field Label</em> is a required field!"
-		}
-
-		//------------------------------
-		// Continue... - 'links_with'
-		//------------------------------
+		//---------------------------
+		// Validation & Processing
+		//---------------------------
 
 		# Module name
 		if ( empty( $input['links_with'] ) )
 		{
-			$this->faults[] = array( 'faultCode' => 704 , 'faultMessage' => "MODULE_NAME__IS_REQUIRED" );
-			return false;
+			$faults[] = array( 'faultCode' => 704 , 'faultMessage' => "MODULE_NAME__IS_REQUIRED" );
+			return $faults;
 		}
 
 		if ( preg_match( '/^[0-9a-z]{32}$/i' , $input['links_with'] ) )
@@ -178,8 +134,8 @@ class Data_Processor__Link extends Data_Processor
 		}
 		if ( ! array_key_exists( $input['links_with'] , $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$this->faults[] = array( 'faultCode' => 704 , 'faultMessage' => "MODULE_NAME__IS_INVALID" );
-			return false;
+			$faults[] = array( 'faultCode' => 704 , 'faultMessage' => "MODULE_NAME__IS_INVALID" );
+			return $faults;
 		}
 		$l =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['links_with'] ];
 
@@ -193,8 +149,8 @@ class Data_Processor__Link extends Data_Processor
 
 		if ( empty( $input['links_with__e_data_definition'] ) )
 		{
-			$this->faults[] = array( 'faultCode' => 705 , 'faultMessage' => "E_DATA_DEFINITION__IS_REQUIRED" );
-			return false;
+			$faults[] = array( 'faultCode' => 705 , 'faultMessage' => "E_DATA_DEFINITION__IS_REQUIRED" );
+			return $faults;
 		}
 
 		foreach ( $input['links_with__e_data_definition'] as $_f )
@@ -230,22 +186,22 @@ class Data_Processor__Link extends Data_Processor
 
 		if ( count( $_list_of_corrupt_fields ) )
 		{
-			$this->faults[] = array( 'faultCode' => 705 , 'faultMessage' => "Fatal error! Invalid data-definition structure detected! Please inform the admin about the situation and DO NOT continue with what were you doing!!! Problematic fields are as follows:<br /><i>" . implode( ", " , $_list_of_corrupt_fields ) . "</i>" );
+			$faults[] = array( 'faultCode' => 705 , 'faultMessage' => "Fatal error! Invalid data-definition structure detected! Please inform the admin about the situation and DO NOT continue with what were you doing!!! Problematic fields are as follows:<br /><i>" . implode( ", " , $_list_of_corrupt_fields ) . "</i>" );
 		}
 
 		if ( count( $_list_of_fields_with_nonlinked_connectors ) )
 		{
-			$this->faults[] = array( 'faultCode' => 705 , 'faultMessage' => "Invalid data-definition provided for external linking! The connectors for the following fields you provided, are not linked:<br /><i>" . implode( ", " , $_list_of_fields_with_nonlinked_connectors ) . "</i>" );
+			$faults[] = array( 'faultCode' => 705 , 'faultMessage' => "Invalid data-definition provided for external linking! The connectors for the following fields you provided, are not linked:<br /><i>" . implode( ", " , $_list_of_fields_with_nonlinked_connectors ) . "</i>" );
 		}
 
 		if ( count( $_list_of_inexistent_fields ) )
 		{
-			$this->faults[] = array( 'faultCode' => 705 , 'faultMessage' => "Invalid data-definition provided for external linking! Module '" . $l['m_name'] . "' does not have following DDL-components:<br /><i>" . implode( ", ", $_list_of_inexistent_fields ) . "</i>" );
+			$faults[] = array( 'faultCode' => 705 , 'faultMessage' => "Invalid data-definition provided for external linking! Module '" . $l['m_name'] . "' does not have following DDL-components:<br /><i>" . implode( ", ", $_list_of_inexistent_fields ) . "</i>" );
 		}
 
-		if ( count( $this->faults ) )
+		if ( count( $faults ) )
 		{
-			return false;
+			return $faults;
 		}
 
 		//--------------------------------------------------------------
@@ -253,18 +209,21 @@ class Data_Processor__Link extends Data_Processor
 		// Updating Module-records and Altering Module content-tables
 		//--------------------------------------------------------------
 
-		$this->ddl_config__validated = array(
-				'm_unique_id'          =>  $m['m_unique_id'],
-				'name'                 =>  $dft_name,
-				'label'                =>  $dft_label,
-				'type'                 =>  "link",
-				'maxlength'            =>  10,
-				'request_regex'        =>  '\d{1,10}',
-				'input_regex'          =>  '\d{1,10}',
-				'is_required'          =>  $dft_is_required,
-				'is_unique'            =>  $input['is_unique'] ? 1 : 0,
-				'is_numeric'           =>  1,
-				'e_data_definition'    =>  $input['links_with'] . "\n" . implode( "\n" , $input['links_with__e_data_definition'] ),
+		$ddl_config__validated = array_merge(
+				$ddl_config__validated,
+				array(
+						'm_unique_id'          =>  $m['m_unique_id'],
+						'name'                 =>  $dft_name,
+						'label'                =>  $dft_label,
+						'type'                 =>  "link",
+						'maxlength'            =>  10,
+						'request_regex'        =>  '\d{1,10}',
+						'input_regex'          =>  '\d{1,10}',
+						'is_required'          =>  $dft_is_required,
+						'is_unique'            =>  $input['is_unique'] ? 1 : 0,
+						'is_numeric'           =>  1,
+						'e_data_definition'    =>  $input['links_with'] . "\n" . implode( "\n" , $input['links_with__e_data_definition'] ),
+					)
 			);
 
 		return true;

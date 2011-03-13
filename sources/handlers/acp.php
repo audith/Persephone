@@ -1,5 +1,5 @@
 <?php
-if ( ! defined( "INIT_DONE" ) )
+if ( !defined( "INIT_DONE" ) )
 {
 	print "Improper access! Exiting now...";
 	exit();
@@ -63,7 +63,7 @@ class Module_Handler
 		// Prelim
 		//-----------
     	$this->API = $API;
-    	if ( ! defined( "ACCESS_TO_AREA" ) )
+    	if ( !defined( "ACCESS_TO_AREA" ) )
     	{
     		define( "ACCESS_TO_AREA" , "admin" );
     	}
@@ -257,7 +257,8 @@ class Module_Handler
 							'remove_subroutine'                    => "modules__subroutines__do_remove",
 							'ddl_alter__add'                       => "modules__ddl__do_create",
 							'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
-							'ddl_alter__edit'                      => "modules__ddl__do_edit__pre_processing",
+							'ddl_alter__pre_edit'                  => "modules__ddl__do_edit__pre_processing",
+							'ddl_alter__edit'                      => "modules__ddl__do_edit",
 							'ddl_alter__sort'                      => "modules__ddl__do_sort",
 							'ddl_alter__drop'                      => "modules__ddl__do_drop",
 							'ddl_alter__restore_backup'            => "modules__ddl__do_restore_backup",
@@ -282,9 +283,9 @@ class Module_Handler
 			);
 
 		if (
-			! isset( $this->processor_map[ $this->running_subroutine['s_name'] ] )
+			!isset( $this->processor_map[ $this->running_subroutine['s_name'] ] )
 			or
-			! isset( $this->processor_map[ $this->running_subroutine['s_name'] ][ $action ] )
+			!isset( $this->processor_map[ $this->running_subroutine['s_name'] ][ $action ] )
 		)
 		{
 			header( "HTTP/1.1 400 Bad Request" );
@@ -377,13 +378,13 @@ class Module_Handler
 							),
 					);
 				print "<br />\nV-SUCCESS: " . $_file_hash . " - " . $_f;
-				if ( ! $this->API->Db->simple_exec_query() )
+				if ( !$this->API->Db->simple_exec_query() )
 				{
 					echo "OOPS! goes for " . $_f;
 				}
 				else
 				{
-					if ( ! file_exists( $_dir_to_move_into = "monthly_for_" . date( "Y_m" , $_mtime ) ) or ! is_dir( $_dir_to_move_into ) )
+					if ( !file_exists( $_dir_to_move_into = "monthly_for_" . date( "Y_m" , $_mtime ) ) or ! is_dir( $_dir_to_move_into ) )
 					{
 						mkdir( $_dir_to_move_into );
 					}
@@ -411,13 +412,13 @@ class Module_Handler
 		// Preliminary stuff
 		//---------------------
 
-		if ( ! isset( $this->running_subroutine['request']['m_unique_id_clean'] ) or ! preg_match( '#^[a-z0-9]{32}$#' , $this->running_subroutine['request']['m_unique_id_clean'] ) )
+		if ( !isset( $this->running_subroutine['request']['m_unique_id_clean'] ) or !preg_match( '#^[a-z0-9]{32}$#' , $this->running_subroutine['request']['m_unique_id_clean'] ) )
 		{
 			return false;
 		}
 		$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 
-		if ( ! array_key_exists( $m_unique_id, $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $m_unique_id, $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return false;
 		}
@@ -450,7 +451,7 @@ class Module_Handler
 		$m['running_subroutine']['content']['count'] = count( $result );
 
 		# No content in this page? Redirect to page 1 then...
-		if ( ! $m['running_subroutine']['content']['count'] )
+		if ( !$m['running_subroutine']['content']['count'] )
 		{
 			return null;
 		}
@@ -505,7 +506,7 @@ class Module_Handler
 		// Is our cache content empty?
 		//-------------------------------
 
-		if ( ! is_array( $this->API->Cache->cache['modules'] ) or ! count( $this->API->Cache->cache['modules'] ) )
+		if ( !is_array( $this->API->Cache->cache['modules'] ) or !count( $this->API->Cache->cache['modules'] ) )
 		{
 			# Empty cache
 			$return = null;
@@ -526,7 +527,7 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__do_view ()
 	{
-		if ( isset( $this->running_subroutine['request']['m_unique_id_clean'] ) and ! empty( $this->running_subroutine['request']['m_unique_id_clean'] ) )
+		if ( isset( $this->running_subroutine['request']['m_unique_id_clean'] ) and !empty( $this->running_subroutine['request']['m_unique_id_clean'] ) )
 		{
 			$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 		}
@@ -572,7 +573,7 @@ class Module_Handler
 			$m =& $_parent_module_cache[ $input['m_unique_id'] ];
 			$c =& $_connector_modules_cache[ $input['connector_linked'] ];
 
-			if ( ! isset( $m['m_data_definition'][ $input['connected_field'] ] ) or $m['m_data_definition'][ $input['connected_field'] ]['connector_linked'] != $input['connector_linked'] )
+			if ( !isset( $m['m_data_definition'][ $input['connected_field'] ] ) or $m['m_data_definition'][ $input['connected_field'] ]['connector_linked'] != $input['connector_linked'] )
 			{
 				return array( array( 'faultCode' => 0, 'faultMessage' => "Fatal error! Inconsistency within the submitted data has been detected..." ) );
 			}
@@ -639,7 +640,7 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_sort ()
 	{
-		if ( ! isset( $this->API->Input->post['position'] ) or ! is_array( $this->API->Input->post['position'] ) or empty( $this->API->Input->post['position'] ) )
+		if ( !isset( $this->API->Input->post['position'] ) or !is_array( $this->API->Input->post['position'] ) or empty( $this->API->Input->post['position'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Empty data-set! Request aborted..." );
 		}
@@ -648,16 +649,16 @@ class Module_Handler
 		// Determine m_unique_id of Connector-Unit
 		//-------------------------------------------
 
-		if ( isset( $this->running_subroutine['request']['m_unique_id_clean'] ) and ! empty( $this->running_subroutine['request']['m_unique_id_clean'] ) )
+		if ( isset( $this->running_subroutine['request']['m_unique_id_clean'] ) and !empty( $this->running_subroutine['request']['m_unique_id_clean'] ) )
 		{
 			$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 		}
-		if ( ! array_key_exists( $m_unique_id , $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $m_unique_id , $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid parent (master) module provided! Request aborted..." );
 		}
 		$_m_cache_node =& $this->API->Cache->cache['modules']['by_unique_id'];
-		if ( ! isset( $_m_cache_node[ $m_unique_id ]['m_data_definition'][ $this->running_subroutine['request']['c_name'] ] ) )
+		if ( !isset( $_m_cache_node[ $m_unique_id ]['m_data_definition'][ $this->running_subroutine['request']['c_name'] ] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid connector provided! Request aborted..." );
 		}
@@ -725,14 +726,14 @@ class Module_Handler
 			$m =& $_parent_module_cache[ $input['m_unique_id'] ];
 			$c =& $_connector_modules_cache[ $input['connector_linked'] ];
 
-			if ( ! isset( $m['m_data_definition'][ $input['connected_field'] ] ) or $m['m_data_definition'][ $input['connected_field'] ]['connector_linked'] != $input['connector_linked'] )
+			if ( !isset( $m['m_data_definition'][ $input['connected_field'] ] ) or $m['m_data_definition'][ $input['connected_field'] ]['connector_linked'] != $input['connector_linked'] )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Fatal error! Inconsistency within the submitted data has been detected..." );
 			}
 
-			if ( ! isset( $input['ddl_checklist'] ) or ! is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
+			if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
 			{
-				if ( ! empty( $input['ddl_checklist'] ) )
+				if ( !empty( $input['ddl_checklist'] ) )
 				{
 					$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 				}
@@ -751,13 +752,13 @@ class Module_Handler
 			foreach ( $list_of_columns_to_process as $column_to_drop )
 			{
 				# Is it a valid field-name?
-				if ( ! array_key_exists( $column_to_drop , $c['m_data_definition'] ) )
+				if ( !array_key_exists( $column_to_drop , $c['m_data_definition'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "No such data-field ('<i>" . $column_to_drop . "</i>') exists withim DDL Repository!" );
 				}
 
 				# Is is 'used' by some subroutine
-				if ( isset( $c['m_data_definition'][ $column_to_drop ]['used_in'] ) and ! empty( $c['m_data_definition'][ $column_to_drop ]['used_in'] ) )
+				if ( isset( $c['m_data_definition'][ $column_to_drop ]['used_in'] ) and !empty( $c['m_data_definition'][ $column_to_drop ]['used_in'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "The selected data-field cannot be removed, as it's being used by one or more subroutines!" );
 				}
@@ -810,7 +811,7 @@ class Module_Handler
 						'col_info'  =>  $list_of_columns_to_process__translated
 					);
 			}
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (ALTER-MODULE-DDL) failed!" );
 			}
@@ -847,7 +848,7 @@ class Module_Handler
 							),
 					);
 			}
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-DDL-RECORD) failed!" );
 			}
@@ -884,9 +885,9 @@ class Module_Handler
 			$c =& $_connector_modules_cache[ $input['connector_linked'] ];
 
 			# Continue...
-			if ( ! isset( $input['ddl_checklist'] ) or ! is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
+			if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
 			{
-				if ( ! empty( $input['ddl_checklist'] ) )
+				if ( !empty( $input['ddl_checklist'] ) )
 				{
 					$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 				}
@@ -900,7 +901,7 @@ class Module_Handler
 			foreach ( $list_of_columns_to_process as $column_to_drop )
 			{
 				# Is it a valid field-name?
-				if ( ! array_key_exists( $column_to_drop , $c['m_data_definition_bak'] ) )
+				if ( !array_key_exists( $column_to_drop , $c['m_data_definition_bak'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "No such data-field ('<i>" . $column_to_drop . "</i>') exists withim DDL Backup Repository!" );
 				}
@@ -929,7 +930,7 @@ class Module_Handler
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
 
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-CONNECTOR-FIELD) failed!" );
 			}
@@ -949,7 +950,7 @@ class Module_Handler
 							. ")",
 						),
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (DELETE-DDL-RECORD) failed!" );
 			}
@@ -985,9 +986,9 @@ class Module_Handler
 			$m =& $_parent_module_cache[ $input['m_unique_id'] ];
 			$c =& $_connector_modules_cache[ $input['connector_linked'] ];
 
-			if ( ! isset( $input['ddl_checklist'] ) or ! is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
+			if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
 			{
-				if ( ! empty( $input['ddl_checklist'] ) )
+				if ( !empty( $input['ddl_checklist'] ) )
 				{
 					$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 				}
@@ -1001,7 +1002,7 @@ class Module_Handler
 			foreach ( $list_of_columns_to_process as $column_to_restore )
 			{
 				# Is it a valid field-name?
-				if ( ! array_key_exists( $column_to_restore , $c['m_data_definition_bak'] ) )
+				if ( !array_key_exists( $column_to_restore , $c['m_data_definition_bak'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "No such data-field ('<i>" . $column_to_restore . "</i>') exists within DDL Backup Repository!" );
 				}
@@ -1029,7 +1030,7 @@ class Module_Handler
 					'action'    =>  "change_column",
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (RESTORE-MODULE-FIELD) failed!" );
 			}
@@ -1085,7 +1086,7 @@ class Module_Handler
 
 		foreach ( $m['m_data_definition'] as $_f )
 		{
-			if ( $_f['connector_enabled'] and ! $_f['connector_linked'] )
+			if ( $_f['connector_enabled'] and !$_f['connector_linked'] )
 			{
 				return false;
 			}
@@ -1166,7 +1167,7 @@ class Module_Handler
 	 */
 	private function modules__do_list ()
 	{
-		if ( ! is_array( $this->API->Cache->cache['modules'] ) or ! count( $this->API->Cache->cache['modules'] ) )
+		if ( !is_array( $this->API->Cache->cache['modules'] ) or !count( $this->API->Cache->cache['modules'] ) )
 		{
 			# Empty cache
 			return null;
@@ -1202,7 +1203,7 @@ class Module_Handler
 		}
 
 		# Check availability of module name
-		if ( ! $this->modules__do_create__check_availability( $m_name ) )
+		if ( !$this->modules__do_create__check_availability( $m_name ) )
 		{
 			$faults[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Module Name</em> is not available!" );
 		}
@@ -1363,14 +1364,14 @@ class Module_Handler
 		// Continue...
 		//---------------
 
-		if ( ! array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
 
-		if ( ! isset( $input['ddl_checklist'] ) or ! is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
+		if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
 		{
-			if ( ! empty( $input['ddl_checklist'] ) )
+			if ( !empty( $input['ddl_checklist'] ) )
 			{
 				$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 			}
@@ -1389,7 +1390,7 @@ class Module_Handler
 			if ( isset( $m['m_data_definition'][ $_f ] ) )
 			{
 				$_connector_field =& $m['m_data_definition'][ $_f ];
-				if ( ! $_connector_field['connector_enabled'] )
+				if ( !$_connector_field['connector_enabled'] )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "The selected field is not Connector-enabled!" );
 				}
@@ -1419,7 +1420,7 @@ class Module_Handler
 							'm_is_enabled'           => null,
 						),
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (INSERT-CONNECTOR-DATA) failed!" );
 			}
@@ -1448,7 +1449,7 @@ class Module_Handler
 							'is_backup'              => $_connector_field['is_backup'],
 						),
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (INSERT-CONNECTOR-DDL) failed!" );
 			}
@@ -1477,7 +1478,7 @@ class Module_Handler
 							"m_unique_id=" . $this->API->Db->quote( $_connector_field['m_unique_id'] ),
 						),
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-MODULE-DDL-CONNECTOR-LINKED) failed!" ) );
 			}
@@ -1504,7 +1505,7 @@ class Module_Handler
 		if ( array_key_exists( strtolower( $m_name ), $this->API->Cache->cache['modules']['by_name'] ) )
 		{
 			# Was module name changed at all? Maybe not... Continue in that case.
-			if ( ! is_null( $m_unique_id ) and $this->API->Cache->cache['modules']['by_name'][ $m_name ]['m_unique_id'] == $m_unique_id )
+			if ( !is_null( $m_unique_id ) and $this->API->Cache->cache['modules']['by_name'][ $m_name ]['m_unique_id'] == $m_unique_id )
 			{
 				return true;
 			}
@@ -1530,7 +1531,7 @@ class Module_Handler
 		$faults = array();
 
 		# Is it a valid module?
-		if ( ! array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			$faults[] = array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
@@ -1548,7 +1549,7 @@ class Module_Handler
 		}
 
 		# Check availability of module name
-		if ( ! $this->modules__do_create__check_availability( $m_name , $input['m_unique_id'] ) )
+		if ( !$this->modules__do_create__check_availability( $m_name , $input['m_unique_id'] ) )
 		{
 			$faults[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Module Name</em> is not available!" );
 		}
@@ -1572,7 +1573,7 @@ class Module_Handler
 				if ( in_array( $_extra , array( "tags" , "comments" ) ) )
 				{
 					$m_extras_new[] = $_extra;
-					if ( ! in_array( $_extra , $_list_of_removed_extras ) )
+					if ( !in_array( $_extra , $_list_of_removed_extras ) )
 					{
 						$_list_of_added_extras[] = $_extra;
 					}
@@ -1687,7 +1688,7 @@ class Module_Handler
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "No module was selected! Please select one..." );
 		}
-		if ( ! array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
@@ -1704,7 +1705,7 @@ class Module_Handler
 		$_data_definitions_merged = array_merge( $m['m_data_definition'] , $m['m_data_definition_bak'] );
 		foreach ( $_data_definitions_merged as $_f )
 		{
-			if ( ! empty( $_f['connector_linked'] ) )
+			if ( !empty( $_f['connector_linked'] ) )
 			{
 				$_list_of_tables_to_drop[]         = "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $_f['name'];
 				$_list_of_unique_ids_to_process[]  = $_f['connector_linked'];
@@ -1842,6 +1843,46 @@ class Module_Handler
 
 			$this->modules__do_cleanup( $m );
 
+			//-----------------------------------------------
+			// DDL Validation & Processing : Primary data
+			//-----------------------------------------------
+
+			$_list_of_reserved_names = array( "id" , "tags" , "timestamp" , "submitted_by" , "status_published" , "status_locked" );
+			$ddl_config__validated = array(
+					'name'         => $this->API->config['modules']['m_names_strtolower'] ? strtolower( $input['name'] ) : $input['name'],
+					'label'        => $input['label'],
+					'is_required'  => $input['is_required'] ? 1 : 0,
+				);
+
+			# NAME: Validation...
+			if ( empty( $ddl_config__validated['name'] ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_REQUIRED" );
+				// "<em>Field Name</em> is a required field!"
+			}
+			elseif ( array_key_exists( $input['name'], $m['m_data_definition'] ) or array_key_exists( $input['name'], $m['m_data_definition_bak'] ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__NOT_AVAILABLE" );
+				// "<em>Field Name</em> not available; either already registered, or exists in backups!"
+			}
+			elseif ( in_array( $ddl_config__validated['name'], $_list_of_reserved_names ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_A_RESERVED_KEYWORD" );
+				// "<em>Field Name</em> cannot have one of the following reserved values - change your entry:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_list_of_reserved_names ) .  "</em>"
+			}
+			elseif ( ! preg_match( "#^[a-z][a-z0-9_]+$#" , $ddl_config__validated['name'] ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_INVALID" );
+				// "<em>Field Name</em> must contain only a lowercase alphanumeric and underscore characters, and must not start with any numerical!"
+			}
+
+			# LABEL: Validation...
+			if ( empty( $ddl_config__validated['label'] ) )
+			{
+				$faults[] = array( 'faultCode' => 702, 'faultMessage' => "LABEL__IS_REQUIRED" );
+				// "<em>Field Label</em> is a required field!"
+			}
+
 			//--------------------------------------------------------------------
 			// DDL Validation & Processing : Deploying Data_Processor instance
 			//--------------------------------------------------------------------
@@ -1851,10 +1892,12 @@ class Module_Handler
 			{
 				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['type'] . "</em>!" );
 			}
-			if ( $_processor_instance->modules__ddl__do_validate( $input, $m ) !== true )
+			$_processor_instance->modules__ddl__do_validate( $input, $m, $ddl_config__validated, $faults );
+
+			# Any "faults"?
+			if ( count( $faults ) )
 			{
-				// __LANGUAGE__TRANSLATOR__ -> config-2-errorcode();
-				return $_processor_instance->faults;  // @todo Language support - code-to-meaning translation pending
+				return $faults;
 			}
 
 			# Continue...
@@ -1897,34 +1940,180 @@ class Module_Handler
 	}
 
 
+	/**
+	 * Populates DDL information into an array which in return is used to populate DDL-Edit form in ACP front-end.
+	 *
+	 * @return   mixed   Array containing DDL-information if such actual DDL exists; NULL otherwise
+	 */
 	private function modules__ddl__do_edit__pre_processing ()
 	{
 		if ( $m = $this->modules__do_view( $this->API->Input->post['m_unique_id'] ) )
 		{
 			if ( $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['is_backup'] )
 			{
-				return false;
+				return null;
 			}
+			$_field =& $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ];  // Just for convenience...
 			$return = array(
-					'name'                           => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['name'],
-					'label'                          => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['label'],
-					'type'                           => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['type'],
-					'subtype'                        => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['subtype'],
-					'links_with'                     => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['links_with'],
-					'links_with__e_data_definition'  => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['links_with__e_data_definition'],
-					'allowed_filetypes'              => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['allowed_filetypes'],
-					'default_options'                => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['default_options'],
-					'maxlength'                      => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['maxlength'],
-					'default_value'                  => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['default_value'],
-					'connector_enabled'              => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['connector_enabled'],
-					'connector_length_cap'           => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['connector_length_cap'],
-					'is_html_allowed'                => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['is_html_allowed'],
-					'is_required'                    => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['is_required'],
-					'is_unique'                      => $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['is_unique'],
+					'name'                           => $_field['name'],
+					'label'                          => $_field['label'],
+					'type'                           => $_field['type'],
+					'subtype'                        => $_field['subtype'],
+					'links_with'                     => $_field['e_data_definition']['m_unique_id'],
+					'links_with__e_data_definition'  => $_field['e_data_definition']['m_data_definition'],
+					'allowed_filetypes'              => $_field['allowed_filetypes'],
+					'maxlength'                      => $_field['maxlength'],
+					'default_value'                  => $_field['default_value'],
+					'connector_enabled'              => $_field['connector_enabled'],
+					'connector_length_cap'           => $_field['connector_length_cap'],
+					'is_html_allowed'                => $_field['is_html_allowed'],
+					'is_required'                    => $_field['is_required'],
+					'is_unique'                      => $_field['is_unique'],
 				);
-			unset( $m );
+			while ( !empty( $_field['default_options'] ) and list( $key, $value ) = each( $_field['default_options'] ) )
+			{
+				$return['default_options'] .= $key . "=" . $value . "\n";
+			}
+			unset( $_field, $m );
 
 			return $return;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * Creates a new DDL element [module data-fields].
+	 *
+	 * @return   array   Array containing status code pairs (either responseCode-responseMessage (on SUCCESS); or faultCodes-faultMessages (otherwise) )
+	 */
+	private function modules__ddl__do_edit ()
+	{
+		$input =& $this->API->Input->post;
+		$faults = array();
+
+		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		{
+			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+
+			//-------------------------
+			// Modules Cache Cleanup
+			//-------------------------
+
+			$this->modules__do_cleanup( $m );
+
+			//-----------------------------------------------
+			// DDL Validation & Processing : Primary data
+			//-----------------------------------------------
+
+			$_list_of_reserved_names = array( "id" , "tags" , "timestamp" , "submitted_by" , "status_published" , "status_locked" );
+			$ddl_config__validated = array(
+					'name'         => $this->API->config['modules']['m_names_strtolower'] ? strtolower( $input['name__old'] ) : $input['name__old'],
+					'label'        => $input['label'],
+					'is_required'  => $input['is_required'] ? 1 : 0,
+				);
+
+			# NAME: Validation...
+			if ( empty( $ddl_config__validated['name'] ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_REQUIRED" );
+				// "<em>Field Name</em> is a required field!"
+			}
+			elseif ( in_array( $ddl_config__validated['name'], $_list_of_reserved_names ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_A_RESERVED_KEYWORD" );
+				// "<em>Field Name</em> cannot have one of the following reserved values - change your entry:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_list_of_reserved_names ) .  "</em>"
+			}
+			elseif ( ! preg_match( "#^[a-z][a-z0-9_]+$#" , $ddl_config__validated['name'] ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__IS_INVALID" );
+				// "<em>Field Name</em> must contain only a lowercase alphanumeric and underscore characters, and must not start with any numerical!"
+			}
+			elseif ( ! array_key_exists( $ddl_config__validated['name'], $m['m_data_definition'] ) )
+			{
+				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__NOT_FOUND" );
+				// "No such <em>Field Name</em> exists!"
+			}
+			else
+			{
+				foreach ( $input as $key=>$value )
+				{
+					if ( ! isset( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] ) )
+					{
+						continue;
+					}
+					if ( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] !== $value )
+					{
+						$faults[] = array( 'faultCode' => 0, 'faultMessage' => "DDL__INCONSISTENCY_DETECTED" );
+						// "Fatal error occured during DDL editing!"
+						break;
+					}
+				}
+			}
+
+			# LABEL: Validation...
+			if ( empty( $ddl_config__validated['label'] ) )
+			{
+				$faults[] = array( 'faultCode' => 702, 'faultMessage' => "LABEL__IS_REQUIRED" );
+				// "<em>Field Label</em> is a required field!"
+			}
+
+			//--------------------------------------------------------------------
+			// DDL Validation & Processing : Deploying Data_Processor instance
+			//--------------------------------------------------------------------
+
+			# TYPE: Validation...
+			if ( ( $_processor_instance = $this->API->classes__do_get( "data_processors__" . $input['type'] ) ) === false )
+			{
+				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['type'] . "</em>!" );
+			}
+			$_processor_instance->modules__ddl__do_validate( $input, $m, $ddl_config__validated, $faults );
+
+			# Any "faults"?
+			if ( count( $faults ) )
+			{
+				return $faults;
+			}
+print "test";
+print_r($ddl_config__validated);
+return;
+			# Continue...
+			$this->API->Db->cur_query = array(
+					'do'         =>  "alter",
+					'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
+					'action'     =>  "add_column",
+					'col_info'   =>  $this->API->Db->modules__ddl_column_type_translation( $_processor_instance->ddl_config__validated , true )
+				);
+
+			if ( $this->API->Db->simple_exec_query() )
+			{
+				# INSERT - modules_data_definition
+				$this->API->Db->cur_query = array(
+						'do'     =>  "insert",
+						'table'  =>  "modules_data_definition",
+						'set'    =>  $_processor_instance->ddl_config__validated,
+					);
+				if ( $this->API->Db->simple_exec_query() )
+				{
+					# On SUCCESS, update cache and respond
+					$_recache = $this->API->classes__do_get("Recache");
+					$_recache->main( "modules" );
+					return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully added!<br />Refreshing...' , 'responseAction' => 'refresh' );
+				}
+				else
+				{
+					return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to create new Data-Definition record for reasons unknown!" );
+				}
+			}
+			else
+			{
+				return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to alter Data-Repo table for reasons unknown!" );
+			}
+		}
+		else
+		{
+			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
 	}
 
@@ -1965,7 +2154,7 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_sort ()
 	{
-		if ( ! isset( $this->API->Input->post['position'] ) or ! is_array( $this->API->Input->post['position'] ) or empty( $this->API->Input->post['position'] ) )
+		if ( !isset( $this->API->Input->post['position'] ) or !is_array( $this->API->Input->post['position'] ) or empty( $this->API->Input->post['position'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Empty data-set! Request aborted..." );
 		}
@@ -2024,9 +2213,9 @@ class Module_Handler
 			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 			# Continue...
-			if ( ! isset( $input['ddl_checklist'] ) or ! is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
+			if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
 			{
-				if ( ! empty( $input['ddl_checklist'] ) )
+				if ( !empty( $input['ddl_checklist'] ) )
 				{
 					$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 				}
@@ -2040,13 +2229,13 @@ class Module_Handler
 			foreach ( $list_of_columns_to_process as $column_to_drop )
 			{
 				# Is it a valid field-name?
-				if ( ! array_key_exists( $column_to_drop , $m['m_data_definition'] ) )
+				if ( !array_key_exists( $column_to_drop , $m['m_data_definition'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "No such data-field ('<i>" . $column_to_drop . "</i>') exists withim DDL Repository!" );
 				}
 
 				# Is is 'used' by some subroutine
-				if ( isset( $m['m_data_definition'][ $column_to_drop ]['used_in'] ) and ! empty( $m['m_data_definition'][ $column_to_drop ]['used_in'] ) )
+				if ( isset( $m['m_data_definition'][ $column_to_drop ]['used_in'] ) and !empty( $m['m_data_definition'][ $column_to_drop ]['used_in'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "The selected data-field cannot be removed, as it's being used by one or more subroutines!" );
 				}
@@ -2069,7 +2258,7 @@ class Module_Handler
 						true
 					);
 
-				if ( $m['m_data_definition'][ $name ]['connector_enabled'] and ! empty( $m['m_data_definition'][ $name ]['connector_linked'] ) )
+				if ( $m['m_data_definition'][ $name ]['connector_enabled'] and !empty( $m['m_data_definition'][ $name ]['connector_linked'] ) )
 				{
 					$list_of_c_unique_ids_to_process[ $name ] =& $m['m_data_definition'][ $name ]['connector_linked'];
 				}
@@ -2101,7 +2290,7 @@ class Module_Handler
 						'col_info'  =>  $list_of_columns_to_process__translated
 					);
 			}
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (ALTER-MODULE-DDL) failed!" );
 			}
@@ -2157,7 +2346,7 @@ class Module_Handler
 						'where'   =>  $_where_clause,
 					);
 			}
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-DDL-RECORD) failed!" );
 			}
@@ -2166,7 +2355,7 @@ class Module_Handler
 			// DELETE : Connector-Unit record and table
 			//----------------------------------------------
 
-			if ( ! $input['do_backup_dropped_field'] and count( $list_of_c_unique_ids_to_process ) )
+			if ( !$input['do_backup_dropped_field'] and count( $list_of_c_unique_ids_to_process ) )
 			{
 				# Connector-Unit data removal
 				$this->API->Db->cur_query = array(
@@ -2188,7 +2377,7 @@ class Module_Handler
 				}
 				if ( count( $_list_of_tables_to_drop ) )
 				{
-					if ( ! $this->API->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
+					if ( !$this->API->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
 					{
 						return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-CONNECTOR-TABLES) failed!" );
 					}
@@ -2208,7 +2397,7 @@ class Module_Handler
 						'set'      =>  array( 'm_title_column' => null ),
 						'where'    =>  "m_unique_id = " . $this->API->Db->quote( $input['m_unique_id'] )
 					);
-				if ( ! $this->API->Db->simple_exec_query() )
+				if ( !$this->API->Db->simple_exec_query() )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-MODULES-TITLE-FIELD-RECORD) failed!" );
 				}
@@ -2246,9 +2435,9 @@ class Module_Handler
 			$this->modules__do_cleanup( $m );
 
 			# Continue...
-			if ( ! isset( $input['ddl_checklist'] ) or ! is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
+			if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
 			{
-				if ( ! empty( $input['ddl_checklist'] ) )
+				if ( !empty( $input['ddl_checklist'] ) )
 				{
 					$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 				}
@@ -2262,7 +2451,7 @@ class Module_Handler
 			foreach ( $list_of_columns_to_process as $column_to_drop )
 			{
 				# Is it a valid field-name?
-				if ( ! array_key_exists( $column_to_drop , $m['m_data_definition_bak'] ) )
+				if ( !array_key_exists( $column_to_drop , $m['m_data_definition_bak'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "No such data-field ('<i>" . $column_to_drop . "</i>') exists withim DDL Backup Repository!" );
 				}
@@ -2283,7 +2472,7 @@ class Module_Handler
 					);
 				$list_of_columns_to_process__translated[ $name ]['name'] = "__" . $name;           // Backup fields have __ prefix
 
-				if ( $m['m_data_definition_bak'][ $name ]['connector_enabled'] and ! empty( $m['m_data_definition_bak'][ $name ]['connector_linked'] ) )
+				if ( $m['m_data_definition_bak'][ $name ]['connector_enabled'] and !empty( $m['m_data_definition_bak'][ $name ]['connector_linked'] ) )
 				{
 					$list_of_c_unique_ids_to_process[ $name ] =& $m['m_data_definition_bak'][ $name ]['connector_linked'];
 				}
@@ -2297,7 +2486,7 @@ class Module_Handler
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
 
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-MODULE-FIELD) failed!" );
 			}
@@ -2336,7 +2525,7 @@ class Module_Handler
 					'table'   =>  "modules_data_definition",
 					'where'   =>  $_where_clause,
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-DDL-RECORD) failed!" );
 			}
@@ -2367,7 +2556,7 @@ class Module_Handler
 				}
 				if ( count( $_list_of_tables_to_drop ) )
 				{
-					if ( ! $this->API->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
+					if ( !$this->API->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
 					{
 						return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-CONNECTOR-TABLES) failed!" );
 					}
@@ -2408,9 +2597,9 @@ class Module_Handler
 			$this->modules__do_cleanup( $m );
 
 			# Continue...
-			if ( ! isset( $input['ddl_checklist'] ) or ! is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
+			if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
 			{
-				if ( ! empty( $input['ddl_checklist'] ) )
+				if ( !empty( $input['ddl_checklist'] ) )
 				{
 					$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 				}
@@ -2424,7 +2613,7 @@ class Module_Handler
 			foreach ( $list_of_columns_to_process as $column_to_restore )
 			{
 				# Is it a valid field-name?
-				if ( ! array_key_exists( $column_to_restore , $m['m_data_definition_bak'] ) )
+				if ( !array_key_exists( $column_to_restore , $m['m_data_definition_bak'] ) )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "No such data-field ('<i>" . $column_to_restore . "</i>') exists within DDL Backup Repository!" );
 				}
@@ -2452,7 +2641,7 @@ class Module_Handler
 					'action'    =>  "change_column",
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( !$this->API->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (RESTORE-MODULE-FIELD) failed!" );
 			}
@@ -2599,7 +2788,7 @@ class Module_Handler
 
 			if ( $subroutine['s_service_mode'] == 'read-only' )
 			{
-				if ( ! isset( $input['s_data_definition'] ) or ! count( $input['s_data_definition'] ) )
+				if ( !isset( $input['s_data_definition'] ) or !count( $input['s_data_definition'] ) )
 				{
 					$fault_message[] = array( 'faultCode' => 700, 'faultMessage' => "At least 1 (one) <em>data source</em> must be selected!" );
 				}
@@ -2623,7 +2812,7 @@ class Module_Handler
 			$input['s_name'] = strtolower( $input['s_name'] );
 			if ( $input['s_name'] )
 			{
-				if ( ! preg_match( '#^[a-z][a-z0-9_]{0,31}$#' , $input['s_name'] ) )
+				if ( !preg_match( '#^[a-z][a-z0-9_]{0,31}$#' , $input['s_name'] ) )
 				{
 					$fault_message[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Subroutine name</em> syntax error - it must start with a letter and may contain only alphanumeric characters!" );
 				}
@@ -2655,7 +2844,7 @@ class Module_Handler
 						foreach ( $_field_data['c_data_definition'] as $__field_name=>$__field_data )
 						{
 							# Certain fields are not eligible to exist inside URI-Schema (identified by non-existent request-regex)
-							if ( ! $__field_data['request_regex'] or empty( $__field_data['request_regex'] ) )
+							if ( !$__field_data['request_regex'] or empty( $__field_data['request_regex'] ) )
 							{
 								$_list_of_unusable_fields[ '{' . $_field_name . "." . $__field_name . '}' ] = false;
 								continue;
@@ -2673,7 +2862,7 @@ class Module_Handler
 				else
 				{
 					# ... and the rest
-					if ( ! $_field_data['request_regex'] or empty( $_field_data['request_regex'] ) )
+					if ( !$_field_data['request_regex'] or empty( $_field_data['request_regex'] ) )
 					{
 						# Certain fields are not eligible to exist inside URI-Schema (identified by non-existent request-regex)
 						$_list_of_unusable_fields[ '{' . $_field_name . '}' ] = false;
@@ -2696,7 +2885,7 @@ class Module_Handler
 					$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em>: Reserved pattern detected! You cannot re-use patterns reserved for preset '<em>update</em>' and '<em>insert</em>' subroutines! Change the schema." );
 				}
 				# The dash (-) character is quoted in PHP 5.3.0 and later, so put it at the beginning of the list
-				if ( ! preg_match( '#^[a-z0-9' . preg_quote('-.,\+/*?[](){}=!<>|:_') . ']+$#i' , $subroutine['s_pathinfo_uri_schema'] ) )
+				if ( !preg_match( '#^[a-z0-9' . preg_quote('-.,\+/*?[](){}=!<>|:_') . ']+$#i' , $subroutine['s_pathinfo_uri_schema'] ) )
 				{
 					$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em> may only contain alphanumeric characters, plus any of the following: <strong>. , \ + / * ? [ ^ ] $ ( ) { } = ! < > | : -</strong>" );
 				}
@@ -2783,7 +2972,7 @@ class Module_Handler
 				{
 					$_occuring_unusable_fields[] = $_field_shortcuts_occuring_in_uri_schema[1][ $i ];
 				}
-				elseif ( ! array_key_exists( '{' . $_field_shortcuts_occuring_in_uri_schema[1][ $i ] . '}' , $_list_of_unusable_fields ) and ! array_key_exists( '{' . $_field_shortcuts_occuring_in_uri_schema[1][ $i ] . '}' , $_list_of_usable_fields ) )
+				elseif ( !array_key_exists( '{' . $_field_shortcuts_occuring_in_uri_schema[1][ $i ] . '}' , $_list_of_unusable_fields ) and !array_key_exists( '{' . $_field_shortcuts_occuring_in_uri_schema[1][ $i ] . '}' , $_list_of_usable_fields ) )
 				{
 					$_occuring_invalid_fields[] = $_field_shortcuts_occuring_in_uri_schema[1][ $i ];
 				}
@@ -2867,7 +3056,7 @@ class Module_Handler
 					// Empty Queries
 					//-----------------
 
-					if ( ! $_rule['value'] )
+					if ( !$_rule['value'] )
 					{
 						if ( $_rule['math_operator'] != 'IS NULL' and $_rule['math_operator'] != 'IS NOT NULL' )
 						{
@@ -2906,7 +3095,7 @@ class Module_Handler
 							{
 								$_rule['value'] = preg_replace( '/(?<!&#36;)&#36;((?>' . $_reference . '))/' , "<backreference>\\1</backreference>" , $_rule['value'] );
 							}
-							elseif ( ! in_array( $_reference, $_field_backreferences[1] ) and in_array( $_reference, $_field_shortcuts_occuring_in_uri_schema[1] ) )
+							elseif ( !in_array( $_reference, $_field_backreferences[1] ) and in_array( $_reference, $_field_shortcuts_occuring_in_uri_schema[1] ) )
 							{
 								$_noncaptured_field_backreferences_in_query[ $_reference ] = "\$" . $_reference;
 							}
@@ -2957,7 +3146,7 @@ class Module_Handler
 						}
 						else
 						{
-							if ( ! $this->API->Input->check_enclosing_parentheses( $_rule['value'] ) )
+							if ( !$this->API->Input->check_enclosing_parentheses( $_rule['value'] ) )
 							{
 								$fault_message[] = array( 'faultCode' => 705, 'faultMessage' => "Opening and closing parentheses do not match inside <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset! Queries related to numeric data-fields require this criteria!", 'faultExtra' => $_i );
 								$_list_of_broken_rules[ $_i ] = true;
@@ -3053,13 +3242,13 @@ class Module_Handler
 			// Fetch Criteria - Limit
 			//--------------------------
 
-			if ( ! preg_match( '/^\d*$/' , $input['s_fetch_criteria']['limit'] ) )
+			if ( !preg_match( '/^\d*$/' , $input['s_fetch_criteria']['limit'] ) )
 			{
 				$fault_message[] = array( 'faultCode' => 706, 'faultMessage' => "<em>Fetch Criteria - Limit</em> field accepts only numeric values!" );
 			}
 			else
 			{
-				if ( isset( $input['s_fetch_criteria']['limit'] ) and ! empty( $input['s_fetch_criteria']['limit'] ) )
+				if ( isset( $input['s_fetch_criteria']['limit'] ) and !empty( $input['s_fetch_criteria']['limit'] ) )
 				{
 					$subroutine['s_fetch_criteria']['limit'] = intval( $input['s_fetch_criteria']['limit'] );
 				}
@@ -3073,13 +3262,13 @@ class Module_Handler
 			// Fetch Criteria - Pagination
 			//-------------------------------
 
-			if ( ! preg_match( '/^\d*$/' , $input['s_fetch_criteria']['pagination'] ) )
+			if ( !preg_match( '/^\d*$/' , $input['s_fetch_criteria']['pagination'] ) )
 			{
 				$fault_message[] = array( 'faultCode' => 707, 'faultMessage' => "<em>Fetch Criteria - Pagination</em> field accepts only numeric values!" );
 			}
 			else
 			{
-				if ( isset( $input['s_fetch_criteria']['pagination'] ) and ! empty( $input['s_fetch_criteria']['pagination'] ) )
+				if ( isset( $input['s_fetch_criteria']['pagination'] ) and !empty( $input['s_fetch_criteria']['pagination'] ) )
 				{
 					$subroutine['s_fetch_criteria']['pagination'] = intval( $input['s_fetch_criteria']['pagination'] );
 				}
@@ -3100,7 +3289,7 @@ class Module_Handler
 				$_i = 0;
 				foreach ( $input['s_fetch_criteria']['sort_by'] as $_sort_criteria )
 				{
-					if ( ! in_array( $_sort_criteria['field_name'] , $_fields_sorted_already ) )
+					if ( !in_array( $_sort_criteria['field_name'] , $_fields_sorted_already ) )
 					{
 						$subroutine['s_fetch_criteria']['sort_by'][] = array(
 								'field_name'  =>  $_sort_criteria['field_name'],
@@ -3167,20 +3356,20 @@ class Module_Handler
 	{
 		$input =& $this->API->Input->input;
 
-		if ( ! array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
 
 		$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
-		if ( isset( $input['s_name'] ) and ! empty( $input['s_name'] ) )
+		if ( isset( $input['s_name'] ) and !empty( $input['s_name'] ) )
 		{
-			if ( ! array_key_exists( $input['s_name'] , $m['m_subroutines'] ) )
+			if ( !array_key_exists( $input['s_name'] , $m['m_subroutines'] ) )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "No such subroutine available!" );
 			}
-			if ( ! $m['m_subroutines'][ $input['s_name'] ]['s_can_remove'] )
+			if ( !$m['m_subroutines'][ $input['s_name'] ]['s_can_remove'] )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "The selected subroutine is not removable! Some of possible reasons are:<ul><li>It's a system-subroutine (such as &#039;insert&#039; or &#039;update&#039; subroutines;</li><li>It's locked by system administrator;</li></ul>" );
 			}
@@ -3244,7 +3433,7 @@ class Module_Handler
 
 						if ( $_v['conf_type'] == 'dropdown' or $_v['conf_type'] == 'multi' )
 						{
-							if ( ! empty( $_v['conf_extra'] ) )
+							if ( !empty( $_v['conf_extra'] ) )
 							{
 								if ( $_v['conf_extra'] == '#show_groups#' )
 								{
