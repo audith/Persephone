@@ -104,12 +104,13 @@ class Db_Driver extends Database
 	 */
 	public function modules__ddl_column_type_translation ( $df_data , $we_need_this_for_master_table = FALSE )
 	{
-		if ( $we_need_this_for_master_table === true and ( isset( $df_data['connectors_enabled'] ) and $df_data['connectors_enabled'] == '1' ) )
+		if ( $we_need_this_for_master_table === true and ( isset( $df_data['connector_enabled'] ) and $df_data['connector_enabled'] == '1' ) )
 		{
 			$_col_info = array(
 					'type'     =>  "MEDIUMTEXT",
 					'length'   =>  null,
 					'default'  =>  "",
+					'extra'    =>  null,
 					'attribs'  =>  null,
 					'is_null'  =>  FALSE
 				);
@@ -125,7 +126,7 @@ class Db_Driver extends Database
 				if ( $df_data['subtype'] == 'string' )
 				{
 					# Default value
-					if ( ! isset( $df_data['default_value'] ) or empty( $df_data['default_value'] ) )
+					if ( ! isset( $df_data['default_value'] ) or is_null( $df_data['default_value'] ) )
 					{
 						if ( $df_data['is_required'] )
 						{
@@ -191,7 +192,7 @@ class Db_Driver extends Database
 				elseif ( preg_match( '#^integer_(?P<attrib>(?:un)?signed)_(?P<bit_length>\d{1,2})$#', $df_data['subtype'], $_dft_subtype ) )
 				{
 					# Default value
-					if ( ! isset( $df_data['default_value'] ) or empty( $df_data['default_value'] ) )
+					if ( ! isset( $df_data['default_value'] ) or is_null( $df_data['default_value'] ) )
 					{
 						if ( $df_data['is_required'] )
 						{
@@ -250,7 +251,7 @@ class Db_Driver extends Database
 				elseif ( $df_data['subtype'] == 'decimal_signed' or $df_data['subtype'] == 'decimal_unsigned' )
 				{
 					# Default value
-					if ( ! isset( $df_data['default_value'] ) or empty( $df_data['default_value'] ) or ! is_numeric( $df_data['default_value'] ) )
+					if ( ! isset( $df_data['default_value'] ) or is_null( $df_data['default_value'] ) or ! is_numeric( $df_data['default_value'] ) )
 					{
 						if ( $df_data['is_required'] )
 						{
@@ -281,7 +282,7 @@ class Db_Driver extends Database
 				elseif ( in_array( $df_data['subtype'], array( "dropdown" , "multiple" ) ) )
 				{
 					# Default value
-					if ( ! isset( $df_data['default_value'] ) or empty( $df_data['default_value'] ) )
+					if ( ! isset( $df_data['default_value'] ) or is_null( $df_data['default_value'] ) )
 					{
 						$_default_value = null;
 						$_is_null       = true;
@@ -348,6 +349,8 @@ class Db_Driver extends Database
 					);
 			}
 		}
+		$_col_info['extra']   = null;
+
 		$_col_info['name']    = $df_data['name'];
 
 		$_col_info['comment'] = $df_data['label'];
@@ -374,66 +377,66 @@ class Db_Driver extends Database
 		$_struct['master_repo'] = array(
 				'col_info'   => array(
 						'id'      => array(
-								"type"      => "int",
-								"length"    => 10,
-								"collation" => null,
-								"attribs"   => "unsigned",
-								"is_null"   => false,
-								"default"   => null,
-								"extra"     => "auto_increment",
-								"indexes"   => array(
+								'type'      => "int",
+								'length'    => 10,
+								'collation' => null,
+								'attribs'   => "unsigned",
+								'is_null'   => false,
+								'default'   => null,
+								'extra'     => "auto_increment",
+								'indexes'   => array(
 										"PRIMARY" => true
 									)
 							),
 						'tags' => array(
-								"type"      => "mediumtext",
-								"length"    => null,
-								"collation" => null,
-								"attribs"   => null,
-								"is_null"   => true,
-								"default"   => null,
-								"extra"     => null,
-								"indexes"   => null
+								'type'      => "mediumtext",
+								'length'    => null,
+								'collation' => null,
+								'attribs'   => null,
+								'is_null'   => true,
+								'default'   => null,
+								'extra'     => null,
+								'indexes'   => null
 							),
 						'timestamp' => array(
-								"type"      => "int",
-								"length"    => 10,
-								"collation" => null,
-								"attribs"   => "unsigned",
-								"is_null"   => false,
-								"default"   => null,
-								"extra"     => null,
-								"indexes"   => null
+								'type'      => "int",
+								'length'    => 10,
+								'collation' => null,
+								'attribs'   => "unsigned",
+								'is_null'   => false,
+								'default'   => null,
+								'extra'     => null,
+								'indexes'   => null
 							),
 						'submitted_by' => array(
-								"type"      => "mediumint",
-								"length"    => 8,
-								"collation" => null,
-								"attribs"   => "unsigned",
-								"is_null"   => false,
-								"default"   => 0,
-								"extra"     => null,
-								"indexes"   => null
+								'type'      => "mediumint",
+								'length'    => 8,
+								'collation' => null,
+								'attribs'   => "unsigned",
+								'is_null'   => false,
+								'default'   => 0,
+								'extra'     => null,
+								'indexes'   => null
 							),
 						'status_published' => array(
-								"type"      => "tinyint",
-								"length"    => 1,
-								"collation" => null,
-								"attribs"   => null,
-								"is_null"   => false,
-								"default"   => 0,
-								"extra"     => null,
-								"indexes"   => null
+								'type'      => "tinyint",
+								'length'    => 1,
+								'collation' => null,
+								'attribs'   => null,
+								'is_null'   => false,
+								'default'   => 0,
+								'extra'     => null,
+								'indexes'   => null
 							),
 						'status_locked' => array(
-								"type"      => "tinyint",
-								"length"    => 1,
-								"collation" => null,
-								"attribs"   => null,
-								"is_null"   => false,
-								"default"   => 0,
-								"extra"     => null,
-								"indexes"   => null
+								'type'      => "tinyint",
+								'length'    => 1,
+								'collation' => null,
+								'attribs'   => null,
+								'is_null'   => false,
+								'default'   => 0,
+								'extra'     => null,
+								'indexes'   => null
 							),
 					),
 				'comment'    => ""
@@ -446,24 +449,25 @@ class Db_Driver extends Database
 		$_struct['connector_repo'] = array(
 				'col_info'   => array(
 						'id' => array(
-								"type"      => "int",
-								"length"    => 10,
-								"collation" => null,
-								"attribs"   => "unsigned",
-								"is_null"   => false,
-								"default"   => null,
-								"extra"     => "auto_increment",
-								"indexes"   => array(
-										"PRIMARY" => true
-									)
+								'type'      => "int",
+								'length'    => 10,
+								'collation' => null,
+								'attribs'   => "unsigned",
+								'is_null'   => false,
+								'default'   => null,
+								'extra'     => "auto_increment",
+								'indexes'   => array(
+										'PRIMARY' => true
+									),
 							),
 						'ref_id' => array(
-								"type"      => "int",
-								"length"    => 10,
-								"collation" => null,
-								"attribs"   => "unsigned",
-								"is_null"   => false,
-								"default"   => null,
+								'type'      => "int",
+								'length'    => 10,
+								'collation' => null,
+								'attribs'   => "unsigned",
+								'is_null'   => false,
+								'default'   => null,
+								'extra'     => null,
 							),
 					),
 			);
@@ -1418,7 +1422,7 @@ class Db_Driver extends Database
 							. " collate utf8_unicode_ci"
 							. " " . $_column_struct['attribs']
 							. ( $_column_struct['is_null']          ? " NULL" : " NOT NULL" )
-							. ( $_column_struct['extra']           ? " " . $_column_struct['extra'] : "" )
+							. ( $_column_struct['extra']            ? " " . $_column_struct['extra'] : "" )
 							. ( $_column_struct['default'] !== null ? " DEFAULT '" . $_column_struct['default'] . "'" : "" )
 							. ",\n";
 						break;

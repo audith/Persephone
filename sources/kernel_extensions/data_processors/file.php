@@ -315,8 +315,7 @@ class Data_Processor__File extends Data_Processor
 
 		if ( ! array_key_exists( $_skel_subtype_key, $skel ) )
 		{
-			$faults[] = array( 'faultCode' => 706, 'faultMessage' => "SUBTYPE__IS_INVALID" );
-			// "No such data-subtype is defined: <em>" . $input[ $_form_field_name ] . "</em> (for data-type: <em>file</em>)!"
+			$faults[] = array( 'faultCode' => 706, 'faultMessage' => "SUBTYPE__IS_INVALID" ); // "No such data-subtype is defined: <em>" . $input[ $_form_field_name ] . "</em> (for data-type: <em>file</em>)!"
 		}
 		else
 		{
@@ -341,8 +340,7 @@ class Data_Processor__File extends Data_Processor
 			{
 				if ( ! array_key_exists( $_ft, $_mimelist_cache['by_ext'] ) )
 				{
-					$faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_INVALID" );
-					// "One or more of the selected file-types appear to be invalid! Please try again for possible configuration updates..."
+					$faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_INVALID" ); // "One or more of the selected file-types appear to be invalid! Please try again for possible configuration updates..."
 					continue;
 				}
 			}
@@ -350,8 +348,7 @@ class Data_Processor__File extends Data_Processor
 		}
 		else
 		{
-			$faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_REQUIRED" );
-			// &quot;Allowed File-types&quot; is a required field.
+			$faults[] = array( 'faultCode' => 707, 'faultMessage' => "ALLOWED_FILETYPES__IS_REQUIRED" ); // &quot;Allowed File-types&quot; is a required field.
 		}
 
 
@@ -361,8 +358,7 @@ class Data_Processor__File extends Data_Processor
 		{
 			if ( false === $dft_maxlength = $this->API->Input->file__filesize__do_parse( $input['maxlength'] ) )
 			{
-				$faults[] = array( 'faultCode' => 709, 'faultMessage' => "MAXFILESIZE__INVALID_SYNTAX" );
-				// Invalid syntax for &quot;Maximum Filesize&quot; field! At least, enter &quot;0&quot; to disable the setting.
+				$faults[] = array( 'faultCode' => 709, 'faultMessage' => "MAXFILESIZE__INVALID_SYNTAX" ); // Invalid syntax for &quot;Maximum Filesize&quot; field! At least, enter &quot;0&quot; to disable the setting.
 			}
 		}
 
@@ -402,9 +398,10 @@ class Data_Processor__File extends Data_Processor
 						'type'                 =>  "file",
 						'subtype'              =>  $dft_subtype,
 						'allowed_filetypes'    =>  $dft_allowed_filetypes,
-						'maxlength'            =>  $dft_maxlength,
+						'maxlength'            =>  trim( $dft_maxlength ),
 						'connector_enabled'    =>  $dft_connector_enabled,
 						'connector_length_cap' =>  $dft_connector_length_cap,
+						'is_required'          =>  $input['is_required'] ? 1 : 0,
 					)
 			);
 

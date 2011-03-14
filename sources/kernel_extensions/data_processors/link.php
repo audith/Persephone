@@ -213,15 +213,13 @@ class Data_Processor__Link extends Data_Processor
 				$ddl_config__validated,
 				array(
 						'm_unique_id'          =>  $m['m_unique_id'],
-						'name'                 =>  $dft_name,
-						'label'                =>  $dft_label,
 						'type'                 =>  "link",
 						'maxlength'            =>  10,
 						'request_regex'        =>  '\d{1,10}',
 						'input_regex'          =>  '\d{1,10}',
-						'is_required'          =>  $dft_is_required,
 						'is_unique'            =>  $input['is_unique'] ? 1 : 0,
 						'is_numeric'           =>  1,
+						'is_required'          =>  $input['is_required'] ? 1 : 0,
 						'e_data_definition'    =>  $input['links_with'] . "\n" . implode( "\n" , $input['links_with__e_data_definition'] ),
 					)
 			);

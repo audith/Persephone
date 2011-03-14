@@ -1364,14 +1364,14 @@ class Module_Handler
 		// Continue...
 		//---------------
 
-		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( ! array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
 
-		if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
+		if ( ! isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or ! count( $input['ddl_checklist'] ) )
 		{
-			if ( !empty( $input['ddl_checklist'] ) )
+			if ( ! empty( $input['ddl_checklist'] ) )
 			{
 				$input['ddl_checklist'] = array( $input['ddl_checklist'] );
 			}
@@ -1390,7 +1390,7 @@ class Module_Handler
 			if ( isset( $m['m_data_definition'][ $_f ] ) )
 			{
 				$_connector_field =& $m['m_data_definition'][ $_f ];
-				if ( !$_connector_field['connector_enabled'] )
+				if ( ! $_connector_field['connector_enabled'] )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "The selected field is not Connector-enabled!" );
 				}
@@ -1436,12 +1436,13 @@ class Module_Handler
 							'subtype'                => $_connector_field['subtype'],
 							'maxlength'              => $_connector_field['maxlength'],
 							'allowed_filetypes'      => $_connector_field['allowed_filetypes'],
-							'connector_length_cap'   => $_connector_field['connector_length_cap'],
+							'connector_length_cap'   => null, // for data-fields belonging to a Connector-unit, 'connector_length_cap' = NULL
 							'input_regex'            => $_connector_field['input_regex'],
 							'request_regex'          => $_connector_field['request_regex'],
+							'default_options'        => serialize( $_connector_field['default_options'] ),
 							'default_value'          => $_connector_field['default_value'],
-							'connector_enabled'      => $_connector_field['connector_enabled'],
-							'connector_linked'       => $_connector_field['connector_linked'],
+							'connector_enabled'      => null, // for data-fields belonging to a Connector-unit, 'connector_enabled' = NULL
+							'connector_linked'       => null, // for data-fields belonging to a Connector-unit, 'connector_linked' = NULL
 							'is_html_allowed'        => $_connector_field['is_html_allowed'],
 							'is_required'            => $_connector_field['is_required'],
 							'is_unique'              => $_connector_field['is_unique'],
@@ -1462,7 +1463,7 @@ class Module_Handler
 				$this->API->Db->modules__default_table_structure( "connector_repo" );
 
 			# Attaching connector-enabled field's data-definition to _conn_repo table structire
-			$struct['tables']['mod_' . $_parent_m_unique_id_clean . '_conn_repo__' . $_connector_field['name'] ][ $_connector_field['name'] ] =
+			$struct['tables']['mod_' . $_parent_m_unique_id_clean . '_conn_repo__' . $_connector_field['name'] ]['col_info'][ $_connector_field['name'] ] =
 				$this->API->Db->modules__ddl_column_type_translation( $_connector_field );
 
 			# CREATE TABLEs
@@ -1824,7 +1825,7 @@ class Module_Handler
 
 
 	/**
-	 * Creates a new DDL element [module data-fields].
+	 * Creates a new DDL-record [module data-fields].
 	 *
 	 * @return   array   Array containing status code pairs (either responseCode-responseMessage (on SUCCESS); or faultCodes-faultMessages (otherwise) )
 	 */
@@ -1905,7 +1906,7 @@ class Module_Handler
 					'do'         =>  "alter",
 					'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 					'action'     =>  "add_column",
-					'col_info'   =>  $this->API->Db->modules__ddl_column_type_translation( $_processor_instance->ddl_config__validated , true )
+					'col_info'   =>  $this->API->Db->modules__ddl_column_type_translation( $ddl_config__validated , true )
 				);
 
 			if ( $this->API->Db->simple_exec_query() )
@@ -1914,7 +1915,7 @@ class Module_Handler
 				$this->API->Db->cur_query = array(
 						'do'     =>  "insert",
 						'table'  =>  "modules_data_definition",
-						'set'    =>  $_processor_instance->ddl_config__validated,
+						'set'    =>  $ddl_config__validated,
 					);
 				if ( $this->API->Db->simple_exec_query() )
 				{
@@ -1984,7 +1985,7 @@ class Module_Handler
 
 
 	/**
-	 * Creates a new DDL element [module data-fields].
+	 * Alters a DDL-record [module data-field].
 	 *
 	 * @return   array   Array containing status code pairs (either responseCode-responseMessage (on SUCCESS); or faultCodes-faultMessages (otherwise) )
 	 */
@@ -2007,11 +2008,10 @@ class Module_Handler
 			// DDL Validation & Processing : Primary data
 			//-----------------------------------------------
 
-			$_list_of_reserved_names = array( "id" , "tags" , "timestamp" , "submitted_by" , "status_published" , "status_locked" );
+			$_list_of_reserved_names = array( "id", "tags", "timestamp", "submitted_by", "status_published", "status_locked" );
 			$ddl_config__validated = array(
 					'name'         => $this->API->config['modules']['m_names_strtolower'] ? strtolower( $input['name__old'] ) : $input['name__old'],
 					'label'        => $input['label'],
-					'is_required'  => $input['is_required'] ? 1 : 0,
 				);
 
 			# NAME: Validation...
@@ -2035,28 +2035,18 @@ class Module_Handler
 				$faults[] = array( 'faultCode' => 701, 'faultMessage' => "NAME__NOT_FOUND" );
 				// "No such <em>Field Name</em> exists!"
 			}
-			else
-			{
-				foreach ( $input as $key=>$value )
-				{
-					if ( ! isset( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] ) )
-					{
-						continue;
-					}
-					if ( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] !== $value )
-					{
-						$faults[] = array( 'faultCode' => 0, 'faultMessage' => "DDL__INCONSISTENCY_DETECTED" );
-						// "Fatal error occured during DDL editing!"
-						break;
-					}
-				}
-			}
 
 			# LABEL: Validation...
 			if ( empty( $ddl_config__validated['label'] ) )
 			{
 				$faults[] = array( 'faultCode' => 702, 'faultMessage' => "LABEL__IS_REQUIRED" );
 				// "<em>Field Label</em> is a required field!"
+			}
+
+			# Any "faults"?
+			if ( count( $faults ) )
+			{
+				return $faults;
 			}
 
 			//--------------------------------------------------------------------
@@ -2070,46 +2060,121 @@ class Module_Handler
 			}
 			$_processor_instance->modules__ddl__do_validate( $input, $m, $ddl_config__validated, $faults );
 
+			//-----------------------------------------------------
+			// Make sure protected properties are not altered!
+			//-----------------------------------------------------
+
+			$_list_of_protected_properties = array( "name", "type", "subtype", "links_with", "default_options", "maxlength", "connector_enabled" );
+			foreach ( $_list_of_protected_properties as $key )
+			{
+				if ( ! isset( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] ) or ! isset( $ddl_config__validated[ $key ] ) )
+				{
+					continue;
+				}
+				if ( is_array( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] ) ) // Arrays are serialized, we need unserialize them to compare
+				{
+					if ( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] != unserialize( $ddl_config__validated[ $key ] ) )
+					{
+						$faults[] = array( 'faultCode' => 0, 'faultMessage' => "DDL__INCONSISTENCY_DETECTED__PROTECTED_PROPERTIES" ); // "Fatal error occured during DDL editing!"
+						break;
+					}
+				}
+				else
+				{
+					if ( $m['m_data_definition'][ $ddl_config__validated['name'] ][ $key ] != $ddl_config__validated[ $key ] )
+					{
+						$faults[] = array( 'faultCode' => 0, 'faultMessage' => "DDL__INCONSISTENCY_DETECTED__PROTECTED_PROPERTIES" ); // "Fatal error occured during DDL editing!"
+						break;
+					}
+				}
+			}
+
 			# Any "faults"?
 			if ( count( $faults ) )
 			{
 				return $faults;
 			}
-print "test";
-print_r($ddl_config__validated);
-return;
-			# Continue...
+
+			//-----------------------------------------
+			// Database : ALTER *_master_repo table
+			//-----------------------------------------
+
+			$ddl_config__validated__translated = $this->API->Db->modules__ddl_column_type_translation( $ddl_config__validated , true );
+			$ddl_config__validated__translated['old_name'] = $ddl_config__validated__translated['name']; // For SQL 'ALTER CHANGE' operation
+
 			$this->API->Db->cur_query = array(
 					'do'         =>  "alter",
 					'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
-					'action'     =>  "add_column",
-					'col_info'   =>  $this->API->Db->modules__ddl_column_type_translation( $_processor_instance->ddl_config__validated , true )
+					'action'     =>  "change_column",
+					'col_info'   =>  array( $ddl_config__validated__translated['name'] => $ddl_config__validated__translated )
 				);
+			if ( ! $this->API->Db->simple_exec_query() )
+			{
+				return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to alter Master-Repo table for reasons unknown!" );
+			}
 
-			if ( $this->API->Db->simple_exec_query() )
+			//-----------------------------------------
+			// Database : ALTER *_conn_repo__* table
+			//-----------------------------------------
+
+			if ( $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_enabled'] and ! empty( $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_linked'] ) )
 			{
-				# INSERT - modules_data_definition
+				$ddl_config__validated__translated_for_conn = $this->API->Db->modules__ddl_column_type_translation( $ddl_config__validated );
+				$ddl_config__validated__translated_for_conn['old_name'] = $ddl_config__validated__translated_for_conn['name']; // For SQL 'ALTER CHANGE' operation
+
 				$this->API->Db->cur_query = array(
-						'do'     =>  "insert",
-						'table'  =>  "modules_data_definition",
-						'set'    =>  $_processor_instance->ddl_config__validated,
+						'do'         =>  "alter",
+						'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . strtolower( $ddl_config__validated['name'] ),
+						'action'     =>  "change_column",
+						'col_info'   =>  array( $ddl_config__validated__translated_for_conn['name'] => $ddl_config__validated__translated_for_conn )
 					);
-				if ( $this->API->Db->simple_exec_query() )
+				if ( ! $this->API->Db->simple_exec_query() )
 				{
-					# On SUCCESS, update cache and respond
-					$_recache = $this->API->classes__do_get("Recache");
-					$_recache->main( "modules" );
-					return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully added!<br />Refreshing...' , 'responseAction' => 'refresh' );
+					return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to alter Conn-Repo table for reasons unknown!" );
 				}
-				else
-				{
-					return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to create new Data-Definition record for reasons unknown!" );
-				}
+
+				# Update DDL-record of Title-field for corresponding connector unit
+				$this->API->Db->cur_query = array(
+						'do'     =>  "update",
+						'tables' =>  "modules_data_definition",
+						'set'    =>  array_merge( // Updating ...
+								$ddl_config__validated,
+								array(
+										'm_unique_id'           => $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_linked'], // ... 'm_unique_id' with that of Connector-unit
+										'connector_enabled'     => null, // for data-fields belonging to a Connector-unit, 'connector_enabled' = NULL
+										'connector_linked'      => null, // for data-fields belonging to a Connector-unit, 'connector_linked' = NULL
+										'connector_length_cap'  => null, // for data-fields belonging to a Connector-unit, 'connector_length_cap' = NULL
+									)
+							),
+						'where'  =>  array(
+								"m_unique_id=" . $this->API->Db->quote( $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_linked'] ),
+								"name=" . $this->API->Db->quote( $ddl_config__validated['name'] ),
+							),
+					);
+				$this->API->Db->simple_exec_query();
+
+				$this->API->classes__do_get("Recache")->main( "modules_connectors" );
 			}
-			else
-			{
-				return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to alter Data-Repo table for reasons unknown!" );
-			}
+
+			//------------------------------------------------
+			// Database : INSERT - modules_data_definition
+			//------------------------------------------------
+
+			$this->API->Db->cur_query = array(
+					'do'     =>  "update",
+					'tables' =>  "modules_data_definition",
+					'set'    =>  $ddl_config__validated,
+					'where'  =>  array(
+							"m_unique_id=" . $this->API->Db->quote( $ddl_config__validated['m_unique_id'] ),
+							"name=" . $this->API->Db->quote( $ddl_config__validated['name'] ),
+						),
+				);
+			$this->API->Db->simple_exec_query();
+
+			$_recache = $this->API->classes__do_get("Recache");
+			$_recache->main( "modules" );
+
+			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully altered!<br />Refreshing...' , 'responseAction' => 'refresh' );
 		}
 		else
 		{
@@ -2250,7 +2315,7 @@ return;
 
 			# Prepare necessary SQL statement parameters
 			$list_of_columns_to_process__translated = array();
-			$list_of_c_unique_ids_to_process        = array();                 // Connector-Unit IDs, for future reference
+			$list_of_c_unique_ids_to_process        = array(); // Connector-Unit IDs, for future reference
 			foreach ( $list_of_columns_to_process as $name )
 			{
 				$list_of_columns_to_process__translated[ $name ] = $this->API->Db->modules__ddl_column_type_translation(
@@ -2267,7 +2332,7 @@ return;
 				if ( $input['do_backup_dropped_field'] )
 				{
 					$list_of_columns_to_process__translated[ $name ]['old_name']  = $name;
-					$list_of_columns_to_process__translated[ $name ]['name']      = "__" . $name;       // Flagging the backup'ed column name with double-underscore prefix
+					$list_of_columns_to_process__translated[ $name ]['name']      = "__" . $name; // Flagging the backup'ed column name with double-underscore prefix
 				}
 			}
 

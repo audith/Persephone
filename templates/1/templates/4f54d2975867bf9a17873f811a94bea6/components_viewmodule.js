@@ -375,7 +375,11 @@ Acp_ComponentsViewmodule.prototype.registry = {
 	},
 	'link' : {
 		'_label' : "Link with other module",
-		'_links' : {},
+		'_links' : {
+			'options' : {
+				'is_required' : false
+			}
+		},
 		'value__for' : {}
 	}
 
@@ -385,6 +389,7 @@ Acp_ComponentsViewmodule.prototype.registry = {
  * @param object
  *            Object that triggers this method
  * @return boolean TRUE on success, FALSE otherwise
+ * @todo Re-write code with reverse logic: open all fieldsets first, then close unnecessary ones and apply values afterwards; instead of, closing all down and opening necessary ones. This way we can have more control over the form and not write dupe code.
  */
 Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( obj /* , customRegistry , doNotRePopulateSubType */ )
 {
@@ -871,7 +876,6 @@ jQuery(document).ready(function ( event )
 				jQuery("#forms__components__ddl__alter_add .default_options").hide(); // 'default_options'
 				jQuery("#forms__components__ddl__alter_add .maxlength").hide(); // 'maxlength'
 				jQuery("#forms__components__ddl__alter_add .connector_enabled").hide(); // 'connector_enabled'
-				jQuery("#forms__components__ddl__alter_add .connector_length_cap").hide(); // 'connector_length_cap'
 
 				return true;
 			}

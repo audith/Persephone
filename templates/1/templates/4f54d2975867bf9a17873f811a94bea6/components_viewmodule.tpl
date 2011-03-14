@@ -1,7 +1,7 @@
 <samp id="system_console" class="full_size"></samp>
 <ul class="data_container full_size">
 	<li id="components__ddl__alter_add" class="ondemand">
-		<h2 class="full_size">Data Definition Management
+		<h2 class="full_size">Data Definition Management (for Master-unit)
 			<span class="description"></span>
 		</h2>
 		<form id="forms__components__ddl__alter_add" action="" method="post" class="js__go_ajax">
@@ -134,8 +134,8 @@
 				<optgroup label="Select one or more:">
 					<option></option>
 					{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
-						{{if $FIELD.connectors_enabled}}
-							{{if $FIELD.connectors_linked and count( $FIELD.c_data_definition )}}
+						{{if $FIELD.connector_enabled}}
+							{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
 								{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
 								<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
 								{{/foreach}}
@@ -198,8 +198,8 @@
 							{{/if}}
 
 							{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
-								{{if $FIELD.connectors_enabled}}
-									{{if $FIELD.connectors_linked and count( $FIELD.c_data_definition )}}
+								{{if $FIELD.connector_enabled}}
+									{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
 										{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
 										<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
 										{{/foreach}}
@@ -246,8 +246,8 @@
 							<option value="status_locked">Is Locked? [status_locked]</option>
 							{{/if}}
 							{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
-								{{if $FIELD.connectors_enabled}}
-									{{if $FIELD.connectors_linked and count( $FIELD.c_data_definition )}}
+								{{if $FIELD.connector_enabled}}
+									{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
 										{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
 										<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
 										{{/foreach}}
@@ -346,7 +346,7 @@
 	</li>
 
 	<li id="components__ddl__list">
-		<h2 class="full_size">Data Definition Management - Actual for: <em>/{{$CONTENT.me.m_name}}</em>
+		<h2 class="full_size">Data Definition Management (for Master-unit) - Actual for: <em>/{{$CONTENT.me.m_name}}</em>
 			<span class="description">
 			... create and manage data-fields of your module
 			</span>
@@ -398,7 +398,7 @@
 					</td>
 					<td>{{$FIELD.type}}{{if $FIELD.subtype neq ''}}/{{$FIELD.subtype}}{{/if}}{{if $FIELD.maxlength neq ''}} [{{$FIELD.maxlength|truncate:30:"...":TRUE}}]{{/if}}</td>
 					<td align="left">
-					{{if count( $FIELD.used_in )}}
+					{{if isset( $FIELD.used_in ) && count( $FIELD.used_in )}}
 						<ul class="dependency_list">{{foreach from=$FIELD.used_in item=S_NAME}}<li>{{$S_NAME}}</li>{{/foreach}}</ul>
 					{{else}}--{{/if}}
 					</td>
@@ -415,7 +415,7 @@
 
 	{{if count($CONTENT.me.m_data_definition_bak)}}
 	<li id="components__ddl__list_bak">
-		<h2 class="full_size">Data Definition Management - Backup for: <em>/{{$CONTENT.me.m_name}}</em>
+		<h2 class="full_size">Data Definition Management (for Master-unit) - Backup for: <em>/{{$CONTENT.me.m_name}}</em>
 			<span class="description">
 			... restore data-fields of your module from backups
 			</span>

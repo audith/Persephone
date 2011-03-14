@@ -181,7 +181,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  null,
 						'request_regex'        =>  "[a-z0-9-]{1,%s}",
 						'default_options'      =>  null,
-						'default_value'        =>  "",
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'is_unique'            =>  0,
@@ -193,7 +193,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+-]?\d{1,%u}",
 						'request_regex'        =>  "[+-]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  -128,
@@ -207,7 +207,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+]?\d{1,%u}",
 						'request_regex'        =>  "[+]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  0,
@@ -221,7 +221,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+-]?\d{1,%u}",
 						'request_regex'        =>  "[+-]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  -32768,
@@ -235,7 +235,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+]?\d{1,%u}",
 						'request_regex'        =>  "[+]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  0,
@@ -249,7 +249,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+-]?\d{1,%u}",
 						'request_regex'        =>  "[+-]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  -8388608,
@@ -263,7 +263,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+]?\d{1,%u}",
 						'request_regex'        =>  "[+]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  0,
@@ -277,7 +277,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+-]?\d{1,%u}",
 						'request_regex'        =>  "[+-]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  -2147483648,
@@ -291,7 +291,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+]?\d{1,%u}",
 						'request_regex'        =>  "[+]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  0,
@@ -305,7 +305,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+-]?\d{1,%u}",
 						'request_regex'        =>  "[+-]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  -9223372036854775808,
@@ -319,7 +319,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+]?\d{1,%u}",
 						'request_regex'        =>  "[+]?\d{1,%u}",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  0,
@@ -333,7 +333,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+-]?\d{1,%u}(?:\.\d{0,%u})?",
 						'request_regex'        =>  "[+-]?\d{1,%u}(?:\.\d{0,%u})?",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  null,
@@ -347,7 +347,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'input_regex'          =>  "[+]?\d{1,%u}(?:\.\d{0,%u})?",
 						'request_regex'        =>  "[+]?\d{1,%u}(?:\.\d{0,%u})?",
 						'default_options'      =>  null,
-						'default_value'        =>  0,
+						'default_value'        =>  null,
 						'connector_enabled'    =>  false,
 						'connector_length_cap' =>  1,
 						'min_value'            =>  null,
@@ -401,8 +401,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 
 		if ( ! array_key_exists( $_skel_subtype_key, $skel ) )
 		{
-			$faults[] = array( 'faultCode' => 706, 'faultMessage' => "SUBTYPE__IS_INVALID" );
-			// "No such data-subtype is defined: <em>" . $input[ $_form_field_name ] . "</em> (for data-type: <em>alphanumeric</em>)!"
+			$faults[] = array( 'faultCode' => 706, 'faultMessage' => "SUBTYPE__IS_INVALID" ); // "No such data-subtype is defined: <em>" . $input[ $_form_field_name ] . "</em> (for data-type: <em>alphanumeric</em>)!"
 		}
 		else
 		{
@@ -428,8 +427,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 					# DEFAULT OPTIONS: Validation (for DROPDOWN, MULTIPLE)...
 					if ( ! $input['default_options'] )
 					{
-						$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__IS_REQUIRED_FOR_DROPDOWN_MULTIPLE" );
-						// "<em>Default Options</em> is a required field for '<em>Preset Single/Multiple Select</em>' data-types!"
+						$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__IS_REQUIRED_FOR_DROPDOWN_MULTIPLE" ); // "<em>Default Options</em> is a required field for '<em>Preset Single/Multiple Select</em>' data-types!"
 					}
 					else
 					{
@@ -439,18 +437,15 @@ class Data_Processor__Alphanumeric extends Data_Processor
 							$__option = explode( "=", $_option );
 							if ( count( $__option ) != 2 )
 							{
-								$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__ONE_EQ_PER_LINE_ONLY" );
-								// "<em>Default Options</em>: Each line must contain one and only one 'equals' (=) sign!"
+								$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__ONE_EQ_PER_LINE_ONLY" ); // "<em>Default Options</em>: Each line must contain one and only one 'equals' (=) sign!"
 							}
 							elseif ( strlen( $__option[0] ) == 0 or strlen( $__option[1] ) == 0 )
 							{
-								$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__EQ_EITHER_SIDE_EMPTY" );
-								// "<em>Default Options</em>: Neither side of 'equals' (=) sign can be empty!"
+								$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__EQ_EITHER_SIDE_EMPTY" ); // "<em>Default Options</em>: Neither side of 'equals' (=) sign can be empty!"
 							}
 							elseif ( ! preg_match( '#^[a-z0-9_]+$#i' , $__option[0] ) )
 							{
-								$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__INVALID_CHARACTERS_INSIDE_KEY" );
-								// "<em>Default Options</em>: Left side of 'equals' (=) signs - i.e. the 'keys' of the options can contain <em>Perl-'word'-characters</em> ('<em>\w</em>') only!"
+								$faults[] = array( 'faultCode' => 708, 'faultMessage' => "DEFAULT_OPTIONS__INVALID_CHARACTERS_INSIDE_KEY" ); // "<em>Default Options</em>: Left side of 'equals' (=) signs - i.e. the 'keys' of the options can contain <em>Perl-'word'-characters</em> ('<em>\w</em>') only!"
 							}
 							# DEFAULT OPTIONS: Processing (for DROPDOWN, MULTIPLE)...
 							$dft_default_options[ $__option[0] ] = $__option[1];
@@ -492,18 +487,15 @@ class Data_Processor__Alphanumeric extends Data_Processor
 					{
 						if ( $_dft_maxlength[1] == 0 )
 						{
-							$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__INVALID_ENTRY__REVERTING_TO_DEFAULT", 'faultExtra' => "10,0" );
-							// "Invalid entry for <em>Precision &amp; Scale</em>! Assuming default value ('<em>10,0</em>'). Re-submit the form!"
+							$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__INVALID_ENTRY__REVERTING_TO_DEFAULT", 'faultExtra' => "10,0" ); // "Invalid entry for <em>Precision &amp; Scale</em>! Assuming default value ('<em>10,0</em>'). Re-submit the form!"
 						}
 						elseif ( $_dft_maxlength[1] > 64 )
 						{
-							$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__PRECISION_EXCEEDS_MAXIMUM" );
-							// "Invalid entry for <em>Precision &amp; Scale</em>! Number to the <em>left of comma</em> cannot exceed 64! You entered <em>" . $_dft_maxlength[1] . "<em> which is more than 64!"
+							$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__PRECISION_EXCEEDS_MAXIMUM" ); // "Invalid entry for <em>Precision &amp; Scale</em>! Number to the <em>left of comma</em> cannot exceed 64! You entered <em>" . $_dft_maxlength[1] . "<em> which is more than 64!"
 						}
 						elseif ( $_dft_maxlength[1] <= $_dft_maxlength[2] )
 						{
-							$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__PRECISION_SMALLER_THAN_SCALE", 'faultExtra' => $_dft_maxlength[1] . ",0" );
-							// "Invalid entry for <em>Precision &amp; Scale</em>! Assuming value to be '<em>" . $_dft_maxlength[1] . ",0</em>'. Re-submit the form!"
+							$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__PRECISION_SMALLER_THAN_SCALE", 'faultExtra' => $_dft_maxlength[1] . ",0" ); // "Invalid entry for <em>Precision &amp; Scale</em>! Assuming value to be '<em>" . $_dft_maxlength[1] . ",0</em>'. Re-submit the form!"
 						}
 						else
 						{
@@ -513,8 +505,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 					}
 					else
 					{
-						$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__INVALID_ENTRY__REVERTING_TO_DEFAULT", 'faultExtra' => "10,0" );
-						// "Invalid entry for <em>Precision &amp; Scale</em>! Assuming default value ('<em>10,0</em>'). Re-submit the form!"
+						$faults[] = array( 'faultCode' => 709, 'faultMessage' => "PRECISION_SCALE__INVALID_ENTRY__REVERTING_TO_DEFAULT", 'faultExtra' => "10,0" ); // "Invalid entry for <em>Precision &amp; Scale</em>! Assuming default value ('<em>10,0</em>'). Re-submit the form!"
 					}
 				}
 				break;
@@ -591,21 +582,18 @@ class Data_Processor__Alphanumeric extends Data_Processor
 
 		# DEFAULT VALUE: Validation...
 		$dft_default_value = $_skel_subtype_node['default_value'];
-
 		switch ( $dft_subtype )
 		{
 			case 'string':
-				if ( ! empty( $input['default_value'] ) )
+				if ( $input['default_value'] != '' )
 				{
 					if ( $dft_maxlength > 255 )
 					{
-						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__STRING__BIGSTRING_DETECTED" );
-						// "255+ character-long '<em>General String</em>' subtype-field cannot have a default value! Leave <em>Default Value</em> field empty!"
+						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__STRING__BIGSTRING_DETECTED" ); // "255+ character-long '<em>General String</em>' subtype-field cannot have a default value! Leave <em>Default Value</em> field empty!"
 					}
 					elseif ( $dft_maxlength <= 255 and strlen( $input['default_value'] ) > $dft_maxlength )
 					{
-						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__STRING__IS_LONGER_THAN_MAXLENGTH" );
-						// "A " . $dft_maxlength . "-character-long field cannot have a '<em>Default Value</em>' with " . strlen( $input['default_value'] ) . " characters! Change either '<em>Default Value</em>' or '<em>Field Max-Length</em>' setting! Also be aware of multi-byte characters!"
+						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__STRING__IS_LONGER_THAN_MAXLENGTH" ); // "A " . $dft_maxlength . "-character-long field cannot have a '<em>Default Value</em>' with " . strlen( $input['default_value'] ) . " characters! Change either '<em>Default Value</em>' or '<em>Field Max-Length</em>' setting! Also be aware of multi-byte characters!"
 					}
 					# DEFAULT VALUE: Processing (for ALPHANUMERIC\STRING)...
 					$dft_default_value = $input['default_value'];
@@ -622,21 +610,19 @@ class Data_Processor__Alphanumeric extends Data_Processor
 			case 'integer_unsigned_32':
 			case 'integer_signed_64':
 			case 'integer_unsigned_64':
-				if ( ! empty( $input['default_value'] ) )
+				# DEFAULT VALUE: Processing (for ALPHANUMERIC\INTEGER)...
+				if ( $input['default_value'] != '' )
 				{
 					if ( ! preg_match( '#^' . $dft_input_regex . '$#', $input['default_value'] ) )
 					{
-						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__INTEGER_UNSIGNED__INVALID_ENTRY" );
-						// "Invalid entry for <em>Default Value</em>: Entry needs to be numeric; and positive, if data-subtype is an unsigned integer! And it cannot violate the range ('<em>" . $_skel_subtype_node['min_value'] . "/" . $_skel_subtype_node['max_value'] ."</em>') of selected data-subtype!"
+						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__INTEGER_UNSIGNED__INVALID_ENTRY" ); // "Invalid entry for <em>Default Value</em>: Entry needs to be numeric; and positive, if data-subtype is an unsigned integer! And it cannot violate the range ('<em>" . $_skel_subtype_node['min_value'] . "/" . $_skel_subtype_node['max_value'] ."</em>') of selected data-subtype!"
 					}
 					else
 					{
 						if ( $input['default_value'] < $_skel_subtype_node['min_value'] or $input['default_value'] > $_skel_subtype_node['max_value'] )
 						{
-							$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__INTEGER__OUT_OF_RANGE" );
-							// "Invalid entry for <em>Default Value</em>: Value beyond the range ('<em>" . $_skel_subtype_node['min_value'] . "/" . $_skel_subtype_node['max_value'] ."</em>') of select data-subtype!"
+							$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__INTEGER__OUT_OF_RANGE" ); // "Invalid entry for <em>Default Value</em>: Value beyond the range ('<em>" . $_skel_subtype_node['min_value'] . "/" . $_skel_subtype_node['max_value'] ."</em>') of select data-subtype!"
 						}
-						# DEFAULT VALUE: Processing (for ALPHANUMERIC\INTEGER)...
 						$dft_default_value = intval( $input['default_value'] );
 					}
 				}
@@ -644,17 +630,15 @@ class Data_Processor__Alphanumeric extends Data_Processor
 
 			case 'decimal_signed':
 			case 'decimal_unsigned':
-				if ( ! empty( $input['default_value'] ) )
+				if ( $input['default_value'] != '' )
 				{
 					if ( $dft_subtype == 'decimal_unsigned' and $input['default_value'] < 0 )
 					{
-						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__NUMERIC_UNSIGNED__ENTRY_IS_SIGNED" );
-						// "Unsigned data-types cannot have a negative <em>Default Value</em>s!"
+						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__NUMERIC_UNSIGNED__ENTRY_IS_SIGNED" ); // "Unsigned data-types cannot have a negative <em>Default Value</em>s!"
 					}
 					if ( ! preg_match( '#^' . $dft_input_regex . '$#', $input['default_value'] ) )
 					{
-						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__DECIMAL__COMPLIANCE_WITH_PRECISION_SCALE_FAILURE" );
-						// "<em>Default Value</em> does not comply with <em>Precision &amp; Scale</em> setting! Fix either one."
+						$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__DECIMAL__COMPLIANCE_WITH_PRECISION_SCALE_FAILURE" ); // "<em>Default Value</em> does not comply with <em>Precision &amp; Scale</em> setting! Fix either one."
 					}
 					# DEFAULT VALUE: Processing (for ALPHANUMERIC\DECIMAL)...
 					$dft_default_value = floatVal( $input['default_value'] );
@@ -663,7 +647,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 
 			case 'dropdown':
 			case 'multiple':
-				if ( ! empty( $input['default_value'] ) )
+				if ( $input['default_value'] != '' )
 				{
 					if ( preg_match_all( '#^(?P<first>[a-z0-9_]+)(?:,(?P<rest>[a-z0-9_]+))*$#i' , $input['default_value'] , $_values ) )
 					{
@@ -673,13 +657,11 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						}
 						if ( $dft_subtype == 'dropdown' and count( $_values['rest'] ) )
 						{
-							$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__DROPDOWN__MORE_THAN_ONE_VALUES_PROVIDED" );
-							// "<em>Default Value</em>: 'Preset Single Select [Dropdown or Radio]' data-type can have only one default value!"
+							$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__DROPDOWN__MORE_THAN_ONE_VALUES_PROVIDED" ); // "<em>Default Value</em>: 'Preset Single Select [Dropdown or Radio]' data-type can have only one default value!"
 						}
 						if ( ! array_key_exists( $_values['first'][0], $dft_default_options ) )
 						{
-							$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__DROPDOWN__OUT_OF_RANGE" );
-							// "<em>Default Value</em>: One or more default values could not be found among the values provided in default options!"
+							$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__DROPDOWN__OUT_OF_RANGE" ); // "<em>Default Value</em>: One or more default values could not be found among the values provided in default options!"
 						}
 						if ( count( $_values['rest'] ) )
 						{
@@ -724,6 +706,10 @@ class Data_Processor__Alphanumeric extends Data_Processor
 
 		# UNIQUE-NESS: Processing...
 		$dft_is_unique = ( isset( $input['is_unique'] ) and $input['is_unique'] ) ? 1 : 0;
+		if ( ! is_null( $dft_default_value ) and $dft_is_unique )
+		{
+			$faults[] = array( 'faultCode' => 710, 'faultMessage' => "DEFAULT_VALUE__UNIQUE_CANNOT_HAVE_DEFAULT_VALUE" );
+		}
 		switch ( $dft_subtype )
 		{
 			case 'dropdown':
@@ -773,7 +759,8 @@ class Data_Processor__Alphanumeric extends Data_Processor
 						'connector_length_cap' =>  $dft_connector_length_cap,
 						'is_html_allowed'      =>  $dft_is_html_allowed,
 						'is_unique'            =>  $dft_is_unique,
-						'is_numeric'           =>  $_skel_subtype_node['is_numeric']
+						'is_required'          =>  $input['is_required'] ? 1 : 0,
+						'is_numeric'           =>  $_skel_subtype_node['is_numeric'],
 					)
 			);
 
