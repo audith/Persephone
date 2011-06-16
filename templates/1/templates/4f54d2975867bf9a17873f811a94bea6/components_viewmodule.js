@@ -820,7 +820,7 @@ jQuery(document).ready(function ( event )
 				}
 
 				/* Building Registry [configuration] */
-				var registry = acp__components_viewmodule.cloneObject( acp__components_viewmodule.registry );
+				var registry = acp__components_viewmodule.cloneObject( acp__components_viewmodule.registry__ddl );
 
 				/* Continue... */
 				jQuery("#forms__components__ddl__list [type='button']:eq(0)").trigger("click"); // Click "Create New DDL" button to open form and reset it
