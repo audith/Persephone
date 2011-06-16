@@ -122,17 +122,17 @@
 
 		<form id="forms__components__sr__create" action="" method="post">
 		<fieldset>
-			<label title="Service Mode" for="create_subroutine__service_mode"><strong>Service Mode:</strong><em>The functionality of the subroutine.</em></label>
+			<label title="Service Mode" for="create_subroutine__service_mode"><strong>Service Mode:</strong><em>Flow of the information within the subroutine.</em></label>
 			<select id="create_subroutine__service_mode" name="s_service_mode">
 				<option value="read-only" selected="selected">Read-Only</option>
 				<option value="write-only">Write-Only</option>
 				<option value="read-write">Read and Write</option>
 			</select>
-
+		</fieldset>
+		<fieldset>
 			<label title="Data Sources"><strong>Data Sources:</strong><em>Db columns to fetch...</em></label>
 			<select name="s_data_definition[]" multiple="multiple" size="5" class="required">
 				<optgroup label="Select one or more:">
-					<option></option>
 					{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
 						{{if $FIELD.connector_enabled}}
 							{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
@@ -157,7 +157,8 @@
 					<option value="status_locked" disabled="disabled">Is Locked? [status_locked]</option>
 				</optgroup>
 			</select>
-
+		</fieldset>
+		<fieldset>
 			<label title="Subroutine Unix Name" for="create_subroutine__name"><strong>Subroutine Unix Name:</strong><em>Lowcase alphanumeric [ASCII codebase] + underscore chars only.</em></label>
 			<input type="text" class="text required" id="create_subroutine__name" name="s_name" value="" maxlength="32" style="text-transform:lowercase;" />
 
@@ -167,7 +168,8 @@
 					<span style="font-weight:bold; float:left;">{{$CONTENT.me.m_url_prefix}}/</span><input type="text" class="text required" id="create_subroutine__request_method__pathinfo__uri_schema" name="s_pathinfo_uri_schema" style="width:55%;" value="" maxlength="255" />
 				</span>
 			</span>
-
+		</fieldset>
+		<fieldset>
 			<span id="create_subroutine__fetch_criteria">
 				<label class="full_size" title="Fetch Criteria - Queries &amp; Query Groups (Policies)" for="create_subroutine__fetch_criteria__all_or_selected">
 					<strong>Fetch Criteria - Queries &amp; Query Groups (Policies):</strong>
@@ -234,7 +236,7 @@
 					</span>
 
 					{{* Sample for cloning , never used itself , thus name="" attribs are empty and are set by JScript after cloning *}}
-					<span class="extra" style="display: none;">
+					<span class="extra">
 						<select name="">
 							{{if count( $CONTENT.me.m_data_definition)}}
 							<option value="id">Id [id]</option>
@@ -282,13 +284,16 @@
 					</span>
 				</span>
 			</span>
-
+		</fieldset>
+		<fieldset>
 			<label title="Fetch Criteria - Limit" for="create_subroutine__fetch_criteria__limit"><strong>Fetch Criteria -  Limit:</strong><em>Total number of fetched rows. Leave empty to fetch everything that matches the request criteria.</em></label>
 			<input type="text" name="s_fetch_criteria[limit]" id="create_subroutine__fetch_criteria__limit" class="text" />
-
+		</fieldset>
+		<fieldset>
 			<label title="Fetch Criteria - Pagination" for="create_subroutine__fetch_criteria__pagination"><strong>Fetch Criteria - Pagination:</strong><em>Number of results per page. Leave empty for no pagination.</em></label>
 			<input type="text" name="s_fetch_criteria[pagination]" id="create_subroutine__fetch_criteria__pagination" class="text" maxlength="3" />
-
+		</fieldset>
+		<fieldset>
 			<span id="create_subroutine__fetch_criteria__order">
 				<label class="full_size" title="Fetch Criteria - Sorting" for="create_subroutine__fetch_criteria__do_perform_sorting">
 					<strong>Fetch Criteria - Sorting:</strong><em>Sort (order) fetched data by one or more columns in certain direction(s) (ascending or descending, sequence-sensitive).</em>
@@ -466,14 +471,15 @@
 		<table class="full_size tablesorter {sortlist: [[0,0]]}" id="tables__components__sr__list">
 			<thead>
 				<tr>
-					<th style="width: 50%; white-space: nowrap;">Subroutine Name</th>
-					<th style="width: 45%; white-space: nowrap;" class="{sorter: false}">Data Repository</th>
+					<th style="width: 45%; white-space: nowrap;">Subroutine Name</th>
+					<th style="width: 10%;">Serv. Mode</th>
+					<th style="width: 40%; white-space: nowrap;" class="{sorter: false}">Data Repository</th>
 					<th style="width: 5%;" class="{sorter: false}"></th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<td colspan="3">
+					<td colspan="4">
 					<div class="system_console"></div>
 					<fieldset class="buttons">
 						<input type="button" value="Create New" {{if count($CONTENT.me.m_data_definition) eq 0}}disabled="disabled"{{/if}} />
@@ -487,7 +493,8 @@
 			<tbody>
 				{{foreach from=$CONTENT.me.m_subroutines item=SR}}
 				<tr>
-					<td><span class="name {{if $SR.s_service_mode eq 'read-only'}}is_ro{{elseif $SR.s_service_mode eq 'write-only'}}is_wo{{elseif $SR.s_service_mode eq 'read-write'}}is_rw{{/if}}"><a href="#" onclick="javascript: void(0);">{{$SR.s_name|truncate:20:"...":TRUE}}</a></span></td>
+					<td><span class="name"><a href="#" onclick="javascript: void(0);">{{$SR.s_name|truncate:20:"...":TRUE}}</a></span></td>
+					<td style="text-align: center;">{{if $SR.s_service_mode eq 'read-only'}}read-only{{elseif $SR.s_service_mode eq 'write-only'}}write-only{{elseif $SR.s_service_mode eq 'read-write'}}read-write{{/if}}</td>
 					<td>
 					{{if count( $SR.s_data_definition )}}
 						<ul class="dependency_list">{{foreach from=$SR.s_data_definition item=DDF}}<li>{{$DDF.name|truncate:32:"...":TRUE}}</li>{{/foreach}}</ul>
@@ -497,7 +504,7 @@
 				</tr>
 				{{foreachelse}}
 				<tr>
-					<td colspan="3"><span class="system_message_error">No Subroutines Found!<br />
+					<td colspan="4"><span class="system_message_error">No Subroutines Found!<br />
 					{{if count($CONTENT.me.m_data_definition) eq 0}}You cannot create new one, until you create at least one data-field!{{/if}}</span></td>
 				</tr>
 				{{/foreach}}

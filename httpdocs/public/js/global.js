@@ -143,7 +143,7 @@ Persephone.prototype.inArray = function ( needle , haystack /* , strict */ )
  * Creates a copy/clone of an object.
  * @param    {Object}  Object to copy/clone
  * @returns  {Object}  New object
- * @usage    var newObj = persephone.cloneObject( originalObj );
+ * @usage    var newObj = persephone.cloneObject( objectToClone );
  */
 Persephone.prototype.cloneObject = function ( objectToClone )
 {
@@ -166,7 +166,7 @@ Persephone.prototype.cloneObject = function ( objectToClone )
 /**
  * Checks whether the given object is empty or not.
  *
- * @returns mixed TRUE if the object is empty, FALSE if not; undefined if error occurs.
+ * @returns {Mixed} TRUE if the object is empty, FALSE if not; undefined if error occurs.
  */
 Persephone.prototype.isEmptyObject = function ( object )
 {
@@ -199,7 +199,7 @@ Persephone.prototype.isEmptyObject = function ( object )
 /**
  * Persephone main Javascript object.
  *
- * @returns object Object handler.
+ * @returns {Object} Object handler.
  */
 function /* Class */ Persephone ()
 {
@@ -230,13 +230,13 @@ Persephone.prototype.debug = function ( item )
 Persephone.prototype.Form = {
 	/**
 	 * Working form object.
-	 * @var mixed
+	 * @var {Mixed}
 	 */
 	self : null,
 
 	/**
 	 * jQuery-UI Dialog instance
-	 * @var mixed
+	 * @var {Mixed}
 	 */
 	dialogInstance : null,
 
@@ -270,7 +270,7 @@ Persephone.prototype.Form = {
 		};
 		if ( typeof newOptions == 'object' && !persephone.isEmptyObject(newOptions) )
 		{
-			jQuery.extend(true, options, newOptions);
+			jQuery.extend(true, options, newOptions);  // 'true' means we merge two arrays and assign the resulting value to the first variable
 		}
 
 		/* Do we have a valid instance? If so, return it; otherwise, create new one. */
@@ -291,7 +291,7 @@ Persephone.prototype.Form = {
 	/**
 	 * Scrolls the page to the to the "top" of Console
 	 *
-	 * @returns mixed jQuery object (current canvas) on success, FALSE otherwise
+	 * @returns {Mixed} [jQuery] jQuery object (current canvas) on success, [Boolean] FALSE otherwise
 	 * @uses jQuery
 	 */
 	scrollToConsole : function ( enforceGlobalConsole )
@@ -350,7 +350,7 @@ Persephone.prototype.Form = {
 	/**
 	 * Closes all Consoles
 	 *
-	 * @returns void
+	 * @returns {Void}
 	 * @uses jQuery
 	 */
 	closeConsoles : function ( excludeGlobalConsole )
@@ -366,9 +366,8 @@ Persephone.prototype.Form = {
 	/**
 	 * Hides all .ondemand elements
 	 *
-	 * @param {String}
-	 *            Optional: What to exclude (DOM elements)
-	 * @return {Boolean} TRUE on success, FALSE otherwise
+	 * @param {String} Optional: What to exclude (DOM elements)
+	 * @return {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
 	 * @uses jQuery
 	 */
 	resetOnDemandObjects : function ( exceptions )
@@ -392,6 +391,13 @@ Persephone.prototype.Form = {
 
 		/* Hide containers [fieldsets] */
 		var _obj = this.self.find(".ondemand");
+
+		/* No matching elements? */
+		if ( _obj.size() == 0 )
+		{
+			return false;
+		}
+
 		if ( exceptions )
 		{
 			_obj = _obj.not(exceptions);
@@ -409,9 +415,8 @@ Persephone.prototype.Form = {
 	/**
 	 * Enables/reveals/shows requested .ondemand element
 	 *
-	 * @param jQuery
-	 *            Requested object
-	 * @return {Boolean} TRUE on success, FALSE otherwise
+	 * @param {Mixed} Requested object: of type {jQuery} or otherwise
+	 * @return {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
 	 * @uses jQuery
 	 */
 	enableOnDemandElement : function ( obj )
@@ -427,6 +432,12 @@ Persephone.prototype.Form = {
 			obj = jQuery(obj);
 		}
 
+		/* No matching elements? */
+		if ( obj.size() == 0 )
+		{
+			return false;
+		}
+
 		/* First show those containers */
 		obj.show();
 
@@ -439,9 +450,8 @@ Persephone.prototype.Form = {
 	/**
 	 * Resets/hides/disables requested .ondemand element
 	 *
-	 * @param jQuery
-	 *            Requested object
-	 * @return {Boolean} TRUE on success, FALSE otherwise
+	 * @param {Mixed} Requested object: of type {jQuery} or otherwise
+	 * @return {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
 	 * @uses jQuery
 	 */
 	resetOnDemandElement : function ( obj )
@@ -455,6 +465,12 @@ Persephone.prototype.Form = {
 		if ( !(obj instanceof jQuery) )
 		{
 			obj = jQuery(obj);
+		}
+
+		/* No matching elements? */
+		if ( obj.size() == 0 )
+		{
+			return false;
 		}
 
 		/* First disable the form elements within those containers */
@@ -496,7 +512,7 @@ Persephone.prototype.Form = {
 /**
  * Modal windows : Masking the Window/Document
  *
- * @returns mixed [INTEGER] Mask z-index value on success, [BOOLEAN] FALSE otherwise
+ * @returns {Mixed} [Number] Mask z-index value on success, [Boolean] FALSE otherwise
  * @uses jQuery
  */
 Persephone.prototype.dimLights = function ()
@@ -515,7 +531,7 @@ Persephone.prototype.dimLights = function ()
 /**
  * Modal windows : Removing the mask
  *
- * @returns boolean TRUE on success, FALSE otherwise
+ * @returns {Boolean} TRUE on success, FALSE otherwise
  * @uses jQuery
  */
 Persephone.prototype.unDimLights = function ()

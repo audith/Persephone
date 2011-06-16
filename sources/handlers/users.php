@@ -220,44 +220,48 @@ class Module_Handler
 					array(
 							'login'                             =>
 								array(
-										's_name'                         => 'login',
-										's_service_mode'                 => 'write-only',
-										's_pathinfo_uri_schema'          => 'login',
-										's_pathinfo_uri_schema_parsed'   => 'login',
-										's_qstring_parameters'           => array(),
-										's_fetch_criteria'               => array(),
-										's_data_definition'              => array(),
-										'm_unique_id'                    => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										's_name'                          => 'login',
+										's_service_mode'                  => 'write-only',
+										's_pathinfo_uri_schema'           => 'login',
+										's_pathinfo_uri_schema_parsed'    => 'login',
+										's_qstring_parameters'            => array(),
+										's_fetch_criteria'                => array(),
+										's_data_definition'               => array(),
+										's_additional_skin_assets'        => array(),
 									),
 							'logout'                            =>
 								array(
-										's_name'                         => 'logout',
-										's_service_mode'                 => 'read-only',
-										's_pathinfo_uri_schema'          => 'logout',
-										's_pathinfo_uri_schema_parsed'   => 'logout',
-										's_qstring_parameters'           => array(),
-										's_fetch_criteria'               => array(),
-										's_data_definition'              => array(),
-										'm_unique_id'                    => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										's_name'                          => 'logout',
+										's_service_mode'                  => 'read-only',
+										's_pathinfo_uri_schema'           => 'logout',
+										's_pathinfo_uri_schema_parsed'    => 'logout',
+										's_qstring_parameters'            => array(),
+										's_fetch_criteria'                => array(),
+										's_data_definition'               => array(),
+										's_additional_skin_assets'        => array(),
 									),
 							'register'                          =>
 								array(
-										's_name'                         => 'register',
-										's_service_mode'                 => 'read-write',
-										's_pathinfo_uri_schema'          => 'register',
-										's_pathinfo_uri_schema_parsed'   => 'register',
-										's_qstring_parameters'           => array(),
-										's_fetch_criteria'               => array(),
-										's_data_definition'              => array(),
-										'm_unique_id'                    => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										's_name'                          => 'register',
+										's_service_mode'                  => 'read-write',
+										's_pathinfo_uri_schema'           => 'register',
+										's_pathinfo_uri_schema_parsed'    => 'register',
+										's_qstring_parameters'            => array(),
+										's_fetch_criteria'                => array(),
+										's_data_definition'               => array(),
+										's_additional_skin_assets'        => array(),
 									),
 							'validate'                          =>
 								array(
-										's_name'                         => 'validate',
-										's_service_mode'                 => 'read-only',
-										's_pathinfo_uri_schema'          => 'validate/mid-(?P<mid>\d+)/aid-(?P<aid>[a-z0-9]{32})',
-										's_pathinfo_uri_schema_parsed'   => 'validate/mid-(?P<mid>\d+)/aid-(?P<aid>[a-z0-9]{32})',
-										's_qstring_parameters'           => array(
+										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										's_name'                          => 'validate',
+										's_service_mode'                  => 'read-only',
+										's_pathinfo_uri_schema'           => 'validate/mid-(?P<mid>\d+)/aid-(?P<aid>[a-z0-9]{32})',
+										's_pathinfo_uri_schema_parsed'    => 'validate/mid-(?P<mid>\d+)/aid-(?P<aid>[a-z0-9]{32})',
+										's_qstring_parameters'            => array(
 												'mid'                               => array(
 														'request_regex'                       => '\d+',
 														'_is_mandatory'                       => TRUE,
@@ -267,9 +271,9 @@ class Module_Handler
 														'_is_mandatory'                       => TRUE,
 													),
 											),
-										's_fetch_criteria'               => array(),
-										's_data_definition'              => array(),
-										'm_unique_id'                    => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
+										's_fetch_criteria'                => array(),
+										's_data_definition'               => array(),
+										's_additional_skin_assets'        => array(),
 									),
 						),
 			);
@@ -286,21 +290,21 @@ class Module_Handler
 		$this->process_map = array(
 				'login'                          =>
 					array(
-							'default'                    => null,
+							'get'                        => null,
 							'do_login'                   => "login",
 						),
 				'logout'                         =>
 					array(
-							'default'                    => "logout",
+							'get'                        => "logout",
 						),
 				'register'                       =>
 					array(
-							'default'                    => "register__do_prepare",
+							'get'                        => "register__do_prepare",
 							'do_register'                => "register__do_process",
 						),
 				'validate'                       =>
 					array(
-							'default'                    => "validate",
+							'get'                        => "validate",
 						),
 			);
 

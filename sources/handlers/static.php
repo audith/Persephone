@@ -161,20 +161,20 @@ class Module_Handler
 		$this->processor_map = array(
 				'download'                       =>
 					array(
-							'default'                              => "download",
+							'get'                                  => "download",
 						),
 				'stream'                         =>
 					array(
-							'default'                              => "stream",
+							'get'                                  => "stream",
 						),
 				'upload'                         =>
 					array(
-							'default'                              => "upload",
+							'get'                                  => "upload",
 							'resume'                               => "upload__do_resume",
 						),
 				'delete'                         =>
 					array(
-							'default'                              => "delete",
+							'get'                                  => "delete",
 						),
 			);
 

@@ -391,8 +391,8 @@ class Recache
 		$this->API->Db->cur_query = array(
 				'do'     => "select",
 				'fields' => array(
-						"m_unique_id", "m_name", "m_description", "m_type", "m_enforce_ssl", "m_title_column", "m_extras", "m_cache_array",
-						"m_handler_class", "m_enable_caching", "m_can_disable", "m_can_remove", "m_is_enabled"
+						"m_unique_id", "m_name", "m_description", "m_type", "m_data_source", "m_data_target", "m_enforce_ssl", "m_title_column",
+						"m_extras", "m_cache_array", "m_handler_class", "m_enable_caching", "m_can_disable", "m_can_remove", "m_is_enabled"
 					),
 				'table'  => "modules",
 				'where'  => "m_type != " . $this->API->Db->quote( "connector" ),
@@ -412,6 +412,8 @@ class Recache
 				$_cache['by_name'][ $row['m_name'] ]['m_unique_id_clean'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_unique_id_clean'] = preg_replace( '#[^a-z0-9]#', "", strtolower( $row['m_unique_id'] ) );
 				$_cache['by_name'][ $row['m_name'] ]['m_description'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_description'] = $row['m_description'];
 				$_cache['by_name'][ $row['m_name'] ]['m_type'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_type'] = $row['m_type'];
+				$_cache['by_name'][ $row['m_name'] ]['m_data_source'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_source'] = $row['m_data_source'];
+				$_cache['by_name'][ $row['m_name'] ]['m_data_target'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_target'] = $row['m_data_target'];
 				$_cache['by_name'][ $row['m_name'] ]['m_enforce_ssl'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_enforce_ssl'] = $row['m_enforce_ssl'];
 				$_cache['by_name'][ $row['m_name'] ]['m_title_column'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_title_column'] = $row['m_title_column'];
 				$_connection_type = $row['m_enforce_ssl'] ? "https" : "http";
@@ -603,7 +605,7 @@ class Recache
 									's_qstring_parameters'          => unserialize( $_row['s_qstring_parameters'] ),
 									's_fetch_criteria'              => unserialize( $_row['s_fetch_criteria'] ),
 									'm_unique_id'                   => $_row['m_unique_id'],
-									's_additional_skin_assets'      => ( ! is_null( $_row['s_additional_skin_assets'] ) ) ? unserialize( $_row['s_additional_skin_assets'] ) : null,
+									's_additional_skin_assets'      => ( !is_null( $_row['s_additional_skin_assets'] ) ) ? unserialize( $_row['s_additional_skin_assets'] ) : array(),
 									's_can_remove'                  => (boolean) $_row['s_can_remove'],
 								);
 						}

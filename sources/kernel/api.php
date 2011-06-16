@@ -593,6 +593,11 @@ final class API
 						'class_name'             => "Data_Processor__Link",
 						'with_api_obj_reference' => true,
 					),
+				'data_sources__rdbms'                           => array(
+						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_sources/rdbms.php",
+						'class_name'             => "Data_Sources__Rdbms",
+						'with_api_obj_reference' => true,
+					),
 				'Recache'                                       => array(
 						'library_location'       => PATH_SOURCES . "/kernel_extensions/cache/recache.php",
 						'class_name'             => "Recache",

@@ -70,10 +70,26 @@ class Data_Processor__Link extends Data_Processor
 	 */
 	public function get__do_process ( $data )
 	{
+		# Content being processed
 		$this->data = $data;
 
+		# Linked module
 		$_linked_module = $this->API->Modules->modules__do_load( $this->API->Cache->cache['modules']['by_unique_id'][ $this->data['field']['e_data_definition']['m_unique_id'] ] );
-		$this->data['content'] = $this->API->Modules->content__do__by_ref_id(
+
+		# Do we have a data-source-handler for the linked module? If not, create one!
+		if ( !isset( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) or !is_object( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) )
+		{
+			if ( ( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] = $this->API->classes__do_get( "data_sources__" . $m['m_data_source'] ) ) === false )
+			{
+				unset( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] );
+				throw new Exception( "Failed to initialize data-source library: '" . $_linked_module['m_data_source'] . "'!" );
+			}
+			$this->API->logger__do_log( "Successfully initialized data-source library: '" . $_linked_module['m_data_source'] . "'." , "INFO" );
+		}
+		$_data_source_handler__for_linked_module =& $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ];  // Alias-shortcut
+
+		# Actual GET
+		$this->data['content'] = $_data_source_handler__for_linked_module->get__do_process__by_ref_id(
 				$_linked_module,
 				$this->data['content'],
 				$this->data['field']['e_data_definition']['m_data_definition']

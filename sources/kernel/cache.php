@@ -85,13 +85,21 @@ class Cache
 			// php-memcached
 			//-----------------
 
-			if ( extension_loaded( "memcached" ) and $this->API->config['performance']['cache']['_method'] == 'memcached' )
+			if ( $this->API->config['performance']['cache']['_method'] == 'memcached' )
 			{
-				require PATH_SOURCES . "/kernel_extensions/cache/abstraction/memcached.php";
-				$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
-				if ( $this->cachelib->crashed )
+				if ( extension_loaded( "memcached" ) )
 				{
-					throw new Exception( "Cache: Memcached failed to connect!" );
+					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/memcached.php";
+					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+					if ( $this->cachelib->crashed )
+					{
+						throw new Exception( "Cache: Memcached failed to connect!" );
+					}
+				}
+				else
+				{
+					$this->API->config['performance']['cache']['_method'] = "diskcache";
+					$this->API->logger__do_log( "Cache: PHP-Memcached not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -99,26 +107,40 @@ class Cache
 			// php-memcache
 			//-----------------
 
-			if ( class_exists( "Memcache" ) and $this->API->config['performance']['cache']['_method'] == 'memcache' )
+			if ( $this->API->config['performance']['cache']['_method'] == 'memcache' )
 			{
-				require PATH_SOURCES . "/kernel_extensions/cache/abstraction/memcache.php";
-				$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
-				if ( $this->cachelib->crashed )
+				if ( class_exists( "Memcache" ) )
 				{
-					throw new Exception( "Cache: Memcache failed to connect!" );
+					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/memcache.php";
+					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+					if ( $this->cachelib->crashed )
+					{
+						throw new Exception( "Cache: Memcache failed to connect!" );
+					}
+				}
+				else
+				{
+					$this->API->config['performance']['cache']['_method'] = "diskcache";
+					$this->API->logger__do_log( "Cache: PHP-Memcache not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
-
-			/*
 
 			//----------------
 			// eaccelerator
 			//----------------
 
-			elseif ( function_exists( "eaccelerator_get" ) and $this->API->config['performance']['cache']['_method'] == 'eaccelerator' )
+			elseif ( $this->API->config['performance']['cache']['_method'] == 'eaccelerator' )
 			{
-				require PATH_SOURCES . "/kernel_extensions/cache/abstraction/eaccelerator.php";
-				$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+				if ( function_exists( "eaccelerator_get" ) )
+				{
+					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/eaccelerator.php";
+					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+				}
+				else
+				{
+					$this->API->config['performance']['cache']['_method'] = "diskcache";
+					$this->API->logger__do_log( "Cache: PHP-eAccelerator not found! Reverting to Disk-cache...", "WARNING" );
+				}
 			}
 
 
@@ -126,30 +148,45 @@ class Cache
 			// xcache
 			//----------
 
-			elseif( function_exists( "xcache_get" ) and $this->API->config['performance']['cache']['_method'] == 'xcache' )
+			elseif( $this->API->config['performance']['cache']['_method'] == 'xcache' )
 			{
-				require PATH_SOURCES . "/kernel_extensions/cache/abstraction/xcache.php";
-				$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+				if ( function_exists( "xcache_get" ) )
+				{
+					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/xcache.php";
+					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+				}
+				else
+				{
+					$this->API->config['performance']['cache']['_method'] = "diskcache";
+					$this->API->logger__do_log( "Cache: PHP-xCache not found! Reverting to Disk-cache...", "WARNING" );
+				}
 			}
 
 			//-------
 			// apc
 			//-------
 
-			elseif ( function_exists( "apc_fetch" ) and $this->API->config['performance']['cache']['_method'] == 'apc' )
+			elseif ( $this->API->config['performance']['cache']['_method'] == 'apc' )
 			{
-				require PATH_SOURCES . "/kernel_extensions/cache/abstraction/apc.php";
-				$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+				if ( function_exists( "apc_fetch" ) )
+				{
+					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/apc.php";
+					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+				}
+				else
+				{
+					$this->API->config['performance']['cache']['_method'] = "diskcache";
+					$this->API->logger__do_log( "Cache: PHP-APC not found! Reverting to Disk-cache...", "WARNING" );
+				}
 			}
 
-			*/
+			//------------------------
+			// diskcache - fallback
+			//------------------------
 
-			//-------------
-			// diskcache
-			//-------------
-
-			else
+			if ( $this->API->config['performance']['cache']['_method'] == 'diskcache' )
 			{
+				$this->API->config['performance']['cache']['_method'] = "diskcache";
 				require PATH_SOURCES . "/kernel_extensions/cache/abstraction/diskcache.php";
 				$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
 			}

@@ -112,7 +112,7 @@ class Db_Driver extends Database
 					'default'  =>  "",
 					'extra'    =>  null,
 					'attribs'  =>  null,
-					'is_null'  =>  FALSE
+					'is_null'  =>  false
 				);
 		}
 		else

@@ -980,6 +980,8 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 	 * @param    string     Template name
 	 * @param    object     Smarty object reference
 	 * @return   boolean    TRUE if template was found and retrieved, FALSE otherwise
+	 *
+	 * @todo     File-system related code below is for development purposes only and is to be removed in production version!
 	 */
 	public function smarty__resource__bits__check_tpl_name ( $tpl_name , $smarty_object )
 	{
@@ -1053,7 +1055,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 			$template_bit_information['fs__full_path'] = $_fs__full_path['secondary'];
 		}
 
-		unset( $_fs__full_path );
+		unset( $_fs__full_path );  // GC
 
 		# Create file if it does not exist
 		if ( !$template_bit_information['fs__exists'] )

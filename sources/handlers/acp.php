@@ -224,35 +224,35 @@ class Module_Handler
 		$this->processor_map = array(
 				'system_index'                   =>
 					array(
-							'default'                              => "settings__do_show",
+							'get'                                  => "settings__do_show",
 							'edit'                                 => "settings__do_edit",
 							'revert'                               => "settings__do_revert",
 						),
 				'management_index'               =>
 					array(
-							'default'                              => "management__do_prepare"
+							'get'                                  => "management__do_prepare"
 						),
 				'management_content'             =>
 					array(
-							'default'                              => "content__do_fetch",
+							'get'                                  => "content__do_fetch",
 							'edit'                                 => "content__do_edit",
 							'create'                               => "content__do_create",
 							'delete'                               => "content__do_remove",
 						),
 				'management_medialibrary'        =>
 					array(
-							'default'                              => "management__media_library__do_list",
+							'get'                                  => "management__media_library__do_list",
 						),
 				'components_modules'             =>
 					array(
-							'default'                              => "modules__do_list",
+							'get'                                  => "modules__do_list",
 							'edit'                                 => "modules__do_edit",
 							'create'                               => "modules__do_create__master_unit",
 							'delete'                               => "modules__do_remove",
 						),
 				'components_viewmodule'          =>
 					array(
-							'default'                              => "modules__do_view",
+							'get'                                  => "modules__do_view",
 							'create_subroutine'                    => "modules__subroutines__do_create",
 							'remove_subroutine'                    => "modules__subroutines__do_remove",
 							'ddl_alter__add'                       => "modules__ddl__do_create",
@@ -268,7 +268,7 @@ class Module_Handler
 						),
 				'components_viewconnector'   =>
 					array(
-							'default'                              => "modules__connector_unit__do_view",
+							'get'                                  => "modules__connector_unit__do_view",
 							'ddl_alter__add'                       => "modules__connector_unit__ddl__do_create",
 							'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
 							'ddl_alter__sort'                      => "modules__connector_unit__ddl__do_sort",
@@ -278,7 +278,7 @@ class Module_Handler
 						),
 				'test'                           =>
 					array(
-							'default'                              => "modules__do_view",
+							'get'                                  => "modules__do_view",
 						),
 			);
 
@@ -1214,8 +1214,27 @@ class Module_Handler
 			$faults[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Module Description</em> is a required field!" );
 		}
 
+		if ( !in_array( $input['m_data_source'], array( "rdbms" ) ) )
+		{
+			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid value for <em>Data-source</em> was provided!" );
+		}
+
+		if ( !in_array( $input['m_data_target'], array( "tpl", "rdbms" ) ) )
+		{
+			$faults[] = array( 'faultCode' => 704, 'faultMessage' => "Invalid value for <em>Data-target</em> was provided!" );
+		}
+
+		# Any errors?
+		if ( count( $faults ) )
+		{
+			return $faults;
+		}
+
+		# None... Good, go on.
 		$m_description  = $input['m_description'];
 		$m_extras       = array();
+		$m_data_source  = $input['m_data_source'];
+		$m_data_target  = $input['m_data_target'];
 
 		if ( isset( $input['m_extras'] ) and count( $input['m_extras'] ) )
 		{
@@ -1226,12 +1245,6 @@ class Module_Handler
 					$m_extras[] = $_extra;
 				}
 			}
-		}
-
-		# Any errors?
-		if ( count( $faults ) )
-		{
-			return $faults;
 		}
 
 		# Calculate module Unique-Id
@@ -1246,6 +1259,8 @@ class Module_Handler
 						'm_unique_id'            => $m_unique_id,
 						'm_description'          => $m_description,
 						'm_type'                 => "master",
+						'm_data_source'          => $m_data_source,
+						'm_data_target'          => $m_data_target,
 						'm_enforce_ssl'          => $input['m_enforce_ssl'] ? 1 : 0,
 						'm_extras'               => serialize( $m_extras ),
 						'm_cache_array'          => "a:0:{}",
@@ -1561,9 +1576,27 @@ class Module_Handler
 			$faults[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Module Description</em> is a required field!" );
 		}
 
-		$m_description = $input['m_description'];
-		$m_enforce_ssl = $input['m_enforce_ssl'];
-		$m_extras_new  = array();
+		if ( !in_array( $input['m_data_source'], array( "rdbms" ) ) )
+		{
+			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid value for <em>Data-source</em> was provided!" );
+		}
+
+		if ( !in_array( $input['m_data_target'], array( "tpl", "rdbms" ) ) )
+		{
+			$faults[] = array( 'faultCode' => 704, 'faultMessage' => "Invalid value for <em>Data-target</em> was provided!" );
+		}
+
+		# Any errors?
+		if ( count( $faults ) )
+		{
+			return $faults;
+		}
+
+		# None... Good, go on.
+		$m_description  = $input['m_description'];
+		$m_extras_new   = array();
+		$m_data_source  = $input['m_data_source'];
+		$m_data_target  = $input['m_data_target'];
 
 		$_list_of_added_extras   = array();
 		$_list_of_removed_extras = $m['m_extras'];
@@ -1586,25 +1619,21 @@ class Module_Handler
 			}
 		}
 
-		# Any errors?
-		if ( count( $faults ) )
-		{
-			return $faults;
-		}
-
-		# Continue... UPDATE
+		# UPDATE
 		$this->API->Db->cur_query = array(
 				'do'	 => "update",
 				'tables' => "modules",
 				'set'    => array(
 						'm_name'                 => ( $this->API->config['modules']['m_names_strtolower'] ) ? strtolower( $m_name ) : $m_name,
 						'm_description'          => $m_description,
-						'm_enforce_ssl'          => $m_enforce_ssl,
+						'm_data_source'          => $m_data_source,
+						'm_data_target'          => $m_data_target,
+						'm_enforce_ssl'          => $input['m_enforce_ssl'] ? 1 : 0,
 						'm_extras'               => serialize( $m_extras_new ),
 						'm_enable_caching'       => $input['m_enable_caching'] ? 1 : 0,
 						'm_is_enabled'           => 0
 					),
-				'where'  => "m_unique_id = '" . $m['m_unique_id'] . "'"
+				'where'  => "m_unique_id = " . $this->API->Db->quote( $m['m_unique_id'] )
 			);
 
 		if ( $this->API->Db->simple_exec_query() )

@@ -59,33 +59,6 @@ TD:hover > SPAN.name
 	{
 		color:#CF8733;
 	}
-	
-	SPAN.name.is_ro
-	{
-		min-height:18px;
-		background-image:url('{{$STYLE_IMAGES_URL}}/acp/s_mode_ro.png');
-		background-position:left center;
-		background-repeat:no-repeat;
-		padding-left:25px;
-	}
-	
-		SPAN.name.is_wo
-		{
-			min-height:18px;
-			background-image:url('{{$STYLE_IMAGES_URL}}/acp/s_mode_wo.png');
-			background-position:left center;
-			background-repeat:no-repeat;
-			padding-left:25px;
-		}
-		
-		SPAN.name.is_rw
-		{
-			min-height:18px;
-			background-image:url('{{$STYLE_IMAGES_URL}}/acp/s_mode_rw.png');
-			background-position:left center;
-			background-repeat:no-repeat;
-			padding-left:25px;
-		}
 
 #content UL.full_size LI FORM A#create_subroutine__fetch_criteria__add_policy_button
 {

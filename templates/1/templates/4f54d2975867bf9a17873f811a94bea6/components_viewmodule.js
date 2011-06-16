@@ -1,7 +1,7 @@
 /**
  * Local Javascript object
  *
- * @returns object Object handler
+ * @returns {Object} Object handler
  */
 function /* Class */ Acp_ComponentsViewmodule ()
 {
@@ -20,9 +20,8 @@ var acp__components_viewmodule = Acp_ComponentsViewmodule.singleton();
 /**
  * Fetches Mime-list to be populated into 'allowed_filetypes' field
  *
- * @param string
- *            Data-subtype
- * @return mixed NULL if no data, FALSE on error, TRUE otherwise
+ * @param {String} Data-subtype
+ * @returns {Mixed} NULL if no data, FALSE on error, TRUE otherwise
  */
 Acp_ComponentsViewmodule.prototype.ddl__register__file__allowed_filetypes__do_fetch = function ( subtype )
 {
@@ -39,7 +38,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__file__allowed_filetypes__do_fe
 	return jQuery.parseJSON(_response.responseText);
 };
 
-Acp_ComponentsViewmodule.prototype.registry = {
+Acp_ComponentsViewmodule.prototype.registry__ddl = {
 	'alphanumeric' : {
 		'_label' : "Alphanumeric",
 		'_subtypes' : {
@@ -385,11 +384,20 @@ Acp_ComponentsViewmodule.prototype.registry = {
 
 };
 
+Acp_ComponentsViewmodule.prototype.registry__sr = {
+	'service_mode' : {
+		'w-fetch-criteria' : [
+				'read-only', 'read-write'
+		],
+		'wo-fetch-criteria' : [
+			'write-only'
+		]
+	}
+};
+
 /**
- * @param object
- *            Object that triggers this method
- * @return boolean TRUE on success, FALSE otherwise
- * @todo Re-write code with reverse logic: open all fieldsets first, then close unnecessary ones and apply values afterwards; instead of, closing all down and opening necessary ones. This way we can have more control over the form and not write dupe code.
+ * @param {Object} Object that triggers this method
+ * @returns {Boolean} TRUE on success, FALSE otherwise
  */
 Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( obj /* , customRegistry , doNotRePopulateSubType */ )
 {
@@ -397,7 +405,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 	acp__components_viewmodule.Form.self = jQuery("#forms__components__ddl__alter_add");
 
 	/* Registry */
-	var registry = ( arguments[1] ) ? arguments[1] : acp__components_viewmodule.registry;
+	var registry = ( arguments[1] ) ? arguments[1] : acp__components_viewmodule.registry__ddl;
 
 	/* 'doNotRePopulateSubType' - Defaults to FALSE */
 	var doNotRePopulateSubType = ( arguments[2] ) ? arguments[2] : false;
@@ -428,7 +436,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 	}
 
 	/**
-	 * @var object Node of the Registry to populate
+	 * @var {Object} Node of the Registry to populate
 	 */
 	var node_to_populate = null;
 
@@ -519,7 +527,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 		jQuery.each(node_to_populate['options'], function ( key , value )
 		{
 			/**
-			 * @var mixed Self-recursion flag/object-reference (type is boolean for the former, object for the
+			 * @var {Mixed} Self-recursion flag/object-reference (type is boolean for the former, object for the
 			 *      latter)
 			 */
 			var _self_recursion = false;
@@ -563,7 +571,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 			acp__components_viewmodule.Form.enableOnDemandElement("#forms__components__ddl__alter_add ." + key + ".ondemand");
 
 			/**
-			 * @var object Form fields
+			 * @var {Object} Form fields
 			 */
 			var input_fields = jQuery("#forms__components__ddl__alter_add ." + key + ".ondemand [name^='" + key + "']");
 
