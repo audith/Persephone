@@ -1,6 +1,6 @@
 <ul>
-<li style="width:113px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/top_menu_system.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/system/" title="System Settings">System Settings</a></li>
-<li style="width:118px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/top_menu_management.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/management/" title="Management">Management</a></li>
-<li style="width:106px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/top_menu_look_and_feel.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/look_and_feel/" title="Look &amp; Feel">Look &amp; Feel</a></li>
-<li style="width:118px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/top_menu_components.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/components/" title="Components">Components</a></li>
+<li style="width:113px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/acp__navigation__system.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/system/" title="System">System</a></li>
+<li style="width:118px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/acp__navigation__components.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/components/" title="Components">Components</a></li>
+<li style="width:106px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/acp__navigation__content_and_data.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/content_and_data/" title="Look &amp; Feel">Content &amp; Data</a></li>
+<li style="width:136px; height:86px; float:left; overflow:hidden; background-image:url('{{$STYLE_IMAGES_URL}}/acp__navigation__look_and_feel.jpg'); background-repeat:no-repeat;"><a href="{{$MODULE_URL}}/look_and_feel/" title="Components">Look &amp; Feel</a></li>
 </ul>

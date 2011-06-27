@@ -36,10 +36,6 @@
 	
 	DIV#document
 	{
-		background-image: url('../images/body_background_1024.jpg');
-		background-position: 50% 0;
-		background-repeat: no-repeat;
-		background-attachment: scroll;
 		width: 100%;
 		margin: 0px auto;
 		overflow: hidden;
@@ -59,16 +55,18 @@
 	
 	DIV#navigation
 	{
-		width: 930px;
+		width: 910px;
 		height: 86px;
 		clear: both;
 		margin: 0px auto;
+		padding: 0 10px;
 		overflow: hidden;
+		background-color: white;
 	}
 	
 	DIV#navigation H1
 	{
-		width: 475px;
+		width: 437px;
 		height: 86px;
 		float: left;
 		overflow: hidden;
@@ -80,12 +78,21 @@
 	
 	DIV#navigation H1.acp
 	{
-		background-image: url('../images/persephone_logo.jpg');
+		background-image: url('../images/acp__logo.jpg');
 	}
+	
+		DIV#navigation H1 A
+		{
+			float: left;
+			width: 100%;
+			height: 100%;
+			
+			text-indent: -99999px;
+		}
 	
 	DIV#navigation UL
 	{
-		width: 455px;
+		width: 473px;
 		list-style: none;
 		list-style-type: none;
 		float: right;
@@ -109,6 +116,19 @@
 		margin: 0px auto;
 		overflow: hidden;
 	}
+	
+		DIV#header.acp
+		{
+			background-image: url('../images/acp__header__bg_1.png'), url('../images/acp__header__bg_2.png'), url('../images/acp__header__bg_3.png'), url('../images/acp__header__bg_4.png');
+			background-position: 0 0, 670px -100px, 370px -120px, 0 0;
+			background-repeat: no-repeat;
+			/*background-image: url('../images/acp__header.jpg');*/
+			width: 925px;
+			height: 163px;
+			position: relative;
+			left: 50%;
+			margin-left: -462px;
+		}
 	
 	DIV#midbar
 	{
