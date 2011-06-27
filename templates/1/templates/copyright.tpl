@@ -1,1 +1,1 @@
-<span id="disclaimer">Copyright &copy; 2001 - 2008 Audith Designs. All Rights Reserved.</span>
+<span id="disclaimer">Copyright &copy; 2001 - 2011 Shahriyar Imanov. All Rights Reserved.</span>

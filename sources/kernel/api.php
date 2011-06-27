@@ -593,9 +593,9 @@ final class API
 						'class_name'             => "Data_Processor__Link",
 						'with_api_obj_reference' => true,
 					),
-				'data_sources__rdbms'                           => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_sources/rdbms.php",
-						'class_name'             => "Data_Sources__Rdbms",
+				'data_storages__rdbms__mysql'                   => array(
+						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_storages/rdbms__mysql.php",
+						'class_name'             => "Data_Storages__Rdbms__Mysql",
 						'with_api_obj_reference' => true,
 					),
 				'Recache'                                       => array(

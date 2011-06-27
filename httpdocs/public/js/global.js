@@ -404,7 +404,7 @@ Persephone.prototype.Form = {
 		}
 
 		/* Disable form elements within those containers */
-		_obj.find("INPUT,TEXTAREA,BUTTON,SELECT").attr("disabled","disabled");
+		_obj.find("INPUT,TEXTAREA,BUTTON,SELECT").prop("disabled","disabled");
 
 		/* Hide the container(s) [fieldsets] */
 		_obj.hide();
@@ -474,7 +474,7 @@ Persephone.prototype.Form = {
 		}
 
 		/* First disable the form elements within those containers */
-		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").attr("disabled","disabled");
+		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").prop("disabled","disabled");
 
 		/* Then hide the container(s) [fieldsets] */
 		obj.hide();

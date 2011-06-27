@@ -87,25 +87,25 @@ class Module_Handler
 										's_data_definition'               => array(),
 										's_additional_skin_assets'        => array(),
 									),
-							'management_index'                  =>
+							'content_and_data__index'           =>
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'management_index',
 										's_service_mode'                  => 'read-only',
-										's_pathinfo_uri_schema'           => 'management',
-										's_pathinfo_uri_schema_parsed'    => 'management',
+										's_pathinfo_uri_schema'           => 'content_and_data',
+										's_pathinfo_uri_schema_parsed'    => 'content_and_data',
 										's_qstring_parameters'            => array(),
 										's_fetch_criteria'                => array(),
 										's_data_definition'               => array(),
 										's_additional_skin_assets'        => array(),
 									),
-							'management_content'                =>
+							'content_and_data__content'         =>
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'management_content',
+										's_name'                          => 'content_and_data__content',
 										's_service_mode'                  => 'read-write',
-										's_pathinfo_uri_schema'           => 'management/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
-										's_pathinfo_uri_schema_parsed'    => 'management/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
+										's_pathinfo_uri_schema'           => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
+										's_pathinfo_uri_schema_parsed'    => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
 										's_qstring_parameters'            => array(
 												'm_unique_id_clean'                 => array(
 														'request_regex'                       => '[a-z0-9]{32}',
@@ -116,13 +116,13 @@ class Module_Handler
 										's_data_definition'               => array(),
 										's_additional_skin_assets'        => array(),
 									),
-							'management_medialibrary'           =>
+							'content_and_data__media_library'   =>
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'management_medialibrary',
+										's_name'                          => 'content_and_data__media_library',
 										's_service_mode'                  => 'read-write',
-										's_pathinfo_uri_schema'           => 'management/medialibrary',
-										's_pathinfo_uri_schema_parsed'    => 'management/medialibrary',
+										's_pathinfo_uri_schema'           => 'content_and_data/media_library',
+										's_pathinfo_uri_schema_parsed'    => 'content_and_data/media_library',
 										's_qstring_parameters'            => array(),
 										's_fetch_criteria'                => array(),
 										's_data_definition'               => array(),
@@ -1214,16 +1214,6 @@ class Module_Handler
 			$faults[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Module Description</em> is a required field!" );
 		}
 
-		if ( !in_array( $input['m_data_source'], array( "rdbms" ) ) )
-		{
-			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid value for <em>Data-source</em> was provided!" );
-		}
-
-		if ( !in_array( $input['m_data_target'], array( "tpl", "rdbms" ) ) )
-		{
-			$faults[] = array( 'faultCode' => 704, 'faultMessage' => "Invalid value for <em>Data-target</em> was provided!" );
-		}
-
 		# Any errors?
 		if ( count( $faults ) )
 		{
@@ -1233,7 +1223,6 @@ class Module_Handler
 		# None... Good, go on.
 		$m_description  = $input['m_description'];
 		$m_extras       = array();
-		$m_data_source  = $input['m_data_source'];
 		$m_data_target  = $input['m_data_target'];
 
 		if ( isset( $input['m_extras'] ) and count( $input['m_extras'] ) )
@@ -1259,8 +1248,6 @@ class Module_Handler
 						'm_unique_id'            => $m_unique_id,
 						'm_description'          => $m_description,
 						'm_type'                 => "master",
-						'm_data_source'          => $m_data_source,
-						'm_data_target'          => $m_data_target,
 						'm_enforce_ssl'          => $input['m_enforce_ssl'] ? 1 : 0,
 						'm_extras'               => serialize( $m_extras ),
 						'm_cache_array'          => "a:0:{}",
@@ -1576,16 +1563,6 @@ class Module_Handler
 			$faults[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Module Description</em> is a required field!" );
 		}
 
-		if ( !in_array( $input['m_data_source'], array( "rdbms" ) ) )
-		{
-			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid value for <em>Data-source</em> was provided!" );
-		}
-
-		if ( !in_array( $input['m_data_target'], array( "tpl", "rdbms" ) ) )
-		{
-			$faults[] = array( 'faultCode' => 704, 'faultMessage' => "Invalid value for <em>Data-target</em> was provided!" );
-		}
-
 		# Any errors?
 		if ( count( $faults ) )
 		{
@@ -1595,8 +1572,6 @@ class Module_Handler
 		# None... Good, go on.
 		$m_description  = $input['m_description'];
 		$m_extras_new   = array();
-		$m_data_source  = $input['m_data_source'];
-		$m_data_target  = $input['m_data_target'];
 
 		$_list_of_added_extras   = array();
 		$_list_of_removed_extras = $m['m_extras'];
@@ -1626,8 +1601,6 @@ class Module_Handler
 				'set'    => array(
 						'm_name'                 => ( $this->API->config['modules']['m_names_strtolower'] ) ? strtolower( $m_name ) : $m_name,
 						'm_description'          => $m_description,
-						'm_data_source'          => $m_data_source,
-						'm_data_target'          => $m_data_target,
 						'm_enforce_ssl'          => $input['m_enforce_ssl'] ? 1 : 0,
 						'm_extras'               => serialize( $m_extras_new ),
 						'm_enable_caching'       => $input['m_enable_caching'] ? 1 : 0,

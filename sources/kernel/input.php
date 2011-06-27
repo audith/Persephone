@@ -1369,12 +1369,12 @@ class Input
 		$_parsed_url['request_uri'] =
 				$_parsed_url['scheme'] . "://" .
 				( ( @$_parsed_url['user'] and @$_parsed_url['pass'] ) ? $_parsed_url['user'] . ":" . $_parsed_url['pass'] . "@" : "" ) .
-				$this->API->config['url']['hostname'][ $_parsed_url['scheme'] ]['full'] .
+				$this->API->config['url']['hostname'][ $_parsed_url['scheme'] ] .
 				$_parsed_url['path'] .
 				( @$_parsed_url['query'] ? "?" . $_parsed_url['query'] : "" );
 
 		# Redirect to default domain-name if request was sent to different domain
-		if ( $_parsed_url['host'] != $this->API->config['url']['hostname'][ $_parsed_url['scheme'] ]['full'] )
+		if ( $_parsed_url['host'] != $this->API->config['url']['hostname'][ $_parsed_url['scheme'] ] )
 		{
 			$this->API->logger__do_log( "API: Request redirection to location: " . $_parsed_url['request_uri'] , "INFO" );
 			$this->API->http_redirect( $_parsed_url['request_uri'] , 301 );

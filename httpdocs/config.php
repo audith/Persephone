@@ -3,14 +3,8 @@
 # URLs
 $CONFIG['url']['ssl_mode']               = FALSE;
 $CONFIG['url']['hostname']               = array(
-		'http'  => array(
-				'full'    => "cms.audith.net",
-				'parsed'  => array( 'prefix' => "cms.audith" , 'tld' => "net" )
-			),
-		'https' => array(
-				'full'    => "cms.audith.net",
-				'parsed'  => array( 'prefix' => "cms.audith" , 'tld' => "net" )
-			),
+		'http'  => "shehi.dyndns.org",
+		'https' => "shehi.dyndns.org",
 	);
 
 

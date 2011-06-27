@@ -715,7 +715,7 @@ jQuery(document).ready(function ( event )
 			jQuery("#components__ddl__alter_add").show(); // Open "DDL-Create" form
 		}
 		jQuery("#forms__components__ddl__alter_add").trigger("reset"); // Reset "DDL-Create" Form
-		jQuery("#forms__components__ddl__alter_add [type='reset']").attr("disabled", ""); // Re-enable 'Reset' button
+		jQuery("#forms__components__ddl__alter_add [type='reset']").prop("disabled", ""); // Re-enable 'Reset' button
 		return;
 	});
 
@@ -738,7 +738,7 @@ jQuery(document).ready(function ( event )
 
 		/* Reset values */
 		whoami.find("INPUT[type='text']").val(null); // Reset all INPUT text-fields
-		whoami.find("SELECT > OPTION:eq(0)").attr("selected","selected"); // Reset all SELECTs
+		whoami.find("SELECT > OPTION:eq(0)").prop("selected","selected"); // Reset all SELECTs
 		whoami.find("[name='do']").val("ddl_alter__add"); // 'do'
 		whoami.find("[type='submit']").val("Register New Data-field");
 
@@ -869,7 +869,7 @@ jQuery(document).ready(function ( event )
 				}
 
 				acp__components_viewmodule.ddl__register__apply_registry(typeElement, registry, true); // Apply Registry, BUT do not re-populate sub-type (third argument = true); otherwise, it will empty SELECT.subtype and we will lose our current value!!!
-				jQuery("#forms__components__ddl__alter_add [type='reset']").attr("disabled", "disabled"); // Disable 'Reset' button
+				jQuery("#forms__components__ddl__alter_add [type='reset']").prop("disabled", "disabled"); // Disable 'Reset' button
 
 				/* Some values */
 				jQuery("#forms__components__ddl__alter_add [name='do']").val("ddl_alter__edit");
@@ -877,7 +877,7 @@ jQuery(document).ready(function ( event )
 				jQuery("#forms__components__ddl__alter_add [type='submit']").val("Alter Data-field");
 
 				/* Lock elements which shouldn't be changed */
-				jQuery("#forms__components__ddl__alter_add [name='name']").attr("disabled", "disabled"); // 'name'
+				jQuery("#forms__components__ddl__alter_add [name='name']").prop("disabled", "disabled"); // 'name'
 				jQuery("#forms__components__ddl__alter_add .type").hide(); // 'type'
 				jQuery("#forms__components__ddl__alter_add .subtype").hide(); // 'subtype'
 				jQuery("#forms__components__ddl__alter_add .links_with").hide(); // 'links_with'

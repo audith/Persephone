@@ -34,10 +34,10 @@ class Modules
 	public $cur_module = array();
 
 	/**
-	 * Data-source handlers
+	 * Data-storage (for modules) handlers
 	 * @var array
 	 */
-	public $data_sources = array();
+	public $data_storages = array();
 
 	/**
 	 * Default DFT (data-field types)
@@ -75,7 +75,7 @@ class Modules
 		if ( ! defined( "SITE_URL" ) )
 		{
 			$_connection_type = $this->cur_module['m_enforce_ssl'] ? "https" : "http";
-			define( "SITE_URL", $_connection_type . "://" . $this->API->config['url']['hostname'][ $_connection_type ]['full'] );
+			define( "SITE_URL", $_connection_type . "://" . $this->API->config['url']['hostname'][ $_connection_type ] );
 		}
 	}
 
@@ -156,7 +156,7 @@ class Modules
 
 
 	/**
-	 * GET processor - wrapper for data-source handler
+	 * GET processor - wrapper for data-storage handler
 	 *
 	 * @param   array    REF: Module info
 	 * @return  mixed    (mixed) Fetched content on success; (boolean) FALSE otherwise
@@ -197,20 +197,20 @@ class Modules
 			# ... otherwise, for regular modules, process the request...
 			else
 			{
-				# Initialize module data-source handler
-				if ( !isset( $this->data_sources['by_module'][ $m['m_unique_id_clean'] ] ) or !is_object( $this->data_sources['by_module'][ $m['m_unique_id_clean'] ] ) )
+				# Initialize module data-storage handler
+				if ( !isset( $this->data_storages['by_module'][ $m['m_unique_id_clean'] ] ) or !is_object( $this->data_storages['by_module'][ $m['m_unique_id_clean'] ] ) )
 				{
-					if ( ( $this->data_sources['by_module'][ $m['m_unique_id_clean'] ] = $this->API->classes__do_get( "data_sources__" . $m['m_data_source'] ) ) === false )
+					if ( ( $this->data_storages['by_module'][ $m['m_unique_id_clean'] ] = $this->API->classes__do_get( "data_storages__" . $m['m_data_storage'] ) ) === false )
 					{
-						unset( $this->data_sources['by_module'][ $m['m_unique_id_clean'] ] );
-						throw new Exception( "Failed to initialize data-source library: '" . $m['m_data_source'] . "'!" );
+						unset( $this->data_storages['by_module'][ $m['m_unique_id_clean'] ] );
+						throw new Exception( "Failed to initialize data-storage library: '" . $m['m_data_storage'] . "'!" );
 					}
-					$this->API->logger__do_log( "Successfully initialized data-source library: '" . $m['m_data_source'] . "'." , "INFO" );
+					$this->API->logger__do_log( "Successfully initialized data-storage library: '" . $m['m_data_storage'] . "'." , "INFO" );
 				}
 
 				if ( $action == 'get' )
 				{
-					return $this->data_sources['by_module'][ $m['m_unique_id_clean'] ]->get__do_process( $m );
+					return $this->data_storages['by_module'][ $m['m_unique_id_clean'] ]->get__do_process( $m );
 				}
 				elseif ( $action == 'put' )
 				{
@@ -271,11 +271,15 @@ class Modules
     		define( "ACCESS_TO_AREA" , "public" );
     	}
 
-		# Its not a built-in module and it has no data-definition configuration?! Its impossible, since you can't ENABLE master module without valid Data Definition configuration
+		# Its not a built-in module and it has no DDL configuration?! Its impossible, since you can't ENABLE master module without valid DDL configuration
 		if ( $m['m_type'] != 'built-in' and ! $m['m_data_definition'] )
 		{
-			trigger_error( "Module (\"" . $m['m_name'] . "\") without DDL config?!", E_USER_ERROR );
+			throw new Exception( "Module (\"" . $m['m_name'] . "\") without DDL config?!" );
 		}
+
+		# Module URL prefix
+		$_connection_type = $m['m_enforce_ssl'] ? "https" : "http";
+		$m['m_url_prefix'] = $_connection_type . "://" . $this->API->config['url']['hostname'][ $_connection_type ] . "/" . $m['m_name'];
 
 		//------------------------------------------------------------------------------------
 		// Process SUBROUTINES and determine the working one and the request coming with it

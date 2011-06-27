@@ -65,7 +65,7 @@ jQuery(document).ready(function ()
 			jQuery(this).get(0).checked = false;
 			return;
 		});
-		jQuery("#forms__modules__alter_add [name='m_unique_id']").val("").attr("disabled","disabled");
+		jQuery("#forms__modules__alter_add [name='m_unique_id']").val("").prop("disabled","disabled");
 
 		/* Scroll to global Console */
 		var currentConsole = acp__components.Form.scrollToConsole(true);
@@ -154,26 +154,11 @@ jQuery(document).ready(function ()
 								/* SELECTs... */
 								if ( input_field.is("SELECT") )
 								{
-									jQuery.each(input_field.children("OPTION"), function ( _key , _value )
+									if ( !( value instanceof Array ) )
 									{
-										jQuery(this).get(0).selected = false;
-
-										/* Is it multiple-SELECT or single-SELECT? */
-										if ( value instanceof Array )
-										{
-											if ( acp__components.inArray( jQuery(this).attr("value"), value ) )
-											{
-												jQuery(this).get(0).selected = true;
-											}
-										}
-										else
-										{
-											if ( jQuery(this).attr("value") == value )
-											{
-												jQuery(this).get(0).selected = true;
-											}
-										}
-									});
+										value = value.split(",");
+									}
+									input_field.val(value);
 								}
 								/* Everything else... */
 								else if ( input_field.is("INPUT[type='text']") )
@@ -202,8 +187,8 @@ jQuery(document).ready(function ()
 
 					/* do = edit */
 					jQuery("#forms__modules__alter_add [name='do']").val("edit");
-					jQuery("#forms__modules__alter_add [name='m_unique_id']").attr("disabled","").val(data.me.m_unique_id);
-
+					jQuery("#forms__modules__alter_add [name='m_unique_id']").prop("disabled","").val(data.me.m_unique_id);
+acp__components.debug(jQuery("#forms__modules__alter_add [name='m_unique_id']"));
 					/* Finalize */
 					currentConsole.html("Form successfully loaded!").removeClass("error").addClass("success");
 					jQuery("#components__modules__alter_add").slideDown("medium");

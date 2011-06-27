@@ -391,7 +391,7 @@ class Recache
 		$this->API->Db->cur_query = array(
 				'do'     => "select",
 				'fields' => array(
-						"m_unique_id", "m_name", "m_description", "m_type", "m_data_source", "m_data_target", "m_enforce_ssl", "m_title_column",
+						"m_unique_id", "m_name", "m_description", "m_type", "m_enforce_ssl", "m_title_column",
 						"m_extras", "m_cache_array", "m_handler_class", "m_enable_caching", "m_can_disable", "m_can_remove", "m_is_enabled"
 					),
 				'table'  => "modules",
@@ -407,24 +407,47 @@ class Recache
 				// Module info
 				//---------------
 
-				$_cache['by_name'][ $row['m_name'] ]['m_name'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_name'] = $row['m_name'];
-				$_cache['by_name'][ $row['m_name'] ]['m_unique_id'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_unique_id'] = $row['m_unique_id'];
-				$_cache['by_name'][ $row['m_name'] ]['m_unique_id_clean'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_unique_id_clean'] = preg_replace( '#[^a-z0-9]#', "", strtolower( $row['m_unique_id'] ) );
-				$_cache['by_name'][ $row['m_name'] ]['m_description'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_description'] = $row['m_description'];
-				$_cache['by_name'][ $row['m_name'] ]['m_type'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_type'] = $row['m_type'];
-				$_cache['by_name'][ $row['m_name'] ]['m_data_source'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_source'] = $row['m_data_source'];
-				$_cache['by_name'][ $row['m_name'] ]['m_data_target'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_target'] = $row['m_data_target'];
-				$_cache['by_name'][ $row['m_name'] ]['m_enforce_ssl'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_enforce_ssl'] = $row['m_enforce_ssl'];
-				$_cache['by_name'][ $row['m_name'] ]['m_title_column'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_title_column'] = $row['m_title_column'];
-				$_connection_type = $row['m_enforce_ssl'] ? "https" : "http";
-				$_cache['by_name'][ $row['m_name'] ]['m_url_prefix'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_url_prefix'] = $_connection_type . "://" . $this->API->config['url']['hostname'][ $_connection_type ]['full'] . "/" . $row['m_name'];
-				$_cache['by_name'][ $row['m_name'] ]['m_extras'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_extras'] = unserialize( $row['m_extras'] );
-				$_cache['by_name'][ $row['m_name'] ]['m_cache_array'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_cache_array'] = unserialize( $row['m_cache_array'] );
-				$_cache['by_name'][ $row['m_name'] ]['m_handler_class'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_handler_class'] = $row['m_handler_class'];
-				$_cache['by_name'][ $row['m_name'] ]['m_enable_caching'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_enable_caching'] = $row['m_enable_caching'];
-				$_cache['by_name'][ $row['m_name'] ]['m_can_disable'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_can_disable'] = $row['m_can_disable'];
-				$_cache['by_name'][ $row['m_name'] ]['m_can_remove'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_can_remove'] = $row['m_can_remove'];
-				$_cache['by_name'][ $row['m_name'] ]['m_is_enabled'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_is_enabled'] = $row['m_is_enabled'];
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_name'] = $row['m_name'];
+				$_cache['by_name'][ $row['m_name'] ]['m_name'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_name'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_unique_id'] = $row['m_unique_id'];
+				$_cache['by_name'][ $row['m_name'] ]['m_unique_id'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_unique_id'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_unique_id_clean'] = preg_replace( '#[^a-z0-9]#', "", strtolower( $row['m_unique_id'] ) );
+				$_cache['by_name'][ $row['m_name'] ]['m_unique_id_clean'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_unique_id_clean'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_description'] = $row['m_description'];
+				$_cache['by_name'][ $row['m_name'] ]['m_description'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_description'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_type'] = $row['m_type'];
+				$_cache['by_name'][ $row['m_name'] ]['m_type'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_type'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_enforce_ssl'] = $row['m_enforce_ssl'];
+				$_cache['by_name'][ $row['m_name'] ]['m_enforce_ssl'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_enforce_ssl'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_title_column'] = $row['m_title_column'];
+				$_cache['by_name'][ $row['m_name'] ]['m_title_column'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_title_column'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_extras'] = unserialize( $row['m_extras'] );
+				$_cache['by_name'][ $row['m_name'] ]['m_extras'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_extras'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_cache_array'] = unserialize( $row['m_cache_array'] );
+				$_cache['by_name'][ $row['m_name'] ]['m_cache_array'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_cache_array'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_handler_class'] = $row['m_handler_class'];
+				$_cache['by_name'][ $row['m_name'] ]['m_handler_class'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_handler_class'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_enable_caching'] = $row['m_enable_caching'];
+				$_cache['by_name'][ $row['m_name'] ]['m_enable_caching'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_enable_caching'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_can_disable'] = $row['m_can_disable'];
+				$_cache['by_name'][ $row['m_name'] ]['m_can_disable'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_can_disable'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_can_remove'] = $row['m_can_remove'];
+				$_cache['by_name'][ $row['m_name'] ]['m_can_remove'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_can_remove'];
+
+				$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_is_enabled'] = $row['m_is_enabled'];
+				$_cache['by_name'][ $row['m_name'] ]['m_is_enabled'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_is_enabled'];
 
 				//---------------
 				// Module DDL
@@ -610,10 +633,17 @@ class Recache
 								);
 						}
 					}
-					$_cache['by_name'][ $row['m_name'] ]['m_data_definition'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition'] = $_m_data_definition;
-					$_cache['by_name'][ $row['m_name'] ]['m_data_definition_bak'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition_bak'] = $_m_data_definition_bak;
-					$_cache['by_name'][ $row['m_name'] ]['m_data_definition_count'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition_count'] = count( $_m_data_definition );
-					$_cache['by_name'][ $row['m_name'] ]['m_subroutines'] = $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_subroutines'] = $_subroutines;
+					$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition'] = $_m_data_definition;
+					$_cache['by_name'][ $row['m_name'] ]['m_data_definition'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition'];
+
+					$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition_bak'] = $_m_data_definition_bak;
+					$_cache['by_name'][ $row['m_name'] ]['m_data_definition_bak'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition_bak'];
+
+					$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition_count'] = count( $_m_data_definition );
+					$_cache['by_name'][ $row['m_name'] ]['m_data_definition_count'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_data_definition_count'];
+
+					$_cache['by_unique_id'][ $row['m_unique_id'] ]['m_subroutines'] = $_subroutines;
+					$_cache['by_name'][ $row['m_name'] ]['m_subroutines'] =& $_cache['by_unique_id'][ $row['m_unique_id'] ]['m_subroutines'];
 				}
 			}
 		}
@@ -764,14 +794,25 @@ class Recache
 		{
 			foreach ( $result as $row )
 			{
-				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_id'] = $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_id'] = $row['conf_group_id'];
-				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_title'] = $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_title'] = $row['conf_group_title'];
-				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_desc'] = $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_desc'] = $row['conf_group_desc'];
-				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_count'] = $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_count'] = $row['conf_group_count'];
-				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_noshow'] = $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_noshow'] = $row['conf_group_noshow'];
-				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_keyword'] = $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_keyword'] = $row['conf_group_keyword'];
+				$_cache['by_id'][ $row['conf_group_id'] ]['conf_group_id'] = $row['conf_group_id'];
+				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_id'] =& $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_id'];
 
-				$_cache['by_id'][ $row['conf_group_id'] ][ $row['conf_id'] ] = $_cache['by_key'][ $row['conf_group_keyword'] ][ $row['conf_key'] ] = array(
+				$_cache['by_id'][ $row['conf_group_id'] ]['conf_group_title'] = $row['conf_group_title'];
+				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_title'] =& $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_title'];
+
+				$_cache['by_id'][ $row['conf_group_id'] ]['conf_group_desc'] = $row['conf_group_desc'];
+				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_desc'] =& $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_desc'];
+
+				$_cache['by_id'][ $row['conf_group_id'] ]['conf_group_count'] = $row['conf_group_count'];
+				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_count'] =& $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_count'];
+
+				$_cache['by_id'][ $row['conf_group_id'] ]['conf_group_noshow'] = $row['conf_group_noshow'];
+				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_noshow'] =& $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_noshow'];
+
+				$_cache['by_id'][ $row['conf_group_id'] ]['conf_group_keyword'] = $row['conf_group_keyword'];
+				$_cache['by_key'][ $row['conf_group_keyword'] ]['conf_group_keyword'] =& $_cache['by_id'][ $row['conf_group_id'] ]['conf_group_keyword'];
+
+				$_cache['by_key'][ $row['conf_group_keyword'] ][ $row['conf_key'] ] = array(
 						'conf_id'                => $row['conf_id'],
 						'conf_title'             => $row['conf_title'],
 						'conf_description'       => $row['conf_description'],
@@ -785,6 +826,7 @@ class Recache
 						'conf_start_group'       => $row['conf_start_group'],
 						'conf_end_group'         => $row['conf_end_group']
 					);
+				$_cache['by_id'][ $row['conf_group_id'] ][ $row['conf_id'] ] =& $_cache['by_key'][ $row['conf_group_keyword'] ][ $row['conf_key'] ];
 			}
 		}
 

@@ -329,7 +329,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		//----------------------
 
 		$_url =& $this->API->config['page']['request'];
-		$this->smarty->assign( "SITE_URL"   , $_url['scheme'] . "://" . $this->API->config['url']['hostname'][ $_url['scheme'] ]['full'] );
+		$this->smarty->assign( "SITE_URL"   , $_url['scheme'] . "://" . $this->API->config['url']['hostname'][ $_url['scheme'] ] );
 		$this->smarty->assign( "SITE_NAME"  , $this->API->config['general']['site_name']        );
 		$this->smarty->assign( "SITE_MOTTO" , $this->API->config['general']['site_motto']       );
 		$this->smarty->assign( "MODULE_URL" , $this->API->Modules->cur_module['m_url_prefix']   );
