@@ -1073,4 +1073,50 @@ jQuery(document).ready(function ( event )
 			});
 		}
 	});
+
+	/**
+	 * Handles Subroutine Removal
+	 */
+	jQuery("#forms__components__sr__list A.sr_alter__drop").click(function ( event )
+	{
+		event.preventDefault();
+		jQuery("#forms__components__sr__list [name='s_name']").val(jQuery(this).attr("href").replace(/\?/,""));
+
+		/* "Are you sure?" */
+		acp__components_viewmodule.Form.getDialogObject({
+			body : "You are about to <b>*delete*</b> a module-subroutine! ACTION IS IRREVERSIBLE!!!<br /><br />Shall I proceed?",
+			buttons : [
+				{
+					text : "Yes, *drop* it!",
+					click : function ( event )
+					{
+						jQuery(this).unbind("dialogclose").dialog("close");
+						jQuery("#forms__components__sr__list [name='do']").val("sr_alter__drop");
+						var whoami = acp__components_viewmodule.Form.self = jQuery("#forms__components__sr__list");
+						whoami.trigger("submit"); // Submit the form via AJAX (.js__go_ajax), it will handle itself...
+					}
+				},
+				{
+					text : "No, stop!",
+					click : function ( event )
+					{
+						jQuery(this).dialog("close");
+						acp__components_viewmodule.Form.getDialogObject({
+							body : "Request aborted by user! No actions performed!",
+							buttons : [
+								{
+									text : "Thanks!",
+									click : function ( event )
+									{
+										jQuery(this).dialog("close");
+									}
+								}
+							]
+						}).dialog("open").unbind("dialogclose");
+					}
+				}
+			],
+			width : 500
+		}).dialog("open");
+	});
 });

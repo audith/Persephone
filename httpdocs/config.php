@@ -1,7 +1,7 @@
 <?php
 
 # URLs
-$CONFIG['url']['ssl_mode']               = FALSE;
+$CONFIG['url']['ssl_mode']               = false;
 $CONFIG['url']['hostname']               = array(
 		'http'  => "shehi.dyndns.org",
 		'https' => "shehi.dyndns.org",
@@ -11,10 +11,10 @@ $CONFIG['url']['hostname']               = array(
 # SQL
 
 $CONFIG['sql']['debug']                  = 2;
-$CONFIG['sql']['pconnect']               = TRUE;
+$CONFIG['sql']['pconnect']               = true;
 $CONFIG['sql']['protocol']               = "tcp";
 $CONFIG['sql']['driver']                 = "mysqli";
-$CONFIG['sql']['ssl']                    = FALSE;
+$CONFIG['sql']['ssl']                    = false;
 $CONFIG['sql']['table_prefix']           = "";
 $CONFIG['sql']['host']                   = "localhost";
 $CONFIG['sql']['port']                   = 3306;
@@ -26,7 +26,7 @@ $CONFIG['sql']['passwd']                 = "";
 # TEMPLATE ENGINE
 
 $CONFIG['display']['cache_lifetime']     = 2592000;                       // = 86400 * 30
-$CONFIG['display']['debugging']          = FALSE;
+$CONFIG['display']['debugging']          = false;
 
 
 # CACHE ABSTRACTION

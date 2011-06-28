@@ -34,7 +34,7 @@ class Session
 	 *
 	 * @var Boolean
 	 */
-	private $do_update = TRUE;
+	private $do_update = true;
 
 	/**
 	 * Session data of the session that didn't authorize
@@ -69,7 +69,7 @@ class Session
 	 *
 	 * @var Boolean
 	 */
-	private $is_not_human = FALSE;
+	private $is_not_human = false;
 
 	/**
 	 * Language ID to use
@@ -219,7 +219,7 @@ class Session
 				$_server_array[] = implode( ":" , $_server );
 			}
 			$_ini_set_status = ini_set( "session.save_path" , $_server_list = implode( "," , $_server_array ) );
-			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === FALSE ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcached-compatible)" , ( $_ini_set_status === FALSE ? "ERROR" : "INFO" ) );
+			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcached-compatible)" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
 
 		}
 		elseif ( $this->API->config['performance']['cache']['_method'] == "memcache" and ! is_null( $this->API->Cache->cachelib ) )
@@ -231,14 +231,14 @@ class Session
 				$_server_array[] = "tcp://" . implode( ":" , $_server );
 			}
 			$_ini_set_status = ini_set( "session.save_path" , $_server_list = implode( "," , $_server_array ) );
-			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === FALSE ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcache-compatible)" , ( $_ini_set_status === FALSE ? "ERROR" : "INFO" ) );
+			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcache-compatible)" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
 
 		}
 		else
 		{
 			ini_set( "session.save_handler" , "files" );
 			$_ini_set_status = ini_set( "session.save_path" , "" );
-			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === FALSE ? "Failed to revert" : "Successfully reverted" ) . " ini-directive 'session.save_path' = 'files'" , ( $_ini_set_status === FALSE ? "ERROR" : "INFO" ) );
+			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to revert" : "Successfully reverted" ) . " ini-directive 'session.save_path' = 'files'" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
 		}
 	}
 
@@ -260,7 +260,7 @@ class Session
 		// Client information
 		//----------------------
 
-		$this->user_agent = substr( $this->API->Input->clean__makesafe_value( $this->API->Input->my_getenv( 'HTTP_USER_AGENT' ), array(), TRUE ) , 0 , 200 );
+		$this->user_agent = substr( $this->API->Input->clean__makesafe_value( $this->API->Input->my_getenv( 'HTTP_USER_AGENT' ), array(), true ) , 0 , 200 );
 		$this->operating_system = $this->fetch_os();
 		$this->fetch_ip_address();
 
@@ -283,8 +283,8 @@ class Session
 			$this->API->config['security']['session_expiration'],
 			$this->API->config['cookies']['cookie_path'],
 			$this->API->config['cookies']['cookie_domain'],
-			FALSE,   // 'cookie_secure'
-			TRUE     // 'cookie_httponly'
+			false,   // 'cookie_secure'
+			true     // 'cookie_httponly'
 		);
 
 		# ... and session name
@@ -514,7 +514,7 @@ class Session
 		$this->member['user_agent_version'] = $this->session_data['uagent_version'];
 		$this->member['user_agent_bypass']  = ( $this->API->Input->my_getcookie( "uagent_bypass" ) )
 			?
-			TRUE
+			true
 			:
 			$this->session_data['uagent_bypass'];
 
@@ -522,27 +522,27 @@ class Session
 		// Can use RTE?
 		//------------------
 
-		$this->member['_can_use_rte'] = FALSE;
+		$this->member['_can_use_rte'] = false;
 
 		if ( $this->member['user_agent_key'] == 'explorer' and $this->member['user_agent_version'] >= 6 )
 		{
-			$this->member['_can_use_rte'] = TRUE;
+			$this->member['_can_use_rte'] = true;
 		}
 		elseif ( $this->member['user_agent_key'] == 'opera' and $this->member['user_agent_version'] >= 9.1 )
 		{
-			$this->member['_can_use_rte'] = TRUE;
+			$this->member['_can_use_rte'] = true;
 		}
 		elseif ( $this->member['user_agent_key'] == 'firefox' and $this->member['user_agent_version'] >= 2 )
 		{
-			$this->member['_can_use_rte'] = TRUE;
+			$this->member['_can_use_rte'] = true;
 		}
 		elseif ( $this->member['user_agent_key'] == 'safari' and $this->member['user_agent_version'] >= 2.1 )
 		{
-			$this->member['_can_use_rte'] = TRUE;
+			$this->member['_can_use_rte'] = true;
 		}
 		elseif ( $this->member['user_agent_key'] == 'chrome' and $this->member['user_agent_version'] >= 0.3 )
 		{
-			$this->member['_can_use_rte'] = TRUE;
+			$this->member['_can_use_rte'] = true;
 		}
 
     	//-----------------
@@ -665,7 +665,7 @@ class Session
 			$this->API->logger__do_log( __CLASS__ . "::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = " . $session_id . ", Member ID = " . $this->session_data['member_id'] , "INFO" );
 		}
 
-		return TRUE;
+		return true;
 	}
 
 
@@ -688,7 +688,7 @@ class Session
 			$this->API->logger__do_log( __CLASS__ . "::kill_authorize_attempt: Authorization attempt FAILED: Session ID = " . $session_id , "INFO" );
 		}
 
-		return FALSE;
+		return false;
 	}
 
 
@@ -706,16 +706,16 @@ class Session
 
 		if ( ! $member['id'] )
 		{
-			return FALSE;
+			return false;
 		}
 
 		if ( $member['pass_hash'] == $this->generate_compiled_pass_hash( $member['pass_salt'], $md5_once_password ) )
 		{
-			return TRUE;
+			return true;
 		}
 		else
 		{
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -740,7 +740,7 @@ class Session
 	 * CUSTOM_FIELDS_INVALID  - Custom fields were invalid
 	 * CUSTOM_FIELDS_TOOBIG   - Custom fields too big
 	 */
-	public function create_member ( $tables = array(), $auto_create_name = FALSE )
+	public function create_member ( $tables = array(), $auto_create_name = false )
 	{
 		//-----------
 		// Prelim
@@ -814,7 +814,7 @@ class Session
 
 			if ( $existing['id'] )
 			{
-				$existing['full']     = TRUE;
+				$existing['full']     = true;
 				$existing['timenow']  = UNIX_TIME_NOW;
 
 				return $existing;
@@ -877,9 +877,9 @@ class Session
 
 		if ( $_final_tables['members']['display_name'] )
 		{
-			if ( $this->names__do_check_if_exists( $_final_tables['members']['display_name'], array(), "display_name", TRUE ) === TRUE )
+			if ( $this->names__do_check_if_exists( $_final_tables['members']['display_name'], array(), "display_name", true ) === true )
 			{
-				if ( $auto_create_name === TRUE )
+				if ( $auto_create_name === true )
 				{
 					# Now, make sure we have a unique display name
 					$this->API->Db->cur_query = array(
@@ -907,9 +907,9 @@ class Session
 
 		if ( $_final_tables['members']['name'] )
 		{
-			if ( $this->names__do_check_if_exists( $_final_tables['members']['name'], array(), "name", TRUE ) === TRUE )
+			if ( $this->names__do_check_if_exists( $_final_tables['members']['name'], array(), "name", true ) === true )
 			{
-				if ( $auto_create_name === TRUE )
+				if ( $auto_create_name === true )
 				{
 					# Now, make sure we have a unique display name
 					$this->API->Db->cur_query = array(
@@ -1023,11 +1023,11 @@ class Session
 		// Insert into partial ID table
 		//---------------------------------
 
-		$full_account = FALSE;
+		$full_account = false;
 
 		if ( $_final_tables['members']['display_name'] and $_final_tables['members']['name'] AND $_final_tables['members']['email'] != $_final_tables['members']['name'] . '@' . $_final_tables['members']['joined'] )
 		{
-			$full_account = TRUE;
+			$full_account = true;
 		}
 
 		if ( ! $full_account )
@@ -1353,18 +1353,18 @@ class Session
 
 				/* Check to see if we've got more than the 'members' table to save on. */
 
-				$_got_more_than_members = FALSE;
+				$_got_more_than_members = false;
 
 				foreach( $_tables as $table )
 				{
 					if ( $table != 'members' )
 					{
-						$_got_more_than_members = TRUE;
+						$_got_more_than_members = true;
 						break;
 					}
 				}
 
-				if ( $_got_more_than_members === TRUE )
+				if ( $_got_more_than_members === true )
 				{
 					/* Get the ID */
 					$_member = $this->load_member( $member_key, 'members' );
@@ -1481,7 +1481,7 @@ class Session
 			}
 		}
 
-		return ( $_updated > 0 ) ? TRUE : FALSE;
+		return ( $_updated > 0 ) ? true : false;
 	}
 
 
@@ -1515,7 +1515,7 @@ class Session
 			$query[] = "ip_address=" . $this->API->Db->db->quote( $this->ip_address );
 		}
 
-		$this->session_id = md5( uniqid( microtime(), TRUE ) . $this->ip_address . $this->user_agent );
+		$this->session_id = md5( uniqid( microtime(), true ) . $this->ip_address . $this->user_agent );
 
 		//------------------
 		// Still update?
@@ -1523,7 +1523,7 @@ class Session
 
 		if ( ! $this->do_update )
 		{
-			return FALSE;
+			return false;
 		}
 
 		$user_agent = $this->process_user_agent( "create" );
@@ -1622,7 +1622,7 @@ class Session
 		/* Set type */
 		$this->member['_session_type'] = "create";
 
-		return TRUE;
+		return true;
 	}
 
 
@@ -1641,7 +1641,7 @@ class Session
 
 			$this->destroy_sessions( "member_id=" . $this->member['id'] );
 
-			$this->session_id = md5( uniqid( microtime(), TRUE ) . $this->ip_address . $this->user_agent );
+			$this->session_id = md5( uniqid( microtime(), true ) . $this->ip_address . $this->user_agent );
 
 			//-----------------------
 			// Get module settings
@@ -1655,7 +1655,7 @@ class Session
 
 			if ( ! $this->do_update )
 			{
-				return FALSE;
+				return false;
 			}
 
 			if ( IN_DEV )
@@ -1767,7 +1767,7 @@ class Session
 		/* Set type */
 		$this->member['_session_type'] = 'create';
 
-		return TRUE;
+		return true;
 	}
 
 
@@ -1780,14 +1780,14 @@ class Session
 	{
 		$pass = "";
 
-		$unique_id  = uniqid( mt_rand(), TRUE );
+		$unique_id  = uniqid( mt_rand(), true );
 		$prefix	    = $this->generate_password_salt();
 		$unique_id .= md5( $prefix );
 
 		usleep( mt_rand( 15000, 1000000 ) );
 		// Hmm, wonder how long we slept for
 
-		$new_uniqid = uniqid( mt_rand(), TRUE );
+		$new_uniqid = uniqid( mt_rand(), true );
 
 		$final_rand = md5( $unique_id . $new_uniqid );
 
@@ -1957,11 +1957,11 @@ class Session
 		$_check = $this->load_member( $email, "" );
 		if ( $_check['id'] )
 		{
-			return TRUE;
+			return true;
 		}
 		else
 		{
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -2266,11 +2266,11 @@ class Session
  		{
 	 		if ( in_array( $mgroup, $this->API->config['userprofiles']['cannot_ignore_groups'] ) )
 	 		{
-		 		return FALSE;
+		 		return false;
 	 		}
 	 	}
 
-		return TRUE;
+		return true;
 	}
 
 
@@ -2293,12 +2293,12 @@ class Session
 
 				if ( $ip and preg_match( "/^" . $ip . "$/", $string ) )
 				{
-					return TRUE;
+					return true;
 				}
 			}
 		}
 
-		return FALSE;
+		return false;
 	}
 
 
@@ -2310,7 +2310,7 @@ class Session
 	 * @param    boolean    TRUE (default, check secondary groups also), FALSE (check primary only)
 	 * @return   boolean    TRUE (is in group) - FALSE (not in group)
 	 */
-	static public function mgroup__is_in_group ( $member, $group, $_check_secondary = TRUE )
+	static public function mgroup__is_in_group ( $member, $group, $_check_secondary = true )
 	{
 		$member_data  = ( is_array( $member ) ) ? $member : $this->load_member( $member, 'members' );
 		$group        = ( is_array( $group ) )  ? $group  : array( $group );
@@ -2318,26 +2318,26 @@ class Session
 
 		if ( ! $member_data['mgroup'] or ! count( $group ) )
 		{
-			return FALSE;
+			return false;
 		}
 
 		foreach ( $group as $gid )
 		{
 			if ( $gid == $member_data['mgroup'] )
 			{
-				return TRUE;
+				return true;
 			}
 
 			if ( $_check_secondary and is_array( $others ) and count( $others ) )
 			{
 				if ( in_array( $gid, $others ) )
 				{
-					return TRUE;
+					return true;
 				}
 			}
 		}
 
-		return FALSE;
+		return false;
 	}
 
 
@@ -2456,7 +2456,7 @@ class Session
 	 * NO_NAME              No display name (or shorter than 3 chars was given)
 	 * ILLEGAL_CHARS        The display name contains illegal characters
 	 */
-	public function names__do_check_if_exists ( $name, $member = array(), $field = "display_name", $ignore = FALSE, $cleaned = TRUE )
+	public function names__do_check_if_exists ( $name, $member = array(), $field = "display_name", $ignore = false, $cleaned = true )
 	{
 		if ( ! $cleaned )
 		{
@@ -2486,7 +2486,7 @@ class Session
 		// Public checks
 		//-----------------
 
-		if ( ACCESS_TO_AREA != 'admin' and $ignore != TRUE )
+		if ( ACCESS_TO_AREA != 'admin' and $ignore != true )
 		{
 			if ( ! $this->API->config['namesettings']['auth_allow_dnames'] or $member['g_dname_changes'] < 1 or $member['g_dname_date'] < 1 )
 			{
@@ -2568,7 +2568,7 @@ class Session
 
 					if ( preg_match( '/^' . $n . '$/i', $name ) )
 					{
-						return TRUE;
+						return true;
 						break;
 					}
 				}
@@ -2591,7 +2591,7 @@ class Session
 		$result = $this->API->Db->simple_exec_query();
 		if ( ! empty( $result ) )
  		{
- 			return TRUE;
+ 			return true;
 		}
 
 		//------------------------------------------------------------
@@ -2611,7 +2611,7 @@ class Session
 	 		{
 	 			if ( $member['id'] and $check_name['id'] != $member['id'] )
 				{
-					return TRUE;
+					return true;
 				}
 			}
 		}
@@ -2637,11 +2637,11 @@ class Session
 			$result = $this->API->Db->simple_exec_query();
 			if ( ! empty( $result ) )
 			{
-				return TRUE;
+				return true;
 			}
 		}
 
-		return FALSE;
+		return false;
 	}
 
 
@@ -2723,16 +2723,16 @@ class Session
 		//-----------------------------------------
 
 		if (
-			strpos( $unicode_name, '&#92;'   ) !== FALSE or
-			strpos( $unicode_name, '&#quot;' ) !== FALSE or
-			strpos( $unicode_name, '&#36;'   ) !== FALSE or
-			strpos( $unicode_name, '&#lt;'   ) !== FALSE or
-			strpos( $unicode_name, '$'       ) !== FALSE or
-			strpos( $unicode_name, ']'       ) !== FALSE or
-			strpos( $unicode_name, '['       ) !== FALSE or
-			strpos( $unicode_name, ','       ) !== FALSE or
-			strpos( $unicode_name, '|'       ) !== FALSE or
-			strpos( $unicode_name, '&#gt;'   ) !== FALSE
+			strpos( $unicode_name, '&#92;'   ) !== false or
+			strpos( $unicode_name, '&#quot;' ) !== false or
+			strpos( $unicode_name, '&#36;'   ) !== false or
+			strpos( $unicode_name, '&#lt;'   ) !== false or
+			strpos( $unicode_name, '$'       ) !== false or
+			strpos( $unicode_name, ']'       ) !== false or
+			strpos( $unicode_name, '['       ) !== false or
+			strpos( $unicode_name, ','       ) !== false or
+			strpos( $unicode_name, '|'       ) !== false or
+			strpos( $unicode_name, '&#gt;'   ) !== false
 		)
 		{
 			return array( 'name' => $original, 'errors' => array( "Username contains illegal characters!" ) );
@@ -2775,7 +2775,7 @@ class Session
 
 		try
 		{
-			if ( ! $this->names__do_check_if_exists( $_cleaned_name['name'], $member, $field, TRUE, TRUE ) )
+			if ( ! $this->names__do_check_if_exists( $_cleaned_name['name'], $member, $field, true, true ) )
 			{
 				if ( $field == 'display_name' )
 				{
@@ -2977,7 +2977,7 @@ class Session
 	 * @param  boolean   Specifies whether cookies should only be sent over secure connections. Defaults to off.
 	 * @param  boolean   Marks the cookie as accessible only through the HTTP protocol. This means that the cookie won't be accessible by scripting languages, such as JavaScript.
 	 */
-	private function session_set_cookie_params ( $lifetime = 0, $path = "/", $domain = "", $secure = FALSE, $httponly = FALSE )
+	private function session_set_cookie_params ( $lifetime = 0, $path = "/", $domain = "", $secure = false, $httponly = false )
 	{
 		if ( version_compare( PHP_VERSION, "5.2", ">=" ) )
 		{
@@ -3031,7 +3031,7 @@ class Session
 		$this->perm_id_array = explode( ",", $group['g_perm_id'] );
 
 		# It's allliiiiiiveeeeee
-		$this->is_not_human = TRUE;
+		$this->is_not_human = true;
 
 		# Logging?
 		if ( $this->API->config['searchenginespiders']['spider_visit'] )
@@ -3310,7 +3310,7 @@ class Session
 		if ( ! $this->session_id )
 		{
 			$this->create_guest_session();
-			return FALSE;
+			return false;
 		}
 
 		//------------------------
@@ -3325,7 +3325,7 @@ class Session
 
 		if ( ! $this->do_update )
 		{
-			return FALSE;
+			return false;
 		}
 
 		$user_agent = $this->process_user_agent( "update" );
@@ -3387,7 +3387,7 @@ class Session
 		# Mark for SAVE
 		$this->sessions_to_save[ $this->session_id ] = $_session_data;
 
-		return TRUE;
+		return true;
 	}
 
 
@@ -3405,21 +3405,21 @@ class Session
 		if ( ! $this->session_id )
 		{
 			$this->create_member_session();
-			return TRUE;
+			return true;
 		}
 
 		if ( ! $this->member['id'] )
 		{
 			$this->set_member( 0 );
 			$this->create_guest_session();
-			return FALSE;
+			return false;
 		}
 
 		if ( ( UNIX_TIME_NOW - $this->member['last_activity'] ) > $this->API->config['security']['session_expiration'] )
 		{
 			// Session is expired - create new session
 			$this->create_member_session();
-			return TRUE;
+			return true;
 		}
 
 		//-------------------------
@@ -3434,7 +3434,7 @@ class Session
 
 		if ( ! $this->do_update )
 		{
-			return TRUE;
+			return true;
 		}
 
 		if ( IN_DEV )
@@ -3486,7 +3486,7 @@ class Session
 
 		$this->sessions_to_save[ $this->session_id ] = $session_data;
 
-		return TRUE;
+		return true;
 	}
 }
 

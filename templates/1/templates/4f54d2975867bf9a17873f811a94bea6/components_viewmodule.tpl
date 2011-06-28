@@ -467,24 +467,23 @@
 			<span class="description"></span>
 		</h2>
 
-		<form id="forms__components__sr__list" method="post" action="">
+		<form id="forms__components__sr__list" class="js__go_ajax" method="post" action="">
 		<table class="full_size tablesorter {sortlist: [[0,0]]}" id="tables__components__sr__list">
 			<thead>
 				<tr>
 					<th style="width: 45%; white-space: nowrap;">Subroutine Name</th>
 					<th style="width: 10%;">Serv. Mode</th>
 					<th style="width: 40%; white-space: nowrap;" class="{sorter: false}">Data Repository</th>
-					<th style="width: 5%;" class="{sorter: false}"></th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<td colspan="4">
+					<td colspan="3">
 					<div class="system_console"></div>
 					<fieldset class="buttons">
 						<input type="button" value="Create New" {{if count($CONTENT.me.m_data_definition) eq 0}}disabled="disabled"{{/if}} />
-						<input type="button" value="Permanently Remove Selected" />
 						<input type="hidden" name="do" value="" />
+						<input type="hidden" name="s_name" value="" />
 						<input type="hidden" name="m_unique_id" value="{{$CONTENT.me.m_unique_id}}" />
 					</fieldset>
 					</td>
@@ -493,18 +492,24 @@
 			<tbody>
 				{{foreach from=$CONTENT.me.m_subroutines item=SR}}
 				<tr>
-					<td><span class="name"><a href="#" onclick="javascript: void(0);">{{$SR.s_name|truncate:20:"...":TRUE}}</a></span></td>
+					<td><span class="name"><a href="#" onclick="javascript: void(0);">{{$SR.s_name|truncate:20:"...":TRUE}}</a></span>
+						<ul class="actions">
+							<li class="ui-icon ui-icon-pencil"><a class="sr_alter__edit" href="?{{$SR.s_name}}" title="Edit">Edit</a></li>
+							{{if $SR.s_can_remove}}
+								<li class="ui-icon ui-icon-closethick"><a class="sr_alter__drop" href="?{{$SR.s_name}}" title="Drop">Drop</a></li>
+							{{/if}}
+						</ul>
+					</td>
 					<td style="text-align: center;">{{if $SR.s_service_mode eq 'read-only'}}read-only{{elseif $SR.s_service_mode eq 'write-only'}}write-only{{elseif $SR.s_service_mode eq 'read-write'}}read-write{{/if}}</td>
 					<td>
 					{{if count( $SR.s_data_definition )}}
 						<ul class="dependency_list">{{foreach from=$SR.s_data_definition item=DDF}}<li>{{$DDF.name|truncate:32:"...":TRUE}}</li>{{/foreach}}</ul>
 					{{else}}-- all --{{/if}}
 					</td>
-					<td align="center"><input type="radio" name="s_name" value="{{$SR.s_name}}" /></td>
 				</tr>
 				{{foreachelse}}
 				<tr>
-					<td colspan="4"><span class="system_message_error">No Subroutines Found!<br />
+					<td colspan="3"><span class="system_message_error">No Subroutines Found!<br />
 					{{if count($CONTENT.me.m_data_definition) eq 0}}You cannot create new one, until you create at least one data-field!{{/if}}</span></td>
 				</tr>
 				{{/foreach}}

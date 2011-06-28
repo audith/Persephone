@@ -253,8 +253,8 @@ class Module_Handler
 				'components_viewmodule'          =>
 					array(
 							'get'                                  => "modules__do_view",
-							'create_subroutine'                    => "modules__subroutines__do_create",
-							'remove_subroutine'                    => "modules__subroutines__do_remove",
+							'sr_alter__add'                        => "modules__subroutines__do_create",
+							'sr_alter__drop'                       => "modules__subroutines__do_remove",
 							'ddl_alter__add'                       => "modules__ddl__do_create",
 							'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
 							'ddl_alter__pre_edit'                  => "modules__ddl__do_edit__pre_processing",
@@ -3460,7 +3460,7 @@ class Module_Handler
 		{
 			$this->API->classes__do_get("Recache")->main( "modules" );
 
-			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Subroutine successfully removed!<br />Refreshing...' );
+			return array( 'responseCode' => 1 , 'responseMessage' => "Success! Subroutine successfully removed!<br />Refreshing...", 'responseAction' => "refresh" );
 		}
 		else
 		{
