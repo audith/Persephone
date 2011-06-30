@@ -486,7 +486,7 @@ class Modules
 				catch ( Zend_Db_Exception $e )
 				{
 					$this->API->Db->exception_handler( $e );
-					return FALSE;
+					return false;
 				}
 
 				$_cache_of_keys_for_the_result_set = array();
@@ -570,7 +570,7 @@ class Modules
 			catch ( Zend_Db_Exception $e )
 			{
 				$this->API->Db->exception_handler( $e );
-				return FALSE;
+				return false;
 			}
 
 			//-----------------------------------------------------------
@@ -782,7 +782,7 @@ class Modules
 		catch ( Zend_Db_Exception $e )
 		{
 			$this->API->Db->exception_handler( $e );
-			return FALSE;
+			return false;
 		}
 
 		//-----------------------------------------------------------
@@ -820,7 +820,7 @@ class Modules
 				// We have field-name, lets check the data-type it belongs to...
 				//------------------------------------------------------------------
 
-				$_field_node = FALSE;
+				$_field_node = false;
 
 				# Is it a connector-enabled field?
 				if ( ( $_field_name_is_connector_enabled = strpos( $_field_name , "." ) ) !== FALSE )
@@ -941,7 +941,7 @@ class Modules
 		# No module information?!
 		if ( ! count( $m ) )
 		{
-			return FALSE;
+			return false;
 		}
 
 		# Is it admin area?
@@ -949,12 +949,6 @@ class Modules
     	{
     		define( "ACCESS_TO_AREA" , "public" );
     	}
-
-		# Its not a built-in module and it has no DDL configuration?! Its impossible, since you can't ENABLE master module without valid DDL configuration
-		if ( $m['m_type'] != 'built-in' and ! $m['m_data_definition'] )
-		{
-			throw new Exception( "Module (\"" . $m['m_name'] . "\") without DDL config?!" );
-		}
 
 		# Module URL prefix
 		$_connection_type = $m['m_enforce_ssl'] ? "https" : "http";
@@ -993,7 +987,7 @@ class Modules
 		}
 		else
 		{
-			# No active modules? Ok then...
+			# No active modules.
 			return null;
 		}
 	}
@@ -1013,12 +1007,12 @@ class Modules
 		if ( array_key_exists( $possible_module_name_from_path_info, $this->active_modules ) )
 		{
 			$this->cur_module =& $this->active_modules[ $possible_module_name_from_path_info ];
-			return TRUE;
+			return true;
 		}
 		else
 		{
 			$this->cur_module = null;
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -1060,13 +1054,13 @@ class Modules
 					:
 					1;
 
-				return TRUE;
+				return true;
 			}
 		}
 
 		# Still no results? Index it is, then...
 		$m['running_subroutine'] = null;
-		return FALSE;
+		return false;
 	}
 
 

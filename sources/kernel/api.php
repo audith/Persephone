@@ -146,9 +146,8 @@ final class API
 		// Read config file
 		//--------------------
 
-		# Are required PHP extensions loaded?
-		$this->config['runtime']['zlib_loaded']     = extension_loaded("zlib")     ? true : false;
-		$this->config['runtime']['mbstring_loaded'] = extension_loaded("mbstring") ? true : false;
+		# Loaded PHP extensions
+		$this->config['runtime']['loaded_extensions'] = get_loaded_extensions();
 
 		# Fetch primary configuration settings from config-file
 		$this->config = array_merge( $this->config__file_read(), $this->config );
@@ -884,7 +883,7 @@ final class API
 	 */
 	public function ob_start ()
 	{
-		if ( ! $this->config['serverenvironment']['disable_gzip'] and $this->config['runtime']['zlib_loaded'] )
+		if ( ! $this->config['serverenvironment']['disable_gzip'] and in_array( "zlib", $this->config['runtime']['loaded_extensions'] ) )
 		{
 			ini_set( "zlib.output_handler"     , "1" );
 			ini_set( "zlib.output_compression" , "1" );

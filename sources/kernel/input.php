@@ -1184,7 +1184,7 @@ class Input
 	 */
 	public function mbstring_check_encoding ( $string, $target_encoding, $secondary_encoding = null )
 	{
-		if ( !$this->API->config['runtime']['mbstring_loaded'] )
+		if ( !in_array( "mbstring", $this->API->config['runtime']['loaded_extensions'] ) )
 		{
 			return -1;
 		}

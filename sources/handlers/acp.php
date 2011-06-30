@@ -1812,7 +1812,7 @@ class Module_Handler
 
 		if ( array_key_exists( $m_unique_id , $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$return['me'] = $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ];
+			$return['me'] = $this->API->Modules->modules__do_load( $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ] );
 			$return['others'] = $this->API->Cache->cache['modules']['by_unique_id'];
 			unset( $return['others'][ $m_unique_id ] );                        // Removing 'me'-self from among 'others' :D
 		}

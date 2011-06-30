@@ -168,7 +168,7 @@ class Cache_Lib
 	 */
 	public function do_put ( $key , $value , $ttl = 0 , $_no_logging = FALSE )
 	{
-		if ( $this->API->config['runtime']['zlib_loaded'] )
+		if (  in_array( "zlib", $this->API->config['runtime']['loaded_extensions'] ) )
 		{
 			$return = $this->link->set( md5( $this->identifier . $key ), $value, MEMCACHE_COMPRESSED, intval( $ttl ) );
 		}

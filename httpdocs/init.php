@@ -82,7 +82,7 @@ define( "MIN_PHP_VERSION"    , "5.1.0"                          );
  */
 if ( ! version_compare( MIN_PHP_VERSION, PHP_VERSION, "<=" ) )
 {
-	trigger_error( "You must be using PHP " . MIN_PHP_VERSION . " or later. You are currently using " . PHP_VERSION, E_USER_ERROR );
+	throw new Exception( "You must be using PHP " . MIN_PHP_VERSION . " or later. You are currently using " . PHP_VERSION );
 	exit();
 }
 
@@ -97,12 +97,12 @@ if ( ! SAFE_MODE_ON )
 /**
  * Ignore User Abort
  */
-ignore_user_abort( TRUE );
+ignore_user_abort( true );
 
 /**
  * Error reporting
  */
-error_reporting( E_ALL /* ^ E_NOTICE */ );
+error_reporting( E_ALL );
 /*
  if ( IN_DEV )
  {

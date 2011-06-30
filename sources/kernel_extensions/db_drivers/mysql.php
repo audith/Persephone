@@ -439,6 +439,16 @@ public final function modules__default_table_structure ( $suffix )
 								'extra'     => null,
 								'indexes'   => null
 							),
+						'_x_data_compatibility' => array(
+								'type'      => "varchar",
+								'length'    => 255,
+								'collation' => null,
+								'attribs'   => null,
+								'is_null'   => true,
+								'default'   => null,
+								'extra'     => null,
+								'indexes'   => null
+							),
 					),
 				'comment'    => ""
 			);

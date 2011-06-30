@@ -438,6 +438,16 @@ class Db_Driver extends Database
 								'extra'     => null,
 								'indexes'   => null
 							),
+						'_x_data_compatibility' => array(
+								'type'      => "varchar",
+								'length'    => 255,
+								'collation' => null,
+								'attribs'   => null,
+								'is_null'   => true,
+								'default'   => null,
+								'extra'     => null,
+								'indexes'   => null
+							),
 					),
 				'comment'    => ""
 			);
