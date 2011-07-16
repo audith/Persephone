@@ -2,43 +2,72 @@
 
 @media screen
 {
-	/* Main
+	/* Reset
 	---------------------------------*/
 	
-	*
+	HTML, BODY, DIV, SPAN, APPLET, OBJECT, IFRAME, H1, H2, H3, H4, H5, H6, P, BLOCKQUOTE, PRE,
+	A, ABBR, ACRONYM, ADDRESS, BIG, CITE, CODE,	DEL, DFN, EM, IMG, INS, KBD, Q, S, SAMP,
+	SMALL, STRIKE, STRONG, SUB, SUP, TT, VAR, B, U, I, CENTER, DL, DT, DD, OL, UL, LI,
+	FIELDSET, FORM, LABEL, LEGEND, TABLE, CAPTION, TBODY, TFOOT, THEAD, TR, TH, TD,
+	ARTICLE, ASIDE, CANVAS, DETAILS, EMBED,	FIGURE, FIGCAPTION, FOOTER, HEADER, HGROUP, 
+	MENU, NAV, OUTPUT, RUBY, SECTION, SUMMARY, TIME, MARK, AUDIO, VIDEO
 	{
-		margin: 0px;
-		padding: 0px;
-		border: 0px;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font-size: 100%;
+		font: inherit;
+		vertical-align: baseline;
+	}
+	
+	/* HTML5 display-role reset for older browsers */
+	ARTICLE, ASIDE, DETAILS, FIGCAPTION, FIGURE, FOOTER, HEADER, HGROUP, MENU, NAV, SECTION
+	{
+		display: block;
 	}
 	
 	BODY
 	{
+		line-height: 1;
+	}
+	
+	OL, UL
+	{
+		list-style: none;
+	}
+	
+	BLOCKQUOTE, Q
+	{
+		quotes: none;
+	}
+	
+	BLOCKQUOTE:before, BLOCKQUOTE:after,
+	Q:before, Q:after
+	{
+		content: '';
+		content: none;
+	}
+	
+	TABLE
+	{
+		border-collapse: collapse;
+		border-spacing: 0;
+	}
+	
+	
+	/* Main
+	---------------------------------*/	
+	
+	BODY
+	{
 		font-family: "trebuchet ms",arial,sans-serif;
-		font-size: 10px;
+		font-size: 12px;
 	}
 	
 	A
 	{
 		color: #0085bf;
 		text-decoration: none;
-	}
-	
-	STRONG
-	{
-		font-weight: bold;
-	}
-	
-	IMG.absmiddle
-	{
-		vertical-align: middle !important;
-	}
-	
-	DIV#document
-	{
-		width: 100%;
-		margin: 0px auto;
-		overflow: hidden;
 	}
 	
 	DIV#matte
@@ -64,24 +93,28 @@
 		background-color: white;
 	}
 	
-	DIV#navigation H1
+	H1#logo
 	{
 		width: 437px;
 		height: 86px;
 		float: left;
+		clear: none;
 		overflow: hidden;
+		position: relative;
+		left: 50%;
+		margin-left: -455px;
 		
 		background-image: url('../images/logo.jpg');
 		cursor: pointer;
 		text-indent: -9999px;
 	}
 	
-	DIV#navigation H1.acp
+	H1#logo.acp
 	{
 		background-image: url('../images/acp__logo.jpg');
 	}
 	
-		DIV#navigation H1 A
+		H1#logo A
 		{
 			float: left;
 			width: 100%;
@@ -90,15 +123,19 @@
 			text-indent: -99999px;
 		}
 	
-	DIV#navigation UL
+	UL#navigation
 	{
 		width: 473px;
 		list-style: none;
 		list-style-type: none;
 		float: right;
+		clear: none;
+		position: relative;
+		right: 50%;
+		margin-right: -455px;
 	}
 	
-	DIV#navigation UL LI A
+	UL#navigation LI A
 	{
 		float: left;
 		width: 100%;
@@ -169,8 +206,8 @@
 	DIV#midbar DIV#user_navigation UL LI,
 	DIV#midbar DIV#user_navigation UL LI *
 	{
-		font-family: tahoma;
-		font-size: 11px;
+		font-family: tahoma, sans-serif;
+		font-size: 1em;
 		color: white;
 	}
 	
@@ -220,9 +257,9 @@
 		line-height: 15px;
 		padding: 15px 10px 13px 7px; /* don't make it margin... padding goes better with transparent bg-color */
 		
-		font-size: 11px;
+		font-size: 1em;
 		font-weight: bold;
-		font-family: tahoma,'trebuchet ms',arial,sans serif;
+		font-family: tahoma, 'Trebuchet MS', arial, sans serif;
 		color: black;
 	}
 	
@@ -290,8 +327,7 @@
 		-moz-border-radius: 3px;
 		
 		text-align: left;
-		font-family: inherit;
-		font-size: 11px;
+		font-size: 1em;
 		list-style-position: outside;
 	}
 	
@@ -358,40 +394,57 @@
 		height: auto;
 		float: left;
 		clear: both;
+		border-color: #dddddd;
+		border-radius: 10px;
+		border-style: solid;
+		border-width: 1px;
 		overflow: hidden;
 		
-		font-size: 14px;
 		color: #4a494b;
 	}
 	
 	DIV#content UL.data_container > LI > H2
 	{
-		background-color: transparent !important;
-		background-repeat: no-repeat !important;
-		background-position: 0 0 !important;
 		border-width: 0 !important;
 		border-radius: 0 !important;
-		-moz-border-radius: 0 !important;
+		background: -moz-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* FF3.6+ */
+		background: -webkit-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* Opera11.10+ */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9eef2', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+		background: linear-gradient(top, #e9eef2 0%, transparent 100%); /* W3C */
 		height: 45px;
 		float: left;
 		clear: both;
-		padding: 10px 16px 10px 15px;
+		padding: 10px 15px;
 		overflow: hidden;
 		/* white-space: nowrap; */
 	
-		font-size: 20px;
+		font-size: 1.5em;
 		font-weight: normal;
-		letter-spacing: -1px;
 		color: #0085bf;
 	}
 	
-	DIV#content UL.data_container > LI > H2 EM
-	{
-		color: #B77400;
-		font-style: normal;
-		font-family: "courier new",monospace;
-		font-weight: bold;
-	}
+		DIV#content UL.data_container > LI > H2 > EM
+		{
+			color: #B77400;
+			font-style: normal;
+			font-family: "courier new",monospace;
+			font-weight: bold;
+		}
+		
+		DIV#content UL.data_container > LI > H2 > .description
+		{
+			float: left;
+			clear: both;
+			letter-spacing: 0;
+			width: 100%;
+			margin-top: 3px;
+		
+			text-transform: lowercase;
+			color: #445a7b;
+			font-size: 0.7em;
+			font-family: tahoma, arial, sans-serif;
+		}
 	
 	DIV#content UL.data_container > LI > P,
 	DIV#content UL.data_container > LI > FIELDSET,
@@ -407,8 +460,6 @@
 		
 		text-align: left;
 		font-family: "trebuchet ms",arial,sans-serif;
-		font-size: 1em;
-		font-weight: normal;
 	}
 	
 		DIV#content UL.data_container > LI > FIELDSET FIELDSET,
@@ -419,7 +470,6 @@
 			width: 100%;
 		}
 	
-	/* DIV#content UL.data_container > LI > TABLE, */
 	DIV#content UL.data_container > LI TABLE
 	/* DIV#content UL.data_container > LI > FORM > TABLE */
 	{
@@ -428,7 +478,7 @@
 		height: 100%;
 		float: left;
 		clear: both;
-		margin: 0 16px 15px 15px;
+		margin: 0 15px 15px;
 		table-layout: fixed;
 		vertical-align: top;
 		/*
@@ -443,8 +493,6 @@
 		empty-cells: show;
 		
 		text-align: left;
-		font-family: tahoma,arial,sans-serif;
-		font-size: 0.8em;
 		font-weight: normal;
 	}
 	
@@ -581,8 +629,7 @@
 		margin: 10px 16px 0 15px;
 		
 		text-align: left;
-		font-family: inherit;
-		font-size: 11px;
+		font-size: 1em;
 		list-style-position: outside;
 	}
 	
@@ -622,19 +669,6 @@
 		list-style-type: disc;
 	}
 	
-	DIV#content UL.data_container > LI > H2 SPAN.description
-	{
-		float: left;
-		clear: both;
-		letter-spacing: 0;
-		width: 100%;
-	
-		font-size: 14px;
-		text-transform: lowercase;
-		color: #445a7b;
-	}
-	
-	
 	DIV#content UL.data_container > LI > FORM
 	{
 		width: 100%;
@@ -655,8 +689,8 @@
 		clear: both;
 		float: left;
 	
-		font-size: 13px;
-		// font-weight: normal;
+		font-size: 1.1em;
+		font-weight: bold;
 		color: #0085bf;
 	}
 	
@@ -664,9 +698,9 @@
 	{
 		clear: both;
 		float: left;
+		margin-top: 3px;
 	
-		font-size: 10px;
-		font-style: normal;
+		font-size: 0.9em;
 		color: #666666;
 	}
 	
@@ -688,21 +722,12 @@
 	DIV#content UL.data_container > LI > FORM TEXTAREA,
 	DIV#content UL.data_container > LI > FORM SELECT
 	{
-		padding: 1px;
-		
-		font-size: 11px;
-		color: #00639D;
-	}
-	
-	DIV#content UL.data_container > LI > FORM INPUT.large_fontsize,
-	DIV#content UL.data_container > LI > FORM TEXTAREA.large_fontsize,
-	DIV#content UL.data_container > LI > FORM SELECT.large_fontsize
-	{
 		padding: 2px;
 		border-radius: 3px;
-		-moz-border-radius: 3px;
 		
-		font-size: 14px;
+		font: inherit;
+		font-size: 0.9em;
+		color: #00639D;
 	}
 	
 	DIV#content UL.data_container > LI > FORM INPUT.error,
@@ -739,9 +764,9 @@
 		padding: 0;
 		margin: 5px 20px 0 10px;
 	
-		font-size: 11px;
+		font-size: 1em;
 		color: #00639D;
-		line-height: 20px;
+		line-height: 1.5em;
 	}
 	
 		DIV#content UL.data_container > LI > FORM SPAN.input > *
@@ -770,7 +795,7 @@
 			padding: 1px;
 			border: 1px #99CBDF solid;
 			
-			font-size: 11px;
+			font-size: 1em;
 			color: #00639D;
 		}
 	
@@ -851,6 +876,9 @@
 			padding: 2px 4px 2px 4px;
 			margin: 0 auto;
 			float: none;
+			
+			font-size: 1em;
+			font-weight: bold;
 		}
 		
 		DIV#content UL.data_container > LI > FORM DIV.buttons SELECT,
@@ -865,7 +893,7 @@
 			float: none;
 			clear: none;
 		
-			font-size: 11px;
+			font-size: 1em;
 			font-weight: bold;
 			color: #0085BF;
 		}
@@ -903,7 +931,6 @@
 	DIV#content UL.half_size > LI > H2
 	{
 		width: 497px;  /* +31px goes to left+right padding */
-		background-image: url('../images/content__halfsize__title_bg.jpg');
 	}
 	
 	DIV#content UL.half_size > LI > FORM > H3
@@ -920,7 +947,6 @@
 		padding: 42px 170px 8px 12px;
 	*/
 		color: white;
-		font-size: 13px;
 		font-weight: bold;
 	}
 	
@@ -964,7 +990,6 @@
 		float: left;
 		clear: left;
 		display: block;
-		margin-top: 5px;
 		padding-right: 10px;
 	}
 	
@@ -984,7 +1009,7 @@
 	{
 		float: left;
 		clear: right;
-		margin: 5px 0 0 10px;
+		margin: 0 0 0 10px;
 		border: 1px #99CBDF solid;
 	}
 	
@@ -1053,18 +1078,13 @@
 		height: auto;
 		clear: left;
 		margin: 5px 0 5px 0;
-		background-image: url('../images/content__fullsize__bg.jpg');
-		background-repeat: repeat-y;
 	}
 	
 	DIV#content UL.full_size > LI
 	{
-		width: 887px;
-		background-image: url('../images/content__fullsize__data_bg.jpg');
-		background-repeat: no-repeat;
-		background-position: bottom;
+		width: 885px;
 		padding-bottom: 5px;
-		margin: 0;
+		margin: 0 0 7px;
 		float: left;
 		clear: both;
 	}
@@ -1076,8 +1096,7 @@
 	
 	DIV#content UL.full_size > LI > H2
 	{
-		width: 857px;  /* +31px goes to left+right padding */
-		background-image: url('../images/content__fullsize__title_bg.jpg') !important;
+		width: 855px;  /* +30px goes to left+right padding */
 	}
 	
 	DIV#content UL.full_size > LI > FORM > H3
@@ -1093,7 +1112,6 @@
 		padding: 42px 170px 8px 12px;
 		
 		color: white;
-		font-size: 13px;
 		font-weight: bold;
 	}
 	
@@ -1155,7 +1173,6 @@
 		float: left;
 		clear: left;
 		display: block;
-		margin-top: 5px;
 		padding-right: 10px;
 	}
 	
@@ -1180,7 +1197,7 @@
 	{
 		float: left;
 		clear: right;
-		margin: 5px 0 0 10px;
+		margin: 0 0 0 10px;
 		border: 1px #99CBDF solid;
 	}
 	
@@ -1199,13 +1216,13 @@
 			DIV#content UL.full_size > LI > FORM > FIELDSET.deco_1 TEXTAREA
 			{
 				width: 375px;
-				margin: 5px 5px 0 10px;
+				margin: 0 5px 0 10px;
 			}
 			
 			DIV#content UL.full_size > LI > FORM > FIELDSET.deco_1 SELECT
 			{
 				width: 379px;
-				margin: 5px 5px 0 10px;
+				margin: 0 5px 0 10px;
 			}
 	
 	DIV#content UL.full_size > LI > FORM INPUT.full_size,
@@ -1263,7 +1280,7 @@
 	DIV#content UL.full_size > LI > TABLE,
 	DIV#content UL.full_size > LI > FORM > TABLE
 	{
-		width: 856px;
+		width: 855px;
 	}
 	
 	/* UL.side_pane
@@ -1365,7 +1382,7 @@
 		line-height: 16px;
 		
 		font-family: arial;
-		font-size: 10px;
+		font-size: 1em;
 		font-weight: bold;
 		color: #A3A3A3;
 		white-space: nowrap;
@@ -1384,49 +1401,51 @@
 	/* The rest
 	---------------------------------*/
 	
-	DIV#footer
+	SPAN#disclaimer, SPAN#footer
 	{
-		width: 930px;
-		height: 50px;
-		clear: both;
-		margin: 0px auto;
 		overflow: hidden;
 	
 		color: #868686;
-		font-size: 10px;
+		font-size: 1em;
 		line-height: 20px;
 	}
 	
-	DIV#footer A
+	SPAN#disclaimer A, SPAN#footer A
 	{
 		color: #868686;
 		font-weight: bold;
 		text-decoration: underline;
 	}
 	
-	DIV#footer A:hover
+	SPAN#disclaimer A:hover, SPAN#footer A:hover
 	{
 		color: #868686;
 		font-weight: bold;
 		text-decoration: none;
 	}
 	
-	DIV#footer SPAN#disclaimer
+	SPAN#disclaimer
 	{
 		width: 350px;
 		height: 20px;
-		margin: 30px 4px 5px 25px;
 		float: left;
+		clear: none;
+		position: relative;
+		left: 50%;
+		margin: 30px 4px 5px -425px;
 		
 		text-align: left;
 	}
 	
-	DIV#footer SPAN#links
+	SPAN#footer
 	{
 		width: 522px;
 		height: 20px;
-		margin: 30px 25px 5px 4px;
-		float: left;
+		float: right;
+		clear: none;
+		position: relative;
+		right: 50%;
+		margin: 30px -425px 5px 4px;
 		
 		text-align: right;
 	}

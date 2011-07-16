@@ -56,7 +56,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 							'maxlength' : 'Maxlength (in bytes)'
 						},
 						'tip__for' : {
-							'maxlength' : 'Maximum length in bytes. Leave empty to default to &quot;255&quot;. <b>Don&39;t forget to compensate for multi-byte characters!</b>'
+							'maxlength' : 'Maximum length in bytes. Leave empty to default to &quot;255&quot;. <b>Don&039;t forget to compensate for multi-byte characters!</b>'
 						}
 					}
 				}
@@ -385,13 +385,25 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 };
 
 Acp_ComponentsViewmodule.prototype.registry__sr = {
-	'service_mode' : {
-		'w-fetch-criteria' : [
-				'read-only', 'read-write'
-		],
-		'wo-fetch-criteria' : [
-			'write-only'
-		]
+	's_data_source' : {
+		'rdbms' : {
+			's_data_compatibility' : null,
+			's_data_target' : null,
+			'_s_config' : {
+				's_data_definition' : true,
+				's_fetch_criteria' : true,
+				'@s_fetch_criteria[do_fetch_all_or_selected]' : 'all',
+				's_fetch_criteria__limit' : true
+			}
+		},
+		'dom' : {
+			's_data_compatibility' : ['xml-cdata-compatible'],
+			's_data_target' : null
+		},
+		'json' : {
+			's_data_compatibility' : ['xml-cdata-compatible'],
+			's_data_target' : null
+		}
 	}
 };
 

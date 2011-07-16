@@ -1,0 +1,49 @@
+#media_library_sneak_peek
+{
+	width: 100px;
+	height: 100px;
+	background-color: transparent;
+	background-position: left top;
+	background-repeat: no-repeat;
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 99999;
+}
+
+DIV#content UL#side_pane LI#side_pane__banners__media_library
+{
+	width: 354px;
+	height: 70px;
+	clear: right;
+	background-image: url('{{$STYLE_IMAGES_URL}}/banner_settings.png');
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	
+	text-indent: -99999px;
+	list-style-image: none;
+	list-style-type: none;
+	list-style-position: inside;
+}
+
+DIV#content UL#side_pane LI#side_pane__banners__manage_content
+{
+	width: 354px;
+	height: 70px;
+	clear: right;
+	background-image: url('{{$STYLE_IMAGES_URL}}/banner_settings.png');
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	
+	text-indent: -99999px;
+	list-style-image: none;
+	list-style-type: none;
+	list-style-position: inside;
+}
+
+DIV#content UL.data_container LI TABLE#tables__media_library TBODY TR TD.w_preview_hover
+{
+	cursor: pointer;
+	height: 25px;
+}

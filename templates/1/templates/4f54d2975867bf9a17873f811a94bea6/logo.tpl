@@ -1,1 +1,1 @@
-<h1 class="acp"><a href="{{$MODULE_URL}}" title="Persephone Control Panel">{{$SITE_NAME}}{{if $SITE_MOTTO neq ''}} - {{$SITE_MOTTO}}{{/if}}</a></h1>
+<h1 id="logo" class="acp"><a href="{{$MODULE_URL}}" title="Persephone Control Panel">{{$SITE_NAME}}{{if $SITE_MOTTO neq ''}} - {{$SITE_MOTTO}}{{/if}}</a></h1>

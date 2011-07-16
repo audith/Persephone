@@ -714,12 +714,6 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			return jQuery.parseJSON(jqXHR.responseText);
 		});
 
-		// Do we have buttonset() function defined? If so, apply it accordingly.
-		if ( 'function' == typeof jQuery().buttonset )
-		{
-			jQuery(".ui-buttonset").buttonset();
-		}
-
 		// Do we have accordion() function defined? If so, apply it accordingly.
 		if ( 'function' == typeof jQuery().accordion )
 		{
@@ -743,15 +737,10 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			jQuery(".buttons").find("INPUT[type='submit'],INPUT[type='button'],INPUT[type='reset']").button();
 		}
 
-		// Do we have tablesorter() function defined? If so, apply it accordingly.
-		if ( 'function' == typeof jQuery().tablesorter )
+		// Do we have buttonset() function defined? If so, apply it accordingly.
+		if ( 'function' == typeof jQuery().buttonset )
 		{
-			jQuery("TABLE.tablesorter").tablesorter({
-				widgets : [
-					'zebra'
-				],
-				widthFixed : true
-			});
+			jQuery(".ui-buttonset").buttonset();
 		}
 
 		// Do we have sortable() function defined? If so, apply it accordingly.
@@ -779,6 +768,25 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			// {
 			// 	console.log(jQuery(this).sortable("serialize"));
 			// });
+		}
+
+		// Do we have tablesorter() function defined? If so, apply it accordingly.
+		if ( 'function' == typeof jQuery().tablesorter )
+		{
+			jQuery("TABLE.tablesorter").tablesorter({
+				widgets : [
+					'zebra'
+				],
+				widthFixed : true
+			});
+		}
+
+		// Do we have tabs() function defined? If so, apply it accordingly.
+		if ( 'function' == typeof jQuery().tabs )
+		{
+			jQuery(".ui-tabs").tabs({
+
+			});
 		}
 	});
 

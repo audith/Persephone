@@ -1,7 +1,7 @@
 <samp id="system_console" class="full_size"></samp>
 <ul class="data_container full_size">
 	<li id="components__modules__alter_add" class="ondemand">
-		<h2 class="full_size">Register a Module
+		<h2>Register a Module
 			<span class="description"></span>
 		</h2>
 		<form id="forms__modules__alter_add" class="js__go_ajax" action="" method="post">
@@ -51,7 +51,7 @@
 	</li>
 
 	<li id="components__modules__list">
-		<h2 class="full_size">Components Management - Modules
+		<h2>Components Management - Modules
 			<span class="description"></span>
 		</h2>
 

@@ -60,7 +60,7 @@ TD:hover > SPAN.name
 		color:#CF8733;
 	}
 
-#content UL.full_size LI FORM A#create_subroutine__fetch_criteria__add_policy_button
+#content UL.full_size LI FORM A#sr__fetch_criteria__add_policy_button
 {
 	height:22px;
 	width:auto;
@@ -78,7 +78,7 @@ TD:hover > SPAN.name
 	color:#006600;
 }
 
-#content UL.full_size LI FORM A.create_subroutine__fetch_criteria__remove_policy_button
+#content UL.full_size LI FORM A.sr__fetch_criteria__remove_policy_button
 {
 	height:28px;
 	width:18px;
@@ -91,15 +91,14 @@ TD:hover > SPAN.name
 	background-repeat:no-repeat;
 }
 
-#content UL.full_size LI FORM SPAN.create_subroutine__fetch_criteria__policies
+#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policies
 {
-	display:none;
 	float:left;
 	margin:0;
 	width:100%;
 }
 
-#content UL.full_size LI FORM SPAN.create_subroutine__fetch_criteria__policies SPAN.create_subroutine__fetch_criteria__arrow_turn_left
+#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policies SPAN.sr__fetch_criteria__arrow_turn_left
 {
 	height:74px;
 	width:20px;
@@ -111,7 +110,7 @@ TD:hover > SPAN.name
 	background-position:bottom left;
 }
 
-#content UL.full_size LI FORM SPAN.create_subroutine__fetch_criteria__policies I.create_subroutine__fetch_criteria__group_heading
+#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policies I.sr__fetch_criteria__group_heading
 {
 	height:20px;
 	width:98px;
@@ -129,7 +128,7 @@ TD:hover > SPAN.name
 	color:#66CC66;
 }
 
-#content UL.full_size LI FORM SPAN.create_subroutine__fetch_criteria__policy_shortcut
+#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policy_shortcut
 {
 	height:18px;
 	width:auto;
@@ -143,7 +142,7 @@ TD:hover > SPAN.name
 	line-height:18px;
 }
 
-#content UL.full_size LI FORM A.create_subroutine__fetch_criteria__add_query_button
+#content UL.full_size LI FORM A.sr__fetch_criteria__add_query_button
 {
 	height:20px;
 	width:20px;
@@ -158,7 +157,7 @@ TD:hover > SPAN.name
 	text-indent:-99999px;
 }
 
-#content UL.full_size LI FORM A.create_subroutine__fetch_criteria__remove_query_button
+#content UL.full_size LI FORM A.sr__fetch_criteria__remove_query_button
 {
 	height:20px;
 	width:20px;
@@ -175,16 +174,15 @@ TD:hover > SPAN.name
 
 #content UL.full_size LI FORM SPAN.pre_extra,
 #content UL.full_size LI FORM SPAN.extra,
-#content UL.full_size LI FORM SPAN.create_subroutine__sort_by
+#content UL.full_size LI FORM SPAN.sr__sort_by
 {
 	width:100%;
 	float:left;
 	clear:both;
 	margin:2px 0 0 0;
-	display:none;
 }
 
-#content UL.full_size LI FORM A#create_subroutine__fetch_criteria__add_sorting_button
+#content UL.full_size LI FORM A#sr__fetch_criteria__add_sorting_button
 {
 	height:22px;
 	width:auto;
@@ -202,7 +200,7 @@ TD:hover > SPAN.name
 	color:#006600;
 }
 
-#content UL.full_size LI FORM A.create_subroutine__fetch_criteria__remove_sorting_button
+#content UL.full_size LI FORM A.sr__fetch_criteria__remove_sorting_button
 {
 	height:20px;
 	width:18px;
@@ -215,12 +213,12 @@ TD:hover > SPAN.name
 	background-repeat:no-repeat;
 }
 
-SPAN.create_subroutine__fetch_criteria__policies SELECT,
-SPAN.create_subroutine__fetch_criteria__policies TEXTAREA,
-SPAN.create_subroutine__fetch_criteria__policies INPUT,
-SPAN.create_subroutine__sort_by SELECT,
-SPAN.create_subroutine__sort_by TEXTAREA,
-SPAN.create_subroutine__sort_by INPUT,
+SPAN.sr__fetch_criteria__policies SELECT,
+SPAN.sr__fetch_criteria__policies TEXTAREA,
+SPAN.sr__fetch_criteria__policies INPUT,
+SPAN.sr__sort_by SELECT,
+SPAN.sr__sort_by TEXTAREA,
+SPAN.sr__sort_by INPUT,
 SPAN.pre_extra SELECT,
 SPAN.pre_extra TEXTAREA,
 SPAN.pre_extra INPUT,
