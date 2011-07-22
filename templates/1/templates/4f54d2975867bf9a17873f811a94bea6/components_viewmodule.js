@@ -56,7 +56,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 							'maxlength' : 'Maxlength (in bytes)'
 						},
 						'tip__for' : {
-							'maxlength' : 'Maximum length in bytes. Leave empty to default to &quot;255&quot;. <b>Don&039;t forget to compensate for multi-byte characters!</b>'
+							'maxlength' : 'Maximum length in bytes. Leave empty to default to &quot;255&quot;. <b>Don&#039;t forget to compensate for multi-byte characters!</b>'
 						}
 					}
 				}
@@ -723,7 +723,7 @@ jQuery(document).ready(function ( event )
 	{
 		if ( jQuery("#components__ddl__alter_add").is(":hidden") )
 		{
-			jQuery("#content UL.data_container > .ondemand").hide(); // Close all .ondemand panes
+			jQuery("#content UL.section > .ondemand").hide(); // Close all .ondemand panes
 			jQuery("#components__ddl__alter_add").show(); // Open "DDL-Create" form
 		}
 		jQuery("#forms__components__ddl__alter_add").trigger("reset"); // Reset "DDL-Create" Form
@@ -1075,7 +1075,7 @@ jQuery(document).ready(function ( event )
 		if ( jQuery("#components__sr__create").is(":hidden") )
 		{
 			/* Close all .ondemand panes */
-			jQuery("#content UL.data_container > .ondemand").hide();
+			jQuery("#content UL.section > .ondemand").hide();
 
 			/* Open "SR-Create" form */
 			jQuery("#components__sr__create").slideDown("medium", function ()

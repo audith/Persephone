@@ -17,7 +17,7 @@
 		<div id="search">{{$SEARCH_FORM}}</div>
 		<div id="user_navigation">{{$MEMBERBAR}}</div>
 	</div>
-	<div id="content">{{$CONTENT}}</div>
+	{{$CONTENT}}
 	{{$COPYRIGHT}}
 	{{$FOOTER}}
 </body>

@@ -85,7 +85,9 @@ class Module_Handler
 										's_qstring_parameters'            => array(),
 										's_fetch_criteria'                => array(),
 										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(),
+										's_additional_skin_assets'        => array(
+												array( 'file' => "/jquery.cookie.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+											),
 									),
 							'content_and_data__index'           =>
 								array(
@@ -3620,9 +3622,10 @@ class Module_Handler
 		if ( $_rows_affected )
 		{
 			$this->API->classes__do_get("Recache")->main( "settings" );
+			return array( 'responseCode' => 1, 'responseMessage' => "Settings successfully updated! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}
 
-		return array( 'responseCode' => 1, 'responseMessage' => "Settings successfully updated!" );
+		return array( 'responseCode' => 1, 'responseMessage' => "Nothing changed..." );
 	}
 
 
@@ -3634,9 +3637,9 @@ class Module_Handler
 	private function settings__do_revert()
 	{
 		$input =& $this->API->Input->post;
-		if ( preg_match( "/^revert_(\d+)$/" , $input['for'] , $_setting_id ) )
+		if ( !empty( $input['revert__for'] ) )
 		{
-			$setting_id = $_setting_id[1];
+			$setting_id = intval( $input['revert__for'] );
 			$this->API->Db->cur_query = array(
 					"do"     => "update",
 					"tables" => array("conf_settings"),
@@ -3647,7 +3650,7 @@ class Module_Handler
 
 			$this->API->classes__do_get("Recache")->main( "settings" );
 
-			return array( 'responseCode' => 1 , 'responseMessage' => "Setting successfully reverted to its default value!<br />Refreshing..." );
+			return array( 'responseCode' => 1 , 'responseMessage' => "Setting successfully reverted to its default value! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}
 		else
 		{

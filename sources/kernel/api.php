@@ -1,6 +1,6 @@
 <?php
 
-if ( ! defined( "INIT_DONE" ) )
+if ( !defined( "INIT_DONE" ) )
 {
 	print "Improper access! Exiting now...";
 	exit();

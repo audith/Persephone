@@ -7,69 +7,57 @@ jQuery(document).ready(function ()
 
 	jQuery(window).bind("resize", function ()
 	{
-		if ( jQuery("DIV#side_pane_control_button").is(":visible") )
+		if ( jQuery("#side_pane_control_button").is(":visible") )
 		{
-			_left = jQuery("DIV#midbar").offset().left + jQuery("DIV#midbar").width() - jQuery("DIV#side_pane_control_button").width() - 50;
-			jQuery("DIV#side_pane_control_button").css("left", _left);
+			_left = jQuery("DIV#midbar").offset().left + jQuery("DIV#midbar").width() - jQuery("#side_pane_control_button").width() - 50;
+			jQuery("#side_pane_control_button").css("left", _left);
 		}
 	});
 
-	jQuery("UL#side_pane").hover(function ( event )
+	jQuery("#side_pane").hover(function ( event )
 	{
-		if ( jQuery("DIV#side_pane_control_button").is(":hidden") )
+		if ( jQuery("#side_pane_control_button").is(":hidden") )
 		{
 			_top = jQuery("DIV#midbar").offset().top + jQuery("DIV#midbar").height() + 2;
-			_left = jQuery("DIV#midbar").offset().left + jQuery("DIV#midbar").width() - jQuery("DIV#side_pane_control_button").width() - 50;
-			jQuery("DIV#side_pane_control_button").css("top", _top).css("left", _left).addClass("forward");
+			_left = jQuery("DIV#midbar").offset().left + jQuery("DIV#midbar").width() - jQuery("#side_pane_control_button").width() - 50;
+			jQuery("#side_pane_control_button").css("top", _top).css("left", _left).addClass("forward");
 		}
 		jQuery(this).animate({
-			top : 16
+			top : 14
 		}, 500, "swing", function ()
 		{
-			jQuery("DIV#side_pane_control_button").fadeIn(1000);
+			jQuery("#side_pane_control_button").fadeIn(1000);
 		});
 		return 1;
 	});
 
 	/*
-	 * jQuery("UL#side_pane").mouseout( function(event){ jQuery(this).animate({top:0},500,"swing"); return 1; } );
+	 * jQuery("#side_pane").mouseout( function(event){ jQuery(this).animate({top:0},500,"swing"); return 1; } );
 	 */
 
-	jQuery("DIV#side_pane_control_button").toggle(function ( event )
+	jQuery("#side_pane_control_button").toggle(function ( event )
 	{
-		jQuery("DIV#side_pane_control_button").removeClass("forward").addClass("backward").html("show side pane");
-		jQuery("DIV#content UL#side_pane").animate({
-			left : 350,
-			opacity : -0.5
-		}, 500, function ()
+		jQuery("#side_pane_control_button").removeClass("forward").addClass("backward").html("show side pane");
+		jQuery("#side_pane").fadeOut(500, function ()
 		{
-			jQuery("DIV#side_pane_control_button").animate({
-				top : jQuery("DIV#side_pane_control_button").offset().top + 10,
-				left : jQuery("DIV#side_pane_control_button").offset().left - 10
+			jQuery("#side_pane_control_button").animate({
+				top : jQuery("#side_pane_control_button").offset().top + 10,
+				left : jQuery("#side_pane_control_button").offset().left - 10
 			}, 500);
-			jQuery("DIV#content UL.data_container").removeClass("half_size").addClass("full_size");
-			jQuery("DIV#content SAMP#system_console").removeClass("half_size").addClass("full_size");
-			jQuery("DIV#content").height(jQuery("DIV#content UL.data_container").height({
-				padding : true,
-				margin : true
-			}));
-			jQuery("DIV#content UL#side_pane").hide();
+			jQuery(".section").removeClass("half_size").addClass("full_size");
+			jQuery("#system_console").removeClass("half_size").addClass("full_size");
+			jQuery("#side_pane").hide();
 		});
 	},function ( event )
 	{
-		jQuery("DIV#side_pane_control_button").removeClass("backward").addClass("forward").html("hide side pane");
-		jQuery("DIV#content UL.data_container").removeClass("full_size").addClass("half_size");
-		jQuery("DIV#content SAMP#system_console").removeClass("full_size").addClass("half_size");
-		jQuery("DIV#side_pane_control_button").animate({
-			top : jQuery("DIV#side_pane_control_button").offset().top - 10,
-			left : jQuery("DIV#side_pane_control_button").offset().left + 10
+		jQuery("#side_pane_control_button").removeClass("backward").addClass("forward").html("hide side pane");
+		jQuery(".section").removeClass("full_size").addClass("half_size");
+		jQuery("#system_console").removeClass("full_size").addClass("half_size");
+		jQuery("#side_pane_control_button").animate({
+			top : jQuery("#side_pane_control_button").offset().top - 10,
+			left : jQuery("#side_pane_control_button").offset().left + 10
 		}, 500);
-		jQuery("DIV#content UL#side_pane").animate({
-			left : 0,
-			opacity : 1
-		}, 500);
-		jQuery("DIV#content").height("auto");
-		jQuery("DIV#content UL#side_pane").show();
+		jQuery("#side_pane").fadeIn(500);
 	});
 
 	jQuery("SPAN.system_console").click(function ( event )

@@ -1,43 +1,16 @@
-DIV#content UL.data_container > LI > H2
+UL.section > LI > FORM A.revert
 {
-	line-height: 45px !important;
-}
-
-DIV#content UL.data_container > LI > H2 > A
-{
-	padding: 0 !important;
-	
-	color: #0085BF !important;
-}
-
-DIV#content UL.data_container > LI > H2 .ui-icon
-{
-	display: none !important;
-}
-
-.ui-accordion .ui-accordion-content
-{
-	padding: 0 !important;
-}
-
-.ui-widget-content
-{
-	background: none !important;
-	border-width: 0 !important;
-}
-
-DIV#content UL.data_container > LI > FORM INPUT.revert
-{
-	width:16px;
-	height:16px;
-	margin:10px 0 2px 0;
-	background-image:url('{{$STYLE_IMAGES_URL}}/arrow_back_2.png');
-	background-position:0 0;
-	background-repeat:no-repeat;
-	background-color:transparent;
-	float:right;
-	clear:right;
-	cursor:pointer;
+	width: 16px;
+	height: 16px;
+	background-image: url('{{$STYLE_IMAGES_URL}}/arrow_back_2.png');
+	background-position: 0 0;
+	background-repeat: no-repeat;
+	background-color: transparent;
+	border-width: 0;
+	float: right;
+	clear: right;
+	cursor: pointer;
+	margin: 10px 5px 10px 5px;
 	
 	text-indent:-99999px;
 }

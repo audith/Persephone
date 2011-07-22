@@ -1,1 +1,1 @@
-<span id="footer"><a href="#">forums</a> | <a href="#">disclaimer</a> | <a href="#">terms &amp; guidelines</a></span>
+<p id="footer"><a href="#">forums</a> | <a href="#">disclaimer</a> | <a href="#">terms &amp; guidelines</a></p>

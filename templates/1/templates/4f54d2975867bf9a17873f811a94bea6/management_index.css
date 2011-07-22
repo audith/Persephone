@@ -42,7 +42,7 @@ DIV#content UL#side_pane LI#side_pane__banners__manage_content
 	list-style-position: inside;
 }
 
-DIV#content UL.data_container LI TABLE#tables__media_library TBODY TR TD.w_preview_hover
+DIV#content UL.section LI TABLE#tables__media_library TBODY TR TD.w_preview_hover
 {
 	cursor: pointer;
 	height: 25px;

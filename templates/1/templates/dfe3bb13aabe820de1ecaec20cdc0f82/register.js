@@ -12,14 +12,14 @@ $( document ).ready(
 			plugins  : "noneditable"
 		});
 
-		$("SAMP#system_console").html("Required fields (in red) must be filled-in!").removeClass("error success").addClass("notice").show();
+		$("#system_console").html("Required fields (in red) must be filled-in!").removeClass("error success").addClass("notice").show();
 
 		// Submit "Register"
 
 		$("FORM#forms__register").submit(
 			function(event){
 				event.preventDefault();
-				$("SAMP#system_console").html("Processing... Please wait!").removeClass("error success").addClass("notice").slideDown("fast");
+				$("#system_console").html("Processing... Please wait!").removeClass("error success").addClass("notice").slideDown("fast");
 				$("FORM#forms__register *").removeClass("error");
 				var consoleTop = $("#system_console").offset().top;
 				$("html,body").animate({scrollTop : consoleTop } , 500);
@@ -33,7 +33,7 @@ $( document ).ready(
 					cache:false,
 					timeout:15000,
 					error:function( xhr, text_status, error ){
-						$("SAMP#system_console")
+						$("#system_console")
 							.html("Unspecified error occured! Possible causes are <i>connection problems</i> or <i>invalid response from server</i>.")
 							.removeClass("notice success").addClass("error");
 						return 0;
@@ -42,7 +42,7 @@ $( document ).ready(
 					{
 						if ( data.responseCode )
 						{
-							$("SAMP#system_console").html( data.responseMessage ).removeClass("notice error").addClass("success");
+							$("#system_console").html( data.responseMessage ).removeClass("notice error").addClass("success");
 							var timeOut = data.responseCode == '3' ? 2000 : 15000;
 							setTimeout( "window.location = \"" + data.extra + "\"", timeOut );
 							return 1;
@@ -79,7 +79,7 @@ $( document ).ready(
 								faultMessageList.push( "<li>" + data[ i ].faultMessage + "</li>" );
 							}
 							faultMessageParsed = "One or more error(s) occured! Correct them and resubmit the form to continue:<ul>" + faultMessageList.join("") + "</ul>"
-							$("SAMP#system_console").html( faultMessageParsed ).removeClass("notice success").addClass("error").show();
+							$("#system_console").html( faultMessageParsed ).removeClass("notice success").addClass("error").show();
 							Recaptcha.reload();
 							return 0;
 						}

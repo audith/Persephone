@@ -1,5 +1,5 @@
-<samp id="system_console" class="full_size"></samp>
-<ul class="data_container full_size">
+<div class="aside full_size" id="system_console"></div>
+<ul class="section full_size">
 	<li id="components__modules__alter_add" class="ondemand">
 		<h2>Register a Module
 			<span class="description"></span>

@@ -4,6 +4,21 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 	/* jQuery::noConflict() */
 	jQuery.noConflict();
 
+	/* HTML-5 support for IE8 and earlier */
+	/*
+	if ( jQuery.support.leadingWhitespace == false ) // This =false in IE 6-8
+	{
+		document.createElement("header");
+		document.createElement("footer");
+		document.createElement("section");
+		document.createElement("aside");
+		document.createElement("nav");
+		document.createElement("article");
+		document.createElement("hgroup");
+		document.createElement("time");
+	}
+	*/
+
 	/* AJAX setup */
 	jQuery.ajaxSetup({
 		async : true,
@@ -174,6 +189,14 @@ Persephone.prototype.isEmptyObject = function ( object )
 	if ( typeof object != 'object' )
 	{
 		return undefined;
+	}
+
+	/**
+	 * jQuery Objects
+	 */
+	if ( object instanceof jQuery )
+	{
+		return object.length === 0 ? true : false;
 	}
 
 	/**
@@ -643,14 +666,14 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 		jQuery("FORM.js__go_ajax").live("submit", function ( event )
 		{
 			event.preventDefault();
-			var whoami = jQuery(this);
+			var whoami = persephone.Form.self = jQuery(this);
 			whoami.find(".error").removeClass("error");
 			persephone.Form.closeConsoles();
 			var currentConsole = persephone.Form.scrollToConsole();
 			currentConsole.html("Processing... Please wait!").removeClass("error success");
 			var jqXHR = jQuery.ajax({
-				url : jQuery(this).attr("action") == '' ? window.location.href : jQuery(this).attr("action"),
-				data : jQuery(this).serialize(),
+				url : whoami.attr("action") == '' ? window.location.href : whoami.attr("action"),
+				data : whoami.serialize(),
 				cache : false,
 				success : function ( data )
 				{
@@ -672,7 +695,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 						/* ... with responseAction */
 						if ( 'responseAction' in data )
 						{
-							var _responseActionMatch = data.responseAction.match(/refresh(?::(\d+))?/);
+							var _responseActionMatch = data.responseAction.match(/refresh(?:\:(\d+))?/);
 
 							var _refreshIn = 2000;
 							if ( _responseActionMatch[1] )
@@ -734,7 +757,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 		// Do we have accordion() function defined? If so, apply it accordingly.
 		if ( 'function' == typeof jQuery().button )
 		{
-			jQuery(".buttons").find("INPUT[type='submit'],INPUT[type='button'],INPUT[type='reset']").button();
+			jQuery(".buttons").find("INPUT[type='submit'],INPUT[type='button'],INPUT[type='reset'],BUTTON").button();
 		}
 
 		// Do we have buttonset() function defined? If so, apply it accordingly.
@@ -785,7 +808,9 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 		if ( 'function' == typeof jQuery().tabs )
 		{
 			jQuery(".ui-tabs").tabs({
-
+				cookie : {
+					expires : 365
+				}
 			});
 		}
 	});

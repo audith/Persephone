@@ -1362,9 +1362,9 @@ class Input
 		$_url .= $_SERVER['HTTP_HOST'] ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 		$_url .= $_SERVER['REQUEST_URI'];
 		$_parsed_url = parse_url( $_url );
-		$_parsed_url['path'] = preg_replace( '#\/$#' , "" , $_parsed_url['path'] );
-		$_parsed_url['path_exploded'] = preg_replace( '#^\/#' , "" , $_parsed_url['path'] );
-		$_parsed_url['path_exploded'] = explode( "/" , $_parsed_url['path_exploded'] );
+		$_parsed_url['path'] = trim( $_parsed_url['path'], '\/' );
+		$_parsed_url['path_exploded'] = explode( "/" , $_parsed_url['path'] );
+		$_parsed_url['path'] = "/" . $_parsed_url['path'];
 
 		$_parsed_url['request_uri'] =
 				$_parsed_url['scheme'] . "://" .

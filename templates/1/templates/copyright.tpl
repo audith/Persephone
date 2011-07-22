@@ -1,1 +1,1 @@
-<span id="disclaimer">Copyright &copy; 2001 - 2011 Shahriyar Imanov. All Rights Reserved.</span>
+<p id="disclaimer">Copyright &copy; 2001 - 2011 Shahriyar Imanov. All Rights Reserved.</p>

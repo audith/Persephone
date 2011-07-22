@@ -27,7 +27,7 @@ jQuery(document).ready(function ()
 		if ( jQuery("#components__modules__alter_add").is(":hidden") )
 		{
 			/* Close all .ondemand panes */
-			jQuery("#content UL.data_container > .ondemand").hide();
+			jQuery("#content UL.section > .ondemand").hide();
 		}
 
 		/* Open "DDL-Create" form */
@@ -105,7 +105,7 @@ jQuery(document).ready(function ()
 		event.preventDefault();
 
 		/* Close all .ondemand panes */
-		jQuery("#content UL.data_container > .ondemand").hide();
+		jQuery("#content UL.section > .ondemand").hide();
 
 		/* The usual... */
 		var whoami = acp__components.Form.self = jQuery("#components__modules__alter_add"); // Working form

@@ -1,5 +1,5 @@
-<samp id="system_console" class="full_size"></samp>
-<ul class="data_container full_size">
+<div class="aside full_size" id="system_console"></div>
+<ul class="section full_size">
 	<li id="sec_content_modules__list">
 		<h2 class="full_size">Content Management - Modules
 			<span class="description"></span>
@@ -67,7 +67,7 @@
 			</thead>
 			<tfoot>
 				<tr>
-					<td colspan="6">										
+					<td colspan="6">
 					<div class="pager">
 					{{pager total_nr_of_items=$CONTENT.media_library__total_nr_of_items nr_of_items_per_page="20"}}
 					</div>

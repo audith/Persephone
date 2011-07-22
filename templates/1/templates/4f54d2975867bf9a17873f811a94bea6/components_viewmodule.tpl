@@ -1,9 +1,7 @@
-<samp id="system_console" class="full_size"></samp>
-<ul class="data_container full_size">
+<div class="aside full_size" id="system_console"></div>
+<ul class="section full_size">
 	<li id="components__ddl__alter_add" class="ondemand">
-		<h2>Data Definition Management (for Master-unit)
-			<span class="description"></span>
-		</h2>
+		<h2>Data Definition Management (for Master-unit)</h2>
 		<form id="forms__components__ddl__alter_add" action="" method="post" class="js__go_ajax">
 			<fieldset class="name onload">
 				<label title="Field Name" for="name"><strong>Field Name:</strong><em>Alphanumeric + underscore chars only, in format: ^[a-z][a-z0-9_]*$ meaning first letter can't be numeric.</em></label>

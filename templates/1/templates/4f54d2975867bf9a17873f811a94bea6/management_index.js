@@ -33,14 +33,14 @@ $( document ).ready(
 				m_unique_id = $("FORM#forms__modules__list INPUT[name='m_unique_id']:checked").val();
 				if ( ! m_unique_id )
 				{
-					$("SAMP#system_console").html("No module was selected! Please select one...").removeClass("notice success").addClass("error").slideDown();
+					$("#system_console").html("No module was selected! Please select one...").removeClass("notice success").addClass("error").slideDown();
 					return 0;
 				}
 				m_unique_id_clean = m_unique_id.replace( /[^a-z0-9]/gi , "" ).toLowerCase();
 				window.location = "{{$MODULE_URL}}/management/content-" + m_unique_id_clean;
 			}
 		);
-		
+
 		$("TABLE#tables__media_library TBODY TR TD.w_preview_hover").mouseover(
 			function ( event )
 			{
@@ -50,7 +50,7 @@ $( document ).ready(
 				{
 					$("DIV#media_library_sneak_peek").css( "background-image","url('/static/stream/s-" + _media_id + "')" );
 				}
-				
+
 				$(this).mousemove(
 					function(event)
 					{
@@ -64,7 +64,7 @@ $( document ).ready(
 						}
 					}
 				);
-				
+
 				$(this).mouseout(
 					function(event)
 					{

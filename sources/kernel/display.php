@@ -9,7 +9,7 @@ if ( ! defined( "INIT_DONE" ) )
 class Display
 {
 	/**
-	 * API Object Reference - Introduced 20080716
+	 * API Object Reference
 	 * @var object
 	 */
 	private $API;
@@ -21,12 +21,6 @@ class Display
 	public $cache_id = array();
 
 	/**
-	 * Whether can use fancy JS or not - Introduced 20080904
-	 * @var Boolean
-	 */
-	public $can_use_fancy_js = false;
-
-	/**
 	 * Content to serve
 	 * @var mixed
 	 */
@@ -34,7 +28,7 @@ class Display
 
 	/**
 	 * Current Skin data
-	 * @var Mixed
+	 * @var mixed
 	 */
 	public $cur_skin = null;
 
@@ -329,17 +323,18 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		//----------------------
 
 		$_url =& $this->API->config['page']['request'];
-		$this->smarty->assign( "SITE_URL"   , $_url['scheme'] . "://" . $this->API->config['url']['hostname'][ $_url['scheme'] ] );
-		$this->smarty->assign( "SITE_NAME"  , $this->API->config['general']['site_name']        );
-		$this->smarty->assign( "SITE_MOTTO" , $this->API->config['general']['site_motto']       );
-		$this->smarty->assign( "MODULE_URL" , $this->API->Modules->cur_module['m_url_prefix']   );
-		$this->smarty->assign( "SITE_DIR"   , PATH_ROOT_WEB                                     );
+		$this->smarty->assign( "SITE_URL", $_url['scheme'] . "://" . $this->API->config['url']['hostname'][ $_url['scheme'] ] );
+		$this->smarty->assign( "SITE_DIR", PATH_ROOT_WEB );
+		$this->smarty->assign( "SITE_NAME", $this->API->config['general']['site_name'] );
+		$this->smarty->assign( "SITE_MOTTO", $this->API->config['general']['site_motto'] );
+		$this->smarty->assign( "MODULE_URL", $this->API->Modules->cur_module['m_url_prefix'] );
+		$this->smarty->assign( "REQUEST_URL", $this->API->config['page']['request']['request_uri'] );
 
-		$this->smarty->assign( "STYLE_IMAGES_URL" , "/public/style/" . $this->cur_skin['set_id'] . "/images" );
+		$this->smarty->assign( "STYLE_IMAGES_URL", "/public/style/" . $this->cur_skin['set_id'] . "/images" );
 
-		$this->smarty->assign( "MEMBER"     , $this->API->member                                );
-		$this->smarty->assign( "CONFIG"     , $this->API->config                                );
-		$this->smarty->assign( "PAGE"       , $this->API->config['page']                        );
+		$this->smarty->assign( "MEMBER", $this->API->member );
+		$this->smarty->assign( "CONFIG", $this->API->config );
+		$this->smarty->assign( "PAGE", $this->API->config['page'] );
 
 		//----------------------------------------
 		// Parse template bits : Global + Local

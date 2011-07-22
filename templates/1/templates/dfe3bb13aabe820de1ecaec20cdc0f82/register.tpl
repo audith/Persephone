@@ -1,5 +1,5 @@
-<samp id="system_console" class="full_size">Required fields (in red) must be filled-in!</samp>
-<ul class="data_container full_size">
+<div class="aside full_size" id="system_console">Required fields (in red) must be filled-in!</div>
+<ul class="section full_size">
 	<li>
 		<h2 class="full_size">Register
 			<span class="description"></span>
