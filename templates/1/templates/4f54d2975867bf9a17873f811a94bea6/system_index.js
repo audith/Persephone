@@ -16,7 +16,6 @@ jQuery(document).ready(function()
 	{
 		event.preventDefault();
 		var whoami = jQuery(this).parent().parent();
-		console.log(whoami);
 		whoami.find("[name='do']").val("revert");
 		whoami.find("[name='revert__for']").val(jQuery(this).attr("href").replace(/\?revert__for_/,""));
 		whoami.trigger("submit"); // Submit the form via AJAX (.js__go_ajax), it will handle itself...

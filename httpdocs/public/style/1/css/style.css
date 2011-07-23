@@ -1158,6 +1158,7 @@
 	UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1 > LEGEND,
 	.section.full_size > .article.ui-tabs > FORM > FIELDSET.deco_1 > LEGEND
 	{
+		background-color: #001d2a;
 		background-image: -moz-linear-gradient(top, #546770 0%, #07222f 35%, #001d2a 100%); /* FF3.6+ */
 		background-image: -webkit-linear-gradient(top, #546770 0%, #07222f 25%, #001d2a 100%); /* Chrome10+,Safari5.1+ */
 		background-image: -ms-linear-gradient(top, #546770 0%, #07222f 25%, #001d2a 100%); /* IE9+ */
@@ -1191,7 +1192,7 @@
 	UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1,
 	.section.full_size > .article.ui-tabs > FORM > FIELDSET.deco_1
 	{
-		width: 821px;
+		width: 853px;
 	}
 
 	UL.section.full_size > LI > FORM LABEL,
@@ -1256,6 +1257,7 @@
 			{
 				width: 379px;
 				margin: 10px 5px 10px 10px;
+				clear: none;
 			}
 
 			UL.section.full_size > LI > FORM > FIELDSET.deco_1 SELECT,
@@ -1263,6 +1265,7 @@
 			{
 				width: 385px;
 				margin: 10px 5px 10px 10px;
+				clear: none;
 			}
 
 	UL.section.full_size > LI > FORM INPUT.full_size,
