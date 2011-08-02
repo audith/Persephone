@@ -548,6 +548,7 @@
 			border: 1px solid #FFFFFF;
 			padding: 4px 4px 4px 6px;
 			overflow: hidden;
+			vertical-align: middle;
 
 			font-weight: normal;
 			font-family: tahoma,arial,sans-serif;
@@ -580,6 +581,7 @@
 			background-color: #FFFFFF;
 			padding: 2px 6px;
 			overflow: hidden;
+			vertical-align: middle;
 
 			color: #3D3D3D;
 		}
@@ -857,10 +859,10 @@
 			width: auto;
 			float: left;
 			clear: none;
-			padding: 1px;
+			padding: 2px !important;
 			border: 1px #99CBDF solid;
 
-			font-size: 1em;
+			/* font-size: 1em; */
 			color: #00639D;
 		}
 
@@ -1186,14 +1188,20 @@
 	UL.section.full_size > LI > FORM > FIELDSET,
 	.section.full_size > .article > FORM > FIELDSET
 	{
-		width: 857px;
+		width: 855px;
 	}
+	
+		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs,
+		.section.full_size > .article > FORM > FIELDSET.ui-tabs
+		{
+			width: 849px;
+		}
 
-	UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1,
-	.section.full_size > .article.ui-tabs > FORM > FIELDSET.deco_1
-	{
-		width: 853px;
-	}
+		UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1,
+		.section.full_size > .article.ui-tabs > FORM > FIELDSET.deco_1
+		{
+			width: 853px;
+		}
 
 	UL.section.full_size > LI > FORM LABEL,
 	.section.full_size > .article > FORM LABEL
