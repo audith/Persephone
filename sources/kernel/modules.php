@@ -168,7 +168,7 @@ class Modules
 		//---------------
 
 		$action = "";
-		if ( isset( $this->API->Input->input['do'] ) )
+		if ( filter_has_var( INPUT_GET, "do" ) or filter_has_var( INPUT_POST, "do" ) )  // For security reasons, let's check original GET and POST data
 		{
 			$action = preg_replace( '#[^a-z_-]#' , "" , $this->API->Input->input['do'] );
 		}

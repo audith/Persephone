@@ -235,30 +235,7 @@ class Input
 	{
 		$email = trim( $email );
 
-		$email = str_replace( " ", "", $email );
-
-		//----------------------------------
-		// Check for more than 1 @ symbol
-		//----------------------------------
-
-		if ( substr_count( $email, '@' ) > 1 )
-		{
-			return FALSE;
-		}
-
-		if ( preg_match( "#[\;\#\n\r\*\'\"<>&\%\!\(\)\{\}\[\]\?\\/\s\\\\]#", $email ) )
-
-		{
-			return FALSE;
-		}
-		elseif ( preg_match( '/^.+\@(\[?)[a-zA-Z0-9\-\.]+\.([a-zA-Z]{2,4}|[0-9]{1,4})(\]?)$/', $email ) )
-		{
-			return TRUE;
-		}
-		else
-		{
-			return FALSE;
-		}
+		return filter_var( $email, FILTER_VALIDATE_EMAIL ) === false ? false : true;
 	}
 
 

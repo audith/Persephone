@@ -416,7 +416,7 @@ Persephone.prototype.Form = {
 		var _obj = this.self.find(".ondemand");
 
 		/* No matching elements? */
-		if ( _obj.size() == 0 )
+		if ( _obj.length == 0 )
 		{
 			return false;
 		}
@@ -442,7 +442,7 @@ Persephone.prototype.Form = {
 	 * @return {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
 	 * @uses jQuery
 	 */
-	enableOnDemandElement : function ( obj )
+	enableOnDemandElement : function ( obj /* , enableImmediateChildrenOnly = false */ )
 	{
 		if ( jQuery === undefined || typeof jQuery != 'function' )
 		{
@@ -456,7 +456,7 @@ Persephone.prototype.Form = {
 		}
 
 		/* No matching elements? */
-		if ( obj.size() == 0 )
+		if ( obj.length == 0 )
 		{
 			return false;
 		}
@@ -465,7 +465,15 @@ Persephone.prototype.Form = {
 		obj.show();
 
 		/* Then enable the disabled form elements within the container(s) [fieldsets] */
-		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").removeAttr("disabled");
+		if ( arguments[1] !== undefined && arguments[1] === true )
+		{
+			obj.children(":input").removeAttr("disabled");
+			obj.children("SPAN.input").children(":input").removeAttr("disabled");
+		}
+		else
+		{
+			obj.find(":input").removeAttr("disabled");
+		}
 
 		return true;
 	},
@@ -491,7 +499,7 @@ Persephone.prototype.Form = {
 		}
 
 		/* No matching elements? */
-		if ( obj.size() == 0 )
+		if ( obj.length == 0 )
 		{
 			return false;
 		}
@@ -807,10 +815,30 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 		// Do we have tabs() function defined? If so, apply it accordingly.
 		if ( 'function' == typeof jQuery().tabs )
 		{
-			jQuery(".ui-tabs").tabs({
+			/* Options */
+			var options = {
+				collapsible : false,
 				cookie : {
 					expires : 365
+				},
+				event : "click"
+			};
+
+			jQuery(".ui-tabs").each(function ( index , element )
+			{
+				/**
+				 * Checks for custom options
+				 * @uses jQuery.metadata()
+				 */
+				if ( 'function' == typeof jQuery().metadata )  // Is jQuery.metadata() installed?
+				{
+					var newOptions = jQuery(this).metadata().newOptions;
+					if ( typeof newOptions == 'object' && !persephone.isEmptyObject(newOptions) )
+					{
+						jQuery.extend(true, options, newOptions);  // 'true' means we merge two arrays and assign the resulting value to the first variable
+					}
 				}
+				jQuery(this).tabs(options);
 			});
 		}
 	});

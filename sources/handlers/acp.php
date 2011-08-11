@@ -164,6 +164,7 @@ class Module_Handler
 										's_fetch_criteria'                => array(),
 										's_data_definition'               => array(),
 										's_additional_skin_assets'        => array(
+												array( 'file' => "/jquery.cookie.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
 												array( 'file' => "/jquery.tablesorter.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
 												array( 'file' => "/jquery.tablesorter.pager.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
 												array( 'file' => "/jquery.metadata.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
@@ -2949,10 +2950,14 @@ class Module_Handler
 			if ( $subroutine['s_pathinfo_uri_schema'] )
 			{
 				# Make sure UPDATE and INSERT preset schemas are not used
+				// @todo Remove or enhance this control
+				/*
 				if ( preg_match( '#^(?:update|insert)\-#i' , $subroutine['s_pathinfo_uri_schema'] ) )
 				{
 					$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em>: Reserved pattern detected! You cannot re-use patterns reserved for preset '<em>update</em>' and '<em>insert</em>' subroutines! Change the schema." );
 				}
+				*/
+
 				# The dash (-) character is quoted in PHP 5.3.0 and later, so put it at the beginning of the list
 				if ( !preg_match( '#^[a-z0-9' . preg_quote('-.,\+/*?[](){}=!<>|:_') . ']+$#i' , $subroutine['s_pathinfo_uri_schema'] ) )
 				{

@@ -1025,7 +1025,7 @@ class Session
 
 		$full_account = false;
 
-		if ( $_final_tables['members']['display_name'] and $_final_tables['members']['name'] AND $_final_tables['members']['email'] != $_final_tables['members']['name'] . '@' . $_final_tables['members']['joined'] )
+		if ( $_final_tables['members']['display_name'] and $_final_tables['members']['name'] and $_final_tables['members']['email'] != $_final_tables['members']['name'] . '@' . $_final_tables['members']['joined'] )
 		{
 			$full_account = true;
 		}
@@ -1254,7 +1254,7 @@ class Session
 					'do'	    => "select",
 					'fields'    => array( "*", 'my_member_id' => "id" ),
 					'table'     => array( 'm' => "members" ),
-					'where'     => ( is_array( $_multiple_ids ) AND count( $_multiple_ids ) ) ? $_member_field . ' IN (' . implode( ',', $_multiple_ids ) . ')' : $_member_field . '=' . $_member_value,
+					'where'     => ( is_array( $_multiple_ids ) and count( $_multiple_ids ) ) ? $_member_field . ' IN (' . implode( ',', $_multiple_ids ) . ')' : $_member_field . '=' . $_member_value,
 					'add_join'  => $_joins,
 				);
 		}
@@ -1263,7 +1263,7 @@ class Session
 			$this->API->Db->cur_query = array(
 					'do'	    => "select",
 					'table'     => array( 'm' => 'members' ),
-					'where'     => ( is_array( $_multiple_ids ) AND count( $_multiple_ids ) ) ? $_member_field . ' IN (' . implode( ',', $_multiple_ids ) . ')' : $_member_field . '=' . $_member_value,
+					'where'     => ( is_array( $_multiple_ids ) and count( $_multiple_ids ) ) ? $_member_field . ' IN (' . implode( ',', $_multiple_ids ) . ')' : $_member_field . '=' . $_member_value,
 				);
 		}
 
@@ -1335,7 +1335,7 @@ class Session
 		$member_k_array = array( 'members' => array(), 'members_pfields_content' => array() );
 		$_tables        = array_keys( $save );
 
-		if ( ! is_array( $save ) OR ! count( $save ) )
+		if ( ! is_array( $save ) or ! count( $save ) )
 		{
 			throw new Exception( 'NO_DATA' );
 		}
@@ -1400,7 +1400,7 @@ class Session
 			}
 		}
 
-		if ( ! is_array( $member_k_array ) OR ! count( $member_k_array ) )
+		if ( ! is_array( $member_k_array ) or ! count( $member_k_array ) )
 		{
 			throw new Exception( 'NO_DATA' );
 		}
@@ -1451,7 +1451,7 @@ class Session
 				if ( $table == 'members' )
 				{
 					/* Make sure we have a value for member_group_id if passed */
-					if ( isset( $data['mgroup'] ) AND ! $data['mgroup'] )
+					if ( isset( $data['mgroup'] ) and ! $data['mgroup'] )
 					{
 						throw new Exception( "NO_MEMBER_GROUP_ID" );
 					}
@@ -1995,17 +1995,10 @@ class Session
 		# Do we have one yet?
 		foreach ( $addrs as $ip )
 		{
-			if ( $ip )
+			if ( !empty( $ip ) and filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) !== false )
 			{
-				if ( preg_match( "/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/", $ip, $match ) )
-				{
-					$this->ip_address = $match[1] . '.' . $match[2] . '.' . $match[3] . '.' . $match[4];
-				}
-
-				if ( $this->ip_address AND $this->ip_address != '...' )
-				{
-					break;
-				}
+				$this->ip_address = $ip;
+				break;
 			}
 		}
 
@@ -2014,17 +2007,17 @@ class Session
 		// if not, check for valid DNS
 		//----------------------------------------
 
-		if ( ( ! $this->ip_address OR $this->ip_address == '...' ) AND ! $this->API->Input->my_getenv('SHELL') AND $this->API->Input->my_getenv('SESSIONNAME') != 'Console' )
+		if ( empty( $this->ip_address ) and !$this->API->Input->my_getenv('SHELL') and $this->API->Input->my_getenv('SESSIONNAME') != 'Console' )
 		{
-			if ( preg_match( "/^[a-z0-9-]+(?:\.[a-z0-9-]+)+$/", $_SERVER['REMOTE_HOST'] ) )
+			if ( filter_has_var( INPUT_SERVER, "REMOTE_HOST" ) )
 			{
-				$this->ip_address = $_SERVER['REMOTE_HOST'];
+				$this->ip_address = filter_input( INPUT_SERVER, "REMOTE_HOST", FILTER_VALIDATE_IP );
 			}
+
 			# Ok. now its bad :(
-			else
+			if ( !$this->ip_address )
 			{
-				print "Could not determine your IP address";
-				exit();
+				throw new Exception( "Could not determine Client's IP-address!" );
 			}
 		}
 		return;
@@ -2173,7 +2166,7 @@ class Session
 				/* @todo
 				if( $this->settings['kill_search_after'] )
 				{
-					if( $_session['search_thread_id'] AND $_session['search_thread_time'] AND $_session['search_thread_time'] < (time() - $this->settings['kill_search_after']) )
+					if( $_session['search_thread_id'] and $_session['search_thread_time'] and $_session['search_thread_time'] < (time() - $this->settings['kill_search_after']) )
 					{
 						$this->DB->return_die	= true;
 						$this->DB->kill( $_session['search_thread_id'] );

@@ -1,7 +1,7 @@
 	<div class="aside full_size" id="system_console"></div>
 
 	<ul class="section full_size">
-		<li class="ui-tabs">
+		<li class="article ui-tabs">
 			<ul>
 				{{foreach from=$CONTENT item=GROUP}}<li><a href="#{{$GROUP.conf_group_keyword}}">{{$GROUP.conf_group_title}}</a></li>{{/foreach}}
 			</ul>

@@ -9,11 +9,10 @@ if ( function_exists( "memory_get_usage" ) )
 # Disable Magic Quotes Runtime
 @set_magic_quotes_runtime(0);
 
-# Set Multi-byte Internal Encoding - VERY IMPORTANT!!!
-if ( function_exists( "mb_internal_encoding" ) )
-{
-	mb_internal_encoding( "UTF-8" );
-}
+# Set Multi-byte Internal Encoding, Language and RegEx Encoding
+mb_internal_encoding("UTF-8");
+mb_language("uni");
+mb_regex_encoding("UTF-8");
 
 # Safe Mode, RegGlobals and MagicQuotesGPC On?
 define( 'SAFE_MODE_ON'         , ini_get( "safe_mode" )        ? 1 : 0 );

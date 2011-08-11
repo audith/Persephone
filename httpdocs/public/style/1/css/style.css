@@ -19,6 +19,21 @@
 		font: inherit;
 		vertical-align: baseline;
 	}
+	
+	STRONG, B
+	{
+		font-weight: bold;
+	}
+	
+	EM, I
+	{
+		font-style: oblique;
+	}
+	
+	TEXTAREA
+	{
+		resize: none;
+	}
 
 	/* HTML5 display-role reset for older browsers */
 	ARTICLE, ASIDE, DETAILS, FIGCAPTION, FIGURE, FOOTER, HEADER, HGROUP, MENU, NAV, SECTION
@@ -481,16 +496,6 @@
 		text-align: left;
 		font-family: "trebuchet ms",arial,sans-serif;
 	}
-
-		UL.section > LI > FIELDSET FIELDSET,
-			UL.section > LI > FORM > FIELDSET FIELDSET,
-		.section > .article > FIELDSET FIELDSET,
-			.section > .article > FORM > FIELDSET FIELDSET
-		{
-			margin: 0;
-			padding: 0;
-			width: 100%;
-		}
 
 	UL.section > LI TABLE,
 	.section > .article TABLE
@@ -1196,6 +1201,13 @@
 		{
 			width: 849px;
 		}
+		
+			UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content,
+			.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content
+			{
+				width: 819px;
+				padding: 15px;
+			}
 
 		UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1,
 		.section.full_size > .article.ui-tabs > FORM > FIELDSET.deco_1
@@ -1219,6 +1231,13 @@
 			width: 390px;
 			margin: 10px 0 10px 15px;
 		}
+		
+		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL,
+		.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL
+		{
+			width: 380px;
+			margin: 10px 0;
+		}
 
 	UL.section.full_size > LI > FORM LABEL.full_size,
 	.section.full_size > .article > FORM LABEL.full_size
@@ -1230,6 +1249,14 @@
 		margin-top: 15px;
 		padding-right: 10px;
 	}
+	
+		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL.full_size,
+		.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL.full_size
+		{
+			width: 819px;
+			margin: 10px 0;
+			padding: 0;
+		}
 
 	UL.section.full_size > LI > FORM INPUT.text,
 		UL.section.full_size > LI > FORM SELECT,
@@ -1274,6 +1301,20 @@
 				width: 385px;
 				margin: 10px 5px 10px 10px;
 				clear: none;
+			}
+			
+			UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content INPUT.text,
+				UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content TEXTAREA,
+			.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content INPUT.text,
+				.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content TEXTAREA
+			{
+				margin: 10px 0 10px 10px;
+			}
+			
+			UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SELECT,
+			.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SELECT
+			{
+				margin: 10px 0 10px 10px;
 			}
 
 	UL.section.full_size > LI > FORM INPUT.full_size,
@@ -1334,6 +1375,16 @@
 			{
 				width: 820px;
 			}
+			
+		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SPAN.full_size,
+		.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SPAN.full_size
+		{
+			width: 819px;
+			clear: both;
+			margin: 0;
+
+			white-space: nowrap;
+		}
 
 	UL.section.full_size > LI > TABLE,
 		UL.section.full_size > LI > FORM > TABLE,

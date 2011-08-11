@@ -1,188 +1,154 @@
 UL.actions
 {
-	float:right;
-	clear:right;
-	margin-left:6px;
-	height:inherit;
-	width:auto;
-	max-width:64px;
-	display:none;
+	float: right;
+	clear: right;
+	margin-left: 6px;
+	height: inherit;
+	width: auto;
+	max-width: 64px;
+	display: none;
 }
 
 TD:hover > UL.actions
 {
-	display:block;
+	display: block;
 }
 
 	UL.actions > LI
 	{
-		float:left;
-		clear:none;
+		float: left;
+		clear: none;
 	}
 	
 		UL.actions > LI > A
 		{
-			float:left;
-			clear:both;
-			width:100%;
-			height:100%;
+			float: left;
+			clear: both;
+			width: 100%;
+			height: 100%;
 			
-			text-indent:-99999px;
+			text-indent: -99999px;
 		}
 
 SPAN.name
 {
-	height:inherit;
-	width:201px;
-	float:left;
-	clear:left;
-	overflow:hidden;
-	white-space:nowrap;
-	vertical-align:middle;
+	height: inherit;
+	width: 201px;
+	float: left;
+	clear: left;
+	overflow: hidden;
+	white-space: nowrap;
+	vertical-align: middle;
 
-	color:#0085BF;
-	line-height:18px;
+	color: #0085BF;
+	line-height: 18px;
 }
 
 TD:hover > SPAN.name
 {
-	width:130px;
+	width: 130px;
 }
 
 	SPAN.name.is_title
 	{
 		
-		color:#6F1414;
+		color: #6F1414;
 	}
 	
 	SPAN.name.is_backup
 	{
-		color:#CF8733;
+		color: #CF8733;
 	}
 
-#content UL.full_size LI FORM A#sr__fetch_criteria__add_policy_button
+#forms__components__sr__create BUTTON
 {
-	height:22px;
-	width:auto;
-	float:right;
-	clear:right;
-	margin:2px 0 0 0;
-	padding:0 18px 0 0;
-	background-image:url('{{$STYLE_IMAGES_URL}}/plus_green_16.png');
-	background-position:right center;
-	background-repeat:no-repeat;
-	display:none;
+	min-width: 16px;
+	height: 22px;
+	float: right;
+	clear: right;
+	border-width: 0;
+	background-position: 100% 50%;
+	background-repeat: no-repeat;
+	background-color: transparent;
 	
-	font-family:inherit;
-	font-style:oblique;
-	color:#006600;
+	text-indent: -99999px;
 }
 
-#content UL.full_size LI FORM A.sr__fetch_criteria__remove_policy_button
-{
-	height:28px;
-	width:18px;
-	float:right;
-	clear:right;
-	margin:0px;
-	padding:0px;
-	background-image:url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
-	background-position:right top;
-	background-repeat:no-repeat;
-}
-
-#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policies
-{
-	float:left;
-	margin:0;
-	width:100%;
-}
-
-#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policies SPAN.sr__fetch_criteria__arrow_turn_left
-{
-	height:74px;
-	width:20px;
-	float:left;
-	clear:none;
-	margin:2px 0 0 1px;
-	background-image:url('{{$STYLE_IMAGES_URL}}/arrow_turn_left.png');
-	background-repeat:no-repeat;
-	background-position:bottom left;
-}
-
-#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policies I.sr__fetch_criteria__group_heading
-{
-	height:20px;
-	width:98px;
-	float:right;
-	clear:right;
-	margin:2px 0 0 1px;
-	padding:5px 2px 0 3px;
+	#buttons__s_fetch_criteria__add_policy
+	{
+		
+		background-image: url('{{$STYLE_IMAGES_URL}}/plus_green_16.png');
+		
+		font-family:inherit;
+		font-style:oblique;
+		color:#006600;
+		line-height: 22px;
+	}
 	
-	font-family:inherit;
-	font-weight:normal;
-	font-style:oblique;
-	font-size:14px;
-	text-align:right;
-	vertical-align:middle;
-	color:#66CC66;
+	BUTTON.buttons__s_fetch_criteria__remove_policy
+	{
+		
+		background-image: url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
+	}
+
+#forms__components__sr__create SPAN.s_fetch_criteria__policies
+{
+	float: left;
+	width: 100% !important;
+	background-image: url('{{$STYLE_IMAGES_URL}}/arrow_turn_left.png');
+	background-repeat: no-repeat;
+	background-position: 84% 100%;
 }
 
-#content UL.full_size LI FORM SPAN.sr__fetch_criteria__policy_shortcut
+	#forms__components__sr__create SPAN.s_fetch_criteria__policies LABEL
+	{
+		height: 20px;
+		width: 98px;
+		float: right;
+		clear: right;
+		margin: 2px 0 0 1px;
+		padding: 5px 2px 0 3px;
+		
+		font-style: oblique;
+		font-size: 1.2em;
+		text-align: right;
+		color: #33aa33;
+	}
+
+#forms__components__sr__create SPAN.s_fetch_criteria__policy_shortcut
 {
-	height:18px;
-	width:auto;
-	float:left;
-	clear:right;
-	margin:2px 0 0 3px;
-	padding:0 4px 0 4px;
-	border:1px solid #0085BF;
+	float: left;
+	margin: 2px 0 0 3px;
+	padding: 0 4px 0 4px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #0085BF;
+	border-radius: 3px;
+	background-color: white;
 	
-	font-weight:bold;
-	line-height:18px;
+	font-weight: bold;
 }
 
-#content UL.full_size LI FORM A.sr__fetch_criteria__add_query_button
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_query
 {
-	height:20px;
-	width:20px;
-	float:right;
-	clear:right;
-	margin:2px 0 0 0;
-	padding:0;
 	background-image:url('{{$STYLE_IMAGES_URL}}/plus_blue_16.png');
-	background-position:right center;
-	background-repeat:no-repeat;
-	
-	text-indent:-99999px;
+	height: 20px;
 }
 
-#content UL.full_size LI FORM A.sr__fetch_criteria__remove_query_button
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_query
 {
-	height:20px;
-	width:20px;
-	float:right;
-	clear:right;
-	margin:2px 0 0 0;
-	padding:0;
 	background-image:url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
-	background-position:right;
-	background-repeat:no-repeat;
-	
-	text-indent:-99999px;
+	height: 20px;
 }
 
-#content UL.full_size LI FORM SPAN.pre_extra,
-#content UL.full_size LI FORM SPAN.extra,
-#content UL.full_size LI FORM SPAN.sr__sort_by
+#forms__components__sr__create SPAN.s_fetch_criteria__query,
+#forms__components__sr__create SPAN.sr__sort_by
 {
-	width:100%;
-	float:left;
-	clear:both;
-	margin:2px 0 0 0;
+	width: 100% !important;
+	float: left;
 }
 
-#content UL.full_size LI FORM A#sr__fetch_criteria__add_sorting_button
+#s_fetch_criteria__add_sorting_button
 {
 	height:22px;
 	width:auto;
@@ -193,14 +159,13 @@ TD:hover > SPAN.name
 	background-image:url('{{$STYLE_IMAGES_URL}}/plus_green_16.png');
 	background-position:right center;
 	background-repeat:no-repeat;
-	display:none;
 	
 	font-family:inherit;
 	font-style:oblique;
 	color:#006600;
 }
 
-#content UL.full_size LI FORM A.sr__fetch_criteria__remove_sorting_button
+A.s_fetch_criteria__remove_sorting_button
 {
 	height:20px;
 	width:18px;
@@ -213,20 +178,17 @@ TD:hover > SPAN.name
 	background-repeat:no-repeat;
 }
 
-SPAN.sr__fetch_criteria__policies SELECT,
-SPAN.sr__fetch_criteria__policies TEXTAREA,
-SPAN.sr__fetch_criteria__policies INPUT,
+SPAN.s_fetch_criteria__policies SELECT,
+SPAN.s_fetch_criteria__policies TEXTAREA,
+SPAN.s_fetch_criteria__policies INPUT,
+SPAN.s_fetch_criteria__query SELECT,
+SPAN.s_fetch_criteria__query TEXTAREA,
+SPAN.s_fetch_criteria__query INPUT,
 SPAN.sr__sort_by SELECT,
 SPAN.sr__sort_by TEXTAREA,
-SPAN.sr__sort_by INPUT,
-SPAN.pre_extra SELECT,
-SPAN.pre_extra TEXTAREA,
-SPAN.pre_extra INPUT,
-SPAN.extra SELECT,
-SPAN.extra TEXTAREA,
-SPAN.extra INPUT
+SPAN.sr__sort_by INPUT
 {
-	margin:2px 2px 0 0 !important;
+	margin: 2px 2px 0 0 !important;
 }
 
 .dependency_list

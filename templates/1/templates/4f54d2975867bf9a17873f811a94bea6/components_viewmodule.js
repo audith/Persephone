@@ -296,7 +296,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 				}
 			}
 		},
-		'value__for' : {}
+		'_value__for' : {}
 	},
 	'file' : {
 		'_label' : "File",
@@ -370,7 +370,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 				}
 			}
 		},
-		'value__for' : {}
+		'_value__for' : {}
 	},
 	'link' : {
 		'_label' : "Link with other module",
@@ -379,30 +379,37 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 				'is_required' : false
 			}
 		},
-		'value__for' : {}
+		'_value__for' : {}
 	}
 
 };
 
 Acp_ComponentsViewmodule.prototype.registry__sr = {
 	's_data_source' : {
+		'no-fetch' : {
+			'_tabs' : {},
+			'_disabled_options__for__s_data_target' : ['tpl']
+		},
 		'rdbms' : {
-			's_data_compatibility' : null,
-			's_data_target' : null,
-			'_s_config' : {
-				's_data_definition' : true,
-				's_fetch_criteria' : true,
-				'@s_fetch_criteria[do_fetch_all_or_selected]' : 'all',
-				's_fetch_criteria__limit' : true
-			}
+			'_tabs' : {
+				1 : {  // 'tabs__sr_alter_add__s_data_source'
+					's_data_definition' : true,
+					's_fetch_criteria' : true,
+					'@s_fetch_criteria[do_fetch_all_or_selected]' : 'all',
+					's_fetch_criteria__limit' : "",
+					's_fetch_criteria__pagination' : "",
+					's_fetch_criteria__order' : {
+						'@s_fetch_criteria[do_sort]' : 0
+					}
+				}
+			},
+			'_disabled_options__for__s_data_target' : []
 		},
 		'dom' : {
-			's_data_compatibility' : ['xml-cdata-compatible'],
-			's_data_target' : null
+
 		},
 		'json' : {
-			's_data_compatibility' : ['xml-cdata-compatible'],
-			's_data_target' : null
+
 		}
 	}
 };
@@ -502,10 +509,10 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 		}
 
 		/* Populate values, if any */
-		for ( var key in node_to_populate['value__for'] )
+		for ( var key in node_to_populate['_value__for'] )
 		{
 			var field_obj = jQuery("#forms__components__ddl__alter_add [name^='" + key + "']");
-			var field_value = node_to_populate['value__for'][ key ];
+			var field_value = node_to_populate['_value__for'][ key ];
 
 			if ( field_obj.is("INPUT[type='text'],TEXTAREA") )
 			{
@@ -566,7 +573,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 					if ( key in node_to_populate['options']['_additional_params']['label__for'] )
 					{
 						_label = node_to_populate['options']['_additional_params']['label__for'][key];
-						jQuery("#forms__components__ddl__alter_add ." + key + ".ondemand > LABEL:eq(0) > STRONG").html(_label);
+						jQuery("#forms__components__ddl__alter_add ." + key + ".ondemand > LABEL:first > STRONG").html(_label);
 					}
 				}
 				if ( node_to_populate['options']['_additional_params']['tip__for'] )
@@ -574,7 +581,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 					if ( key in node_to_populate['options']['_additional_params']['tip__for'] )
 					{
 						_tip = node_to_populate['options']['_additional_params']['tip__for'][key];
-						jQuery("#forms__components__ddl__alter_add ." + key + ".ondemand > LABEL:eq(0) > EM").html(_tip);
+						jQuery("#forms__components__ddl__alter_add ." + key + ".ondemand > LABEL:first > EM").html(_tip);
 					}
 				}
 			}
@@ -714,16 +721,295 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 	return true;
 };
 
+/**
+ * @param {Object} Object that triggers this method
+ * @returns {Boolean} TRUE on success, FALSE otherwise
+ */
+Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /* , customRegistry */ )
+{
+	/* Working form element */
+	acp__components_viewmodule.Form.self = jQuery("#forms__components__sr__create");
+
+	/* Registry */
+	var registry = ( arguments[1] ) ? arguments[1] : acp__components_viewmodule.registry__sr;
+
+	/* Initializing this.obj */
+	this.obj = obj;
+
+	/* Make sure it's not a string, but (DOM or jQuery) object */
+	if ( typeof this.obj == 'string' )
+	{
+		if ( this.obj.match(/^#/) )
+		{
+			this.obj = jQuery(this.obj);
+		}
+		else
+		{
+			this.debug("Error: Invalid HTML-tag-id received - leading # character missing!");
+			return false;
+		}
+	}
+	else if ( typeof this.obj == 'object' )
+	{
+		/* We need to convert our object to jQuery object, if it's not already so. */
+		if ( !(this.obj instanceof jQuery) )
+		{
+			this.obj = jQuery(this.obj);
+		}
+	}
+
+	/**
+	 * @var {Object} Node of the Registry to populate
+	 */
+	var node_to_populate = null;
+
+	/* Retrieve the node of the Registry we are going to populate */
+	if ( this.obj.attr("name") == 's_data_source' )
+	{
+		/* Disable all "tabs" and reset .ondemand elements */
+		jQuery(".ui-tabs.sr_alter_add__s_data_flow_config").tabs("option", "disabled", [1,2,3]);
+		acp__components_viewmodule.Form.resetOnDemandObjects();
+
+		node_to_populate = registry['s_data_source'][this.obj.val()];
+
+		if ( '_tabs' in node_to_populate )
+		{
+			/* Enable "tabs" and their .ondemand elements */
+			for ( var tabId in node_to_populate['_tabs'] )
+			{
+				jQuery(".ui-tabs.sr_alter_add__s_data_flow_config").tabs("enable", parseInt(tabId));
+
+				jQuery.each(node_to_populate['_tabs'][ tabId ], function ( key , value )
+				{
+					/**
+					 * @var {Mixed} Self-recursion flag/object-reference (type is {Boolean} for the former, {Object} for the latter)
+					 */
+					var _self_recursion = false;
+
+					// Skip keys with leading underscore
+					if ( !node_to_populate['_tabs'][ tabId ].hasOwnProperty(key) || (typeof key == 'string' && key.match(/^_/)) )
+					{
+						return;
+					}
+					// and determine keys which require self-recursion
+					else if ( typeof key == 'string' && key.match(/^@/) )
+					{
+						_self_recursion = true;
+						key = key.replace(/^@/, "");
+					}
+
+					// Reveal the element
+					acp__components_viewmodule.Form.enableOnDemandElement("#tabs__sr_alter_add__s_data_source > ." + key + ".ondemand", true);
+
+					/**
+					 * @var {Object} Form fields
+					 */
+					var input_fields = jQuery("#forms__components__sr__create ." + key + ".ondemand [name^='" + key + "']");
+
+					if ( input_fields.length == 1 )
+					{
+						input_fields.val("");
+						if ( value != null )
+						{
+							// SELECTs...
+							if ( typeof value == 'object' || value instanceof Array )
+							{
+								var _options = "";
+								jQuery.each(value, function ( _key , _value )
+								{
+									_options += "<option value=\"" + _key + "\">." + _key + " - " + _value + "</option>";
+								});
+								input_fields.empty().append(_options);
+							}
+							// Everything else...
+							else if ( typeof value == 'string' )
+							{
+								input_fields.val(value);
+							}
+						}
+
+						// Self-recursion obj
+						if ( _self_recursion != false )
+						{
+							_self_recursion = input_fields;
+						}
+					}
+					else if ( input_fields.length > 1 )
+					{
+						input_fields.each(function ( index )
+						{
+							if ( jQuery(this).is(":radio") )
+							{
+								// We have RADIO buttons here
+								jQuery(this).get(0).checked = false; // @see 4-5 lines below
+								if ( jQuery(this).val() == '1' && (value == true || value == '1') || jQuery(this).val() == '0' && (value == false || value == '0') )
+								{
+									// Not working when invoked from form "reset" event handler :(
+									jQuery("LABEL[for='" + jQuery(this).attr("id") + "']").click();
+									jQuery(this).get(0).checked = true; // Going old-school...
+
+									// Self-recursion obj - "checked" one in case of RADIO buttons
+									if ( _self_recursion != false )
+									{
+										// Do nothing : click() handler above already invokes this recursion
+										// _self_recursion = jQuery(this);
+									}
+								}
+							}
+						});
+					}
+
+					// Self-recursion
+					if ( _self_recursion != false )
+					{
+						return arguments.callee(_self_recursion, registry);
+					}
+
+					return true;
+				});
+			}
+		}
+
+		if ( '_disabled_options__for__s_data_target' in node_to_populate )
+		{
+			jQuery("#sr__s_data_target OPTION:disabled").prop("disabled","");
+			for ( var option in node_to_populate['_disabled_options__for__s_data_target'] )
+			{
+				jQuery("#sr__s_data_target OPTION[value='" + node_to_populate['_disabled_options__for__s_data_target'][option] + "']").prop("disabled", "disabled");
+				if ( jQuery("#sr__s_data_target").val() == node_to_populate['_disabled_options__for__s_data_target'][option] )
+				{
+					jQuery("#sr__s_data_target OPTION:enabled:first").prop("selected", "selected");
+				}
+			}
+		}
+
+		if ( '_value__for' in node_to_populate )
+		{
+			// Populate values, if any
+			for ( var key in node_to_populate['_value__for'] )
+			{
+				var field_obj = jQuery("#forms__components__sr__create [name^='" + key + "']");
+				var field_value = node_to_populate['_value__for'][ key ];
+
+				if ( field_obj.is("INPUT[type='text'],TEXTAREA") )
+				{
+					field_obj.val(field_value);
+				}
+				else if ( field_obj.is("SELECT") )
+				{
+					if ( !( field_value instanceof Array ) )
+					{
+						field_value = field_value.split(",");
+					}
+					for ( var _key in field_value )
+					{
+						field_obj.val( field_value );
+					}
+				}
+			}
+		}
+
+		/* Populate Data-target-configuration, by recursively-calling this method */
+		arguments.callee("#forms__components__sr__create [name='s_data_target']", registry);
+	}
+
+
+	else if ( this.obj.attr("name") == 's_data_target' )
+	{
+		/* Disable **only** .ondemand elemens within Data-target-configuration-tab!!! */
+		acp__components_viewmodule.Form.resetOnDemandObjects("#tabs__sr_alter_add__s_data_source .ondemand, #tabs__sr_alter_add__s_data_binding .ondemand");
+
+		// @todo Coming soon...
+	}
+
+
+	else if ( this.obj.attr("name") == 's_fetch_criteria[do_fetch_all_or_selected]' )
+	{
+		var whoami = jQuery("#forms__components__sr__create .ondemand.s_fetch_criteria .s_fetch_criteria__policies, #forms__components__sr__create .ondemand.s_fetch_criteria .s_fetch_criteria__query");
+		if ( this.obj.val() == 'all' )
+		{
+			jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__query").not(":first").remove();
+			jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__policies").not(":first").remove();
+			acp__components_viewmodule.Form.resetOnDemandElement(whoami);
+		}
+		else if ( this.obj.val() == 'selected' )
+		{
+			acp__components_viewmodule.Form.enableOnDemandElement(whoami);
+		}
+		return true;
+	}
+
+	/*
+	else if ( this.obj.attr("name") == 'links_with' )
+	{
+		// We don't have a module selected yet, so return here
+		if ( this.obj.val() == '' )
+		{
+			acp__components_viewmodule.Form.resetOnDemandElement("#forms__components__ddl__alter_add .links_with__e_data_definition.ondemand");
+			return true;
+		}
+
+		// Fetch m_data_definition for selected module
+		var _response = jQuery.ajax({
+			type : "GET",
+			url: "{{$MODULE_URL}}/components/viewmodule-" + this.obj.val(),
+			async : false
+		});
+		_response = jQuery.parseJSON(_response.responseText);
+		_response = _response['me']['m_data_definition'];
+		var _m_data_definition = [];
+		jQuery.each(_response, function ( key , value )
+		{
+			if ( value['type'] == 'link' )
+			{
+				// continue;
+				return;
+			}
+
+			if ( value['connector_enabled'] == 1 )
+			{
+				for ( var c in value['c_data_definition'] )
+				{
+					_m_data_definition[key + "." + value['c_data_definition'][c]['name']] = {
+						'name' : key + "." + value['c_data_definition'][c]['name'],
+						'label' : value['c_data_definition'][c]['label']
+					};
+				}
+			}
+			else
+			{
+				_m_data_definition[key] = {
+					'name' : value['name'],
+					'label' : value['label']
+				};
+			}
+		});
+		delete(_response);
+
+		// Populate "links_with__e_data_definition"
+		jQuery("#forms__components__ddl__alter_add [name^='links_with__e_data_definition']").empty();
+		for ( key in _m_data_definition )
+		{
+			jQuery("#forms__components__ddl__alter_add .links_with__e_data_definition.ondemand > [name^='links_with__e_data_definition']")
+				.append("<option value='" + _m_data_definition[key]['name'] + "'>" + _m_data_definition[key]['label'] + " [" + _m_data_definition[key]['name'] + "]</option");
+		}
+
+		acp__components_viewmodule.Form.enableOnDemandElement("#forms__components__ddl__alter_add .links_with__e_data_definition.ondemand");
+	}
+	*/
+	return true;
+};
+
 jQuery(document).ready(function ( event )
 {
 	/**
 	 * Opens "DDL-Create" Form
 	 */
-	jQuery("#forms__components__ddl__list [type='button']:eq(0)").click(function ( event )
+	jQuery("#forms__components__ddl__list [type='button']:first").click(function ( event )
 	{
 		if ( jQuery("#components__ddl__alter_add").is(":hidden") )
 		{
-			jQuery("#content UL.section > .ondemand").hide(); // Close all .ondemand panes
+			jQuery(".section > .ondemand").hide(); // Close all .ondemand panes
 			jQuery("#components__ddl__alter_add").show(); // Open "DDL-Create" form
 		}
 		jQuery("#forms__components__ddl__alter_add").trigger("reset"); // Reset "DDL-Create" Form
@@ -750,7 +1036,7 @@ jQuery(document).ready(function ( event )
 
 		/* Reset values */
 		whoami.find("INPUT[type='text']").val(null); // Reset all INPUT text-fields
-		whoami.find("SELECT > OPTION:eq(0)").prop("selected","selected"); // Reset all SELECTs
+		whoami.find("SELECT > OPTION:first").prop("selected","selected"); // Reset all SELECTs
 		whoami.find("[name='do']").val("ddl_alter__add"); // 'do'
 		whoami.find("[type='submit']").val("Register New Data-field");
 
@@ -770,7 +1056,7 @@ jQuery(document).ready(function ( event )
 	/**
 	 * Close "DDL-Create" Form
 	 */
-	jQuery("#forms__components__ddl__alter_add [type='button']:eq(0)").click(function ( event )
+	jQuery("#forms__components__ddl__alter_add [type='button']:first").click(function ( event )
 	{
 		if ( jQuery("#components__ddl__alter_add").is(":visible") )
 		{
@@ -835,17 +1121,17 @@ jQuery(document).ready(function ( event )
 				var registry = acp__components_viewmodule.cloneObject( acp__components_viewmodule.registry__ddl );
 
 				/* Continue... */
-				jQuery("#forms__components__ddl__list [type='button']:eq(0)").trigger("click"); // Click "Create New DDL" button to open form and reset it
+				jQuery("#forms__components__ddl__list [type='button']:first").trigger("click"); // Click "Create New DDL" button to open form and reset it
 				var typeElement = jQuery("#forms__components__ddl__alter_add [name='type']");
 
 				/* Populate data into Registry (part 1) */
-				registry[ data['type'] ]['value__for'] = {
+				registry[ data['type'] ]['_value__for'] = {
 					'name' : data['name'],
 					'label' : data['label']
 				};
 				if ( data['connector_length_cap'] !== null )
 				{
-					registry[ data['type'] ]['value__for']['connector_length_cap'] = data['connector_length_cap'];
+					registry[ data['type'] ]['_value__for']['connector_length_cap'] = data['connector_length_cap'];
 				}
 				if ( data['links_with'] !== null )
 				{
@@ -853,7 +1139,7 @@ jQuery(document).ready(function ( event )
 				}
 				if ( data['links_with__e_data_definition'] !== null )
 				{
-					registry[ data['type'] ]['value__for']['links_with__e_data_definition'] = data['links_with__e_data_definition'];
+					registry[ data['type'] ]['_value__for']['links_with__e_data_definition'] = data['links_with__e_data_definition'];
 				}
 
 				typeElement.val( data['type'] ).trigger("change"); // Trigger change() event handler for 'type' field
@@ -869,7 +1155,7 @@ jQuery(document).ready(function ( event )
 					{
 						if ( option == 'allowed_filetypes' )
 						{
-							registry[ data['type'] ]['value__for']['allowed_filetypes'] = data[ option ];
+							registry[ data['type'] ]['_value__for']['allowed_filetypes'] = data[ option ];
 							continue;
 						}
 						var option__as_appears_in_data = option.replace(/^@/, "");
@@ -977,7 +1263,7 @@ jQuery(document).ready(function ( event )
 	/**
 	 * Submits "DDL-BAK-Restore" Form
 	 */
-	jQuery("#forms__components__ddl__list_bak [type='button']:eq(0)").click(function ( event )
+	jQuery("#forms__components__ddl__list_bak [type='button']:first").click(function ( event )
 	{
 		jQuery("#forms__components__ddl__list_bak [name='do']").val("ddl_alter__restore_backup");
 		var whoami = acp__components_viewmodule.Form.self = jQuery("#forms__components__ddl__list_bak");
@@ -1068,21 +1354,169 @@ jQuery(document).ready(function ( event )
 	});
 
 	/**
+	 * "Sr__Create" : Binds onChange event for SELECTs of ".js__trigger_on_change" class
+	 */
+	jQuery("#forms__components__sr__create SELECT.js__trigger_on_change").change(function ( event )
+	{
+		acp__components_viewmodule.sr__create__apply_registry(jQuery(this));
+	});
+
+	/**
+	 * "Sr__Create" : Binds onClick event for LABELs, :radio's and :checkbox'es of ".js__trigger_on_change" class
+	 */
+	jQuery("#forms__components__sr__create .js__trigger_on_change").filter("LABEL,:radio,:checkbox").click(function ( event )
+	{
+		var what_is_being_triggered = ( jQuery(this).is("LABEL") ) ? jQuery("#" + jQuery(this).attr("for")) : jQuery(this);
+		if ( !( what_is_being_triggered.is(":disabled") ) )
+		{
+			acp__components_viewmodule.sr__create__apply_registry(what_is_being_triggered);
+		}
+	});
+
+	/**
+	 * Resets "Sr-Create" Form to its clean and default state
+	 */
+	jQuery("#forms__components__sr__create").bind("reset", function ( event )
+	{
+		/* Prelim */
+		var whoami = acp__components_viewmodule.Form.self = jQuery("#forms__components__sr__create");
+		var sDataSourceElement = whoami.find("[name='s_data_source']");
+
+		/* Reset common fields */
+		whoami.find("INPUT[type='text']").val(null); // Reset all INPUT text-fields
+console.log(whoami.find("SELECT > OPTION:eq(0)"));
+		whoami.find("SELECT > OPTION:eq(0)").prop("selected", "selected"); // Reset all SELECTs
+		whoami.find("[name='do']").val("sr_alter__add"); // 'do'
+		whoami.find("[type='submit']").val("Create New Subroutine");
+
+		/* Reset errors and close consoles */
+		whoami.find(".error").removeClass("error");
+		acp__components_viewmodule.Form.closeConsoles(true);
+
+		/* Apply Registry */
+		acp__components_viewmodule.sr__create__apply_registry(sDataSourceElement);
+
+		/* Reset jQuery-UI-tabs */
+		jQuery(".ui-tabs.sr_alter_add__s_data_flow_config").tabs("select", 0).tabs("option", "disabled", [1,2,3]);
+		acp__components_viewmodule.Form.resetOnDemandObjects();
+
+		/* Scroll to global Console */
+		var currentConsole = acp__components_viewmodule.Form.scrollToConsole(true);
+		var defaultConsoleMessage =
+			"Please note that:<ul><li>&quot;<strong>Data-source</strong>&quot; tab is disabled, as it is set to &#39;<em>-- no content fetching --</em>&#39;.</li>"
+			+ "<li>&quot;<strong>Data-binding</strong>&quot; tab is disabled, as no eligible data-binding options are available for setup.</li>"
+			+ "<li>&quot;<strong>Data-target</strong>&quot; tab is disabled, as no eligible data-targetting options are available for setup.</li></ul>";
+		currentConsole.html(defaultConsoleMessage).removeClass("error success");
+
+		/* Prevent default "reset" event from occuring... */
+		event.preventDefault();
+
+		return;
+	});
+
+	/**
 	 * Opens "SR-Create" Form
 	 */
-	jQuery("#forms__components__sr__list [type='button']:eq(0)").click(function ( event )
+	jQuery("#forms__components__sr__list [type='button']:first").click(function ( event )
 	{
 		if ( jQuery("#components__sr__create").is(":hidden") )
 		{
 			/* Close all .ondemand panes */
-			jQuery("#content UL.section > .ondemand").hide();
+			jQuery(".section > .ondemand").hide();
 
 			/* Open "SR-Create" form */
 			jQuery("#components__sr__create").slideDown("medium", function ()
 			{
-				/* Reset "DDL-Create" Form */
-				//jQuery("#forms__components__ddl__alter_add").trigger("reset");
+				/* Reset "Sr-Create" Form */
+				jQuery("#forms__components__sr__create").trigger("reset");
 			});
+		}
+	});
+
+	/**
+	 * Handles "Add-query-policy" button
+	 */
+	jQuery("#forms__components__sr__create #buttons__s_fetch_criteria__add_policy").click(function ( event )
+	{
+		/* Clone the first policy-container and insert the clone after the original one. */
+		var htmlToCopy  = jQuery("SPAN.s_fetch_criteria__policies:first").html();
+		jQuery("<SPAN>").addClass("s_fetch_criteria__policies").html(htmlToCopy).insertAfter(jQuery("SPAN.s_fetch_criteria__policies:last"));
+		jQuery("SPAN.s_fetch_criteria__policies:last BUTTON").attr("class", "buttons__s_fetch_criteria__remove_policy").removeAttr("id").text("remove query-policy");
+		jQuery("SPAN.s_fetch_criteria__policies:last TEXTAREA:first").val("1");
+
+		/* Re-enumerate all policy elements */
+		var nr_of_policies = jQuery("SPAN.s_fetch_criteria__policies").length;
+		for ( i = 1; i < nr_of_policies; i++ ) // No need to touch the first one
+		{
+			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") TEXTAREA:first")
+				.attr("name", "s_fetch_criteria[policies][" + i + "]")
+				.attr("id",	"s_fetch_criteria__policies__" + i);
+			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") LABEL")
+				.attr("for", "s_fetch_criteria__policies__" + i)
+				.html("Query Policy " + (i + 1));
+		}
+	});
+
+	/**
+	 * Handles "Remove-query-policy" button
+	 */
+	jQuery("#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_policy").live("click", function ( event )
+	{
+		/* Remove policy-container */
+		jQuery(this).parent().remove();
+
+		/* Re-enumerate remaining policy elements */
+		var nr_of_policies = jQuery("SPAN.s_fetch_criteria__policies").length;
+		for ( i = 1; i < nr_of_policies; i++ )  // No need to touch the first one
+		{
+			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") TEXTAREA:first")
+				.attr("name", "s_fetch_criteria[policies][" + i + "]")
+				.attr("id",	"s_fetch_criteria__policies__" + i);
+			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") LABEL")
+				.attr("for", "s_fetch_criteria__policies__" + i)
+				.html("Query Policy " + (i + 1));
+		}
+	});
+
+	/**
+	 * Handles "Add-query" button
+	 */
+	jQuery("#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_query").click(function ( event )
+	{
+		/* Clone the first query-container and insert the clone after the original one. */
+		var htmlToCopy  = jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__query:first").html();
+		jQuery("<SPAN>").addClass("s_fetch_criteria__query").html(htmlToCopy).insertAfter(jQuery("SPAN.s_fetch_criteria__query:last"));
+		jQuery("SPAN.s_fetch_criteria__query:last BUTTON").attr("class", "buttons__s_fetch_criteria__remove_query").removeAttr("id").text("remove query");
+
+		/* Re-enumerate all query elements */
+		var nr_of_queries = jQuery("SPAN.s_fetch_criteria__query").length;
+		for ( i = 1; i < nr_of_queries; i++ ) // No need to touch the first one
+		{
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][field_name]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(1)").attr("name","s_fetch_criteria[rules][" + i + "][math_operator]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(2)").attr("name","s_fetch_criteria[rules][" + i + "][type_of_expr_in_value]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") INPUT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][value]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SPAN:last").html("Shortcut: <i>" + ( i + 1 ) + "</i>");
+		}
+	});
+
+	/**
+	 * Handles "Remove-query" button
+	 */
+	jQuery("#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_query").live("click", function ( event )
+	{
+		/* Remove query-container */
+		jQuery(this).parent().remove();
+
+		/* Re-enumerate remaining query elements */
+		var nr_of_queries = jQuery("SPAN.s_fetch_criteria__query").length;
+		for ( i = 1; i < nr_of_queries; i++ ) // No need to touch the first one
+		{
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][field_name]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(1)").attr("name","s_fetch_criteria[rules][" + i + "][math_operator]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(2)").attr("name","s_fetch_criteria[rules][" + i + "][type_of_expr_in_value]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") INPUT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][value]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SPAN:last").html("Shortcut: <i>" + ( i + 1 ) + "</i>");
 		}
 	});
 

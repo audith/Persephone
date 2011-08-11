@@ -130,228 +130,42 @@
 				</span>
 			</fieldset>
 
-			<fieldset class="ui-tabs">
+			<fieldset class="ui-tabs {newOptions:{cookie:null,disabled:[1,2,3]}} sr_alter_add__s_data_flow_config">
 				<ul>
-					<li><a href="#tabs__sr_create__s_data_source">Data-source</a></li>
-					<li><a href="#tabs__sr_create__s_data_binding">Data-binding</a></li>
-					<li><a href="#tabs__sr_create__s_data_target">Data-target</a></li>
+					<li><a href="#tabs__sr_alter_add__s_help">Data-flow Configuration</a></li>
+					<li><a href="#tabs__sr_alter_add__s_data_source">Data-source</a></li>
+					<li><a href="#tabs__sr_alter_add__s_data_binding">Data-binding</a></li>
+					<li><a href="#tabs__sr_alter_add__s_data_target">Data-target</a></li>
 				</ul>
-				<fieldset id="tabs__sr_create__s_data_source">tabs__sr_create__s_data_source
-				</fieldset>
-				<fieldset id="tabs__sr_create__s_data_binding">tabs__sr_create__s_data_binding
-				</fieldset>
-				<fieldset id="tabs__sr_create__s_data_target">tabs__sr_create__s_data_target
-				</fieldset>
-			</fieldset>
+				<fieldset id="tabs__sr_alter_add__s_help">
+					<fieldset class="s_data_source">
+						<label title="Data-source" for="sr__s_data_source"><strong>Data-source:</strong><em>Where to fetch the content from?</em></label>
+						<select id="sr__s_data_source" name="s_data_source" class="js__trigger_on_change">
+							<option value="no-fetch">-- no content fetching --</option>
+							<option value="rdbms">Module RDBMS data-repository</option>
 
-
-			<!--
-			<fieldset class="s_data_source">
-				<label title="Data-source" for="sr__s_data_source"><strong>Data-source:</strong><em>Where to fetch the content from?</em></label>
-				<select id="sr__s_data_source" name="s_data_source">
-					<option value="">-- no content fetching --</option>
-					<option value="rdbms">Module's local data-repository on RDBMS</option>
-
-					{{if in_array("dom", $CONFIG.runtime.loaded_extensions)}}
-					<option value="dom">External, DOM-based document (HTML, XML etc) source [over HTTP]</option>
-					{{else}}
-					<option value="dom" disabled="disabled">External, DOM-based document (HTML, XML etc) source [over HTTP] - Disabled: PHP-DOM extension not loaded!</option>
-					{{/if}}
-
-					<option value="json">External,JSON/P-based source [over HTTP]</option>
-				</select>
-			</fieldset>
-			<fieldset class="s_data_compatibility">
-				<label title="Data compatibility" for="sr__s_data_compatibility"><strong>Data Compatibility:</strong><em>Additional processing/conversions, to perform on the processed data.</em></label>
-				<select id="sr__s_data_compatibility" name="s_data_compatibility">
-					<option value="">-- none --</option>
-					<option value="xml-cdata-compatible">XML- or (X)HTML-compatible (e.g. encode special characters etc)</option>
-				</select>
-			</fieldset>
-			<fieldset class="s_data_target">
-				<label title="Data-target" for="sr__s_data_target"><strong>Data-target:</strong><em>Where to redirect the processed content?</em></label>
-				<select id="sr__s_data_target" name="s_data_target">
-					<option value="tpl">Template engine</option>
-					<option value="rdbms">Module RDBMS data-repository</option>
-				</select>
-			</fieldset>
-
-			<fieldset class="s_data_definition">
-				<label title="Columns to Fetch" for="sr__s_data_definition"><strong>Columns to Fetch:</strong><em>Columns/fields to fetch.</em></label>
-				<select id="sr__s_data_definition" name="s_data_definition[]" multiple="multiple" size="5" class="required">
-					<optgroup label="Select one or more:">
-						{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
-							{{if $FIELD.connector_enabled}}
-								{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
-									{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
-									<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
-									{{/foreach}}
-								{{else}}
-									<option value="{{$FIELD.name}}" disabled="disabled" class="not_linked">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}} - not linked]</option>
-								{{/if}}
+							{{if in_array("dom", $CONFIG.runtime.loaded_extensions)}}
+							<option value="dom">External, DOM-based document (HTML, XML etc) source [over HTTP]</option>
 							{{else}}
-							<option value="{{$FIELD.name}}">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}]</option>
-							{{/if}}
-						{{/foreach}}
-					</optgroup>
-					<optgroup label="Also automatically are selected:">
-						<option value="id" disabled="disabled">Id [id]</option>
-						<option value="tags" disabled="disabled">Tags [tags]</option>
-						<option value="timestamp" disabled="disabled">Timestamp [timestamp]</option>
-						<option value="submitted_by" disabled="disabled">Submitted By: [submitted_by]</option>
-						<option value="status_published" disabled="disabled">Is Published? [status_published]</option>
-						<option value="status_archived" disabled="disabled">Is Archived? [status_archived]</option>
-						<option value="status_locked" disabled="disabled">Is Locked? [status_locked]</option>
-					</optgroup>
-				</select>
-			</fieldset>
-
-			<fieldset class="s_fetch_criteria">
-				<label class="full_size" title="Fetch Criteria - Queries &amp; Query Groups (Policies)" for="sr__fetch_criteria__all_or_selected">
-					<strong>Fetch Criteria - Queries &amp; Query Groups (Policies):</strong>
-					<em>What to fetch? Determine rules by adding one or more queries. Then group those queries. If more than one groups provided, using <i>UNION DISTINCT</i> logic, each fetched data collection will be merged together.</em>
-				</label>
-				<span class="input full_size">
-					<select id="sr__fetch_criteria__all_or_selected" class=".ondemand" name="s_fetch_criteria[do_fetch_all_or_selected]">
-						<option value="all">-- fetch all records --</option>
-						<option value="selected">-- fetch selected records --</option>
-					</select>
-					<a href="javascript:void(0);" onclick="javascript:sr__request_criteria__add_policy(this);" id="sr__fetch_criteria__add_policy_button" title="add a new group-policy (implements UNION rule)">add a new group-policy (implements UNION rule)</a>
-
-					<span class="sr__fetch_criteria__policies ondemand">
-						<textarea class="text required" name="s_fetch_criteria[policies][0]" id="sr__fetch_criteria__policies__0" style="width: 662px; height: 70px; text-transform: uppercase; clear: left;" cols="" rows="">1</textarea>
-						<span class="sr__fetch_criteria__arrow_turn_left"></span>
-						<i class="sr__fetch_criteria__group_heading">Group Policy 1</i>
-					</span>
-					<span class="pre_extra ondemand">
-						<select name="s_fetch_criteria[rules][0][field_name]">
-							{{if count( $CONTENT.me.m_data_definition )}}
-							<option value="id">Id [id]</option>
-							<option value="tags">Tags [tags]</option>
-							<option value="timestamp">Timestamp [timestamp]</option>
-							<option value="submitted_by">Submitted By: [submitted_by]</option>
-							<option value="status_published">Is Published? [status_published]</option>
-							<option value="status_archived">Is Archived? [status_archived]</option>
-							<option value="status_locked">Is Locked? [status_locked]</option>
+							<option value="dom" disabled="disabled">External, DOM-based document (HTML, XML etc) source [over HTTP] - Disabled: PHP-DOM extension not loaded!</option>
 							{{/if}}
 
-							{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
-								{{if $FIELD.connector_enabled}}
-									{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
-										{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
-										<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
-										{{/foreach}}
-									{{else}}
-										<option value="{{$FIELD.name}}" disabled="disabled" class="not_linked">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}} - not linked]</option>
-									{{/if}}
-								{{else}}
-								<option value="{{$FIELD.name}}">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}]</option>
-								{{/if}}
-							{{/foreach}}
+							<option value="json">External,JSON/P-based source [over HTTP]</option>
 						</select>
-						<select name="s_fetch_criteria[rules][0][math_operator]">
-							<option value="&gt;">&gt;</option>
-							<option value="&gt;=">&gt;=</option>
-							<option value="&lt;">&lt;</option>
-							<option value="&lt;=">&lt;=</option>
-							<option value="=">=</option>
-							<option value="!=">!=</option>
-							<option value="LIKE">LIKE</option>
-							<option value="NOT LIKE">NOT LIKE</option>
-							<option value="IS NULL">IS NULL</option>
-							<option value="IS NOT NULL">IS NOT NULL</option>
+					</fieldset>
+					<fieldset class="s_data_target">
+						<label title="Data-target" for="sr__s_data_target"><strong>Data-target:</strong><em>Where to redirect the processed content?</em></label>
+						<select id="sr__s_data_target" name="s_data_target">
+							<option value="tpl">Template engine</option>
+							<option value="rdbms">Module RDBMS data-repository</option>
 						</select>
-						<select name="s_fetch_criteria[rules][0][type_of_expr_in_value]">
-							<option value="generic">Generic Value [String]</option>
-							<option value="math">Mathematical Value</option>
-							<option value="zend_db_expr">Zend_Db_Expr</option>
-						</select>
-						<input type="text" class="text required" name="s_fetch_criteria[rules][0][value]" value="" style="width:200px;" />
-						<span class="sr__fetch_criteria__policy_shortcut">Shortcut: <i>1</i></span>
-						<a href="javascript:void(0);" onclick="javascript:sr__request_criteria__add_query(this);" class="sr__fetch_criteria__add_query_button" title="add a query-instance"></a>
-					</span>
-
-					{{* Sample for cloning , never used itself , thus name="" attribs are empty and are set by JScript after cloning *}}
-					<span class="extra ondemand">
-						<select name="">
-							{{if count( $CONTENT.me.m_data_definition)}}
-							<option value="id">Id [id]</option>
-							<option value="tags">Tags [tags]</option>
-							<option value="timestamp">Timestamp [timestamp]</option>
-							<option value="submitted_by">Submitted By: [submitted_by]</option>
-							<option value="status_published">Is Published? [status_published]</option>
-							<option value="status_archived">Is Archived? [status_archived]</option>
-							<option value="status_locked">Is Locked? [status_locked]</option>
-							{{/if}}
-							{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
-								{{if $FIELD.connector_enabled}}
-									{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
-										{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
-										<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
-										{{/foreach}}
-									{{else}}
-										<option value="{{$FIELD.name}}" disabled="disabled" class="not_linked">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}} - not linked]</option>
-									{{/if}}
-								{{else}}
-								<option value="{{$FIELD.name}}">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}]</option>
-								{{/if}}
-							{{/foreach}}
-						</select>
-						<select name="">
-							<option value="&gt;">&gt;</option>
-							<option value="&gt;=">&gt;=</option>
-							<option value="&lt;">&lt;</option>
-							<option value="&lt;=">&lt;=</option>
-							<option value="=">=</option>
-							<option value="!=">!=</option>
-							<option value="LIKE">LIKE</option>
-							<option value="NOT LIKE">NOT LIKE</option>
-							<option value="IS NULL">IS NULL</option>
-							<option value="IS NOT NULL">IS NOT NULL</option>
-						</select>
-						<select name="">
-							<option value="generic">Generic Value [String]</option>
-							<option value="math">Mathematical Value</option>
-							<option value="zend_db_expr">Zend_Db_Expr</option>
-						</select>
-						<input type="text" class="text required" name="" value="" style="width:200px;" />
-						<span class="sr__fetch_criteria__policy_shortcut">Shortcut: <i>2</i></span>
-						<a href="javascript: void(0);" onclick="javascript:sr__request_criteria__remove_query(this);" class="sr__fetch_criteria__remove_query_button" title="remove"></a>
-					</span>
-				</span>
-			</fieldset>
-
-
-			<fieldset class="s_fetch_criteria__limit">
-				<label title="Fetch Criteria - Limit" for="sr__fetch_criteria__limit"><strong>Fetch Criteria -  Limit:</strong><em>Total number of fetched rows. Leave empty to fetch everything that matches the request criteria.</em></label>
-				<input type="text" name="s_fetch_criteria[limit]" id="sr__fetch_criteria__limit" class="text" />
-			</fieldset>
-			<fieldset>
-				<label title="Fetch Criteria - Pagination" for="sr__fetch_criteria__pagination"><strong>Fetch Criteria - Pagination:</strong><em>Number of results per page. Leave empty for no pagination.</em></label>
-				<input type="text" name="s_fetch_criteria[pagination]" id="sr__fetch_criteria__pagination" class="text" maxlength="3" />
-			</fieldset>
-			<fieldset>
-				<span id="sr__fetch_criteria__order">
-					<label class="full_size" title="Fetch Criteria - Sorting" for="sr__fetch_criteria__do_perform_sorting">
-						<strong>Fetch Criteria - Sorting:</strong><em>Sort (order) fetched data by one or more columns in certain direction(s) (ascending or descending, sequence-sensitive).</em>
-					</label>
-					<span class="input full_size">
-						<select id="sr__fetch_criteria__do_perform_sorting" name="s_fetch_criteria[do_sort]">
-							<option value="0" selected="selected">-- disable sorting --</option>
-							<option value="1">-- enable sorting --</option>
-						</select>
-						<a href="javascript:void(0);" onclick="javascript:sr__request_criteria__add_sorting(this);" id="sr__fetch_criteria__add_sorting_button" title="add a new sorting-rule">add a new sorting-rule</a>
-						<span class="sr__sort_by">
-							<select name="s_fetch_criteria[sort_by][0][field_name]">
-								{{if count( $CONTENT.me.m_data_definition)}}
-								<option value="id">Id [id]</option>
-								<option value="tags">Tags [tags]</option>
-								<option value="timestamp">Timestamp [timestamp]</option>
-								<option value="submitted_by">Submitted By: [submitted_by]</option>
-								<option value="status_published">Is Published? [status_published]</option>
-								<option value="status_archived">Is Archived? [status_archived]</option>
-								<option value="status_locked">Is Locked? [status_locked]</option>
-								{{/if}}
+					</fieldset>
+				</fieldset>
+				<fieldset id="tabs__sr_alter_add__s_data_source">
+					<fieldset class="s_data_definition ondemand">
+						<label title="Columns to Fetch" for="sr__s_data_definition"><strong>Columns to Fetch:</strong><em>Columns/fields to fetch.</em></label>
+						<select id="sr__s_data_definition" name="s_data_definition[]" multiple="multiple" size="5" class="required">
+							<optgroup label="Select one or more:">
 								{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
 									{{if $FIELD.connector_enabled}}
 										{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
@@ -365,22 +179,155 @@
 									<option value="{{$FIELD.name}}">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}]</option>
 									{{/if}}
 								{{/foreach}}
+							</optgroup>
+							<optgroup label="Also automatically are selected:">
+								<option value="id" disabled="disabled">Id [id]</option>
+								<option value="tags" disabled="disabled">Tags [tags]</option>
+								<option value="timestamp" disabled="disabled">Timestamp [timestamp]</option>
+								<option value="submitted_by" disabled="disabled">Submitted By: [submitted_by]</option>
+								<option value="status_published" disabled="disabled">Is Published? [status_published]</option>
+								<option value="status_archived" disabled="disabled">Is Archived? [status_archived]</option>
+								<option value="status_locked" disabled="disabled">Is Locked? [status_locked]</option>
+							</optgroup>
+						</select>
+					</fieldset>
+
+					<fieldset class="s_fetch_criteria ondemand">
+						<label class="full_size" title="Fetch Criteria - Queries &amp; Query Groups (Policies)" for="s_fetch_criteria__all_or_selected">
+							<strong>Fetch Criteria - Queries &amp; Query Groups (Policies):</strong>
+							<em>What to fetch? Determine rules by adding one or more queries. Then group those queries. If more than one groups provided, using <i>UNION DISTINCT</i> logic, each fetched data collection will be merged together.</em>
+						</label>
+						<span class="input full_size">
+							<select id="s_fetch_criteria__all_or_selected" class="js__trigger_on_change" name="s_fetch_criteria[do_fetch_all_or_selected]">
+								<option value="all">-- fetch all records --</option>
+								<option value="selected">-- fetch selected records --</option>
 							</select>
-							<select name="s_fetch_criteria[sort_by][0][dir]">
-								<option value="ASC">Ascending</option>
-								<option value="DESC">Descending</option>
-							</select>
+
+							<span class="s_fetch_criteria__policies ondemand">
+								<label for="s_fetch_criteria__policies__0">Query Policy 1</label>
+								<textarea class="text required" name="s_fetch_criteria[policies][0]" id="s_fetch_criteria__policies__0" style="width: 662px; height: 70px; text-transform: uppercase; clear: left;" cols="" rows="">1</textarea>
+								<button type="button" id="buttons__s_fetch_criteria__add_policy">add a new group-policy (implements UNION rule)</button>
+							</span>
+							<span class="s_fetch_criteria__query ondemand">
+								<select name="s_fetch_criteria[rules][0][field_name]">
+									{{if count( $CONTENT.me.m_data_definition )}}
+									<option value="id">Id [id]</option>
+									<option value="tags">Tags [tags]</option>
+									<option value="timestamp">Timestamp [timestamp]</option>
+									<option value="submitted_by">Submitted By: [submitted_by]</option>
+									<option value="status_published">Is Published? [status_published]</option>
+									<option value="status_archived">Is Archived? [status_archived]</option>
+									<option value="status_locked">Is Locked? [status_locked]</option>
+									{{/if}}
+
+									{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
+										{{if $FIELD.connector_enabled}}
+											{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
+												{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
+												<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
+												{{/foreach}}
+											{{else}}
+												<option value="{{$FIELD.name}}" disabled="disabled" class="not_linked">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}} - not linked]</option>
+											{{/if}}
+										{{else}}
+										<option value="{{$FIELD.name}}">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}]</option>
+										{{/if}}
+									{{/foreach}}
+								</select>
+								<select name="s_fetch_criteria[rules][0][math_operator]">
+									<option value="&gt;">&gt;</option>
+									<option value="&gt;=">&gt;=</option>
+									<option value="&lt;">&lt;</option>
+									<option value="&lt;=">&lt;=</option>
+									<option value="=">=</option>
+									<option value="!=">!=</option>
+									<option value="LIKE">LIKE</option>
+									<option value="NOT LIKE">NOT LIKE</option>
+									<option value="IS NULL">IS NULL</option>
+									<option value="IS NOT NULL">IS NOT NULL</option>
+								</select>
+								<select name="s_fetch_criteria[rules][0][type_of_expr_in_value]">
+									<option value="generic">Generic Value [String]</option>
+									<option value="math">Mathematical Value</option>
+									<option value="zend_db_expr">Zend_Db_Expr</option>
+								</select>
+								<input type="text" class="text required" name="s_fetch_criteria[rules][0][value]" value="" style="width:200px;" />
+								<span class="s_fetch_criteria__policy_shortcut">Shortcut: <i>1</i></span>
+								<button type="button" class="buttons__s_fetch_criteria__add_query">add a query</button>
+							</span>
 						</span>
-					</span>
-				</span>
+					</fieldset>
+
+					<fieldset class="s_fetch_criteria__limit ondemand">
+						<label title="Fetch Criteria - Limit" for="s_fetch_criteria__limit"><strong>Fetch Criteria -  Limit:</strong><em>Total number of fetched rows. Leave empty to fetch everything that matches the request criteria.</em></label>
+						<input type="text" name="s_fetch_criteria[limit]" id="s_fetch_criteria__limit" class="text" />
+					</fieldset>
+
+					<fieldset class="s_fetch_criteria__pagination ondemand">
+						<label title="Fetch Criteria - Pagination" for="s_fetch_criteria__pagination"><strong>Fetch Criteria - Pagination:</strong><em>Number of fetched rows per page. Leave empty for no pagination.</em></label>
+						<input type="text" name="s_fetch_criteria[pagination]" id="s_fetch_criteria__pagination" class="text" maxlength="3" />
+					</fieldset>
+
+					<fieldset class="s_fetch_criteria__order ondemand">
+						<label class="full_size" title="Fetch Criteria - Sorting" for="s_fetch_criteria__do_perform_sorting">
+							<strong>Fetch Criteria - Sorting:</strong><em>Sort (order) fetched data by one or more columns in certain direction(s) (ascending or descending, sequence-sensitive).</em>
+						</label>
+						<span class="input full_size">
+							<select id="s_fetch_criteria__do_perform_sorting" name="s_fetch_criteria[do_sort]" class="js__trigger_on_change">
+								<option value="0">-- disable sorting --</option>
+								<option value="1">-- enable sorting --</option>
+							</select>
+							<a href="javascript:void(0);" onclick="javascript:sr__request_criteria__add_sorting(this);" id="s_fetch_criteria__add_sorting_button" title="add a new sorting-rule">add a new sorting-rule</a>
+							<span class="sr__sort_by ondemand">
+								<select name="s_fetch_criteria[sort_by][0][field_name]">
+									{{if count( $CONTENT.me.m_data_definition)}}
+									<option value="id">Id [id]</option>
+									<option value="tags">Tags [tags]</option>
+									<option value="timestamp">Timestamp [timestamp]</option>
+									<option value="submitted_by">Submitted By: [submitted_by]</option>
+									<option value="status_published">Is Published? [status_published]</option>
+									<option value="status_archived">Is Archived? [status_archived]</option>
+									<option value="status_locked">Is Locked? [status_locked]</option>
+									{{/if}}
+									{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
+										{{if $FIELD.connector_enabled}}
+											{{if $FIELD.connector_linked and count( $FIELD.c_data_definition )}}
+												{{foreach from=$FIELD.c_data_definition item=C_FIELD}}
+												<option value="{{$FIELD.name}}.{{$C_FIELD.name}}">{{$C_FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}.{{$C_FIELD.name|truncate:32:"...":TRUE}}]</option>
+												{{/foreach}}
+											{{else}}
+												<option value="{{$FIELD.name}}" disabled="disabled" class="not_linked">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}} - not linked]</option>
+											{{/if}}
+										{{else}}
+										<option value="{{$FIELD.name}}">{{$FIELD.label}} [{{$FIELD.name|truncate:32:"...":TRUE}}]</option>
+										{{/if}}
+									{{/foreach}}
+								</select>
+								<select name="s_fetch_criteria[sort_by][0][dir]">
+									<option value="ASC">Ascending</option>
+									<option value="DESC">Descending</option>
+								</select>
+							</span>
+						</span>
+					</fieldset>
+				</fieldset>
+				<fieldset id="tabs__sr_alter_add__s_data_binding">tabs__sr_alter_add__s_data_binding
+				</fieldset>
+				<fieldset id="tabs__sr_alter_add__s_data_target">
+					<label title="Data compatibility" for="sr__s_data_compatibility"><strong>Data Compatibility:</strong><em>Additional processing/conversions, to perform on the processed data.</em></label>
+					<select id="sr__s_data_compatibility" name="s_data_compatibility">
+						<option value="">-- none --</option>
+						<option value="xml-cdata-compatible">XML- or (X)HTML-compatible (e.g. encode special characters etc)</option>
+					</select>
+				</fieldset>
 			</fieldset>
-			 -->
+
 			<div class="system_console"></div>
 
 			<fieldset class="buttons">
-				<input type="hidden" name="do" value="" />
+				<input type="hidden" name="do" value="sr_alter__add" />
 				<input type="hidden" name="m_unique_id" value="{{$CONTENT.me.m_unique_id}}" />
-				<input type="submit" value="Create Subroutine" />
+				<input type="submit" value="Create New Subroutine" />
 				<input type="reset" value="Clear Form" />
 				<input type="button" value="Cancel &amp; Close" />
 			</fieldset>
