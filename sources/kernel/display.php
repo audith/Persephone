@@ -158,7 +158,7 @@ class Display
 
 		if ( $this->API->Input->headers['request']['_is_ajax'] or $this->output_mode == 'json' )
 		{
-			$this->API->classes__do_get("Zend_Json", false);
+			$this->API->loader("Zend_Json", false);
 
 			# @see http://www.ietf.org/rfc/rfc4627.txt
 			header("Content-type: application/json");
@@ -782,7 +782,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 				{
 					throw new Exception( "Public and/or private key not found! Make sure both are set in order to use ReCaptcha feature..." );
 				}
-				$_recaptcha_obj = $this->API->classes__do_get("Zend_Captcha_ReCaptcha");
+				$_recaptcha_obj = $this->API->loader("Zend_Captcha_ReCaptcha");
 				$_recaptcha_obj->setPubKey( $this->API->config['security']['recaptcha_public_key'] );
 				$_recaptcha_obj->setPrivKey( $this->API->config['security']['recaptcha_private_key'] );
 				return $_recaptcha_obj->getService()->getHTML();

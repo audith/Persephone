@@ -1,4 +1,4 @@
-<div class="aside full_size" id="system_console"></div>
+<samp id="system_console" class="full_size"></samp>
 <ul class="section full_size">
 	<li id="components__modules__alter_add" class="ondemand">
 		<h2>Register a Module

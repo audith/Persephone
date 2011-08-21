@@ -79,7 +79,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'system_index',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'tpl',
 										's_pathinfo_uri_schema'           => 'system(\/\?[a-z_]+)?',
 										's_pathinfo_uri_schema_parsed'    => 'system(\/\?[a-z_]+)?',
 										's_qstring_parameters'            => array(),
@@ -93,7 +94,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'management_index',
-										's_service_mode'                  => 'read-only',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'tpl',
 										's_pathinfo_uri_schema'           => 'content_and_data',
 										's_pathinfo_uri_schema_parsed'    => 'content_and_data',
 										's_qstring_parameters'            => array(),
@@ -105,7 +107,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'content_and_data__content',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
 										's_pathinfo_uri_schema_parsed'    => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
 										's_qstring_parameters'            => array(
@@ -122,7 +125,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'content_and_data__media_library',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'content_and_data/media_library',
 										's_pathinfo_uri_schema_parsed'    => 'content_and_data/media_library',
 										's_qstring_parameters'            => array(),
@@ -136,7 +140,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'components_modules',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'components',
 										's_pathinfo_uri_schema_parsed'    => 'components',
 										's_qstring_parameters'            => array(),
@@ -152,7 +157,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'components_viewmodule',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'components/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
 										's_pathinfo_uri_schema_parsed'    => 'components/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
 										's_qstring_parameters'            => array(
@@ -174,7 +180,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'components_viewconnector',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'components/viewconnector-(?P<m_unique_id_clean>[a-z0-9]{32})-(?P<c_name>[a-z][a-z0-9_]+)',
 										's_pathinfo_uri_schema_parsed'    => 'components/viewconnector-(?P<m_unique_id_clean>[a-z0-9]{32})-(?P<c_name>[a-z][a-z0-9_]+)',
 										's_qstring_parameters'            => array(
@@ -195,7 +202,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 										's_name'                          => 'test',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'test/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
 										's_pathinfo_uri_schema_parsed'    => 'test/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
 										's_qstring_parameters'            => array(
@@ -474,9 +482,9 @@ class Module_Handler
 	private function management__media_library__do_list ()
 	{
 		$_page_nr = 1;
-		if ( isset( $this->API->Input->get['_page'][ $this->running_subroutine['s_name'] ] ) and intval( $this->API->Input->get['_page'][ $this->running_subroutine['s_name'] ] ) > 1 )
+		if ( isset( $_GET['_page'][ $this->running_subroutine['s_name'] ] ) and intval( $_GET['_page'][ $this->running_subroutine['s_name'] ] ) > 1 )
 		{
-			$_page_nr = intval( $this->API->Input->get['_page'][ $this->running_subroutine['s_name'] ] );
+			$_page_nr = intval( $_GET['_page'][ $this->running_subroutine['s_name'] ] );
 		}
 
 		$this->API->Db->cur_query = array(
@@ -567,7 +575,7 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_create ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$faults = array();
 		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
 		$_connector_modules_cache = $this->API->Cache->cache__do_get( "modules_connectors" );
@@ -586,7 +594,7 @@ class Module_Handler
 			//--------------------------------------------------------------------
 
 			# TYPE: Validation...
-			if ( ( $_processor_instance = $this->API->classes__do_get( "data_processors__" . $input['dft_type'] ) ) === false )
+			if ( ( $_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $input['dft_type'] ) ) ) === false )
 			{
 				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['dft_type'] . "</em>!" );
 			}
@@ -614,7 +622,7 @@ class Module_Handler
 				if ( $this->API->Db->simple_exec_query() )
 				{
 					# On SUCCESS, update cache and respond
-					$_recache = $this->API->classes__do_get("Recache");
+					$_recache = $this->API->loader("Cache__Recache");
 					$_recache->main( "modules" );
 					$_recache->main( "modules_connectors" );
 					return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field-registry successfully added!<br />Refreshing..." );
@@ -643,7 +651,8 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_sort ()
 	{
-		if ( !isset( $this->API->Input->post['position'] ) or !is_array( $this->API->Input->post['position'] ) or empty( $this->API->Input->post['position'] ) )
+		$_position_information = $this->API->Input->post("position");
+		if ( is_null( $_position_information ) or !is_array( $_position_information ) or empty( $_position_information ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Empty data-set! Request aborted..." );
 		}
@@ -675,7 +684,7 @@ class Module_Handler
 		//-------------
 
 		$_rows_affected  = 0;
-		foreach ( $this->API->Input->post['position'] as $_position=>$_name )
+		foreach ( $_position_information as $_position=>$_name )
 		{
 			$this->API->Db->cur_query = array(
 					'do'      =>  "update",
@@ -690,7 +699,7 @@ class Module_Handler
 		}
 		if ( $_rows_affected )
 		{
-			$this->API->classes__do_get("Recache")->main( "modules_connectors" );
+			$this->API->loader("Cache__Recache")->main( "modules_connectors" );
 		}
 
 		return array( 'responseCode' => 1, 'responseMessage' => "Re-order successful! Refreshing in 2 seconds..." );
@@ -719,7 +728,7 @@ class Module_Handler
 		else
 		{
 			# Regular REQUEST
-			$input =& $this->API->Input->post;
+			$input = $this->API->Input->post();
 		}
 
 		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
@@ -860,7 +869,7 @@ class Module_Handler
 			// SUCCESS : Still here :) Update cache
 			//-----------------------------------------
 
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field-registry successfully dropped!<br />Refreshing..." );
@@ -879,7 +888,7 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_drop_backup ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
 		$_connector_modules_cache = $this->API->Cache->cache__do_get( "modules_connectors" );
 		if ( array_key_exists( $input['connector_linked'], $_connector_modules_cache ) )
@@ -962,7 +971,7 @@ class Module_Handler
 			// SUCCESS : Update cache and respond
 			//--------------------------------------
 
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully dropped!<br />Refreshing...' );
@@ -981,7 +990,7 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_restore_backup ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
 		$_connector_modules_cache = $this->API->Cache->cache__do_get( "modules_connectors" );
 		if ( array_key_exists( $input['connector_linked'], $_connector_modules_cache ) )
@@ -1057,7 +1066,7 @@ class Module_Handler
 			if ( $this->API->Db->simple_exec_query() )
 			{
 				# On SUCCESS, update cache and respond
-				$_recache = $this->API->classes__do_get("Recache");
+				$_recache = $this->API->loader("Cache__Recache");
 				$_recache->main( "modules" );
 				$_recache->main( "modules_connectors" );
 				return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully restored!<br />Refreshing...' );
@@ -1190,7 +1199,7 @@ class Module_Handler
 	private function modules__do_create__master_unit ()
 	{
 		# Input
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$faults = array();
 		$struct = array();
 
@@ -1274,75 +1283,8 @@ class Module_Handler
 			# CREATE TABLEs
 			$this->API->Db->simple_exec_create_table_struct ( $struct );
 
-			//----------------------------------------
-			// Create INSERT and UPDATE subroutines
-			//----------------------------------------
-
-			$_insert_subroutine_parameters = array(
-					's_name'                        =>  "insert",
-					's_service_mode'                =>  "write-only",
-					's_data_definition'             =>  serialize( null ),
-					's_pathinfo_uri_schema'         =>  "insert",
-					's_pathinfo_uri_schema_parsed'  =>  "insert",
-					's_qstring_parameters'          =>  "a:0:{}",
-					's_fetch_criteria'              =>  serialize( false ),
-					'm_unique_id'                   =>  $m_unique_id,
-					's_can_remove'                  =>  0
-				);
-
-			$this->API->Db->cur_query = array(
-					'do'	 => "insert",
-					'table'  => "modules_subroutines",
-					'set'    => $_insert_subroutine_parameters
-				);
-
-			if ( !$this->API->Db->simple_exec_query() )
-			{
-				return array( array( 'faultCode' => 0, 'faultMessage' => "Unexpected problem occured! Possible DB-connection problems?!" ) );
-			}
-
-			$_update_subroutine_parameters = array(
-					's_name'                        =>  "update",
-					's_service_mode'                =>  "read-write",
-					's_data_definition'             =>  serialize( null ),
-					's_pathinfo_uri_schema'         =>  "update-({id})",
-					's_pathinfo_uri_schema_parsed'  =>  "update-(?P<id>\d{1,10})",
-					's_qstring_parameters'          =>  serialize( array( 'id' => array( 'request_regex' => '\d{1,10}' , '_is_mandatory' => true ) ) ),
-					's_fetch_criteria'              =>  serialize(
-							array(
-									'do_fetch_all_or_selected'  => "selected",
-									'rules'                     => array(
-											array(
-													'field_name'               => "id",
-													'math_operator'            => "=",
-													'type_of_expr_in_value'    => "math",
-													'value'                    => "<backreference>id</backreference>",
-												),
-										),
-									'policies'                  => array( "(1)" ),
-									'limit'                     => 1,
-									'pagination'                => null,
-									'do_sort'                   => 0,
-								)
-
-						),
-					'm_unique_id'                   =>  $m_unique_id,
-					's_can_remove'                  =>  0
-				);
-
-			$this->API->Db->cur_query = array(
-					'do'	 => "insert",
-					'table'  => "modules_subroutines",
-					'set'    => $_update_subroutine_parameters
-				);
-
-			if ( !$this->API->Db->simple_exec_query() )
-			{
-				return array( array( 'faultCode' => 0, 'faultMessage' => "Unexpected problem occured! Possible DB-connection problems?!" ) );
-			}
-
 			# On SUCCESS, update cache and respond
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			return array( 'responseCode' => 1, 'responseMessage' => "Module successfully created!", 'responseAction' => "refresh" );
 		}
@@ -1361,7 +1303,7 @@ class Module_Handler
 	private function modules__do_create__connector_unit ()
 	{
 		# Prelim
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$faults = array();
 		$struct = array();
 
@@ -1491,7 +1433,7 @@ class Module_Handler
 		}
 
 		# Update cache and respond
-		$_recache = $this->API->classes__do_get("Recache");
+		$_recache = $this->API->loader("Cache__Recache");
 		$_recache->main( "modules" );
 		$_recache->main( "modules_connectors" );
 
@@ -1533,7 +1475,7 @@ class Module_Handler
 	private function modules__do_edit ()
 	{
 		# Input
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$faults = array();
 
 		# Is it a valid module?
@@ -1662,7 +1604,7 @@ class Module_Handler
 			}
 
 			# On SUCCESS, update cache and respond
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			return array( 'responseCode' => 1, 'responseMessage' => "Module successfully modified! Please note that the module also has been disabled!<br />Refreshing...", 'responseAction' => "refresh" );
 		}
@@ -1684,7 +1626,7 @@ class Module_Handler
 		// Prelim
 		//----------
 
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 
 		//-----------
 		// Cleanup
@@ -1787,7 +1729,7 @@ class Module_Handler
 		//------------
 
 		# Update cache
-		$_recache = $this->API->classes__do_get("Recache");
+		$_recache = $this->API->loader("Cache__Recache");
 		$_recache->main( "modules" );
 		$_recache->main( "modules_connectors" );
 		return array( 'responseCode' => 1, 'responseMessage' => "Module (and its subroutines) successfully removed! Skin templates are still remaining in system!", 'responseAction' => "refresh" );
@@ -1836,7 +1778,7 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_create ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$faults = array();
 
 		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
@@ -1894,7 +1836,7 @@ class Module_Handler
 			//--------------------------------------------------------------------
 
 			# TYPE: Validation...
-			if ( ( $_processor_instance = $this->API->classes__do_get( "data_processors__" . $input['type'] ) ) === false )
+			if ( ( $_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $input['type'] ) ) ) === false )
 			{
 				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['type'] . "</em>!" );
 			}
@@ -1925,7 +1867,7 @@ class Module_Handler
 				if ( $this->API->Db->simple_exec_query() )
 				{
 					# On SUCCESS, update cache and respond
-					$_recache = $this->API->classes__do_get("Recache");
+					$_recache = $this->API->loader("Cache__Recache");
 					$_recache->main( "modules" );
 					return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully added!<br />Refreshing...' , 'responseAction' => 'refresh' );
 				}
@@ -1953,13 +1895,13 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_edit__pre_processing ()
 	{
-		if ( $m = $this->modules__do_view( $this->API->Input->post['m_unique_id'] ) )
+		if ( !is_null( $this->API->Input->post("m_unique_id") ) and $m = $this->modules__do_view( $this->API->Input->post("m_unique_id") ) )
 		{
-			if ( $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ]['is_backup'] )
+			if ( $m['me']['m_data_definition'][ $this->API->Input->post("ddl_checklist") ]['is_backup'] )
 			{
 				return null;
 			}
-			$_field =& $m['me']['m_data_definition'][ $this->API->Input->post['ddl_checklist'] ];  // Just for convenience...
+			$_field =& $m['me']['m_data_definition'][ $this->API->Input->post("ddl_checklist") ];  // Just for convenience...
 			$return = array(
 					'name'                           => $_field['name'],
 					'label'                          => $_field['label'],
@@ -1996,7 +1938,7 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_edit ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$faults = array();
 
 		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
@@ -2059,7 +2001,7 @@ class Module_Handler
 			//--------------------------------------------------------------------
 
 			# TYPE: Validation...
-			if ( ( $_processor_instance = $this->API->classes__do_get( "data_processors__" . $input['type'] ) ) === false )
+			if ( ( $_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $input['type'] ) ) ) === false )
 			{
 				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['type'] . "</em>!" );
 			}
@@ -2158,7 +2100,7 @@ class Module_Handler
 					);
 				$this->API->Db->simple_exec_query();
 
-				$this->API->classes__do_get("Recache")->main( "modules_connectors" );
+				$this->API->loader("Cache__Recache")->main( "modules_connectors" );
 			}
 
 			//------------------------------------------------
@@ -2176,7 +2118,7 @@ class Module_Handler
 				);
 			$this->API->Db->simple_exec_query();
 
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully altered!<br />Refreshing...' , 'responseAction' => 'refresh' );
@@ -2200,9 +2142,9 @@ class Module_Handler
 
 		# Fetch what we need
 		$_mimelist_cache__subset =
-			in_array( $this->API->Input->input['mimetype'] , array( "image", "audio", "video" ) )
+			( !is_null( $this->API->Input->request("mimetype") ) and in_array( $this->API->Input->request("mimetype") , array( "image", "audio", "video" ) ) )
 			?
-			array_values( $_mimelist_cache['by_type'][ $this->API->Input->input['mimetype'] ] )
+			array_values( $_mimelist_cache['by_type'][ $this->API->Input->request("mimetype") ] )
 			:
 			array_values( $_mimelist_cache['by_ext'] );
 
@@ -2224,14 +2166,15 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_sort ()
 	{
-		if ( !isset( $this->API->Input->post['position'] ) or !is_array( $this->API->Input->post['position'] ) or empty( $this->API->Input->post['position'] ) )
+		$_position_information = $this->API->Input->post("position");
+		if ( is_null( $_position_information ) or !is_array( $_position_information ) or empty( $_position_information ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Empty data-set! Request aborted..." );
 		}
-
 		$m_unique_id     = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 		$_rows_affected  = 0;
-		foreach ( $this->API->Input->post['position'] as $_position=>$_name )
+
+		foreach ( $_position_information as $_position=>$_name )
 		{
 			$this->API->Db->cur_query = array(
 					'do'      =>  "update",
@@ -2246,7 +2189,7 @@ class Module_Handler
 		}
 		if ( $_rows_affected )
 		{
-			$this->API->classes__do_get("Recache")->main( "modules" );
+			$this->API->loader("Cache__Recache")->main( "modules" );
 		}
 
 		return array( 'responseCode' => 1, 'responseMessage' => "Re-order successful! Refreshing in 2 seconds..." );
@@ -2275,7 +2218,7 @@ class Module_Handler
 		else
 		{
 			# Regular REQUEST
-			$input =& $this->API->Input->post;
+			$input = $this->API->Input->post();
 		}
 
 		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
@@ -2477,7 +2420,7 @@ class Module_Handler
 			// SUCCESS : Still here :) Update cache
 			//-----------------------------------------
 
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field-registry successfully dropped!<br />Refreshing...", "responseAction" => "refresh" );
@@ -2495,7 +2438,7 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_drop_backup ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 
 		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
@@ -2638,7 +2581,7 @@ class Module_Handler
 			// SUCCESS : Update cache and respond
 			//--------------------------------------
 
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully dropped!<br />Refreshing...' , 'responseAction' => "refresh" );
@@ -2657,7 +2600,7 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_restore_backup ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 
 		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
@@ -2735,7 +2678,7 @@ class Module_Handler
 			if ( $this->API->Db->simple_exec_query() )
 			{
 				# On SUCCESS, update cache and respond
-				$_recache = $this->API->classes__do_get("Recache");
+				$_recache = $this->API->loader("Cache__Recache");
 				$_recache->main( "modules" );
 				$_recache->main( "modules_connectors" );
 				return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully restored!<br />Refreshing...' , 'responseAction' => "refresh" );
@@ -2759,7 +2702,7 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_set_title_column ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 
 		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
@@ -2783,7 +2726,7 @@ class Module_Handler
 					//----------------------------------------------------------
 
 					$_ddl_information =& $m['m_data_definition'][ $input['ddl_checklist'] ];
-					$_processor_instance = $this->API->classes__do_get( "data_processors__" . $_ddl_information['type'] );
+					$_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $_ddl_information['type'] ) );
 					if ( $_processor_instance->modules__ddl__is_eligible_for_title( $_ddl_information ) )
 					{
 						$this->API->Db->cur_query = array(
@@ -2795,7 +2738,7 @@ class Module_Handler
 						if ( $this->API->Db->simple_exec_query() )
 						{
 							# On SUCCESS, update cache and respond
-							$_recache = $this->API->classes__do_get("Recache");
+							$_recache = $this->API->loader("Cache__Recache");
 							$_recache->main( "modules" );
 							return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field successfully set as Title!<br />Refreshing..." , 'responseAction' => "refresh" );
 						}
@@ -2825,572 +2768,47 @@ class Module_Handler
 	/**
 	 * Creates a new Module Subroutine
 	 *
+	 * @param    array   Custom subroutine-configuration
 	 * @return   array   Array containing status code pairs (either responseCode-responseMessage (on SUCCESS); or faultCodes-faultMessages (otherwise) )
 	 */
 	private function modules__subroutines__do_create ( $input = null )
 	{
 		if ( is_null( $input ) )
 		{
-			$input =& $this->API->Input->input;
+			$input = $this->API->Input->post();
 		}
-		$fault_message = array();
+		$faults = array();
 
 		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
-
 			//------------------
 			// Main container
 			//------------------
 
 			$subroutine = array();
 
-			//----------------
-			// Service Mode
-			//----------------
+			//------------------------------------------
+			// Data-source, Data-binding, Data-target
+			//------------------------------------------
 
-			$subroutine['s_service_mode'] = isset( $input['s_service_mode'] ) ? $input['s_service_mode'] : "read-only";
+			$subroutine['s_data_source'] = $input['s_data_source'];
+			$subroutine['s_data_target'] = $input['s_data_target'];
 
-			//------------------------------------------------------------------------
-			// DDL Information - Only required if SERVICE-MODE=read_only.
-			// Otherwise, we use the current DDL record, every time we load a page.
-			//------------------------------------------------------------------------
+			$faults = $this->API->loader( "Data_Sources__" . ucwords( $subroutine['s_data_source'] ) )->modules__subroutines__do_validate( $subroutine, $input );
 
-			if ( $subroutine['s_service_mode'] == 'read-only' )
-			{
-				if ( !isset( $input['s_data_definition'] ) or !count( $input['s_data_definition'] ) )
-				{
-					$fault_message[] = array( 'faultCode' => 700, 'faultMessage' => "At least 1 (one) <em>data source</em> must be selected!" );
-				}
-				else
-				{
-					foreach ( $input['s_data_definition'] as $_field )
-					{
-						$subroutine['s_data_definition'][ $_field ] = array( 'name' => $_field );
-					}
-				}
-			}
-			else
-			{
-				$subroutine['s_data_definition'] = null;
-			}
-
-			//-------------------
-			// Subroutine Name
-			//-------------------
-
-			$input['s_name'] = strtolower( $input['s_name'] );
-			if ( $input['s_name'] )
-			{
-				if ( !preg_match( '#^[a-z][a-z0-9_]{0,31}$#' , $input['s_name'] ) )
-				{
-					$fault_message[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Subroutine name</em> syntax error - it must start with a letter and may contain only alphanumeric characters!" );
-				}
-				if ( array_key_exists( $input['s_name'] , $m['m_subroutines'] ) )
-				{
-					$fault_message[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Subroutine name</em> is not available!" );
-				}
-			}
-			else
-			{
-				$fault_message[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Subroutine name</em> is a required field!" );
-			}
-			$subroutine['s_name'] = $input['s_name'];
-
-			//------------------------
-			// Path-info URI Schema
-			//------------------------
-
-			# Building list of fields and their respective request-regex
-			$_list_of_usable_fields = array( "{id}" => '\d{1,10}' , "{timestamp}" => '\d{1,10}' , "{submitted_by}" => '\d{1,8}' );
-			$_list_of_unusable_fields = array();
-			foreach ( $m['m_data_definition'] as $_field_name=>$_field_data )
-			{
-				# Connector-enabled fields ...
-				if ( $_field_data['connector_enabled'] )
-				{
-					if ( $_field_data['connector_linked'] )
-					{
-						foreach ( $_field_data['c_data_definition'] as $__field_name=>$__field_data )
-						{
-							# Certain fields are not eligible to exist inside URI-Schema (identified by non-existent request-regex)
-							if ( !$__field_data['request_regex'] or empty( $__field_data['request_regex'] ) )
-							{
-								$_list_of_unusable_fields[ '{' . $_field_name . "." . $__field_name . '}' ] = false;
-								continue;
-							}
-							$_list_of_usable_fields[ '{' . $_field_name . "." . $__field_name . '}' ] = $__field_data['request_regex'];
-						}
-					}
-					else
-					{
-						# Adding both the standalone and the dot-version field, to prevent admin misuse or mistake
-						$_list_of_unusable_fields[ '{' . $_field_name . '}' ] = false;
-						$_list_of_unusable_fields[ '{' . $_field_name . "." . $_field_name . '}' ] = false;
-					}
-				}
-				else
-				{
-					# ... and the rest
-					if ( !$_field_data['request_regex'] or empty( $_field_data['request_regex'] ) )
-					{
-						# Certain fields are not eligible to exist inside URI-Schema (identified by non-existent request-regex)
-						$_list_of_unusable_fields[ '{' . $_field_name . '}' ] = false;
-						continue;
-					}
-					$_list_of_usable_fields[ '{' . $_field_name . '}' ] = $_field_data['request_regex'];
-				}
-			}
-
-			# Path-Info : Character fix
-			$_convert_from  = array( "&gt;" , "&lt;" , "&#33;" );
-			$_convert_to    = array( ">"    , "<"    , "!"     );
-			$subroutine['s_pathinfo_uri_schema'] = str_replace( $_convert_from, $_convert_to, $input['s_pathinfo_uri_schema'] );
-
-			if ( $subroutine['s_pathinfo_uri_schema'] )
-			{
-				# Make sure UPDATE and INSERT preset schemas are not used
-				// @todo Remove or enhance this control
-				/*
-				if ( preg_match( '#^(?:update|insert)\-#i' , $subroutine['s_pathinfo_uri_schema'] ) )
-				{
-					$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em>: Reserved pattern detected! You cannot re-use patterns reserved for preset '<em>update</em>' and '<em>insert</em>' subroutines! Change the schema." );
-				}
-				*/
-
-				# The dash (-) character is quoted in PHP 5.3.0 and later, so put it at the beginning of the list
-				if ( !preg_match( '#^[a-z0-9' . preg_quote('-.,\+/*?[](){}=!<>|:_') . ']+$#i' , $subroutine['s_pathinfo_uri_schema'] ) )
-				{
-					$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em> may only contain alphanumeric characters, plus any of the following: <strong>. , \ + / * ? [ ^ ] $ ( ) { } = ! < > | : -</strong>" );
-				}
-
-				# Any leading or trailing slashes?
-				if ( preg_match( '#^\/+#' , $subroutine['s_pathinfo_uri_schema'] ) or preg_match( '#\/+$#' , $subroutine['s_pathinfo_uri_schema'] ) )
-				{
-					$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "Remove all leading and trailing slashes from within <em>Path Info - URI Schema</em>!" );
-				}
-
-				# Do parentheses match?
-				if ( $this->API->Input->check_enclosing_parentheses( $subroutine['s_pathinfo_uri_schema'] ) === false )
-				{
-					$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "Parentheses within <em>Path Info - URI Schema</em> do not match!" );
-				}
-				else
-				{
-					//----------------------------------
-					// Confirm Path-Info RegEx works
-					//----------------------------------
-
-					# Cleanup
-					$_s_pathinfo_uri_schema = str_replace( array_keys( $_list_of_usable_fields ) , "" , $subroutine['s_pathinfo_uri_schema'] );
-
-					# Validate
-					if ( @preg_match_all( "#" . $_s_pathinfo_uri_schema . "#", "", $_ ) === false )
-					{
-						$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em>: Invalid RegEx syntax detected!" );
-					}
-
-					//-------------------------------------------------
-					// Named Backreferences : Lets parse their names
-					//-------------------------------------------------
-
-					if ( preg_match_all( '#(?<=\(\?P\<)[a-z][a-zA-Z0-9_]*(?=\>)#' , $subroutine['s_pathinfo_uri_schema'] , $_named_backreferences ) )
-					{
-						$_invalid_named_backreferences = array();
-						foreach ( $_named_backreferences[0] as $_refs )
-						{
-							if ( array_key_exists( "{".$_refs."}", $_list_of_usable_fields ) )
-							{
-								$_invalid_named_backreferences[] = $_refs;
-							}
-						}
-						if ( count( $_invalid_named_backreferences ) )
-						{
-							$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em> - Following custom-references are already in use by field-references:<br />&nbsp;&nbsp;&nbsp;<i>" . implode( ", " , $_invalid_named_backreferences ) . "</i>" );
-						}
-						unset( $_invalid_named_backreferences );
-					}
-				}
-			}
-			else
-			{
-				$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "<em>Path Info - URI Schema</em> is a required field!" );
-			}
-
-			//---------------------------------
-			// Path-info URI Schema [parsed]
-			//---------------------------------
-
-			# OCCURING FIELDS : Detect occuring fields
-			preg_match_all( '#\{([a-z][.a-z0-9_]*)\}#' , $subroutine['s_pathinfo_uri_schema'] , $_field_shortcuts_occuring_in_uri_schema );
-
-			# OCCURING + CAPTURED FIELDS : Detect captured (!) occuring fields
-			preg_match_all( '#\(\{([a-z][.a-z0-9_]*)\}\)#' , $subroutine['s_pathinfo_uri_schema'] , $_field_backreferences );
-
-			# CAPTURED CUSTOM VALUES
-			preg_match_all( '#\((?<!\{)[^)]*\)#u' , $subroutine['s_pathinfo_uri_schema'] , $_captured_custom_values );
-
-			# Lets check which occuring fields are invalid
-			$_occuring_invalid_fields  = array();                             // Invalid fields - those that do not exist
-			$_occuring_unusable_fields = array();                             // Unusable fields - those which aren't allowed inside Path-Info
-			for ( $i = 0 ; $i < count( $_field_shortcuts_occuring_in_uri_schema[0] ) ; $i++ )
-			{
-				# We have the field-name in our list of valid field names, so skip it (no problems here)...
-				if ( array_key_exists( $_field_shortcuts_occuring_in_uri_schema[0][ $i ], $_list_of_usable_fields ) )
-				{
-					continue;
-				}
-
-				# Either there is no such field-name (wrong-string), or its request-regex is FALSE (field can't be used in SCHEMA)
-				if ( array_key_exists( '{' . $_field_shortcuts_occuring_in_uri_schema[1][ $i ] . '}' , $_list_of_unusable_fields ) )
-				{
-					$_occuring_unusable_fields[] = $_field_shortcuts_occuring_in_uri_schema[1][ $i ];
-				}
-				elseif ( !array_key_exists( '{' . $_field_shortcuts_occuring_in_uri_schema[1][ $i ] . '}' , $_list_of_unusable_fields ) and !array_key_exists( '{' . $_field_shortcuts_occuring_in_uri_schema[1][ $i ] . '}' , $_list_of_usable_fields ) )
-				{
-					$_occuring_invalid_fields[] = $_field_shortcuts_occuring_in_uri_schema[1][ $i ];
-				}
-			}
-
-			if ( count( $_occuring_unusable_fields ) )
-			{
-				$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "Following field-names cannot be used inside URI-Schema (usually, because of their extreme sizes, or their types) - remove them:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_occuring_unusable_fields ) . "</em>" );
-				unset( $_occuring_unusable_fields );
-			}
-
-			if ( count( $_occuring_invalid_fields ) )
-			{
-				$fault_message[] = array( 'faultCode' => 702, 'faultMessage' => "Invalid field-names detected inside URI-Schema, which do not exist - remove them:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_occuring_invalid_fields ) . "</em>" );
-				unset( $_occuring_invalid_fields );
-			}
-
-			# Still here? Continue...
-			$subroutine['s_pathinfo_uri_schema_parsed'] = $subroutine['s_pathinfo_uri_schema'];
-			while ( list( $_field_name , $_field_request_regex ) = each( $_list_of_usable_fields ) )
-			{
-				// Handling capturable version of the data-field
-				$subroutine['s_pathinfo_uri_schema_parsed'] =
-					preg_replace(
-						"#\(" . preg_quote( $_field_name ) . "\)#",
-						"(?P<"
-							. substr( $_field_name, 1, strlen( $_field_name ) - 2 )      // Getting rid of curly parantheses in a fastest way possible
-							. ">" . $_field_request_regex . ")",
-						$subroutine['s_pathinfo_uri_schema_parsed']
-					);
-				// Handling the standard version of the data-field
-				$subroutine['s_pathinfo_uri_schema_parsed'] = preg_replace( "#" . preg_quote( $_field_name ) . "#" , $_field_request_regex , $subroutine['s_pathinfo_uri_schema_parsed'] );
-			}
-			$subroutine['s_pathinfo_uri_schema_parsed'] = str_replace( "/" , '\/' , $subroutine['s_pathinfo_uri_schema_parsed'] );
-
-			//-----------------------
-			// Q-String Parameters
-			//-----------------------
-
-			$subroutine['s_qstring_parameters'] = array();
-			if ( isset( $_field_backreferences[1] ) )
-			{
-				foreach ( $_field_backreferences[1] as $_ref )
-				{
-					$subroutine['s_qstring_parameters'][ $_ref ] = array(
-							'request_regex'      =>  $_list_of_usable_fields[ "{" . $_ref . "}" ],
-							'_is_mandatory'      =>  true
-						);
-				}
-			}
-			if ( isset( $_named_backreferences[0] ) )
-			{
-				foreach ( $_named_backreferences[0] as $_ref )
-				{
-					$subroutine['s_qstring_parameters'][ $_ref ] = array(
-							'request_regex'      =>  $_list_of_usable_fields[ "{" . $_ref . "}" ],
-							'_is_mandatory'      =>  true
-						);
-				}
-			}
-
-			//------------------------------------------------------
-			// Fetch Criteria - Queries & Query Groups (Policies)
-			//------------------------------------------------------
-
-			$subroutine['s_fetch_criteria'] = array();
-			if ( $input['s_fetch_criteria']['do_fetch_all_or_selected'] == 'selected' )
-			{
-				$subroutine['s_fetch_criteria']['do_fetch_all_or_selected'] = 'selected';
-
-				//----------------------------
-				// Fetch Criteria - Queries
-				//----------------------------
-
-				$subroutine['s_fetch_criteria']['rules'] = array();
-				$_list_of_broken_rules = array();
-				$_i = 0;
-				foreach ( $input['s_fetch_criteria']['rules'] as $_rule )
-				{
-					//-----------------
-					// Empty Queries
-					//-----------------
-
-					if ( !$_rule['value'] )
-					{
-						if ( $_rule['math_operator'] != 'IS NULL' and $_rule['math_operator'] != 'IS NOT NULL' )
-						{
-							$fault_message[] = array( 'faultCode' => 705, 'faultMessage' => "Missing value in <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset! Fill-in or remove the query set.", 'faultExtra' => $_i );
-							$_list_of_broken_rules[ $_i ] = true;
-							$_i++;
-							continue;
-						}
-					}
-
-					//----------------------------
-					// Validation of References
-					//----------------------------
-
-					if ( preg_match_all( '/(?<!&#36;)&#36;([a-zA-Z][a-zA-Z0-9_]+)/' , $_rule['value'] , $_references_occuring_in_query_value ) )
-					{
-						$_noncaptured_field_backreferences_in_query  = array();          // Field-references which are not captured [Fault reporting]
-						$_invalid_field_backreferences_in_query      = array();          // Field-references which do not exist at all [Fault reporting]
-						$_noncaptured_custom_backreferences_in_query = array();          // Custom-references which are not captured [Fault reporting]
-
-						# Let's mark all passing references
-						foreach ( $_references_occuring_in_query_value[1] as $_reference )
-						{
-							# Captured reference is not numeric - it gotta be field-name reference.
-							# Each field name can only be paired with its own reference! Let's make sure of this...
-							if ( $_reference != $_rule['field_name'] and in_array( $_reference, $_field_backreferences[1] ) )
-							{
-								$fault_message[] = array( 'faultCode' => 705, 'faultMessage' => "Following invalid data-field reference(s) detected in <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset:<br />&nbsp;&nbsp;&nbsp;<em>\$" . $_reference . "</em><br />A data-field can only use its own captured reference (in this case: <em>" . $_rule['field_name'] . "</em> data-field can only use captured <em>\$" . $_rule['field_name'] . "</em>)", 'faultExtra' => $_i );
-								$_list_of_broken_rules[ $_i ] = true;
-								$_i++;
-								continue;
-							}
-
-							# ... and let's make sure these references do get captured in Path-Info ...
-							if ( in_array( $_reference, $_field_backreferences[1] ) or in_array( $_reference, $_named_backreferences[0] ) )
-							{
-								$_rule['value'] = preg_replace( '/(?<!&#36;)&#36;((?>' . $_reference . '))/' , "<backreference>\\1</backreference>" , $_rule['value'] );
-							}
-							elseif ( !in_array( $_reference, $_field_backreferences[1] ) and in_array( $_reference, $_field_shortcuts_occuring_in_uri_schema[1] ) )
-							{
-								$_noncaptured_field_backreferences_in_query[ $_reference ] = "\$" . $_reference;
-							}
-							else
-							{
-								$_invalid_field_backreferences_in_query[ $_reference ] = "\$" . $_reference;
-							}
-						}
-
-						if ( count( $_noncaptured_field_backreferences_in_query ) )
-						{
-							$fault_message[] = array( 'faultCode' => 705, 'faultMessage' => "Following data-fields are not captured, thus cannot be referenced to in <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset - either escape or fix these references:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_noncaptured_field_backreferences_in_query ) . "</em>", 'faultExtra' => $_i );
-							$_list_of_broken_rules[ $_i ] = true;
-							$_i++;
-							continue;
-						}
-
-						if ( count( $_invalid_field_backreferences_in_query ) )
-						{
-							$fault_message[] = array( 'faultCode' => 705, 'faultMessage' => "Following invalid data-field reference(s) detected in <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset:<br />&nbsp;&nbsp;&nbsp;<em>" . implode( ", " , $_invalid_field_backreferences_in_query ) . "</em><br />Either escape appropriate $ signs; or remove invalid references; or update your URI-Schema with missing captures.", 'faultExtra' => $_i );
-							$_list_of_broken_rules[ $_i ] = true;
-							$_i++;
-							continue;
-						}
-					}
-
-					# ... and finally, one small insurance policy - we can't have <backreference /> tag or its closing pair as a part of rule-value
-					if ( preg_match( '#&lt;\/?backreference&gt;#' , $_rule['value'] ) )
-					{
-						$fault_message[] = array( 'faultCode' => 705, 'faultMessage' => "The tag &lt;backreference&gt; alongside its closing counterpart, is a reserved phrase and cannot be used anywhere inside <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset! Remove any occurrances of it.", 'faultExtra' => $_i );
-						$_list_of_broken_rules[ $_i ] = true;
-						$_i++;
-					}
-
-
-					# Un-$-escape the remaining df-reference-alikes considering them as a regular string
-					$_rule['value'] = preg_replace( '/(?<=&#36;)&#36;((?>[a-z][a-z0-9_]+))/' , "\\1" , $_rule['value'] );
-
-					//--------------------------------------------------------------------
-					// Checking parentheses in queries belonging to numeric data-fields
-					//--------------------------------------------------------------------
-
-					if ( isset( $m['m_data_definition'][ $_rule['field_name'] ] ) and $m['m_data_definition'][ $_rule['field_name'] ]['is_numeric'] == 1 )
-					{
-						if ( $_rule['type_of_expr_in_value'] != 'math' and $_rule['type_of_expr_in_value'] != 'zend_db_expr' )
-						{
-							$fault_message[] = array( 'faultCode' => 709, 'faultMessage' => "'<em>Generic Value</em>' expression-type does not work in pair with numeric fields; select either '<em>Mathematical Value</em>' or '<em>Zend_Db_Expr</em>'!", 'faultExtra' => $_i );
-						}
-						else
-						{
-							if ( !$this->API->Input->check_enclosing_parentheses( $_rule['value'] ) )
-							{
-								$fault_message[] = array( 'faultCode' => 705, 'faultMessage' => "Opening and closing parentheses do not match inside <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset! Queries related to numeric data-fields require this criteria!", 'faultExtra' => $_i );
-								$_list_of_broken_rules[ $_i ] = true;
-								$_i++;
-							}
-						}
-					}
-
-					# Raw
-					$subroutine['s_fetch_criteria']['rules'][] = array(
-							'field_name'             => $_rule['field_name'],
-							'math_operator'          => $_rule['math_operator'],
-							'type_of_expr_in_value'  => $_rule['type_of_expr_in_value'],
-							'value'                  => $_rule['value']
-						);
-
-					$_i++;
-				}
-				unset( $_rule );
-
-				//--------------------------------------------
-				// Fetch Criteria - Query Groups [Policies]
-				//--------------------------------------------
-
-				$subroutine['s_fetch_criteria']['policies'] = array();
-				$_i = 0;
-				foreach ( $input['s_fetch_criteria']['policies'] as $_policy )
-				{
-					# Do parantheses match?
-					$_operators = '(?:\s(?:OR|XOR|AND|NOT)\s)?';
-					$pattern = array( '/\s\s+/' , '/\(\s/' , '/\s\)/' );
-					$replacement = array( " " , "(" , ")" );
-					$_policy = strtoupper( "(" . preg_replace( $pattern , $replacement , $_policy ) . ")" );
-					preg_match_all(
-						'/
-						\(
-							(?>
-								(?>
-									(?>
-										(?: \d* | (?R) )
-										' . $_operators . '
-										(?> \d+ | (?R) )
-									)
-									|
-									(?R)
-								)*
-							)
-						\)
-						/xi' , $_policy , $_parentheses_check_matches );
-					if ( $_policy != @$_parentheses_check_matches[0][0] )
-					{
-						$fault_message[] = array( 'faultCode' => 704, 'faultMessage' => "Syntax Error in <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset!", 'faultExtra' => $_i );
-						$_i++;
-						continue;
-					}
-
-					# Are all policy shortcuts of queries valid?
-					preg_match_all( '#(?>\d+)#' , $_policy , $_shortcut_matches );
-					$_invalid_shortcuts = array();
-					foreach ( $_shortcut_matches[0] as $_match )
-					{
-						if ( array_key_exists( intval( $_match ) - 1 , $_list_of_broken_rules ) )
-						{
-							$_invalid_shortcuts[] = "<i>" . $_match . "</i>";
-						}
-
-						if ( intval( $_match ) > count( $input['s_fetch_criteria']['rules'] ) )
-						{
-							$_invalid_shortcuts[] = "<i>" . $_match . "</i>";
-						}
-					}
-					$_invalid_shortcuts = implode( ", " , $_invalid_shortcuts );
-					if ( $_invalid_shortcuts )
-					{
-						$fault_message[] = array( 'faultCode' => 704, 'faultMessage' => "Invalid shortcuts (" . $_invalid_shortcuts . ") detected within Group Policy " . ( $_i + 1 ) . " in <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset!", 'faultExtra' => $_i );
-						$_i++;
-						continue;
-					}
-					unset( $_invalid_shortcuts );
-
-					# Raw
-					$subroutine['s_fetch_criteria']['policies'][] = $_policy;
-
-					$_i++;
-				}
-			}
-			elseif ( $input['s_fetch_criteria']['do_fetch_all_or_selected'] == 'all' )
-			{
-				$subroutine['s_fetch_criteria']['do_fetch_all_or_selected'] = 'all';
-			}
-
-			//--------------------------
-			// Fetch Criteria - Limit
-			//--------------------------
-
-			if ( !preg_match( '/^\d*$/' , $input['s_fetch_criteria']['limit'] ) )
-			{
-				$fault_message[] = array( 'faultCode' => 706, 'faultMessage' => "<em>Fetch Criteria - Limit</em> field accepts only numeric values!" );
-			}
-			else
-			{
-				if ( isset( $input['s_fetch_criteria']['limit'] ) and !empty( $input['s_fetch_criteria']['limit'] ) )
-				{
-					$subroutine['s_fetch_criteria']['limit'] = intval( $input['s_fetch_criteria']['limit'] );
-				}
-				else
-				{
-					$subroutine['s_fetch_criteria']['limit'] = null;
-				}
-			}
-
-			//-------------------------------
-			// Fetch Criteria - Pagination
-			//-------------------------------
-
-			if ( !preg_match( '/^\d*$/' , $input['s_fetch_criteria']['pagination'] ) )
-			{
-				$fault_message[] = array( 'faultCode' => 707, 'faultMessage' => "<em>Fetch Criteria - Pagination</em> field accepts only numeric values!" );
-			}
-			else
-			{
-				if ( isset( $input['s_fetch_criteria']['pagination'] ) and !empty( $input['s_fetch_criteria']['pagination'] ) )
-				{
-					$subroutine['s_fetch_criteria']['pagination'] = intval( $input['s_fetch_criteria']['pagination'] );
-				}
-				else
-				{
-					$subroutine['s_fetch_criteria']['pagination'] = null;
-				}
-			}
-
-			//----------------------------
-			// Fetch Criteria - Sorting
-			//----------------------------
-
-			$subroutine['s_fetch_criteria']['do_sort'] = $input['s_fetch_criteria']['do_sort'] ? 1 : 0;
-			if ( $subroutine['s_fetch_criteria']['do_sort'] )
-			{
-				$_fields_sorted_already = array();
-				$_i = 0;
-				foreach ( $input['s_fetch_criteria']['sort_by'] as $_sort_criteria )
-				{
-					if ( !in_array( $_sort_criteria['field_name'] , $_fields_sorted_already ) )
-					{
-						$subroutine['s_fetch_criteria']['sort_by'][] = array(
-								'field_name'  =>  $_sort_criteria['field_name'],
-								'dir'         =>  strtoupper( $_sort_criteria['dir'] )
-							);
-						$_fields_sorted_already[] = $_sort_criteria['field_name'];
-					}
-					else
-					{
-						$fault_message[] = array( 'faultCode' => 708, 'faultMessage' => "One or more duplicate field-names detected in <em>Fetch Criteria - Sorting</em> fieldset! Remove those...", 'faultExtra' => $_i );
-					}
-					$_i++;
-				}
-			}
 		}
 		else
 		{
-			$fault_message[] = array( 'faultCode' => 0, 'faultMessage' => "Error! Invalid module-unique-id provided!" );
+			$faults[] = array( 'faultCode' => 0, 'faultMessage' => "Error! Invalid module-unique-id provided!" );
 		}
 
 		//-------------------------------------------------------------------------
 		// Any errors so far? If so, return them and halt processing the request
 		//-------------------------------------------------------------------------
 
-		if ( count( $fault_message ) )
+		if ( count( $faults ) )
 		{
-			return $fault_message;
+			return $faults;
 		}
 
 		//-----------------------------------------------
@@ -3410,7 +2828,7 @@ class Module_Handler
 
 		if ( $this->API->Db->simple_exec_query() )
 		{
-			$_recache = $this->API->classes__do_get("Recache");
+			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Subroutine successfully created!<br />Refreshing...' );
 		}
@@ -3428,7 +2846,7 @@ class Module_Handler
 	 */
 	private function modules__subroutines__do_remove ()
 	{
-		$input =& $this->API->Input->input;
+		$input =& $this->API->Input->request();
 
 		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
 		{
@@ -3465,7 +2883,7 @@ class Module_Handler
 
 		if ( $this->API->Db->simple_exec_query() )
 		{
-			$this->API->classes__do_get("Recache")->main( "modules" );
+			$this->API->loader("Cache__Recache")->main( "modules" );
 
 			return array( 'responseCode' => 1 , 'responseMessage' => "Success! Subroutine successfully removed!<br />Refreshing...", 'responseAction' => "refresh" );
 		}
@@ -3610,7 +3028,7 @@ class Module_Handler
 	 */
 	private function settings__do_edit ()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		$_rows_affected = 0;
 
 		foreach ( $input['conf_key'] as $_k=>$_v )
@@ -3626,7 +3044,7 @@ class Module_Handler
 		}
 		if ( $_rows_affected )
 		{
-			$this->API->classes__do_get("Recache")->main( "settings" );
+			$this->API->loader("Cache__Recache")->main( "settings" );
 			return array( 'responseCode' => 1, 'responseMessage' => "Settings successfully updated! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}
 
@@ -3641,7 +3059,7 @@ class Module_Handler
 	 */
 	private function settings__do_revert()
 	{
-		$input =& $this->API->Input->post;
+		$input = $this->API->Input->post();
 		if ( !empty( $input['revert__for'] ) )
 		{
 			$setting_id = intval( $input['revert__for'] );
@@ -3653,7 +3071,7 @@ class Module_Handler
 				);
 			$this->API->Db->simple_exec_query();
 
-			$this->API->classes__do_get("Recache")->main( "settings" );
+			$this->API->loader("Cache__Recache")->main( "settings" );
 
 			return array( 'responseCode' => 1 , 'responseMessage' => "Setting successfully reverted to its default value! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}

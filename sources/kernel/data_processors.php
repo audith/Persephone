@@ -13,7 +13,7 @@ if ( ! defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
-abstract class Data_Processor
+abstract class Data_Processors
 {
 	/**
 	 * Constructor
@@ -79,5 +79,3 @@ abstract class Data_Processor
 	 */
 	abstract public function modules__ddl__is_eligible_for_title ( &$ddl_information );
 }
-
-?>

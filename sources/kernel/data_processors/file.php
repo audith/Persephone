@@ -7,16 +7,16 @@ if ( ! defined( "INIT_DONE" ) )
 }
 
 /**
- * FILE Data Processor
+ * Data-Processors > File
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
 
-require_once( dirname( __FILE__ ) . "/_interface.php" );
+require_once( PATH_SOURCES . "/kernel/data_processors.php" );
 
-class Data_Processor__File extends Data_Processor
+class Data_Processors__File extends Data_Processors
 {
 	/**
 	 * API Object Reference
@@ -77,22 +77,22 @@ class Data_Processor__File extends Data_Processor
 		{
 			if ( $_is_imagick_available )
 			{
-				$this->graphic_library_used = $this->API->classes__do_get( "data_processors__file__image__imagick" );
+				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Imagick" );
 			}
 			else
 			{
-				$this->graphic_library_used = $this->API->classes__do_get( "data_processors__file__image__gd" );
+				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Gd" );
 			}
 		}
 		elseif (  $this->API->config['medialibrary']['graphic_library_preferred'] == 'gd' )
 		{
 			if ( $_is_gd_available )
 			{
-				$this->graphic_library_used = $this->API->classes__do_get( "data_processors__file__image__gd" );
+				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Gd" );
 			}
 			else
 			{
-				$this->graphic_library_used = $this->API->classes__do_get( "data_processors__file__image__imagick" );
+				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Imagick" );
 			}
 		}
 	}
@@ -133,12 +133,7 @@ class Data_Processor__File extends Data_Processor
 		// Processing...
 		//-----------------
 
-		# READ-ONLY mode
-		if ( $s['s_service_mode'] == 'read-only' )
-		{
-			// NOthing for now...
-		}
-		elseif ( $s['s_service_mode'] == 'read-write' )
+		if ( $s['s_data_target'] == 'rdbms' )
 		{
 			//$this->data['content'] = html_entity_decode( $this->data['content'], ENT_QUOTES, "UTF-8" );
 		}
@@ -723,7 +718,7 @@ class Data_Processor__File extends Data_Processor
 				);
 
 			# Recache
-			$_recache_processor_obj = $this->API->classes__do_get( "Recache" );
+			$_recache_processor_obj = $this->API->loader( "Cache__Recache" );
 			$_recache_processor_obj->main( "linkinfo_" . $_link_info['f_hash'] . "_" . $_link_info['m_id'] );
 
 			# Return the link details

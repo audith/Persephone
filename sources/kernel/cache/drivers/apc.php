@@ -7,16 +7,19 @@ if ( ! defined( "INIT_DONE" ) )
 }
 
 /**
- * EAccelerator Cache Storage
+ * Cache > Drivers > APC
  *
- * @package  Invision Power Board
- * @author   Matthew Mecham @ IPS
- * @version  1.0
+ * @package      Audith CMS codename Persephone
+ * @author       Shahriyar Imanov <shehi@imanov.name>
+ * @version      1.0
+ *
+ * @license		 http://www.invisionpower.com/community/board/license.html
+ * @copyright    Matthew Mecham, Invision Power Board v1.3
 **/
 
 require_once( dirname( __FILE__ ) . "/_interface.php" );
 
-class Cache_Lib implements iCache_Lib
+class Cache__Drivers__Apc implements iCache_Drivers
 {
 	/**
 	 * API Object reference
@@ -40,13 +43,13 @@ class Cache_Lib implements iCache_Lib
 	public $crashed = 0;
 
 
-	public function __construct ( $identifier="" , API $API )
+	public function __construct ( API $API, $identifier = "" )
 	{
 		# Prelim
 		$this->API = $API;
 
 		# Cont.
-		if ( ! function_exists( "eaccelerator_get" ) )
+		if ( ! function_exists( "apc_fetch" ) )
 		{
 			$this->crashed = 1;
 			return FALSE;
@@ -54,7 +57,7 @@ class Cache_Lib implements iCache_Lib
 
 		if ( !$identifier )
 		{
-			$this->identifier = md5( uniqid( rand(), TRUE ) );
+			$this->identifier = $this->API->Input->server('SERVER_NAME');
 		}
 		else
 		{
@@ -68,38 +71,33 @@ class Cache_Lib implements iCache_Lib
 
 	public function disconnect ()
 	{
-		if ( function_exists( "eaccelerator_gc" ) )
-		{
-			eaccelerator_gc();
-		}
-
 		return TRUE;
 	}
 
 
 	public function do_put ( $key, $value, $ttl=0 )
 	{
-		eaccelerator_lock( md5( $this->identifier . $key ) );
+		$ttl = $ttl > 0 ? intval($ttl) : 0;
 
-		eaccelerator_put(
+		apc_store(
 				md5( $this->identifier . $key ),
 				$value,
-				intval($ttl)
+				$ttl
 			);
-
-		eaccelerator_unlock( md5( $this->identifier . $key ) );
 	}
 
 	public function do_get ( $key )
 	{
-		$return_val = eaccelerator_get( md5( $this->identifier . $key ) );
+		$return_val = "";
+
+		$return_val = apc_fetch( md5( $this->identifier . $key ) );
 
 		return $return_val;
 	}
 
-	function do_remove ( $key )
+	public function do_remove ( $key )
 	{
-		eaccelerator_rm( md5( $this->identifier . $key ) );
+		apc_delete( md5( $this->identifier . $key ) );
 	}
 }
 ?>

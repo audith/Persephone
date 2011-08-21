@@ -118,15 +118,15 @@
 			<span class="description"></span>
 		</h2>
 
-		<form id="forms__components__sr__create" action="" method="post">
+		<form id="forms__components__sr__create" class="js__go_ajax" action="" method="post">
 			<fieldset class="s_name">
 				<label title="Subroutine Unix Name" for="sr__s_name"><strong>Subroutine Unix Name:</strong><em>Lowercase alphanumeric [ASCII codebase] + underscore characters only!</em></label>
-				<input type="text" class="text required" id="sr__s_name" name="s_name" value="" maxlength="32" style="text-transform:lowercase;" />
+				<input type="text" class="text required _701" id="sr__s_name" name="s_name" value="" maxlength="32" style="text-transform: lowercase;" />
 			</fieldset>
 			<fieldset class="s_pathinfo_uri_schema">
 				<label class="full_size" title="Path-Info URI-Schema" for="sr__s_pathinfo_uri_schema"><strong>Path-Info URI-Schema:</strong><em>URL-Schema assigned to this subroutine (required when Request-Mode = Path-Info). E.g.: '<i>/id-{id}/{timestamp}</i>'</em></label>
 				<span class="input full_size">
-					<span style="font-weight:bold; float:left;">{{$CONTENT.me.m_url_prefix}}/</span><input type="text" class="text required" id="sr__s_pathinfo_uri_schema" name="s_pathinfo_uri_schema" style="width:55%;" value="" maxlength="255" />
+					<span style="font-weight:bold; float:left;">{{$CONTENT.me.m_url_prefix}}/</span><input type="text" class="text required _702" id="sr__s_pathinfo_uri_schema" name="s_pathinfo_uri_schema" style="width:55%;" value="" maxlength="255" />
 				</span>
 			</fieldset>
 
@@ -164,7 +164,7 @@
 				<fieldset id="tabs__sr_alter_add__s_data_source">
 					<fieldset class="s_data_definition ondemand">
 						<label title="Columns to Fetch" for="sr__s_data_definition"><strong>Columns to Fetch:</strong><em>Columns/fields to fetch.</em></label>
-						<select id="sr__s_data_definition" name="s_data_definition[]" multiple="multiple" size="5" class="required">
+						<select id="sr__s_data_definition" name="s_data_definition[]" multiple="multiple" size="5" class="required _700">
 							<optgroup label="Select one or more:">
 								{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
 									{{if $FIELD.connector_enabled}}
@@ -192,21 +192,21 @@
 						</select>
 					</fieldset>
 
-					<fieldset class="s_fetch_criteria ondemand">
+					<fieldset class="s_fetch_criteria__all_or_selected ondemand">
 						<label class="full_size" title="Fetch Criteria - Queries &amp; Query Groups (Policies)" for="s_fetch_criteria__all_or_selected">
 							<strong>Fetch Criteria - Queries &amp; Query Groups (Policies):</strong>
 							<em>What to fetch? Determine rules by adding one or more queries. Then group those queries. If more than one groups provided, using <i>UNION DISTINCT</i> logic, each fetched data collection will be merged together.</em>
 						</label>
-						<span class="input full_size">
-							<select id="s_fetch_criteria__all_or_selected" class="js__trigger_on_change" name="s_fetch_criteria[do_fetch_all_or_selected]">
+						<span class="input s_fetch_criteria__all_or_selected full_size">
+							<select id="s_fetch_criteria__all_or_selected" class="js__trigger_on_change" name="s_fetch_criteria__all_or_selected">
 								<option value="all">-- fetch all records --</option>
 								<option value="selected">-- fetch selected records --</option>
 							</select>
 
 							<span class="s_fetch_criteria__policies ondemand">
 								<label for="s_fetch_criteria__policies__0">Query Policy 1</label>
-								<textarea class="text required" name="s_fetch_criteria[policies][0]" id="s_fetch_criteria__policies__0" style="width: 662px; height: 70px; text-transform: uppercase; clear: left;" cols="" rows="">1</textarea>
-								<button type="button" id="buttons__s_fetch_criteria__add_policy">add a new group-policy (implements UNION rule)</button>
+								<textarea class="text required _704-0" name="s_fetch_criteria[policies][0]" id="s_fetch_criteria__policies__0" style="width: 662px; height: 70px; text-transform: uppercase; clear: left;" cols="" rows="">1</textarea>
+								<button type="button" class="buttons__s_fetch_criteria__add_policy">add a new group-policy (implements UNION rule)</button>
 							</span>
 							<span class="s_fetch_criteria__query ondemand">
 								<select name="s_fetch_criteria[rules][0][field_name]">
@@ -246,12 +246,12 @@
 									<option value="IS NULL">IS NULL</option>
 									<option value="IS NOT NULL">IS NOT NULL</option>
 								</select>
-								<select name="s_fetch_criteria[rules][0][type_of_expr_in_value]">
+								<select name="s_fetch_criteria[rules][0][type_of_expr_in_value]" class="_709-0">
 									<option value="generic">Generic Value [String]</option>
 									<option value="math">Mathematical Value</option>
 									<option value="zend_db_expr">Zend_Db_Expr</option>
 								</select>
-								<input type="text" class="text required" name="s_fetch_criteria[rules][0][value]" value="" style="width:200px;" />
+								<input type="text" class="text required _705-0" name="s_fetch_criteria[rules][0][value]" value="" style="width:200px;" />
 								<span class="s_fetch_criteria__policy_shortcut">Shortcut: <i>1</i></span>
 								<button type="button" class="buttons__s_fetch_criteria__add_query">add a query</button>
 							</span>
@@ -260,26 +260,25 @@
 
 					<fieldset class="s_fetch_criteria__limit ondemand">
 						<label title="Fetch Criteria - Limit" for="s_fetch_criteria__limit"><strong>Fetch Criteria -  Limit:</strong><em>Total number of fetched rows. Leave empty to fetch everything that matches the request criteria.</em></label>
-						<input type="text" name="s_fetch_criteria[limit]" id="s_fetch_criteria__limit" class="text" />
+						<input type="text" name="s_fetch_criteria[limit]" id="s_fetch_criteria__limit" class="text _706" />
 					</fieldset>
 
 					<fieldset class="s_fetch_criteria__pagination ondemand">
 						<label title="Fetch Criteria - Pagination" for="s_fetch_criteria__pagination"><strong>Fetch Criteria - Pagination:</strong><em>Number of fetched rows per page. Leave empty for no pagination.</em></label>
-						<input type="text" name="s_fetch_criteria[pagination]" id="s_fetch_criteria__pagination" class="text" maxlength="3" />
+						<input type="text" name="s_fetch_criteria[pagination]" id="s_fetch_criteria__pagination" class="text _707" maxlength="3" />
 					</fieldset>
 
-					<fieldset class="s_fetch_criteria__order ondemand">
+					<fieldset class="s_fetch_criteria__do_perform_sorting ondemand">
 						<label class="full_size" title="Fetch Criteria - Sorting" for="s_fetch_criteria__do_perform_sorting">
 							<strong>Fetch Criteria - Sorting:</strong><em>Sort (order) fetched data by one or more columns in certain direction(s) (ascending or descending, sequence-sensitive).</em>
 						</label>
-						<span class="input full_size">
-							<select id="s_fetch_criteria__do_perform_sorting" name="s_fetch_criteria[do_sort]" class="js__trigger_on_change">
+						<span class="input s_fetch_criteria__do_perform_sorting full_size">
+							<select id="s_fetch_criteria__do_perform_sorting" name="s_fetch_criteria__do_perform_sorting" class="js__trigger_on_change">
 								<option value="0">-- disable sorting --</option>
 								<option value="1">-- enable sorting --</option>
 							</select>
-							<a href="javascript:void(0);" onclick="javascript:sr__request_criteria__add_sorting(this);" id="s_fetch_criteria__add_sorting_button" title="add a new sorting-rule">add a new sorting-rule</a>
 							<span class="sr__sort_by ondemand">
-								<select name="s_fetch_criteria[sort_by][0][field_name]">
+								<select name="s_fetch_criteria[sort_by][0][field_name]" class="_708-0">
 									{{if count( $CONTENT.me.m_data_definition)}}
 									<option value="id">Id [id]</option>
 									<option value="tags">Tags [tags]</option>
@@ -303,10 +302,11 @@
 										{{/if}}
 									{{/foreach}}
 								</select>
-								<select name="s_fetch_criteria[sort_by][0][dir]">
+								<select name="s_fetch_criteria[sort_by][0][dir]" class="_708-0">
 									<option value="ASC">Ascending</option>
 									<option value="DESC">Descending</option>
 								</select>
+								<button type="button" class="buttons__s_fetch_criteria__add_sorting">add a new sorting-rule</button>
 							</span>
 						</span>
 					</fieldset>
@@ -455,14 +455,13 @@
 		<table class="full_size tablesorter {sortlist: [[0,0]]}" id="tables__components__sr__list">
 			<thead>
 				<tr>
-					<th style="width: 45%; white-space: nowrap;">Subroutine Name</th>
-					<th style="width: 10%;">Serv. Mode</th>
-					<th style="width: 40%; white-space: nowrap;" class="{sorter: false}">Data Repository</th>
+					<th style="width: 35%; white-space: nowrap;">Subroutine Name</th>
+					<th style="width: 65%; white-space: nowrap;" class="{sorter: false}">Data Repository</th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<td colspan="3">
+					<td colspan="2">
 					<div class="system_console"></div>
 					<fieldset class="buttons">
 						<input type="button" value="Create New" {{if count($CONTENT.me.m_data_definition) eq 0}}disabled="disabled"{{/if}} />
@@ -484,7 +483,6 @@
 							{{/if}}
 						</ul>
 					</td>
-					<td style="text-align: center;">{{if $SR.s_service_mode eq 'read-only'}}read-only{{elseif $SR.s_service_mode eq 'write-only'}}write-only{{elseif $SR.s_service_mode eq 'read-write'}}read-write{{/if}}</td>
 					<td>
 					{{if count( $SR.s_data_definition )}}
 						<ul class="dependency_list">{{foreach from=$SR.s_data_definition item=DDF}}<li>{{$DDF.name|truncate:32:"...":TRUE}}</li>{{/foreach}}</ul>
@@ -493,7 +491,7 @@
 				</tr>
 				{{foreachelse}}
 				<tr>
-					<td colspan="3"><span class="system_message_error">No Subroutines Found!<br />
+					<td colspan="2"><span class="system_message_error">No Subroutines Found!<br />
 					{{if count($CONTENT.me.m_data_definition) eq 0}}You cannot create new one, until you create at least one data-field!{{/if}}</span></td>
 				</tr>
 				{{/foreach}}

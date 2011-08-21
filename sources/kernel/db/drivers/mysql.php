@@ -13,7 +13,8 @@ if ( ! defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
-class Db_Driver extends Database
+require_once( PATH_SOURCES . "/kernel/db.php" );
+class Db__Drivers__Mysql extends Database
 {
 	/**
 	 * Zend DB instance
@@ -32,15 +33,16 @@ class Db_Driver extends Database
 		$this->API = $API;
 
 		# Zend Db
-		$this->API->classes__do_get( "Zend_Db", false );
+		$this->API->loader( "Zend_Db", false );
 
 		# Db options
 		$driver_options = array(
-				MYSQLI_INIT_COMMAND  => "SET NAMES UTF8;"
+				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY  => true,
+				PDO::MYSQL_ATTR_INIT_COMMAND        => "SET NAMES UTF8;"
 			);
 
 		$options = array(
-				Zend_Db::AUTO_QUOTE_IDENTIFIERS  => true
+				Zend_Db::AUTO_QUOTE_IDENTIFIERS     => true
 			);
 
 		# Preparing DSN and Options for PEAR DB::connect
@@ -53,12 +55,12 @@ class Db_Driver extends Database
 				'options'         => $options
 			);
 
-		$this->db = Zend_Db::factory( "Mysqli", $params );
+		$this->db = Zend_Db::factory( "Pdo_Mysql", $params );
 
 		# Db Profiler
 		if ( IN_DEV )
 		{
-			$this->API->classes__do_get( "Zend_Db_Profiler_Firebug", false );
+			$this->API->loader( "Zend_Db_Profiler_Firebug", false );
 			$_profiler = new Zend_Db_Profiler_Firebug('All DB Queries');
 			$_profiler->setEnabled( true );
 
@@ -67,7 +69,7 @@ class Db_Driver extends Database
 
 			# Check connection
 			$_connection = $this->db->getConnection();
-			$this->API->logger__do_log( "Database: Connection " . ( $_connection !== FALSE ? "successful!" : "failed!" ) , $_connection !== FALSE ? "INFO" : "ERROR" );
+			$this->API->logger__do_log( "Database: Connection " . ( $_connection !== false ? "successful!" : "failed!" ) , $_connection !== false ? "INFO" : "ERROR" );
 		}
 	}
 
@@ -102,7 +104,7 @@ class Db_Driver extends Database
 	 * @param   boolean    Whether translated info will be applied to "_master_repo" tables or not (related to Connector-enabled fields only!)
 	 * @return  array      Column info
 	 */
-	public function modules__ddl_column_type_translation ( $df_data , $we_need_this_for_master_table = FALSE )
+	public function modules__ddl_column_type_translation ( $df_data , $we_need_this_for_master_table = false )
 	{
 		if ( $we_need_this_for_master_table === true and ( isset( $df_data['connector_enabled'] ) and $df_data['connector_enabled'] == '1' ) )
 		{
@@ -372,7 +374,7 @@ class Db_Driver extends Database
 	 * @param   array   Table suffix, determining specific table
 	 * @return  array   Table structure
 	 */
-	public final function modules__default_table_structure ( $suffix )
+public final function modules__default_table_structure ( $suffix )
 	{
 		$_struct['master_repo'] = array(
 				'col_info'   => array(
@@ -501,7 +503,7 @@ class Db_Driver extends Database
 		}
 		else
 		{
-			$this->API->classes__do_get( "Zend_Db_Exception", false );
+			$this->API->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No or bad table references specified for DELETE query");
 		}
 
@@ -564,7 +566,7 @@ class Db_Driver extends Database
 		}
 		else
 		{
-			$this->API->classes__do_get( "Zend_Db_Exception", false );
+			$this->API->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No or bad table references specified for INSERT query");
 		}
 
@@ -575,7 +577,7 @@ class Db_Driver extends Database
 		}
 		else
 		{
-			$this->API->classes__do_get( "Zend_Db_Exception", false );
+			$this->API->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No data specified for SETting in INSERT query");
 		}
 
@@ -607,14 +609,14 @@ class Db_Driver extends Database
 		}
 		else
 		{
-			$this->API->classes__do_get( "Zend_Db_Exception", false );
+			$this->API->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No or bad table references specified for REPLACE query");
 		}
 
 		# "SET"
 		if ( ! isset( $sql['set'] ) or ! is_array( $sql['set'] ) or ! count( $sql['set'] ) )
 		{
-			$this->API->classes__do_get( "Zend_Db_Exception", false );
+			$this->API->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No data specified for SETting in REPLACE query");
 			return false;
 		}
@@ -645,7 +647,7 @@ class Db_Driver extends Database
 
 		try
 		{
-			$stmt = $this->db->query( $this->cur_query, $sql['set'] );
+			$stmt = $this->db->query( $this->cur_query, array_values( $sql['set'] ) );
 			$result = $stmt->rowCount();
 			return $result;
 		}
@@ -687,7 +689,7 @@ class Db_Driver extends Database
 	protected final function simple_select_query ( $sql )
 	{
 		$select = $this->db->select();
-		$this->API->classes__do_get( "Zend_Db_Select_Exception", false );
+		$this->API->loader( "Zend_Db_Select_Exception", false );
 
 		# Columns
 		$fields = array();
@@ -987,15 +989,15 @@ class Db_Driver extends Database
 		//----------
 
 		$_tables = array();
-		if ( ! isset( $sql['tables'] ) )
+		if ( !isset( $sql['tables'] ) )
 		{
 			return false;
 		}
-		if ( ! is_array( $sql['tables'] ) )
+		if ( !is_array( $sql['tables'] ) )
 		{
 			$sql['tables'] = array( $sql['tables'] );
 		}
-		if ( ! count( $sql['tables'] ) )
+		if ( !count( $sql['tables'] ) )
 		{
 			return false;
 		}
@@ -1029,7 +1031,7 @@ class Db_Driver extends Database
 		// "SET"
 		//---------
 
-		if ( ! count( $sql['set'] ) )
+		if ( !count( $sql['set'] ) )
 		{
 			return false;
 		}
@@ -1086,7 +1088,7 @@ class Db_Driver extends Database
 
 		try
 		{
-			$stmt = $this->db->query( $this->cur_query, $sql['set'] );
+			$stmt = $this->db->query( $this->cur_query, array_values( $sql['set'] ) );
 			$result = $stmt->rowCount();
 			return $result;
 		}
@@ -1104,7 +1106,7 @@ class Db_Driver extends Database
 	 * @param    array      array(
 	 							"do"          => "alter",
 								"table"       => string,
-								"action"      => "add_column"|"drop_column"|"change_column"|"add_key"|"comment"
+								"action"      => "add_column"|"drop_column"|"change_column"|"add_key"
 								"col_info"    => column info to parse
 							)
 	 * @return   mixed      # of affected rows on success, FALSE otherwise
@@ -1300,7 +1302,7 @@ class Db_Driver extends Database
 
 		try
 		{
-			$stmt = new Zend_Db_Statement_Mysqli( $this->db, $this->cur_query );
+			$stmt = new Zend_Db_Statement_Pdo( $this->db, $this->cur_query );
 			return $stmt->execute();
 		}
 		catch ( Zend_Db_Exception $e )
@@ -1346,7 +1348,7 @@ class Db_Driver extends Database
 
 		try
 		{
-			$stmt = new Zend_Db_Statement_Mysqli( $this->db, $this->cur_query );
+			$stmt = new Zend_Db_Statement_Pdo( $this->db, $this->cur_query );
 			$this->query_count++;
 			return $stmt->execute();
 		}
@@ -1491,9 +1493,9 @@ class Db_Driver extends Database
 			$return = 0;
 			try
 			{
-				$stmt = new Zend_Db_Statement_Mysqli( $this->db, $this->cur_query );
+				$stmt = new Zend_Db_Statement_Pdo( $this->db, $this->cur_query );
 				$this->query_count++;
-				$return += $stmt->execute();
+				return $stmt->execute();
 			}
 			catch ( Zend_Db_Exception $e )
 			{

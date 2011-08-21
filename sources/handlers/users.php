@@ -121,7 +121,7 @@ class Module_Handler
     	//----------
 
     	$this->API = $API;
-    	$this->request = $this->API->Input->input;
+    	$this->request = $this->API->Input->request();
     	$this->request['referer'] = isset( $this->request['referer'] ) ? urldecode( $this->request['referer'] ) : "";
     	$this->member =& $this->API->member;
 
@@ -222,7 +222,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
 										's_name'                          => 'login',
-										's_service_mode'                  => 'write-only',
+										's_data_source'                   => 'no-fetch',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'login',
 										's_pathinfo_uri_schema_parsed'    => 'login',
 										's_qstring_parameters'            => array(),
@@ -234,7 +235,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
 										's_name'                          => 'logout',
-										's_service_mode'                  => 'read-only',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'tpl',
 										's_pathinfo_uri_schema'           => 'logout',
 										's_pathinfo_uri_schema_parsed'    => 'logout',
 										's_qstring_parameters'            => array(),
@@ -246,7 +248,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
 										's_name'                          => 'register',
-										's_service_mode'                  => 'read-write',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'rdbms',
 										's_pathinfo_uri_schema'           => 'register',
 										's_pathinfo_uri_schema_parsed'    => 'register',
 										's_qstring_parameters'            => array(),
@@ -258,7 +261,8 @@ class Module_Handler
 								array(
 										'm_unique_id'                     => "{DFE3BB13-AABE820D-E1ECAEC2-0CDC0F82}",
 										's_name'                          => 'validate',
-										's_service_mode'                  => 'read-only',
+										's_data_source'                   => 'rdbms',
+										's_data_target'                   => 'tpl',
 										's_pathinfo_uri_schema'           => 'validate/mid-(?P<mid>\d+)/aid-(?P<aid>[a-z0-9]{32})',
 										's_pathinfo_uri_schema_parsed'    => 'validate/mid-(?P<mid>\d+)/aid-(?P<aid>[a-z0-9]{32})',
 										's_qstring_parameters'            => array(
@@ -966,9 +970,9 @@ class Module_Handler
 		// Referer
 		//-----------
 
-		if ( isset( $this->API->Input->input['referer'] ) )
+		if ( !is_null( $this->API->Input->request("referer") ) )
 		{
-			$return['referer'] = $this->API->Input->input['referer'];
+			$return['referer'] = $this->API->Input->request("referer");
 		}
 
 
@@ -1124,7 +1128,7 @@ class Module_Handler
 
 		if ( $this->API->config['security']['enable_captcha'] )
 		{
-			$_recaptcha_obj = $this->API->classes__do_get("ReCaptcha");
+			$_recaptcha_obj = $this->API->loader("ReCaptcha");
 			$_recaptcha_obj->setPubKey( $this->API->config['security']['recaptcha_public_key'] );
 			$_recaptcha_obj->setPrivKey( $this->API->config['security']['recaptcha_private_key'] );
 

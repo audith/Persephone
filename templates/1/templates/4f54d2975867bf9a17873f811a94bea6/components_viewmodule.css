@@ -74,7 +74,7 @@ TD:hover > SPAN.name
 	text-indent: -99999px;
 }
 
-	#buttons__s_fetch_criteria__add_policy
+	#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_policy
 	{
 		
 		background-image: url('{{$STYLE_IMAGES_URL}}/plus_green_16.png');
@@ -85,7 +85,7 @@ TD:hover > SPAN.name
 		line-height: 22px;
 	}
 	
-	BUTTON.buttons__s_fetch_criteria__remove_policy
+	#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_policy
 	{
 		
 		background-image: url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
@@ -129,13 +129,15 @@ TD:hover > SPAN.name
 	font-weight: bold;
 }
 
-#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_query
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_query,
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_sorting
 {
 	background-image:url('{{$STYLE_IMAGES_URL}}/plus_blue_16.png');
 	height: 20px;
 }
 
-#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_query
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_query,
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_sorting
 {
 	background-image:url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
 	height: 20px;
@@ -146,36 +148,6 @@ TD:hover > SPAN.name
 {
 	width: 100% !important;
 	float: left;
-}
-
-#s_fetch_criteria__add_sorting_button
-{
-	height:22px;
-	width:auto;
-	float:right;
-	clear:right;
-	margin:2px 0 0 0;
-	padding:0 18px 0 0;
-	background-image:url('{{$STYLE_IMAGES_URL}}/plus_green_16.png');
-	background-position:right center;
-	background-repeat:no-repeat;
-	
-	font-family:inherit;
-	font-style:oblique;
-	color:#006600;
-}
-
-A.s_fetch_criteria__remove_sorting_button
-{
-	height:20px;
-	width:18px;
-	float:right;
-	clear:right;
-	margin:0px;
-	padding:0px;
-	background-image:url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
-	background-position:center right;
-	background-repeat:no-repeat;
 }
 
 SPAN.s_fetch_criteria__policies SELECT,

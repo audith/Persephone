@@ -7,20 +7,20 @@ if ( ! defined( "INIT_DONE" ) )
 }
 
 /**
- * MODULES : CORE.ALPHANUMERIC
+ * Cache > Drivers Interface
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
-interface iCache_Lib
+interface iCache_Drivers
 {
 	/**
 	 * Constructor
 	 *
 	 * @param  object  API reference
 	 */
-	public function __construct ( $identifier = "" , API $API );
+	public function __construct ( API $API, $identifier = "" );
 
 
 	/**

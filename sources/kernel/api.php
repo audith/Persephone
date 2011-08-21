@@ -117,8 +117,7 @@ final class API
 	/**
 	 * Constructor - [Singleton implementation - cannot be accessed directly]
 	 *
-	 * @param  Array  $disabled_classes  List of disabled classes, which don't need to be init'ed
-	 *                                   (NOTE: DB and Input classes are mandatory, meaning, they cannot be disabled).
+	 * @param    array    List of disabled classes, which don't need to be initialized (NOTE: Db and Input classes are mandatory, meaning, they cannot be disabled).
 	**/
 	private function __construct ( $disabled_classes )
 	{
@@ -135,8 +134,8 @@ final class API
 		# Zend_Log
 		if ( ! class_exists( "Zend_Log" ) )
 		{
-			require_once( "Zend/Log.php" );
-			require_once( "Zend/Log/Writer/Stream.php" );
+			$this->loader( "Zend_Log", false );
+			$this->loader( "Zend_Log_Writer_Stream", false );
 		}
 
 		# Performance log
@@ -153,33 +152,19 @@ final class API
 		$this->config = array_merge( $this->config__file_read(), $this->config );
 
 		//---------------------------
-		// Instantiate DB Driver
+		// Instantiate Db Driver
 		//---------------------------
 
-		$path_to_driver = PATH_SOURCES . "/kernel_extensions/db_drivers/" . $this->config['sql']['driver'] . ".php";
+		$this->Db = $this->loader( "Db__Drivers__" . ucwords( $this->config['sql']['driver'] ) );
 
 		# Performance log
-		$this->logger__do_performance_log( "API::config [preliminary]" );
-
-		if ( @is_file( $path_to_driver ) )
-		{
-			# Ok, we got module lib, let's read it and instantiate the class within
-			require_once( $path_to_driver );
-			$this->Db = new Db_Driver( $this );                                          // Instantiating...
-
-			# Performance log
-			$this->logger__do_performance_log( "Db::__construct()" );
-		}
-		else
-		{
-			trigger_error( "Could not initiate DB Driver", E_USER_ERROR );
-		}
+		$this->logger__do_performance_log( "Db::__construct()" );
 
 		//------------------------
 		// Instantiate Input class
 		//------------------------
 
-		$this->Input = new Input( $this );
+		$this->Input = $this->loader( "Input" );
 
 		# Performance log
 		$this->logger__do_performance_log( "Input::__construct()" );
@@ -188,9 +173,9 @@ final class API
 		// Instantiate Caching Storage Management
 		//----------------------------------------
 
-		if ( ! in_array( "Cache", $disabled_classes ) )
+		if ( !in_array( "Cache", $disabled_classes ) )
 		{
-			$this->Cache = new Cache( $this );
+			$this->Cache = $this->loader( "Cache" );
 
 			# Performance log
 			$this->logger__do_performance_log( "Cache::__construct()" );
@@ -214,7 +199,7 @@ final class API
 
 		if ( ! in_array( "Session", $disabled_classes ) )
 		{
-			$this->Session = new Session( $this );
+			$this->Session = $this->loader( "Session" );
 
 			# Performance log
 			$this->logger__do_performance_log( "Session::__construct()" );
@@ -294,7 +279,7 @@ final class API
 
 		if ( ! in_array( "Modules", $disabled_classes ) )
 		{
-			$this->Modules = new Modules( $this );
+			$this->Modules = $this->loader( "Modules" );
 
 			# Performance log
 			$this->logger__do_performance_log( "Modules::__construct()" );
@@ -318,7 +303,7 @@ final class API
 
 		if ( ! in_array( "Display", $disabled_classes ) )
 		{
-			$this->Display = new Display( $this );
+			$this->Display = $this->loader( "Display" );
 
 			# Performance log
 			$this->logger__do_performance_log( "Display::__construct()" );
@@ -346,9 +331,9 @@ final class API
 		// Instantiate Converge class
 		//------------------------------
 
-		if ( ! in_array( "Converge", $disabled_classes ) and $this->config['ipconverge']['ipconverge_enabled'] )
+		if ( ! in_array( "Ips_Converge", $disabled_classes ) and $this->config['ipconverge']['ipconverge_enabled'] )
 		{
-			$this->IPS_Converge = new Converge( $this );
+			$this->IPS_Converge = $this->loader( "Ips_Converge" );
 
 			# Performance log
 			$this->logger__do_performance_log( "Converge::__construct()" );
@@ -421,45 +406,20 @@ final class API
 
 
 	/**
-	 * Stores class handles to prevent having to re-initialize them constantly
-	 *
-	 * @param   string    Key
-	 * @param   object    Object to store
-	 * @return  boolean   TRUE on success, FALSE otherwise
-	 */
-	private function _classes__do_register ( $key = "", $value = "" )
-	{
-		if ( ! $key or ! $value )
-		{
-			throw new Exception( "Missing a key or value" );
-			return false;
-		}
-		else if ( ! is_object( $value ) )
-		{
-			throw new Exception( "$value is not an object" );
-			return false;
-		}
-
-		$this->classes[ $key ] = $value;
-		return true;
-	}
-
-
-	/**
 	 * Retrieves class handles
 	 *
 	 * @param    string    Key
 	 * @param    boolean   Whether to init the class, or not [i.e. load-only]
 	 * return    mixed     (object) Retrieved object on SUCCESS, (boolean) FALSE otherwise
 	 */
-	public function classes__do_get ( $key, $_do_init = true )
+	public function loader ( $key , $_do_init = true )
 	{
 		//-----------------------------------------------------------------------------------------
 		// Do some magic here to retreive common classes without having to initialize them first
 		//-----------------------------------------------------------------------------------------
 
 		# Do we have it in our class-registry? If yes, return it...
-		if ( $this->_classes__is_loaded( $key ) )
+		if ( $this->_loader__is_loaded( $key ) )
 		{
 			return $this->classes[ $key ];
 		}
@@ -483,53 +443,58 @@ final class API
 			}
 		}
 
-		# Otherwise, use our class-Registry map
-		if ( array_key_exists( $key, $_map_of_classes = $this->classes__do_map() ) )
+		# Otherwise, run our own Autoloader
+		$_library_location = PATH_SOURCES . "/kernel/" . strtolower( str_replace( "__", '/', $key ) ) . ".php";
+		if ( !file_exists( $_library_location ) or !is_file( $_library_location ) )
 		{
-			if ( ! is_null( $_map_of_classes[ $key ]['library_location'] ) )
-			{
-				require_once( $_map_of_classes[ $key ]['library_location'] );
-			}
-			else
-			{
-				if ( ! class_exists( $_map_of_classes[ $key ]['class_name'] ) )
-				{
-					throw new Exception( "Class '" . $_map_of_classes[ $key ]['class_name'] . "' is not loaded!" );
-					return false;
-				}
-			}
-
-			# We have the class loaded, return true if init not requested.
-			if ( ! $_do_init )
-			{
-				return true;
-			}
-
-			$_class_name = $_map_of_classes[ $key ]['class_name'];
-			if ( $_map_of_classes[ $key ]['with_api_obj_reference'] === true )
-			{
-				if ( $this->_classes__do_register( $key , new $_class_name( $this ) ) === false )
-				{
-					throw new Exception( "Could not REGISTER class '" . $key . "'" );
-					return false;
-				}
-			}
-			else
-			{
-				if ( $this->_classes__do_register( $key , new $_class_name() ) === false )
-				{
-					throw new Exception( "Could not REGISTER class '" . $key . "'" );
-					return false;
-				}
-			}
+			throw new Exception( "Couldn't locate library file for class: '" . $_library_location . "'!" );
+			return false;
 		}
-		else
+		require_once( $_library_location );
+
+		if ( ! class_exists( $key ) )
 		{
-			throw new Exception( $key . " is not an object!" );
+			throw new Exception( "Couldn't find class '" . $key . "', although its library was loaded!" );
+			return false;
+		}
+
+		if ( !$_do_init )
+		{
+			return true;
+		}
+
+		if ( $this->_loader__do_register( $key , new $key( $this ) ) === false )
+		{
+			throw new Exception( "Could not REGISTER class '" . $key . "'" );
 			return false;
 		}
 
 		return $this->classes[ $key ];
+	}
+
+
+	/**
+	 * Stores class handles to prevent having to re-initialize them constantly
+	 *
+	 * @param   string    Key
+	 * @param   object    Object to store
+	 * @return  boolean   TRUE on success, FALSE otherwise
+	 */
+	private function _loader__do_register ( $key = "", $value = "" )
+	{
+		if ( ! $key or ! $value )
+		{
+			throw new Exception( "Missing a key or value" );
+			return false;
+		}
+		else if ( ! is_object( $value ) )
+		{
+			throw new Exception( "$value is not an object" );
+			return false;
+		}
+
+		$this->classes[ $key ] = $value;
+		return true;
 	}
 
 
@@ -539,75 +504,9 @@ final class API
 	 * @param    string     Key
 	 * @return   boolean    Loaded or not
 	 */
-	private function _classes__is_loaded ( $key )
+	private function _loader__is_loaded ( $key )
 	{
 		return ( isset( $this->classes[ $key ] ) and is_object( $this->classes[ $key ] ) ) ? true : false;
-	}
-
-
-	/**
-	 * Return a list of classes
-	 * IN_DEV ONLY
-	 *
-	 * @return	mixed     Array of items or FALSE if IN_DEV is off
-	 */
-	public function classes__do_list ()
-	{
-		if ( ! IN_DEV )
-		{
-			return false;
-		}
-		else
-		{
-			return array_keys( $this->classes );
-		}
-	}
-
-
-	public function classes__do_map ()
-	{
-		return array(
-				'data_processors__alphanumeric'                 => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_processors/alphanumeric.php",
-						'class_name'             => "Data_Processor__Alphanumeric",
-						'with_api_obj_reference' => true,
-					),
-				'data_processors__file'                         => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_processors/file.php",
-						'class_name'             => "Data_Processor__File",
-						'with_api_obj_reference' => true,
-					),
-				'data_processors__file__image__imagick'         => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_processors/file__image__imagick.php",
-						'class_name'             => "Data_Processor__File__Image__Imagick",
-						'with_api_obj_reference' => true,
-					),
-				'data_processors__file__image__gd'              => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_processors/file__image__gd.php",
-						'class_name'             => "Data_Processor__File__Image__GD",
-						'with_api_obj_reference' => true,
-					),
-				'data_processors__link'                         => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_processors/link.php",
-						'class_name'             => "Data_Processor__Link",
-						'with_api_obj_reference' => true,
-					),
-				'data_storages__rdbms__mysql'                   => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/data_storages/rdbms__mysql.php",
-						'class_name'             => "Data_Storages__Rdbms__Mysql",
-						'with_api_obj_reference' => true,
-					),
-				'Recache'                                       => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/cache/recache.php",
-						'class_name'             => "Recache",
-						'with_api_obj_reference' => true,
-					),
-				'User_Agents'                                   => array(
-						'library_location'       => PATH_SOURCES . "/kernel_extensions/user_agents/main.php",
-						'class_name'             => "User_Agents",
-						'with_api_obj_reference' => true,
-					),
-			);
 	}
 
 

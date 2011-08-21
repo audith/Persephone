@@ -170,7 +170,7 @@ class Modules
 		$action = "";
 		if ( filter_has_var( INPUT_GET, "do" ) or filter_has_var( INPUT_POST, "do" ) )  // For security reasons, let's check original GET and POST data
 		{
-			$action = preg_replace( '#[^a-z_-]#' , "" , $this->API->Input->input['do'] );
+			$action = preg_replace( '#[^a-z_-]#' , "" , $this->API->Input->request("do") );
 		}
 		if ( !$action )
 		{
@@ -182,7 +182,7 @@ class Modules
 		// we don't need to fetch any content. Return NULL...
 		//---------------------------------------------------------------
 
-		if ( isset( $m['running_subroutine'] ) and $m['running_subroutine']['s_service_mode'] == 'write-only' and $action == 'get' )
+		if ( isset( $m['running_subroutine'] ) and $m['running_subroutine']['s_data_source'] == 'no-fetch' and $action == 'get' )
 		{
 			return null;
 		}
@@ -256,12 +256,12 @@ class Modules
 			//   Here we populate two things:
 			//     a) list of tables for the Joins of the final SQL-clause, which fetches the content;
 			//     b) list of fields which are used to fetch a content from.
-			//   If service-mode is 'read-only' we use subroutine-data-definition to accomplish this task,
+			//   If data-target is 'tpl' we use subroutine-data-definition to accomplish this task,
 			//   otherwise we have to iterate through whole module-data-definition and build our lists
 			//   (mostly because 'update' subroutine doesn't have subroutine-data-definition set).
 			//-----------------------------------------------------------------------------------------------
 
-			if ( $m['running_subroutine']['s_service_mode'] == 'read-write' )
+			if ( $m['running_subroutine']['s_data_target'] == 'rdbms' )
 			{
 				$_fields_to_fetch = array( "id", "tags", "timestamp", "submitted_by", "status_published", "status_locked" );
 				$s_data_definition_for_join = array();
@@ -299,7 +299,7 @@ class Modules
 				$return['m_data_definition'] = $m['m_data_definition'];
 				return $return;
 			}
-			elseif ( $m['running_subroutine']['s_service_mode'] == 'read-only' )
+			elseif ( $m['running_subroutine']['s_data_target'] == 'tpl' )
 			{
 				$_fields_to_fetch = array_merge( array( "id", "tags", "timestamp", "submitted_by", "status_published", "status_locked" ) , $s_data_definition_for_join = array_keys( $m['running_subroutine']['s_data_definition'] ) );
 
@@ -613,7 +613,7 @@ class Modules
 					{
 						# Data-processor instance
 						$_data_type = $m['running_subroutine']['s_data_definition'][ $_field_name ]['type'];
-						$_processor_instance = $this->API->classes__do_get( "data_processors__" . $_data_type );
+						$_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $_data_type ) );
 
 						//-------------------------------
 						// Organize content container
@@ -675,7 +675,7 @@ class Modules
 				);
 		}
 
-		if ( $m['running_subroutine']['s_service_mode'] == 'write-only' )
+		if ( $m['running_subroutine']['s_data_target'] == 'rdbms' )
 		{
 			$return['m_data_definition'] = $m['m_data_definition'];
 		}
@@ -855,7 +855,7 @@ class Modules
 					{
 						continue;
 					}
-					$_processor_instance = $this->API->classes__do_get( "data_processors__" . $_field_node['type'] );
+					$_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $_field_node['type'] ) );
 
 					//-------------------------------
 					// Organize content container

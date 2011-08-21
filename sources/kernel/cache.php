@@ -90,7 +90,7 @@ class Cache
 				if ( extension_loaded( "memcached" ) )
 				{
 					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/memcached.php";
-					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+					$this->cachelib = $this->API->loader("Cache__Drivers__Memcached");
 					if ( $this->cachelib->crashed )
 					{
 						throw new Exception( "Cache: Memcached failed to connect!" );
@@ -111,8 +111,7 @@ class Cache
 			{
 				if ( class_exists( "Memcache" ) )
 				{
-					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/memcache.php";
-					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+					$this->cachelib = $this->API->loader("Cache__Drivers__Memcache");
 					if ( $this->cachelib->crashed )
 					{
 						throw new Exception( "Cache: Memcache failed to connect!" );
@@ -133,8 +132,7 @@ class Cache
 			{
 				if ( function_exists( "eaccelerator_get" ) )
 				{
-					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/eaccelerator.php";
-					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+					$this->cachelib = $this->API->loader("Cache__Drivers__Eaccelerator");
 				}
 				else
 				{
@@ -144,24 +142,6 @@ class Cache
 			}
 
 
-			//----------
-			// xcache
-			//----------
-
-			elseif( $this->API->config['performance']['cache']['_method'] == 'xcache' )
-			{
-				if ( function_exists( "xcache_get" ) )
-				{
-					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/xcache.php";
-					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
-				}
-				else
-				{
-					$this->API->config['performance']['cache']['_method'] = "diskcache";
-					$this->API->logger__do_log( "Cache: PHP-xCache not found! Reverting to Disk-cache...", "WARNING" );
-				}
-			}
-
 			//-------
 			// apc
 			//-------
@@ -170,8 +150,7 @@ class Cache
 			{
 				if ( function_exists( "apc_fetch" ) )
 				{
-					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/apc.php";
-					$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+					$this->cachelib = $this->API->loader("Cache__Drivers__Apc");
 				}
 				else
 				{
@@ -186,9 +165,7 @@ class Cache
 
 			if ( $this->API->config['performance']['cache']['_method'] == 'diskcache' )
 			{
-				$this->API->config['performance']['cache']['_method'] = "diskcache";
-				require PATH_SOURCES . "/kernel_extensions/cache/abstraction/diskcache.php";
-				$this->cachelib = new Cache_Lib( $_SERVER['SERVER_NAME'] , $this->API );
+				$this->cachelib = $this->API->loader("Cache__Drivers__Diskcache");
 			}
 
 		}
@@ -369,7 +346,7 @@ class Cache
 				{
 					foreach ( $_cache_array as $_k )
 					{
-						$_recache = $this->API->classes__do_get("Recache");
+						$_recache = $this->API->loader("Cache__Recache");
 						$_cache[ $_k ] = $_recache->main( $_k );
 					}
 				}
@@ -480,7 +457,7 @@ class Cache
 
 		$_problematic_keys = array();
 
-		$_recache_obj = $this->API->classes__do_get("Recache");
+		$_recache_obj = $this->API->loader("Cache__Recache");
 
 		if ( is_array( $key ) )
 		{

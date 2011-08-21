@@ -13,7 +13,7 @@ if ( ! defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
-final class Data_Processor__File__Image__Imagick
+final class Data_Processors__File__Image__Imagick
 {
 	/**
 	 * API Object reference

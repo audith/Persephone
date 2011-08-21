@@ -21,7 +21,7 @@ if ( ! defined( "INIT_DONE" ) )
 	exit();
 }
 
-class User_Agents
+class Session__User_Agents
 {
 	/**
 	 * API Object Reference
@@ -141,7 +141,7 @@ class User_Agents
 		// Get file...
 		//-----------------------------------------
 
-		require_once( PATH_SOURCES . "/kernel_extensions/user_agents/master_list.php" );
+		require_once( PATH_SOURCES . "/kernel/session/user_agents/master_list.php" );
 
 		//-----------------------------------------
 		// Build names

@@ -74,7 +74,8 @@ class Module_Handler
 							'download'                          =>
 								array(
 										's_name'                         => 'download',
-										's_service_mode'                 => 'read-only',
+										's_data_source'                  => 'rdbms',
+										's_data_target'                  => 'tpl',
 										's_pathinfo_uri_schema'          => 'download\/(?:(?P<file_variation>[a-z]+)\-)?(?P<identifier>[0-9]+)(?:\/(?P<f_name>[^/]+))?',
 										's_pathinfo_uri_schema_parsed'   => 'download\/(?:(?P<file_variation>[a-z]+)\-)?(?P<identifier>[0-9]+)(?:\/(?P<f_name>[^/]+))?',
 										's_qstring_parameters'           => array(
@@ -98,7 +99,8 @@ class Module_Handler
 							'stream'                            =>
 								array(
 										's_name'                         => 'stream',
-										's_service_mode'                 => 'read-only',
+										's_data_source'                  => 'rdbms',
+										's_data_target'                  => 'tpl',
 										's_pathinfo_uri_schema'          => 'stream\/(?:(?P<file_variation>[a-z]+)\-)?(?P<identifier>[0-9]+)(?:\/(?P<f_name>[^/]+))?',
 										's_pathinfo_uri_schema_parsed'   => 'stream\/(?:(?P<file_variation>[a-z]+)\-)?(?P<identifier>[0-9]+)(?:\/(?P<f_name>[^/]+))?',
 										's_qstring_parameters'           => array(
@@ -122,7 +124,8 @@ class Module_Handler
 							'upload'                            =>
 								array(
 										's_name'                         => 'upload',
-										's_service_mode'                 => 'read-only',
+										's_data_source'                  => 'rdbms',
+										's_data_target'                  => 'tpl',
 										's_pathinfo_uri_schema'          => 'upload',
 										's_pathinfo_uri_schema_parsed'   => 'upload',
 										's_qstring_parameters'           => array(),
@@ -133,7 +136,8 @@ class Module_Handler
 							'delete'                            =>
 								array(
 										's_name'                         => 'delete',
-										's_service_mode'                 => 'read-only',
+										's_data_source'                  => 'rdbms',
+										's_data_target'                  => 'tpl',
 										's_pathinfo_uri_schema'          => 'delete-(?P<f_id>[1-9][0-9]*)',
 										's_pathinfo_uri_schema_parsed'   => 'delete-(?P<f_id>[1-9][0-9]*)',
 										's_qstring_parameters'           => array(
@@ -215,7 +219,7 @@ class Module_Handler
 			// Is it a duplicate?
 			//----------------------
 
-			$_file_processor_obj = $this->API->classes__do_get( "data_processors__file" );
+			$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
 			if ( ( $_file_info = $_file_processor_obj->file__info__do_get( $this->running_subroutine['request']['f_id'] ) ) == FALSE )
 			{
 				throw new Exception( "Delete failed! File does not exist..." );
@@ -326,6 +330,7 @@ class Module_Handler
 		// Prelim
 		//-----------
 
+		$input = $this->API->Input->post();
 		$_partition_size = 0;
 		if ( intval( $this->API->config['performance']['upload_chunk_size'] ) > 0 )
 		{
@@ -336,37 +341,37 @@ class Module_Handler
 
 		try
 		{
-			if ( ! isset( $this->API->Input->post['fileLength'] ) )
+			if ( ! isset( $input['fileLength'] ) )
 			{
 				throw new Exception( "fileLength parameter is missing!" );
 			}
-			if ( ! isset( $this->API->Input->post['fileName'] ) )
+			if ( ! isset( $input['fileName'] ) )
 			{
 				throw new Exception( "fileName parameter is missing!" );
 			}
-			if ( ! isset( $this->API->Input->post['md5'] ) )
+			if ( ! isset( $input['md5'] ) )
 			{
 				throw new Exception( "md5 parameter is missing!" );
 			}
-			if ( ! isset( $this->API->Input->post['partitionMd5'] ) )
+			if ( ! isset( $input['partitionMd5'] ) )
 			{
 				throw new Exception( "partitionMd5 parameter is missing!" );
 			}
-			if ( ! isset( $this->API->Input->post['partitionIndex'] ) )
+			if ( ! isset( $input['partitionIndex'] ) )
 			{
 				throw new Exception( "partitionIndex parameter is missing!" );
 			}
-			if ( ! isset( $this->API->Input->post['partitionCount'] ) )
+			if ( ! isset( $input['partitionCount'] ) )
 			{
 				throw new Exception( "partitionCount parameter is missing!" );
 			}
 
-			$_file_length              = $this->API->Input->post['fileLength'];
-			$_file_name                = $this->API->Input->post['fileName'];
-			$_file_md5_checksum        = $this->API->Input->post['md5'];
-			$_partition_md5_checksum   = $this->API->Input->post['partitionMd5'];
-			$_partition_index          = $this->API->Input->post['partitionIndex'];
-			$_partition_count          = $this->API->Input->post['partitionCount'];
+			$_file_length              = $input['fileLength'];
+			$_file_name                = $input['fileName'];
+			$_file_md5_checksum        = $input['md5'];
+			$_partition_md5_checksum   = $input['partitionMd5'];
+			$_partition_index          = $input['partitionIndex'];
+			$_partition_count          = $input['partitionCount'];
 
 			$_filename_parsed          = pathinfo( $_file_name );
 			$_file_extension           = strtolower( $_filename_parsed['extension'] );
@@ -379,7 +384,7 @@ class Module_Handler
 			// Is it a duplicate?
 			//----------------------
 
-			$_file_processor_obj = $this->API->classes__do_get( "data_processors__file" );
+			$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
 			if ( ( $_existing_file_record = $_file_processor_obj->file__info__do_get( $_file_md5_checksum ) ) !== FALSE )
 			{
 				if ( in_array( $_file_name, $_existing_file_record['f_name'] ) )
@@ -589,18 +594,18 @@ class Module_Handler
 
 		try
 		{
-			if ( ! isset( $this->API->Input->post['fileLength'] ) )
+			if ( ! isset( $input['fileLength'] ) )
 			{
 				throw new Exception( "fileLength parameter is missing!" );
 			}
-			if ( ! isset( $this->API->Input->post['fileName'] ) )
+			if ( ! isset( $input['fileName'] ) )
 			{
 				throw new Exception( "fileName parameter is missing!" );
 			}
 
 			$_file_id                  = UNIX_TIME_NOW;
-			$_file_length              = $this->API->Input->post['fileLength'];
-			$_file_name                = $this->API->Input->post['fileName'];
+			$_file_length              = $input['fileLength'];
+			$_file_name                = $input['fileName'];
 			$_partition_index          = 0;
 
 			$_filename_parsed          = pathinfo( $_file_name );
@@ -653,7 +658,7 @@ class Module_Handler
 	private function download ()
 	{
 		# Prelim
-		$_file_processor_object = $this->API->classes__do_get("data_processors__file");
+		$_file_processor_object = $this->API->loader("Data_Processors__File");
 		$file_info = $_file_processor_object->file__info__do_get( $this->running_subroutine['request']['identifier'] );
 
 		if ( ! isset( $this->running_subroutine['request']['f_name'] ) )
@@ -842,7 +847,7 @@ class Module_Handler
 	private function stream ()
 	{
 		# Prelim
-		$_file_processor_object = $this->API->classes__do_get("data_processors__file");
+		$_file_processor_object = $this->API->loader("Data_Processors__File");
 		$file_info = $_file_processor_object->file__info__do_get( $this->running_subroutine['request']['identifier'] );
 
 		if ( ! isset( $this->running_subroutine['request']['f_name'] ) )
@@ -1058,7 +1063,7 @@ class Module_Handler
 		if ( ! $file_info['_diagnostics']['thumbs_ok'] )
 		{
 			# FILE data-processor object instance
-			$_file_processor_obj = $this->API->classes__do_get( "data_processors__file" );
+			$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
 
 			# Small thumbs
 			if ( $file_info['_f_thumbs_small'] === FALSE )
@@ -1100,7 +1105,7 @@ class Module_Handler
 	private function _file__image__do_watermark ( $file_info )
 	{
 		# FILE data-processor object instance
-		$_file_processor_obj = $this->API->classes__do_get( "data_processors__file" );
+		$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
 
 		# Continue
 		return $_file_processor_obj->image__do_watermark( $file_info );

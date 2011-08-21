@@ -393,14 +393,11 @@ Acp_ComponentsViewmodule.prototype.registry__sr = {
 		'rdbms' : {
 			'_tabs' : {
 				1 : {  // 'tabs__sr_alter_add__s_data_source'
-					's_data_definition' : true,
-					's_fetch_criteria' : true,
-					'@s_fetch_criteria[do_fetch_all_or_selected]' : 'all',
+					's_data_definition' : null,
+					'@s_fetch_criteria__all_or_selected' : "all",
 					's_fetch_criteria__limit' : "",
 					's_fetch_criteria__pagination' : "",
-					's_fetch_criteria__order' : {
-						'@s_fetch_criteria[do_sort]' : 0
-					}
+					'@s_fetch_criteria__do_perform_sorting' : "0"
 				}
 			},
 			'_disabled_options__for__s_data_target' : []
@@ -524,10 +521,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 				{
 					field_value = field_value.split(",");
 				}
-				for ( var _key in field_value )
-				{
-					field_obj.val( field_value );
-				}
+				field_obj.val( field_value );
 			}
 		}
 	}
@@ -770,6 +764,11 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 		jQuery(".ui-tabs.sr_alter_add__s_data_flow_config").tabs("option", "disabled", [1,2,3]);
 		acp__components_viewmodule.Form.resetOnDemandObjects();
 
+		/* Delete cloned elements */
+		jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__query").not(":first").remove();
+		jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__policies").not(":first").remove();
+		jQuery("#forms__components__sr__create SPAN.sr__sort_by").not(":first").remove();
+
 		node_to_populate = registry['s_data_source'][this.obj.val()];
 
 		if ( '_tabs' in node_to_populate )
@@ -804,27 +803,24 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 					/**
 					 * @var {Object} Form fields
 					 */
-					var input_fields = jQuery("#forms__components__sr__create ." + key + ".ondemand [name^='" + key + "']");
+					var input_fields = jQuery("#forms__components__sr__create ." + key + " [name^='" + key + "']");
 
 					if ( input_fields.length == 1 )
 					{
 						input_fields.val("");
 						if ( value != null )
 						{
-							// SELECTs...
-							if ( typeof value == 'object' || value instanceof Array )
-							{
-								var _options = "";
-								jQuery.each(value, function ( _key , _value )
-								{
-									_options += "<option value=\"" + _key + "\">." + _key + " - " + _value + "</option>";
-								});
-								input_fields.empty().append(_options);
-							}
-							// Everything else...
-							else if ( typeof value == 'string' )
+							if ( input_fields.is("INPUT[type='text'],TEXTAREA") )
 							{
 								input_fields.val(value);
+							}
+							else if ( input_fields.is("SELECT") )
+							{
+								if ( !( value instanceof Array ) )
+								{
+									value = value.split(",");
+								}
+								input_fields.change( value );
 							}
 						}
 
@@ -864,7 +860,6 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 					{
 						return arguments.callee(_self_recursion, registry);
 					}
-
 					return true;
 				});
 			}
@@ -913,7 +908,6 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 		arguments.callee("#forms__components__sr__create [name='s_data_target']", registry);
 	}
 
-
 	else if ( this.obj.attr("name") == 's_data_target' )
 	{
 		/* Disable **only** .ondemand elemens within Data-target-configuration-tab!!! */
@@ -922,81 +916,36 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 		// @todo Coming soon...
 	}
 
-
-	else if ( this.obj.attr("name") == 's_fetch_criteria[do_fetch_all_or_selected]' )
+	else if ( this.obj.attr("name") == 's_fetch_criteria__all_or_selected' )
 	{
-		var whoami = jQuery("#forms__components__sr__create .ondemand.s_fetch_criteria .s_fetch_criteria__policies, #forms__components__sr__create .ondemand.s_fetch_criteria .s_fetch_criteria__query");
+		var whoami = jQuery("#forms__components__sr__create .ondemand.s_fetch_criteria__all_or_selected .s_fetch_criteria__policies, #forms__components__sr__create .ondemand.s_fetch_criteria__all_or_selected .s_fetch_criteria__query");
 		if ( this.obj.val() == 'all' )
 		{
 			jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__query").not(":first").remove();
 			jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__policies").not(":first").remove();
+
 			acp__components_viewmodule.Form.resetOnDemandElement(whoami);
 		}
 		else if ( this.obj.val() == 'selected' )
 		{
 			acp__components_viewmodule.Form.enableOnDemandElement(whoami);
 		}
-		return true;
 	}
 
-	/*
-	else if ( this.obj.attr("name") == 'links_with' )
+	else if ( this.obj.attr("name") == 's_fetch_criteria__do_perform_sorting' )
 	{
-		// We don't have a module selected yet, so return here
-		if ( this.obj.val() == '' )
+		var whoami = jQuery("#forms__components__sr__create .ondemand.s_fetch_criteria__do_perform_sorting SPAN.sr__sort_by");
+		if ( this.obj.val() == '0' )
 		{
-			acp__components_viewmodule.Form.resetOnDemandElement("#forms__components__ddl__alter_add .links_with__e_data_definition.ondemand");
-			return true;
+			jQuery("#forms__components__sr__create SPAN.sr__sort_by").not(":first").remove();
+			acp__components_viewmodule.Form.resetOnDemandElement(whoami);
 		}
-
-		// Fetch m_data_definition for selected module
-		var _response = jQuery.ajax({
-			type : "GET",
-			url: "{{$MODULE_URL}}/components/viewmodule-" + this.obj.val(),
-			async : false
-		});
-		_response = jQuery.parseJSON(_response.responseText);
-		_response = _response['me']['m_data_definition'];
-		var _m_data_definition = [];
-		jQuery.each(_response, function ( key , value )
+		else if ( this.obj.val() == '1' )
 		{
-			if ( value['type'] == 'link' )
-			{
-				// continue;
-				return;
-			}
-
-			if ( value['connector_enabled'] == 1 )
-			{
-				for ( var c in value['c_data_definition'] )
-				{
-					_m_data_definition[key + "." + value['c_data_definition'][c]['name']] = {
-						'name' : key + "." + value['c_data_definition'][c]['name'],
-						'label' : value['c_data_definition'][c]['label']
-					};
-				}
-			}
-			else
-			{
-				_m_data_definition[key] = {
-					'name' : value['name'],
-					'label' : value['label']
-				};
-			}
-		});
-		delete(_response);
-
-		// Populate "links_with__e_data_definition"
-		jQuery("#forms__components__ddl__alter_add [name^='links_with__e_data_definition']").empty();
-		for ( key in _m_data_definition )
-		{
-			jQuery("#forms__components__ddl__alter_add .links_with__e_data_definition.ondemand > [name^='links_with__e_data_definition']")
-				.append("<option value='" + _m_data_definition[key]['name'] + "'>" + _m_data_definition[key]['label'] + " [" + _m_data_definition[key]['name'] + "]</option");
+			acp__components_viewmodule.Form.enableOnDemandElement(whoami);
 		}
-
-		acp__components_viewmodule.Form.enableOnDemandElement("#forms__components__ddl__alter_add .links_with__e_data_definition.ondemand");
 	}
-	*/
+
 	return true;
 };
 
@@ -1036,9 +985,12 @@ jQuery(document).ready(function ( event )
 
 		/* Reset values */
 		whoami.find("INPUT[type='text']").val(null); // Reset all INPUT text-fields
-		whoami.find("SELECT > OPTION:first").prop("selected","selected"); // Reset all SELECTs
 		whoami.find("[name='do']").val("ddl_alter__add"); // 'do'
 		whoami.find("[type='submit']").val("Register New Data-field");
+		whoami.find("SELECT").each(function ( index ) // Reset all SELECTs
+		{
+			jQuery(this).find("OPTION:first").prop("selected","selected");
+		});
 
 		/* Apply Registry */
 		acp__components_viewmodule.ddl__register__apply_registry(typeElement);
@@ -1358,7 +1310,8 @@ jQuery(document).ready(function ( event )
 	 */
 	jQuery("#forms__components__sr__create SELECT.js__trigger_on_change").change(function ( event )
 	{
-		acp__components_viewmodule.sr__create__apply_registry(jQuery(this));
+		acp__components_viewmodule.sr__create__apply_registry(event.currentTarget);
+console.log(event);
 	});
 
 	/**
@@ -1366,7 +1319,7 @@ jQuery(document).ready(function ( event )
 	 */
 	jQuery("#forms__components__sr__create .js__trigger_on_change").filter("LABEL,:radio,:checkbox").click(function ( event )
 	{
-		var what_is_being_triggered = ( jQuery(this).is("LABEL") ) ? jQuery("#" + jQuery(this).attr("for")) : jQuery(this);
+		var what_is_being_triggered = ( event.currentTarget.is("LABEL") ) ? jQuery("#" + event.currentTarget.attr("for")) : event.currentTarget;
 		if ( !( what_is_being_triggered.is(":disabled") ) )
 		{
 			acp__components_viewmodule.sr__create__apply_registry(what_is_being_triggered);
@@ -1383,11 +1336,13 @@ jQuery(document).ready(function ( event )
 		var sDataSourceElement = whoami.find("[name='s_data_source']");
 
 		/* Reset common fields */
-		whoami.find("INPUT[type='text']").val(null); // Reset all INPUT text-fields
-console.log(whoami.find("SELECT > OPTION:eq(0)"));
-		whoami.find("SELECT > OPTION:eq(0)").prop("selected", "selected"); // Reset all SELECTs
 		whoami.find("[name='do']").val("sr_alter__add"); // 'do'
 		whoami.find("[type='submit']").val("Create New Subroutine");
+		whoami.find("INPUT[type='text']").val(null); // Reset all INPUT text-fields
+		whoami.find("SELECT").each(function ( index ) // Reset all SELECTs
+		{
+			jQuery(this).find("OPTION:enabled:first").prop("selected","selected");
+		});
 
 		/* Reset errors and close consoles */
 		whoami.find(".error").removeClass("error");
@@ -1434,14 +1389,26 @@ console.log(whoami.find("SELECT > OPTION:eq(0)"));
 	});
 
 	/**
+	 * Close "SR-Create" Form
+	 */
+	jQuery("#forms__components__sr__create .buttons > [type='button']:first").click(function ( event )
+	{
+		if ( jQuery("#components__sr__create").is(":visible") )
+		{
+			acp__components_viewmodule.Form.closeConsoles();
+			jQuery("#components__sr__create").slideUp("medium");
+		}
+	});
+
+	/**
 	 * Handles "Add-query-policy" button
 	 */
-	jQuery("#forms__components__sr__create #buttons__s_fetch_criteria__add_policy").click(function ( event )
+	jQuery("#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_policy").click(function ( event )
 	{
 		/* Clone the first policy-container and insert the clone after the original one. */
 		var htmlToCopy  = jQuery("SPAN.s_fetch_criteria__policies:first").html();
 		jQuery("<SPAN>").addClass("s_fetch_criteria__policies").html(htmlToCopy).insertAfter(jQuery("SPAN.s_fetch_criteria__policies:last"));
-		jQuery("SPAN.s_fetch_criteria__policies:last BUTTON").attr("class", "buttons__s_fetch_criteria__remove_policy").removeAttr("id").text("remove query-policy");
+		jQuery("SPAN.s_fetch_criteria__policies:last BUTTON").attr("class", "buttons__s_fetch_criteria__remove_policy").text("remove query-policy");
 		jQuery("SPAN.s_fetch_criteria__policies:last TEXTAREA:first").val("1");
 
 		/* Re-enumerate all policy elements */
@@ -1450,7 +1417,8 @@ console.log(whoami.find("SELECT > OPTION:eq(0)"));
 		{
 			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") TEXTAREA:first")
 				.attr("name", "s_fetch_criteria[policies][" + i + "]")
-				.attr("id",	"s_fetch_criteria__policies__" + i);
+				.attr("id",	"s_fetch_criteria__policies__" + i)
+				.attr("class", "text required _704-" + i);
 			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") LABEL")
 				.attr("for", "s_fetch_criteria__policies__" + i)
 				.html("Query Policy " + (i + 1));
@@ -1471,7 +1439,8 @@ console.log(whoami.find("SELECT > OPTION:eq(0)"));
 		{
 			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") TEXTAREA:first")
 				.attr("name", "s_fetch_criteria[policies][" + i + "]")
-				.attr("id",	"s_fetch_criteria__policies__" + i);
+				.attr("id",	"s_fetch_criteria__policies__" + i)
+				.attr("class", "text required _704-" + i);
 			jQuery("SPAN.s_fetch_criteria__policies:eq(" + i + ") LABEL")
 				.attr("for", "s_fetch_criteria__policies__" + i)
 				.html("Query Policy " + (i + 1));
@@ -1486,7 +1455,7 @@ console.log(whoami.find("SELECT > OPTION:eq(0)"));
 		/* Clone the first query-container and insert the clone after the original one. */
 		var htmlToCopy  = jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__query:first").html();
 		jQuery("<SPAN>").addClass("s_fetch_criteria__query").html(htmlToCopy).insertAfter(jQuery("SPAN.s_fetch_criteria__query:last"));
-		jQuery("SPAN.s_fetch_criteria__query:last BUTTON").attr("class", "buttons__s_fetch_criteria__remove_query").removeAttr("id").text("remove query");
+		jQuery("SPAN.s_fetch_criteria__query:last BUTTON").attr("class", "buttons__s_fetch_criteria__remove_query").text("remove the query");
 
 		/* Re-enumerate all query elements */
 		var nr_of_queries = jQuery("SPAN.s_fetch_criteria__query").length;
@@ -1494,8 +1463,8 @@ console.log(whoami.find("SELECT > OPTION:eq(0)"));
 		{
 			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][field_name]");
 			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(1)").attr("name","s_fetch_criteria[rules][" + i + "][math_operator]");
-			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(2)").attr("name","s_fetch_criteria[rules][" + i + "][type_of_expr_in_value]");
-			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") INPUT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][value]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(2)").attr("name","s_fetch_criteria[rules][" + i + "][type_of_expr_in_value]").attr("class", "_709-" + i);
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") INPUT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][value]").attr("class", "text required _705-" + i);
 			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SPAN:last").html("Shortcut: <i>" + ( i + 1 ) + "</i>");
 		}
 	});
@@ -1514,9 +1483,45 @@ console.log(whoami.find("SELECT > OPTION:eq(0)"));
 		{
 			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][field_name]");
 			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(1)").attr("name","s_fetch_criteria[rules][" + i + "][math_operator]");
-			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(2)").attr("name","s_fetch_criteria[rules][" + i + "][type_of_expr_in_value]");
-			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") INPUT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][value]");
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SELECT:eq(2)").attr("name","s_fetch_criteria[rules][" + i + "][type_of_expr_in_value]").attr("class", "_709-" + i);
+			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") INPUT:eq(0)").attr("name","s_fetch_criteria[rules][" + i + "][value]").attr("class", "text required _705-" + i);
 			jQuery("SPAN.s_fetch_criteria__query:eq(" + i + ") SPAN:last").html("Shortcut: <i>" + ( i + 1 ) + "</i>");
+		}
+	});
+
+	/**
+	 * Handles "Add-sorting" button
+	 */
+	jQuery("#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_sorting").click(function ( event )
+	{
+		/* Clone the first query-container and insert the clone after the original one. */
+		var htmlToCopy  = jQuery("#forms__components__sr__create SPAN.sr__sort_by:first").html();
+		jQuery("<SPAN>").addClass("sr__sort_by").html(htmlToCopy).insertAfter(jQuery("SPAN.sr__sort_by:last"));
+		jQuery("SPAN.sr__sort_by:last BUTTON").attr("class", "buttons__s_fetch_criteria__remove_sorting").text("remove the new sorting-rule");
+
+		/* Re-enumerate all query elements */
+		var nr_of_rules = jQuery("SPAN.sr__sort_by").length;
+		for ( i = 1; i < nr_of_rules; i++ ) // No need to touch the first one
+		{
+			jQuery("SPAN.sr__sort_by:eq(" + i + ") SELECT:eq(0)").attr("name","s_fetch_criteria[sort_by][" + i + "][field_name]").attr("class", "_708-" + i);
+			jQuery("SPAN.sr__sort_by:eq(" + i + ") SELECT:eq(1)").attr("name","s_fetch_criteria[sort_by][" + i + "][dir]").attr("class", "_708-" + i);
+		}
+	});
+
+	/**
+	 * Handles "Remove-sorting" button
+	 */
+	jQuery("#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_sorting").live("click", function ( event )
+	{
+		/* Remove query-container */
+		jQuery(this).parent().remove();
+
+		/* Re-enumerate remaining query elements */
+		var nr_of_rules = jQuery("SPAN.sr__sort_by").length;
+		for ( i = 1; i < nr_of_rules; i++ ) // No need to touch the first one
+		{
+			jQuery("SPAN.sr__sort_by:eq(" + i + ") SELECT:eq(0)").attr("name","s_fetch_criteria[sort_by][" + i + "][field_name]").attr("class", "_708-" + i);
+			jQuery("SPAN.sr__sort_by:eq(" + i + ") SELECT:eq(1)").attr("name","s_fetch_criteria[sort_by][" + i + "][dir]").attr("class", "_708-" + i);
 		}
 	});
 

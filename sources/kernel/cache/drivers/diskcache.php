@@ -7,7 +7,7 @@ if ( ! defined( "INIT_DONE" ) )
 }
 
 /**
- * Hard-disk Cache Storage
+ * Cache > Drivers > File-system
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
@@ -16,7 +16,7 @@ if ( ! defined( "INIT_DONE" ) )
 
 require_once( dirname( __FILE__ ) . "/_interface.php" );
 
-class Cache_Lib implements iCache_Lib
+class Cache__Drivers__Diskcache implements iCache_Drivers
 {
 	/**
 	 * API Object reference
@@ -40,7 +40,7 @@ class Cache_Lib implements iCache_Lib
 	public $crashed = 0;
 
 
-	public function __construct ( $identifier="" , API $API )
+	public function __construct ( API $API, $identifier = "" )
 	{
 		# Prelim
 		$this->API = $API;
@@ -54,7 +54,7 @@ class Cache_Lib implements iCache_Lib
 
 		if ( ! $identifier )
 		{
-			$this->identifier = md5( uniqid( rand(), TRUE ) );
+			$this->identifier = $this->API->Input->server('SERVER_NAME');
 		}
 		else
 		{

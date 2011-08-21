@@ -13,7 +13,7 @@ if ( ! defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
-class Recache
+class Cache__Recache
 {
 	/**
 	 * API Object Reference
@@ -572,9 +572,8 @@ class Recache
 					$this->API->Db->cur_query = array(
 							'do'     => "select",
 							'table'  => "modules_subroutines",
-							'fields' => array( "s_name" , "s_service_mode" , "s_pathinfo_uri_schema" , "s_pathinfo_uri_schema_parsed" ,
-									"s_qstring_parameters" , "s_fetch_criteria" , "m_unique_id" , "s_data_definition" ,
-									"s_additional_skin_assets", "s_can_remove"
+							'fields' => array( "s_name" , "s_data_source", "s_data_target" , "s_pathinfo_uri_schema" , "s_pathinfo_uri_schema_parsed" ,
+									"s_qstring_parameters" , "s_fetch_criteria" , "m_unique_id" , "s_data_definition" ,	"s_additional_skin_assets", "s_can_remove"
 								),
 							'where'  => array( array( "m_unique_id=?", $row['m_unique_id'] ) )
 						);
@@ -620,7 +619,8 @@ class Recache
 							}
 
 							$_subroutines[ $_row['s_name'] ] = array(
-									's_service_mode'                => $_row['s_service_mode'],
+									's_data_source'                 => $_row['s_data_source'],
+									's_data_target'                 => $_row['s_data_target'],
 									's_data_definition'             => $_s_data_definition,
 									's_name'                        => $_row['s_name'],
 									's_pathinfo_uri_schema'         => $_row['s_pathinfo_uri_schema'],

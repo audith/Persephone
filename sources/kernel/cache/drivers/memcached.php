@@ -7,7 +7,7 @@ if ( ! defined( "INIT_DONE" ) )
 }
 
 /**
- * Memcache Storage
+ * Cache > Drivers > php-memcached
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
@@ -18,7 +18,7 @@ if ( ! defined( "INIT_DONE" ) )
 
 require_once( dirname( __FILE__ ) . "/_interface.php" );
 
-class Cache_Lib implements iCache_Lib
+class Cache__Drivers__Memcached implements iCache_Drivers
 {
 	/**
 	 * API Object reference
@@ -49,21 +49,21 @@ class Cache_Lib implements iCache_Lib
 	public $link;
 
 
-	public function __construct ( $identifier = "" , API $API )
+	public function __construct ( API $API, $identifier = "" )
 	{
 		# Prelim
 		$this->API = $API;
 
 		# Cont.
-		if ( ! extension_loaded("memcached") )
+		if ( !extension_loaded("memcached") )
 		{
 			$this->crashed = 1;
 			return false;
 		}
 
-		if ( ! $identifier )
+		if ( !$identifier )
 		{
-			$this->identifier = md5( uniqid( rand(), true ) );
+			$this->identifier = $this->API->Input->server('SERVER_NAME');
 		}
 		else
 		{

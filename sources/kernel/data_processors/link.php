@@ -7,16 +7,16 @@ if ( ! defined( "INIT_DONE" ) )
 }
 
 /**
- * FILE Data Processor
+ * Data-Processors > Link
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
 
-require_once( dirname( __FILE__ ) . "/_interface.php" );
+require_once( PATH_SOURCES . "/kernel/data_processors.php" );
 
-class Data_Processor__Link extends Data_Processor
+class Data_Processors__Link extends Data_Processors
 {
 	/**
 	 * API Object Reference
@@ -79,7 +79,7 @@ class Data_Processor__Link extends Data_Processor
 		# Do we have a data-source-handler for the linked module? If not, create one!
 		if ( !isset( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) or !is_object( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) )
 		{
-			if ( ( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] = $this->API->classes__do_get( "data_sources__" . $m['m_data_source'] ) ) === false )
+			if ( ( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] = $this->API->loader( "data_sources__" . $m['m_data_source'] ) ) === false )
 			{
 				unset( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] );
 				throw new Exception( "Failed to initialize data-source library: '" . $_linked_module['m_data_source'] . "'!" );

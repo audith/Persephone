@@ -326,10 +326,10 @@ class Session
 		(
 			$this->API->config['security']['session_via_url']
 			and
-			isset( $this->API->Input->get[ $this->session_name ] )
+			isset( $_GET[ $this->session_name ] )
 		)
 		{
-			$this->get_session( $this->API->Input->get[ $this->session_name ] );
+			$this->get_session( $this->API->Input->get( $this->session_name ) );
 			$this->session_type = "url";
 		}
 		else
@@ -2930,7 +2930,7 @@ class Session
 			// Get useragent stuff
 			//-----------------------------------------
 
-			$user_agent = $this->API->classes__do_get( "User_Agents" )->find_user_agent_id( $this->user_agent );
+			$user_agent = $this->API->loader( "Session__User_Agents" )->find_user_agent_id( $this->user_agent );
 
 			if ( $user_agent['uagent_key'] === null )
 			{

@@ -9,25 +9,13 @@ if ( ! defined( "INIT_DONE" ) )
 /**
  * Memcache Storage
  *
- * @package  Invision Power Board
- * @author   Matthew Mecham @ IPS
- * @version  1.0
+ * @package      Audith CMS codename Persephone
+ * @author       Shahriyar Imanov <shehi@imanov.name>
+ * @version      1.0
 **/
+require_once( dirname( __FILE__ ) . "/_interface.php" );
 
-/**
-* Basic Usage Examples
-* <code>
-* $cache = new cache_lib( 'identifier' );
-* Update:
-* $db->do_put( 'key', 'value' [, 'ttl'] );
-* Remove:
-* $db->do_remove( 'key' );
-* Retrieve:
-* $db->do_get( 'key' );
-* </code>
-*/
-
-class Cache_Lib
+class Cache__Drivers__Memcache implements iCache_Drivers
 {
 	/**
 	 * API Object reference
@@ -58,7 +46,7 @@ class Cache_Lib
 	public $link;
 
 
-	public function __construct ( $identifier="" , $API )
+	public function __construct ( API $API, $identifier = "" )
 	{
 		# Prelim
 		$this->API = $API;
@@ -72,7 +60,7 @@ class Cache_Lib
 
 		if ( !$identifier )
 		{
-			$this->identifier = md5( uniqid( rand(), TRUE ) );
+			$this->identifier = $this->API->Input->server('SERVER_NAME');
 		}
 		else
 		{
@@ -112,12 +100,12 @@ class Cache_Lib
 					throw new Exception( "Invalid server information!" );
 				}
 
-				if ( ! is_object( $this->link ) )
+				if ( !is_object( $this->link ) )
 				{
 					throw new Exception( "Link not instantiated?!" );
 				}
 
-				if ( ! $this->link->addServer( $_server[0], $_server[1] ) )
+				if ( !$this->link->addServer( $_server[0], $_server[1] ) )
 				{
 					throw new Exception( "Connection to " . $_server[0] . ":" . $_server[1] . " failed!" );
 				}

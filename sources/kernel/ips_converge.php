@@ -16,7 +16,7 @@ if ( ! defined( "INIT_DONE" ) )
  * @author   Matthew Mecham (Adapted by Shahriyar Imanov)
  * @version  2.1
 **/
-class Converge
+class Ips_Converge
 {
 	/**
 	 * API Object Reference

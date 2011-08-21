@@ -22,7 +22,7 @@ class Input
 	private $API;
 
 	/**
-	 * Makesafe() version of $_COOKIE
+	 * Safe version of $_COOKIE
 	 * @var array
 	 */
 	public $cookie = array();
@@ -40,7 +40,13 @@ class Input
 	public $encoding_converter;
 
 	/**
-	 * Makesafe() version of $_GET
+	 * Safe version of $_ENV
+	 * @var array
+	 */
+	public $env = array();
+
+	/**
+	 * Safe version of $_GET
 	 * @var array
 	 */
 	public $get = array();
@@ -52,13 +58,19 @@ class Input
 	public $headers = array();
 
 	/**
-	 * Global input
+	 * Whether or not, Input::clean_makesafe_recursively() was applied to the selected Superglobal.
 	 * @var array
 	 */
-	public $input = array();
+	private $_is_cleanup_done_for = array(
+			'post'     => false,
+			'get'      => false,
+			'cookie'   => false,
+			'server'   => false,
+			'env'      => false
+		);
 
 	/**
-	 * Makesafe() version of $_POST
+	 * Safe version of $_POST
 	 * @var array
 	 */
 	public $post = array();
@@ -82,7 +94,7 @@ class Input
 	public $query_string_safe = "";
 
 	/**
-	 * Makesafe() version of $_REQUEST
+	 * Safe version of $_REQUEST
 	 * @var array
 	 */
 	public $request = array();
@@ -106,6 +118,48 @@ class Input
 		//----------
 
 		$this->API = $API;
+	}
+
+
+	/**
+	 * Method overloading for Input class
+	 *
+	 * @param     string      The name of the method being called.
+	 * @param     array       Enumerated array containing the parameters passed to the $name'd method.
+	 * @throws    Exception   In case, if method is not one of the pre-defined Six.
+	 */
+	public function __call ( $name , $arguments )
+	{
+		if ( !in_array( $name, array( "post", "get", "cookie", "request", "server", "env" ) ) )
+		{
+			throw new Exception( "Input::" . $name . "() not declared!" );
+			exit;
+		}
+
+		$_name_of_superglobal = "_" . strtoupper( $name );
+		$_max_iteration_level_for_cleanup = in_array( $name, array( "server", "env" ) ) ? 1 : 10;
+
+		if ( !empty( $arguments[0] ) and isset( $this->$name[ $arguments[0] ] ) )
+		{
+			return $this->$name[ $arguments[0] ];
+		}
+		elseif ( !empty( $arguments[0] ) and array_key_exists( $arguments[0], $GLOBALS[ $_name_of_superglobal ] ) )
+		{
+			return $this->$name[ $this->clean__makesafe_key( $arguments[0] ) ] = $this->clean__makesafe_value( $GLOBALS[ $_name_of_superglobal ][ $arguments[0] ], array(), true );
+		}
+		elseif ( !empty( $arguments[0] ) and !array_key_exists( $arguments[0], $GLOBALS[ $_name_of_superglobal ] ) )
+		{
+			return null;
+		}
+		else
+		{
+			if ( $this->_is_cleanup_done_for[ $name ] === true )
+			{
+				return $this->$name;
+			}
+			$this->_is_cleanup_done_for[ $name ] = true;
+			return $this->$name = $this->clean__makesafe_recursively( $GLOBALS[ $_name_of_superglobal ], $_max_iteration_level_for_cleanup );
+		}
 	}
 
 
@@ -140,10 +194,10 @@ class Input
 		}
 
 		# Is it an XMLHttpRequest?
-		$this->headers['request']['_is_ajax'] = FALSE;
+		$this->headers['request']['_is_ajax'] = false;
 		if ( isset( $this->headers['request']['X-REQUESTED-WITH'] ) and $this->headers['request']['X-REQUESTED-WITH'] == 'XMLHttpRequest' )
 		{
-			$this->headers['request']['_is_ajax'] = TRUE;
+			$this->headers['request']['_is_ajax'] = true;
 		}
 
 		//---------------------------------------------------
@@ -166,26 +220,6 @@ class Input
 		$this->clean__globals( $_COOKIE  );
 		$this->clean__globals( $_REQUEST );
 
-		//-----------------
-		// Makesafe
-		//-----------------
-
-		$this->request  = $_REQUEST; $this->clean__makesafe_value( $this->request   );
-		$this->get      = $_GET;     $this->clean__makesafe_value( $this->get       );
-		$this->cookie   = $_COOKIE;  $this->clean__makesafe_value( $this->cookie    );
-		$this->post     = $_POST;    $this->clean__makesafe_value( $this->post      );
-
-		//-------------------------------------------------------------
-		// Main Input container (POST has higher priority over GET)
-		//-------------------------------------------------------------
-
-		$this->input = @array_merge(
-				array() ,
-				$this->clean__makesafe_recursively( $_GET ) ,
-				$this->clean__makesafe_recursively( $_POST ) ,
-				$this->clean__makesafe_recursively( $_COOKIE )
-			);
-
 		//----------------------------------
 		// SERVER['PATH_INFO'] "exploded"
 		//----------------------------------
@@ -200,7 +234,7 @@ class Input
 		//-----------------------------
 
 		$this->query_string_safe = $this->clean__excessive_separators(
-				$this->clean__makesafe_value( $this->my_getenv( "QUERY_STRING" ), array( "urldecode" ), TRUE ),
+				$this->clean__makesafe_value( $this->my_getenv( "QUERY_STRING" ), array( "urldecode" ), true ),
 				"&amp;"
 			);
 		$this->query_string_real = str_replace( '&amp;' , '&' , $this->query_string_safe );
@@ -558,28 +592,29 @@ class Input
 
 		if ( is_array( $data ) and count( $data ) )
 		{
+			$_cleaned_data = array();
 			foreach ( $data as $k => $v )
 			{
 				# Recursion
 				if ( is_array( $v ) )
 				{
-					unset( $data[ $k ] );
-					$data[ $this->clean__makesafe_key( $k ) ] = $this->clean__makesafe_recursively( $v, $iteration + 1, $filters );
+					//unset( $data[ $k ] );
+					$_cleaned_data[ $this->clean__makesafe_key( $k ) ] = $this->clean__makesafe_recursively( $v, $iteration + 1, $filters );
 				}
 				# Actual cleanup
 				else
 				{
-					unset( $data[ $k ] );
-					$data[ $this->clean__makesafe_key( $k ) ] = $this->clean__makesafe_value( $v, $filters, true );    // We need output
+					//unset( $data[ $k ] );
+					$_cleaned_data[ $this->clean__makesafe_key( $k ) ] = $this->clean__makesafe_value( $v, $filters, true );    // We need output
 				}
 			}
 		}
 		else
 		{
-			$this->clean__makesafe_value( $data, $filters );
+			$_cleaned_data = $this->clean__makesafe_value( $data, $filters, true );
 		}
 
-		return $data;
+		return $_cleaned_data;
 	}
 
 
@@ -591,7 +626,7 @@ class Input
 	 * @param    boolean  Whether to return the result or not, defaults to FALSE
 	 * @return   mixed    MIXED Cleaned value if output_flag is set on; BOOLEAN otherwise
 	 */
-	public function clean__makesafe_value ( &$val, $filters = array(), $do_output = false )
+	public function clean__makesafe_value ( &$val , $filters = array() , $do_output = false )
 	{
 		# If its an array, 'walk-through-it' recursively with Input::_clean__makesafe() ...
 		if ( is_array( $val ) )
@@ -1354,7 +1389,7 @@ class Input
 		if ( $_parsed_url['host'] != $this->API->config['url']['hostname'][ $_parsed_url['scheme'] ] )
 		{
 			$this->API->logger__do_log( "API: Request redirection to location: " . $_parsed_url['request_uri'] , "INFO" );
-			$this->API->http_redirect( $_parsed_url['request_uri'] , 301 );
+			//$this->API->http_redirect( $_parsed_url['request_uri'] , 301 );
 		}
 
 		return $_parsed_url;

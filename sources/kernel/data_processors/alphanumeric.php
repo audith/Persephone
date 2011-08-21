@@ -7,16 +7,16 @@ if ( ! defined( "INIT_DONE" ) )
 }
 
 /**
- * MODULES : CORE.ALPHANUMERIC
+ * Data-Processors > Alphanumeric
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
 **/
 
-require_once( dirname( __FILE__ ) . "/_interface.php" );
+require_once( PATH_SOURCES . "/kernel/data_processors.php" );
 
-class Data_Processor__Alphanumeric extends Data_Processor
+class Data_Processors__Alphanumeric extends Data_Processors
 {
 	/**
 	 * API Object Reference
@@ -79,12 +79,7 @@ class Data_Processor__Alphanumeric extends Data_Processor
 		// Processing...
 		//-----------------
 
-		# READ-ONLY mode
-		if ( $m['running_subroutine']['s_service_mode'] == 'read-only' )
-		{
-			// NOthing for now...
-		}
-		elseif ( $m['running_subroutine']['s_service_mode'] == 'read-write' )
+		if ( $m['running_subroutine']['s_data_target'] == 'rdbms' )
 		{
 			//$this->data['content'] = html_entity_decode( $this->data['content'], ENT_QUOTES, "UTF-8" );
 		}
