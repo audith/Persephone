@@ -134,7 +134,7 @@
 				<ul>
 					<li><a href="#tabs__sr_alter_add__s_help">Data-flow Configuration</a></li>
 					<li><a href="#tabs__sr_alter_add__s_data_source">Data-source</a></li>
-					<li><a href="#tabs__sr_alter_add__s_data_binding">Data-binding</a></li>
+					<li><a href="#tabs__sr_alter_add__s_data_processing">Data-processing</a></li>
 					<li><a href="#tabs__sr_alter_add__s_data_target">Data-target</a></li>
 				</ul>
 				<fieldset id="tabs__sr_alter_add__s_help">
@@ -311,7 +311,7 @@
 						</span>
 					</fieldset>
 				</fieldset>
-				<fieldset id="tabs__sr_alter_add__s_data_binding">tabs__sr_alter_add__s_data_binding
+				<fieldset id="tabs__sr_alter_add__s_data_processing">tabs__sr_alter_add__s_data_processing
 				</fieldset>
 				<fieldset id="tabs__sr_alter_add__s_data_target">
 					<label title="Data compatibility" for="sr__s_data_compatibility"><strong>Data Compatibility:</strong><em>Additional processing/conversions, to perform on the processed data.</em></label>

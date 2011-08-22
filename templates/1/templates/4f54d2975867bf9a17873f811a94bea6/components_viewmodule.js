@@ -388,7 +388,10 @@ Acp_ComponentsViewmodule.prototype.registry__sr = {
 	's_data_source' : {
 		'no-fetch' : {
 			'_tabs' : {},
-			'_disabled_options__for__s_data_target' : ['tpl']
+			'_disabled_options__for' : {
+				's_data_target' : ['tpl']
+			},
+			'_value__for' : {}
 		},
 		'rdbms' : {
 			'_tabs' : {
@@ -400,7 +403,8 @@ Acp_ComponentsViewmodule.prototype.registry__sr = {
 					'@s_fetch_criteria__do_perform_sorting' : "0"
 				}
 			},
-			'_disabled_options__for__s_data_target' : []
+			'_disabled_options__for' : {},
+			'_value__for' : {}
 		},
 		'dom' : {
 
@@ -765,9 +769,9 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 		acp__components_viewmodule.Form.resetOnDemandObjects();
 
 		/* Delete cloned elements */
-		jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__query").not(":first").remove();
-		jQuery("#forms__components__sr__create SPAN.s_fetch_criteria__policies").not(":first").remove();
-		jQuery("#forms__components__sr__create SPAN.sr__sort_by").not(":first").remove();
+		acp__components_viewmodule.Form.self.find("SPAN.s_fetch_criteria__query").not(":first").remove();
+		acp__components_viewmodule.Form.self.find("SPAN.s_fetch_criteria__policies").not(":first").remove();
+		acp__components_viewmodule.Form.self.find("SPAN.sr__sort_by").not(":first").remove();
 
 		node_to_populate = registry['s_data_source'][this.obj.val()];
 
@@ -803,7 +807,7 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 					/**
 					 * @var {Object} Form fields
 					 */
-					var input_fields = jQuery("#forms__components__sr__create ." + key + " [name^='" + key + "']");
+					var input_fields = acp__components_viewmodule.Form.self.find("." + key + " [name^='" + key + "']");
 
 					if ( input_fields.length == 1 )
 					{
@@ -865,25 +869,12 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 			}
 		}
 
-		if ( '_disabled_options__for__s_data_target' in node_to_populate )
-		{
-			jQuery("#sr__s_data_target OPTION:disabled").prop("disabled","");
-			for ( var option in node_to_populate['_disabled_options__for__s_data_target'] )
-			{
-				jQuery("#sr__s_data_target OPTION[value='" + node_to_populate['_disabled_options__for__s_data_target'][option] + "']").prop("disabled", "disabled");
-				if ( jQuery("#sr__s_data_target").val() == node_to_populate['_disabled_options__for__s_data_target'][option] )
-				{
-					jQuery("#sr__s_data_target OPTION:enabled:first").prop("selected", "selected");
-				}
-			}
-		}
-
 		if ( '_value__for' in node_to_populate )
 		{
 			// Populate values, if any
 			for ( var key in node_to_populate['_value__for'] )
 			{
-				var field_obj = jQuery("#forms__components__sr__create [name^='" + key + "']");
+				var field_obj = acp__components_viewmodule.Form.self.find("[name^='" + key + "']");
 				var field_value = node_to_populate['_value__for'][ key ];
 
 				if ( field_obj.is("INPUT[type='text'],TEXTAREA") )
@@ -904,6 +895,22 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 			}
 		}
 
+		if ( '_disabled_options__for' in node_to_populate )
+		{
+			acp__components_viewmodule.Form.self.find("SELECT > OPTION:disabled").prop("disabled", "");
+			for ( var key in node_to_populate['_disabled_options__for'] )
+			{
+				for ( var option in node_to_populate['_disabled_options__for'][key] )
+				{
+					acp__components_viewmodule.Form.self.find("SELECT[name='" + key + "'] > OPTION[value='" + node_to_populate['_disabled_options__for'][key] + "']").prop("disabled", "disabled");
+				}
+				if ( acp__components_viewmodule.Form.self.find("SELECT[name='" + key + "']").val() == node_to_populate['_disabled_options__for'][key] )
+				{
+					acp__components_viewmodule.Form.self.find("SELECT[name='" + key + "'] > OPTION:enabled:first").prop("selected", "selected");
+				}
+			}
+		}
+
 		/* Populate Data-target-configuration, by recursively-calling this method */
 		arguments.callee("#forms__components__sr__create [name='s_data_target']", registry);
 	}
@@ -911,7 +918,7 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 	else if ( this.obj.attr("name") == 's_data_target' )
 	{
 		/* Disable **only** .ondemand elemens within Data-target-configuration-tab!!! */
-		acp__components_viewmodule.Form.resetOnDemandObjects("#tabs__sr_alter_add__s_data_source .ondemand, #tabs__sr_alter_add__s_data_binding .ondemand");
+		acp__components_viewmodule.Form.resetOnDemandObjects("#tabs__sr_alter_add__s_data_source .ondemand, #tabs__sr_alter_add__s_data_processing .ondemand");
 
 		// @todo Coming soon...
 	}
