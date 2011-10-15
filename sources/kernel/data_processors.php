@@ -69,7 +69,7 @@ abstract class Data_Processors
 	 * @param   array      Array of errors occured. Used on return. Defaults to empty array.
 	 * @return  boolean    TRUE on success, FALSE otherwise.
 	 */
-	abstract public function modules__ddl__do_validate( &$input , &$m , &$ddl_config__validated = array() , &$faults );
+	abstract public function modules__ddl__do_validate( &$input , &$m , &$ddl_config__validated = array() , &$faults = array() );
 
 	/**
 	 * Checks whether the chosen data-field is eligible to be a Title-field or not.
