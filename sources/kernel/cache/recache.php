@@ -81,6 +81,10 @@ class Cache__Recache
 		{
 			# Cache Abstraction - Do your thing :) and log the result
 			$return = $this->API->Cache->cache__do_update( array( 'name' => $key, 'value' => $_cache, 'array' => is_array( $_cache ) ? 1 : 0 ) );
+			if ( array_key_exists( $key , $this->API->Cache->cache ) )  // Update Cache->cache container if applicable.
+			{
+				$this->API->Cache->cache[ $key ] = $_cache;
+			}
 			$this->API->logger__do_log( "Cache - Recache " . ( $return !== FALSE ? "succeeded" : "completely or partially failed" ) . " for key '" . $key . "'" , $return !== FALSE ? "INFO" : "ERROR" );
 		}
 

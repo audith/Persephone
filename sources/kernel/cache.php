@@ -565,8 +565,8 @@ class Cache
 						),
 				);
 
-			//if ( $v['donow'] )
-			//{
+			if ( $v['donow'] )
+			{
 				$_db_return = $this->API->Db->simple_exec_query();
 
 				# Log
@@ -579,11 +579,11 @@ class Cache
 
 				# Return
 				return ( $_cachelib_return !== FALSE and $_db_return !== FALSE );
-			//}
-			//else
-			//{
-			//	$this->API->Db->simple_exec_query_shutdown();
-			//}
+			}
+			else
+			{
+				$this->API->Db->simple_exec_query_shutdown();
+			}
 		}
 		else
 		{

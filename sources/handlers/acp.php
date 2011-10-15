@@ -204,8 +204,8 @@ class Module_Handler
 										's_name'                          => 'test',
 										's_data_source'                   => 'rdbms',
 										's_data_target'                   => 'rdbms',
-										's_pathinfo_uri_schema'           => 'test/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
-										's_pathinfo_uri_schema_parsed'    => 'test/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
+										's_pathinfo_uri_schema'           => 'test',
+										's_pathinfo_uri_schema_parsed'    => 'test',
 										's_qstring_parameters'            => array(
 												'm_unique_id_clean'                 => array(
 														'request_regex'                       => '[a-z0-9]{32}',
@@ -214,11 +214,7 @@ class Module_Handler
 											),
 										's_fetch_criteria'                => array(),
 										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(
-												array( 'file' => "/jquery.tablesorter.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-												array( 'file' => "/jquery.tablesorter.pager.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-												array( 'file' => "/jquery.metadata.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-											),
+										's_additional_skin_assets'        => array(),
 									),
 						),
 			);
@@ -1800,6 +1796,7 @@ class Module_Handler
 					'name'         => $this->API->config['modules']['m_names_strtolower'] ? strtolower( $input['name'] ) : $input['name'],
 					'label'        => $input['label'],
 					'is_required'  => $input['is_required'] ? 1 : 0,
+					'position'     => count( $m['m_data_definition'] ) + 1,
 				);
 
 			# NAME: Validation...
@@ -2166,14 +2163,26 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_sort ()
 	{
+		$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
+
 		$_position_information = $this->API->Input->post("position");
+		/**
+		 * If we don't have position-information, we guess it, based on DDL-information, since DDL-info is fetched with sorting.
+		 *
+		 * @see Cache__Recache->modules__do_recache()
+		 */
 		if ( is_null( $_position_information ) or !is_array( $_position_information ) or empty( $_position_information ) )
 		{
-			return array( 'faultCode' => 0, 'faultMessage' => "Empty data-set! Request aborted..." );
+			$_position_information = array();
+			$_i = 0;
+			foreach ( $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ]['m_data_definition'] as $_field_info )
+			{
+				$_position_information[ $_i ] = $_field_info['name'];
+				$_i++;
+			}
 		}
-		$m_unique_id     = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
-		$_rows_affected  = 0;
 
+		$_rows_affected = 0;
 		foreach ( $_position_information as $_position=>$_name )
 		{
 			$this->API->Db->cur_query = array(
@@ -2416,13 +2425,14 @@ class Module_Handler
 				}
 			}
 
-			//-----------------------------------------
-			// SUCCESS : Still here :) Update cache
-			//-----------------------------------------
+			//------------------------------------------
+			// SUCCESS : Update cache and reorder DDL
+			//------------------------------------------
 
 			$_recache = $this->API->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
+			$this->modules__ddl__do_sort();
 			return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field-registry successfully dropped!<br />Refreshing...", "responseAction" => "refresh" );
 		}
 		else
