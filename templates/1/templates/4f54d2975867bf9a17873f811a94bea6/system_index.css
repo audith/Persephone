@@ -10,7 +10,7 @@ UL.section > LI > FORM A.revert
 	float: right;
 	clear: right;
 	cursor: pointer;
-	margin: 10px 5px 10px 5px;
+	margin: 1.5% 1.5% 1.5% 0;
 	
 	text-indent:-99999px;
 }

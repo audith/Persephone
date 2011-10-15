@@ -832,7 +832,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 				 */
 				if ( 'function' == typeof jQuery().metadata )  // Is jQuery.metadata() installed?
 				{
-					var newOptions = jQuery(this).metadata().newOptions;
+					var newOptions = jQuery(this).metadata().tabs;
 					if ( typeof newOptions == 'object' && !persephone.isEmptyObject(newOptions) )
 					{
 						jQuery.extend(true, options, newOptions);  // 'true' means we merge two arrays and assign the resulting value to the first variable

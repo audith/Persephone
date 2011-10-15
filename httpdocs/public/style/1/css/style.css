@@ -84,7 +84,7 @@
 		color: #0085bf;
 		text-decoration: none;
 	}
-
+	
 	DIV#matte
 	{
 		position: absolute;
@@ -338,8 +338,7 @@
 		min-height: 54px;
 		padding: 3px 3px 3px 60px;
 		margin-top: 5px;
-		border-radius: 3px;
-		-moz-border-radius: 3px;
+		border-radius: 6px;
 		position: relative;
 		left: 50%;
 
@@ -420,6 +419,7 @@
 		border-radius: 10px;
 		border-style: solid;
 		border-width: 1px !important;
+		margin: 0 0 0.7%;
 		overflow: hidden;
 
 		color: #4a494b;
@@ -428,23 +428,23 @@
 		UL.section > LI.ui-tabs,
 		.section > .article.ui-tabs
 		{
-			padding: 2px !important;
+			width: 99.4% !important;
+			padding: 0.2%;
 		}
 
 	UL.section > LI > H2,
 	.section > .article > H2
 	{
-		border-width: 0 !important;
-		border-radius: 0 !important;
 		background: -moz-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* FF3.6+ */
 		background: -webkit-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* Chrome10+,Safari5.1+ */
 		background: -o-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* Opera11.10+ */
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9eef2', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
 		background: linear-gradient(top, #e9eef2 0%, transparent 100%); /* W3C */
-		height: 45px;
+		width: 97%;
+		height: 1.2em;
 		float: left;
 		clear: both;
-		padding: 10px 15px;
+		padding: 1.5%;
 		overflow: hidden;
 		/* white-space: nowrap; */
 
@@ -478,18 +478,15 @@
 		}
 
 	UL.section > LI > P,
-		UL.section > LI > FIELDSET,
 		UL.section > LI > FORM > P,
 		UL.section > LI > FORM > FIELDSET,
 	.section > .article > P,
-		.section > .article > FIELDSET,
 		.section > .article > FORM > P,
 		.section > .article > FORM > FIELDSET
 	{
 		height: 100%;
 		float: left;
 		clear: both;
-		margin: 0 15px 15px;
 		table-layout: fixed;
 		vertical-align: top;
 
@@ -502,10 +499,10 @@
 	{
 		background-color: #E6EEEE;
 		display: table;
+		width: 100%;
 		height: 100%;
 		float: left;
 		clear: both;
-		margin: 0 15px 15px;
 		table-layout: fixed;
 		vertical-align: top;
 		/*
@@ -652,6 +649,7 @@
 	.section > .article FORM .system_console
 	{
 		display: none;
+		width: 91.8%;
 		min-height: 54px;
 		float: left;
 		clear: both;
@@ -660,8 +658,9 @@
 		background-repeat: no-repeat;
 		border-width: 1px;
 		border-style: solid;
-		padding: 3px 3px 3px 60px;
-		margin: 10px 16px 0 15px;
+		border-radius: 6px;
+		padding: 1% 1% 1% 7%;
+		margin: 0;
 
 		text-align: left;
 		font-size: 1em;
@@ -712,60 +711,168 @@
 	UL.section > LI > FORM,
 	.section > .article > FORM
 	{
-		width: 100%;
+		width: 97%;
 		height: auto;
 		float: left;
-	}
-
-	UL.section > LI.ui-tabs > FORM.ui-widget-content,
-	.section > .article.ui-tabs > FORM.ui-widget-content
-	{
-		width: 855px;
-		padding: 1em 13px;
+		padding: 1.5%;
 	}
 	
-	UL.section > LI.ui-tabs > FORM > FIELDSET.deco_1,
-	.section > .article.ui-tabs > FORM > FIELDSET.deco_1
-	{
-		border-width: 0 1px 1px;
-		border-style: solid;
-		border-color: #dddddd;
-		border-radius: 6px;
-		background-color: white;
-		padding: 0 0 5px;
-		margin: 0 0 5px;
-	}
+		/**
+		 * All FIELDSETs
+		 */
+		UL.section > LI > FORM FIELDSET,
+		.section > .article > FORM FIELDSET
+		{
+			width: 100%;
+			float: left;
+		}
+		
+			/**
+			 * FIELDSET, a child of FORM
+			 */
+			UL.section > LI > FORM > FIELDSET,
+			.section > .article > FORM > FIELDSET
+			{
+				margin: 0 0 1% 0;
+			}
+			
+				UL.section > LI > FORM > FIELDSET.ui-tabs,
+				.section > .article > FORM > FIELDSET.ui-tabs
+				{
+					width: auto;
+				}
+				
+					UL.section > LI > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel,
+					.section > .article > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel
+					{
+						width: auto;
+						padding: 0;
+						margin: 0;
+					}
+					
+						UL.section > LI > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel FIELDSET,
+						.section > .article > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel FIELDSET
+						{
+							width: 100%;
+							margin: 0;
+						}
+			
+			/**
+			 * FIELDSET.deco_1
+			 */
+			UL.section > LI > FORM FIELDSET.deco_1,
+			.section > .article > FORM FIELDSET.deco_1
+			{
+				border-width: 0 1px 1px;
+				border-style: solid;
+				border-color: #dddddd;
+				border-radius: 6px;
+				background-color: white;
+			}
+			
+			/**
+			 * Nested FIELDSETs, a descendant of FORM
+			 */
+			UL.section > LI > FORM FIELDSET > FIELDSET,
+			.section > .article > FORM FIELDSET > FIELDSET
+			{
+				margin: 2%;
+				width: 95.7%;
+			}
 
-	UL.section > LI > FORM LABEL > STRONG,
-	.section > .article > FORM LABEL > STRONG
+		UL.section > LI > FORM LABEL,
+		.section > .article > FORM LABEL
+		{
+			width: 35%;
+			float: left;
+			clear: left;
+			display: block;
+			margin: 1.5% 0 0 1.5%;
+		}
+		
+			UL.section > LI > FORM LABEL.full_size,
+			.section > .article > FORM LABEL.full_size
+			{
+				clear: both;
+			}
+		
+			UL.section > LI > FORM LABEL > STRONG,
+			.section > .article > FORM LABEL > STRONG
+			{
+				clear: both;
+				float: left;
+		
+				font-size: 1.1em;
+				line-height: 1.5em;
+				font-weight: bold;
+				color: #0085bf;
+			}
+			
+		UL.section > LI > FORM EM.ui-tooltip,
+		.section > .article > FORM EM.ui-tooltip
+		{
+			clear: right;
+			float: left;
+			width: 55%;
+			margin: 0.5% 0 0.5% 36.5%;
+			
+			font-size: 0.9em;
+			color: #666666;
+		}
+		
+		UL.section > LI > FORM INPUT.text,
+			UL.section > LI > FORM TEXTAREA,
+			UL.section > LI > FORM SELECT,
+		.section > .article > FORM INPUT.text,
+			.section > .article > FORM TEXTAREA,
+			.section > .article > FORM SELECT
+		{
+			min-width: 40%;
+			max-width: 75%;
+			margin: 1.5% 0 0;
+			float: left;
+			clear: none;
+			border: 1px #99CBDF solid;
+		}
+
+
+
+	UL.section.full_size > LI > FORM INPUT.full_size,
+		UL.section.full_size > LI > FORM TEXTAREA.full_size,
+	.section.full_size > .article > FORM INPUT.full_size,
+		.section.full_size > .article > FORM TEXTAREA.full_size
 	{
-		clear: both;
+		width: 834px;
+		height: 300px; /* @todo */
 		float: left;
-
-		font-size: 1.1em;
-		font-weight: bold;
-		color: #0085bf;
-	}
-
-	UL.section > LI > FORM LABEL > EM,
-	.section > .article > FORM LABEL > EM
-	{
 		clear: both;
-		float: left;
-		margin-top: 3px;
-
-		font-size: 0.9em;
-		color: #666666;
+		margin: 10px 20px 15px 0;
+		border: 1px #99CBDF solid;
+		overflow: hidden;
 	}
-
+	
 	UL.section > LI > FORM SELECT OPTION,
 	.section > .article > FORM SELECT OPTION
 	{
 		padding-left: 2px;
 	}
+	
+	UL.section > LI > FORM SELECT OPTGROUP,
+	.section > .article > FORM SELECT OPTGROUP
+	{
+		padding-left: 5px;
+	}
 
-	UL.section > LI > FORM INPUT.radio,	UL.section > LI > FORM INPUT.checkbox,
-	.section > .article > FORM INPUT.radio, .section > .article > FORM INPUT.checkbox
+		UL.section > LI > FORM SELECT OPTGROUP OPTION,
+		.section > .article > FORM SELECT OPTGROUP OPTION
+		{
+			padding-left: 10px;
+		}
+
+	UL.section > LI > FORM INPUT.radio,
+		UL.section > LI > FORM INPUT.checkbox,
+	.section > .article > FORM INPUT.radio,
+		.section > .article > FORM INPUT.checkbox
 	{
 		width: auto;
 		margin: 0;
@@ -818,31 +925,25 @@
 		color: #BB0000 !important;
 	}
 
-	UL.section > LI > FORM SPAN.mceEditor > TABLE,
-	.section > .article > FORM SPAN.mceEditor > TABLE
-	{
-		margin: 0;
-	}
-
 	UL.section > LI > FORM SPAN.input,
 	.section > .article > FORM SPAN.input
 	{
 		float: left;
-		padding: 0;
-		margin: 5px 20px 0 10px;
+		clear: none;
+		margin: 1.5% 0 0;
 
-		font-size: 1em;
+		font-size: inherit;
 		color: #00639D;
 		line-height: 1.5em;
 	}
-
+	
 		UL.section > LI > FORM SPAN.input > *,
 		.section > .article > FORM SPAN.input > *
 		{
-			width: auto !important;
-			clear: none !important;
-			padding: 0 !important;
-			margin: 2px 3px 0 0 !important;
+			width: auto;
+			clear: none;
+			padding: 0;
+			margin: 2px 3px 0 0;
 			border: 0;
 		}
 
@@ -852,6 +953,13 @@
 			clear: none;
 			padding: 0;
 			margin: 0 !important;
+		}
+		
+		UL.section > LI > FORM SPAN.input > LABEL,
+		.section > .article > FORM SPAN.input > LABEL
+		{
+			margin: 0;
+			clear: none;
 		}
 
 		UL.section > LI > FORM SPAN.input INPUT.text,
@@ -870,17 +978,32 @@
 			/* font-size: 1em; */
 			color: #00639D;
 		}
-
-	UL.section > LI > FORM SELECT OPTGROUP,
-	.section > .article > FORM SELECT OPTGROUP
+		
+	UL.section > LI > FORM SPAN.input.full_size,
+	.section > .article > FORM SPAN.input.full_size
 	{
-		padding-left: 5px;
+		clear: both;
+		margin: 1% 0 2% 3%;
+		width: 97%;
 	}
-
-	UL.section > LI > FORM SELECT OPTGROUP OPTION,
-	.section > .article > FORM SELECT OPTGROUP OPTION
+	
+		UL.section > LI > FORM EM.ui-tooltip.full_size,
+		.section > .article > FORM EM.ui-tooltip.full_size
+		{
+			clear: right;
+			float: left;
+			width: auto;
+			max-width: 85%;
+			margin: 0.5% 0 1.5% 3%;
+			
+			font-size: 0.9em;
+			color: #666666;
+		}
+	
+	UL.section > LI > FORM SPAN.mceEditor > TABLE,
+	.section > .article > FORM SPAN.mceEditor > TABLE
 	{
-		padding-left: 10px;
+		margin: 0;
 	}
 
 	UL.section > LI > FORM TABLE TFOOT DIV.pager,
@@ -941,11 +1064,9 @@
 		.section > .article > FORM SPAN.buttons,
 		.section > .article > FORM FIELDSET.buttons
 	{
-		width: 100%;
-		margin: 0px auto;
-		padding: 15px 0 20px 0;
-		clear: both;
-		float: left;
+		margin: 0 auto;
+		padding: 2% 0;
+		float: none;
 
 		text-align: center;
 	}
@@ -989,141 +1110,10 @@
 	/* .section.half_size
 	---------------------------------*/
 
-	UL.section.half_size
-	{
-		width: 528px;
-		margin: 5px 5px 5px -443px;
-	}
-
-	UL.section.half_size > LI
-	{
-		width: 528px;
-		padding-bottom: 5px;
-		margin: 0;
-		float: left;
-		clear: both;
-	}
-
-	UL.section.half_size > LI FORM .system_console
-	{
-		width: 432px;
-	}
-
-	UL.section.half_size > LI > H2
-	{
-		width: 497px;  /* +31px goes to left+right padding */
-	}
-
-	UL.section.half_size > LI > FORM > H3
-	{
-	/*
-		background-image: url('../images/content__fullsize__subtitle_bg.jpg');
-		background-position: 0 0;
-		background-repeat: no-repeat;
-		float: left;
-		width: 675px;
-		height: 23px;
-		clear: both;
-		margin: 0 15px;
-		padding: 42px 170px 8px 12px;
-	*/
-		color: white;
-		font-weight: bold;
-	}
-
-	/*
-	UL.section.half_size > LI > P,
-	UL.section.half_size > LI > FORM > P,
-	*/
-	UL.section.half_size > LI > FORM > FIELDSET
-	{
-		width: 498px;
-	}
-
-	UL.section.half_size > LI > FORM LABEL
-	{
-		width: 238px;
-		float: left;
-		clear: left;
-		display: block;
-		padding-right: 10px;
-	}
-
-	UL.section.half_size > LI > FORM LABEL.full_size
-	{
-		width: 487px;
-		float: left;
-		clear: both;
-		display: block;
-		margin-top: 15px;
-		padding-right: 10px;
-	}
-
-	UL.section.half_size > LI > FORM INPUT.text,
-	UL.section.half_size > LI > FORM SELECT,
-	UL.section.half_size > LI > FORM TEXTAREA
-	{
-		float: left;
-		clear: right;
-		margin: 0 0 0 10px;
-		border: 1px #99CBDF solid;
-	}
-
-		UL.section.half_size > LI > FORM INPUT.text,
-		UL.section.half_size > LI > FORM TEXTAREA
-		{
-			width: 210px;
-		}
-
-		UL.section.half_size > LI > FORM SELECT
-		{
-			width: 214px;
-		}
-
-	UL.section.half_size > LI > FORM INPUT.full_size,
-	UL.section.half_size > LI > FORM TEXTAREA.full_size
-	{
-		width: 473px;  /* 497 in total */
-		height: 300px; /* @todo */
-		float: left;
-		clear: both;
-		margin: 10px 20px 15px 0;
-		border: 1px #99CBDF solid;
-		overflow: hidden;
-	}
-
-	UL.section.half_size > LI > FORM SPAN.mceEditor
-	{
-		width: 473px;  /* 497 in total */
-		height: auto;
-		float: left;
-		clear: both;
-		margin: 10px 20px 15px 0;
-		border: 1px #99CBDF solid;
-		overflow: hidden;
-	}
-
-	UL.section.half_size > LI > FORM SPAN.half_size    /* extends SPAN.input above */
-	{
-		width: 219px;
-		clear: right;
-		margin: 15px 20px 0 10px;
-	}
-
-	UL.section.half_size > LI > FORM SPAN.full_size    /* extends SPAN.input above */
-	{
-		width: 477px;
-		clear: both;
-		margin: 15px 20px 10px 0;
-
-		white-space: nowrap;
-	}
-
-	UL.section.half_size > LI > TABLE,
-	UL.section.half_size > LI > FORM > TABLE
-	{
-		width: 497px;
-	}
+	
+	
+	
+	
 
 	/* .section.full_size
 	---------------------------------*/
@@ -1138,28 +1128,8 @@
 	.section.full_size > .article
 	{
 		width: 885px;
-		padding-bottom: 5px;
-		margin: 0 0 7px;
 		float: left;
 		clear: both;
-	}
-
-		UL.section > LI.ui-tabs,
-		.section > .article.ui-tabs
-		{
-			width: 881px !important;
-		}
-
-	UL.section.full_size > LI FORM .system_console,
-	.section.full_size > .article FORM .system_console
-	{
-		width: 791px;
-	}
-
-	UL.section.full_size > LI > H2,
-	.section.full_size > .article > H2
-	{
-		width: 855px;  /* +30px goes to left+right padding */
 	}
 
 	UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1 > LEGEND,
@@ -1175,160 +1145,15 @@
 		border-width: 0;
 		border-radius: 6px 6px 0 0;
 		float: left;
-		width: 843px;
-		height: 24px;
+		width: 845px;
+		height: 2em;
 		clear: both;
-		padding: 3px 5px;
+		padding: 0.3% 0.7%;
 
 		color: white;
 		font-weight: bold;
 		font-size: 1.2em;
-		line-height: 24px;
-	}
-
-	/*
-	UL.section.full_size > LI > P, UL.section.full_size > LI > FORM > P,
-	.section.full_size > .article > P, .section.full_size > .article > FORM > P,
-	*/
-	UL.section.full_size > LI > FORM > FIELDSET,
-	.section.full_size > .article > FORM > FIELDSET
-	{
-		width: 855px;
-	}
-	
-		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs,
-		.section.full_size > .article > FORM > FIELDSET.ui-tabs
-		{
-			width: 849px;
-		}
-		
-			UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content,
-			.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content
-			{
-				width: 819px;
-				padding: 15px;
-			}
-
-		UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1,
-		.section.full_size > .article.ui-tabs > FORM > FIELDSET.deco_1
-		{
-			width: 853px;
-		}
-
-	UL.section.full_size > LI > FORM LABEL,
-	.section.full_size > .article > FORM LABEL
-	{
-		width: 418px;
-		float: left;
-		clear: left;
-		display: block;
-		padding-right: 10px;
-	}
-
-		UL.section.full_size > LI > FORM > FIELDSET.deco_1 > LABEL,
-		.section.full_size > .article > FORM > FIELDSET.deco_1 > LABEL
-		{
-			width: 390px;
-			margin: 10px 0 10px 15px;
-		}
-		
-		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL,
-		.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL
-		{
-			width: 380px;
-			margin: 10px 0;
-		}
-
-	UL.section.full_size > LI > FORM LABEL.full_size,
-	.section.full_size > .article > FORM LABEL.full_size
-	{
-		width: 846px;
-		float: left;
-		clear: both;
-		display: block;
-		margin-top: 15px;
-		padding-right: 10px;
-	}
-	
-		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL.full_size,
-		.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content LABEL.full_size
-		{
-			width: 819px;
-			margin: 10px 0;
-			padding: 0;
-		}
-
-	UL.section.full_size > LI > FORM INPUT.text,
-		UL.section.full_size > LI > FORM SELECT,
-		UL.section.full_size > LI > FORM TEXTAREA,
-	.section.full_size > .article > FORM INPUT.text,
-		.section.full_size > .article > FORM SELECT,
-		.section.full_size > .article > FORM TEXTAREA
-	{
-		float: left;
-		clear: right;
-		margin: 0 0 0 10px;
-		border: 1px #99CBDF solid;
-	}
-
-		UL.section.full_size > LI > FORM INPUT.text,
-			UL.section.full_size > LI > FORM TEXTAREA,
-		.section.full_size > .article > FORM INPUT.text,
-			.section.full_size > .article > FORM TEXTAREA
-		{
-			width: 389px;
-		}
-
-		UL.section.full_size > LI > FORM SELECT,
-		.section.full_size > .article > FORM SELECT
-		{
-			width: 393px;
-		}
-
-			UL.section.full_size > LI > FORM > FIELDSET.deco_1 > INPUT.text,
-				UL.section.full_size > LI > FORM > FIELDSET.deco_1 > TEXTAREA,
-			.section.full_size > .article > FORM > FIELDSET.deco_1 > INPUT.text,
-				.section.full_size > .article > FORM > FIELDSET.deco_1 > TEXTAREA
-			{
-				width: 379px;
-				margin: 10px 5px 10px 10px;
-				clear: none;
-			}
-
-			UL.section.full_size > LI > FORM > FIELDSET.deco_1 SELECT,
-			.section.full_size > .article > FORM > FIELDSET.deco_1 SELECT
-			{
-				width: 385px;
-				margin: 10px 5px 10px 10px;
-				clear: none;
-			}
-			
-			UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content INPUT.text,
-				UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content TEXTAREA,
-			.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content INPUT.text,
-				.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content TEXTAREA
-			{
-				margin: 10px 0 10px 10px;
-			}
-			
-			UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SELECT,
-			.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SELECT
-			{
-				margin: 10px 0 10px 10px;
-			}
-
-	UL.section.full_size > LI > FORM INPUT.full_size,
-		UL.section.full_size > LI > FORM TEXTAREA.full_size,
-	.section.full_size > .article > FORM INPUT.full_size,
-		.section.full_size > .article > FORM TEXTAREA.full_size
-	{
-		width: 834px;
-		height: 300px; /* @todo */
-		float: left;
-		clear: both;
-		margin: 10px 20px 15px 0;
-		border: 1px #99CBDF solid;
-		overflow: hidden;
+		line-height: 2em;
 	}
 
 	UL.section.full_size > LI > FORM SPAN.mceEditor,
@@ -1340,60 +1165,8 @@
 		margin: 10px 20px 15px 0;
 		border: 1px #99CBDF solid;
 		overflow: hidden;
-	}
-
-	UL.section.full_size > LI > FORM SPAN.half_size,  /* extends SPAN.input above */
-	.section.full_size > .article > FORM SPAN.half_size
-	{
-		width: 398px;
-		clear: right;
-		margin: 15px 20px 0 10px;
-	}
-
-	UL.section.full_size > LI > FORM SPAN.full_size,  /* extends SPAN.input above */
-	.section.full_size > .article > FORM SPAN.full_size
-	{
-		width: 836px;
-		clear: both;
-		margin: 15px 20px 10px 0;
-
-		white-space: nowrap;
-	}
-
-		UL.section.full_size > LI > FORM > FIELDSET.deco_1 > SPAN.full_size,
-		.section.full_size > .article > FORM > FIELDSET.deco_1 > SPAN.full_size
-		{
-			width: 826px;
-			clear: both;
-			margin: 15px 0 10px;
-
-			white-space: nowrap;
-		}
-
-			UL.section.full_size > LI > FORM > FIELDSET.deco_1 > SPAN.full_size TEXTAREA,
-			.section.full_size > .article > FORM > FIELDSET.deco_1 > SPAN.full_size TEXTAREA
-			{
-				width: 820px;
-			}
-			
-		UL.section.full_size > LI > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SPAN.full_size,
-		.section.full_size > .article > FORM > FIELDSET.ui-tabs FIELDSET.ui-widget-content SPAN.full_size
-		{
-			width: 819px;
-			clear: both;
-			margin: 0;
-
-			white-space: nowrap;
-		}
-
-	UL.section.full_size > LI > TABLE,
-		UL.section.full_size > LI > FORM > TABLE,
-	.section.full_size > .article > TABLE,
-		.section.full_size > .article > FORM > TABLE
-	{
-		width: 855px;
-	}
-
+	}				
+				
 	/* UL.side_pane
 	---------------------------------*/
 

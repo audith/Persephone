@@ -20,7 +20,6 @@
 
 					<label title="{{$SETTINGS.conf_title}}" {{if $SETTINGS.conf_type neq 'yes_no'}}for="settings_{{$SETTINGS.conf_key}}"{{/if}}>
 						<strong>{{$SETTINGS.conf_title}}</strong>
-						<em>{{$SETTINGS.conf_description}}</em>
 					</label>
 
 						{{if $SETTINGS.conf_type eq 'yes_no'}}
@@ -55,9 +54,12 @@
 					Error - empty dropdown extraz! Skipping...
 							{{/if}}
 						{{/if}}
+
 						{{if $SETTINGS.conf_value !== $SETTINGS.conf_default and !is_null( $SETTINGS.conf_value ) and $SETTINGS.conf_value neq ''}}
 					<a class="revert" title="Revert to default value" href="?revert__for_{{$SETTINGS.conf_id}}">Revert to default value</a>
 						{{/if}}
+
+					<em class="ui-tooltip">{{$SETTINGS.conf_description}}</em>
 
 						{{if $SETTINGS.conf_end_group neq ''}}
 				</fieldset>

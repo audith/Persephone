@@ -53,7 +53,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Maxlength (in bytes)'
+							'maxlength' : 'Maxlength (in bytes):'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum length in bytes. Leave empty to default to &quot;255&quot;. <b>Don&#039;t forget to compensate for multi-byte characters!</b>'
@@ -71,7 +71,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -89,7 +89,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -107,7 +107,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -125,7 +125,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -143,7 +143,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -161,7 +161,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -179,7 +179,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -197,7 +197,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -215,7 +215,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -233,7 +233,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Max # of Digits'
+							'maxlength' : 'Max # of Digits:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum number of digits, including sign (+/-) character. The value is automatically set and is shown here for your reference.'
@@ -251,7 +251,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Precision &amp; Scale'
+							'maxlength' : 'Precision &amp; Scale:'
 						},
 						'tip__for' : {
 							'maxlength' : 'In &quot;<i><b>p,s</b></i>&quot; format; e.g.: &quot;5,2&quot; means total 5 digits, 2 of which follows decimal point, as in &quot;999.99&quot;. Leave empty to default to &quot;10,0&quot;.'
@@ -269,7 +269,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_unique' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Precision &amp; Scale'
+							'maxlength' : 'Precision &amp; Scale:'
 						},
 						'tip__for' : {
 							'maxlength' : 'In &quot;<i><b>p,s</b></i>&quot; format; e.g.: &quot;5,2&quot; means total 5 digits, 2 of which follows decimal point, as in &quot;999.99&quot;. Leave empty to default to &quot;10,0&quot;.'
@@ -310,7 +310,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_required' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Maximum Filesize'
+							'maxlength' : 'Maximum Filesize:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum filesize (suffixes supported: &quot;1K&quot;, &quot;2M&quot;). Enter &quot;0&quot; to disable this restriction.'
@@ -327,7 +327,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_required' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Maximum Filesize'
+							'maxlength' : 'Maximum Filesize:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum filesize (suffixes supported: &quot;1K&quot;, &quot;2M&quot;). Enter &quot;0&quot; to disable this restriction.'
@@ -344,7 +344,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_required' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Maximum Filesize'
+							'maxlength' : 'Maximum Filesize:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum filesize (suffixes supported: &quot;1K&quot;, &quot;2M&quot;). Enter &quot;0&quot; to disable this restriction.'
@@ -361,7 +361,7 @@ Acp_ComponentsViewmodule.prototype.registry__ddl = {
 					'is_required' : false,
 					'_additional_params' : {
 						'label__for' : {
-							'maxlength' : 'Maximum Filesize'
+							'maxlength' : 'Maximum Filesize:'
 						},
 						'tip__for' : {
 							'maxlength' : 'Maximum filesize (suffixes supported: &quot;1K&quot;, &quot;2M&quot;). Enter &quot;0&quot; to disable this restriction.'
@@ -579,7 +579,7 @@ Acp_ComponentsViewmodule.prototype.ddl__register__apply_registry = function ( ob
 					if ( key in node_to_populate['options']['_additional_params']['tip__for'] )
 					{
 						_tip = node_to_populate['options']['_additional_params']['tip__for'][key];
-						jQuery("#forms__components__ddl__alter_add ." + key + ".ondemand > LABEL:first > EM").html(_tip);
+						jQuery("#forms__components__ddl__alter_add ." + key + ".ondemand > EM.ui-tooltip").html(_tip);
 					}
 				}
 			}
@@ -897,7 +897,7 @@ Acp_ComponentsViewmodule.prototype.sr__create__apply_registry = function ( obj /
 
 		if ( '_disabled_options__for' in node_to_populate )
 		{
-			acp__components_viewmodule.Form.self.find("SELECT > OPTION:disabled").prop("disabled", "");
+			acp__components_viewmodule.Form.self.find("SELECT > OPTION:disabled").prop("disabled","");
 			for ( var key in node_to_populate['_disabled_options__for'] )
 			{
 				for ( var option in node_to_populate['_disabled_options__for'][key] )

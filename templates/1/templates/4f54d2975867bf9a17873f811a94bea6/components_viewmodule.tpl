@@ -4,23 +4,26 @@
 		<h2>Data Definition Management (for Master-unit)</h2>
 		<form id="forms__components__ddl__alter_add" action="" method="post" class="js__go_ajax">
 			<fieldset class="name onload">
-				<label title="Field Name" for="name"><strong>Field Name:</strong><em>Alphanumeric + underscore chars only, in format: ^[a-z][a-z0-9_]*$ meaning first letter can't be numeric.</em></label>
+				<label title="Field Name" for="name"><strong>Field Name:</strong></label>
 				<input type="text" class="text required _701" id="name" name="name" value="" maxlength="64" style="text-transform: lowercase;" />
+				<em class="ui-tooltip">Alphanumeric + underscore chars only, in format: ^[a-z][a-z0-9_]*$ meaning first letter can't be numeric.</em>
 			</fieldset>
 			<fieldset class="label onload">
-				<label title="Field Label" for="label"><strong>Field Label:</strong><em>A form-label [e.g. &quot;Article heading&quot;, &quot;Hotel name&quot; etc]. It will be used in the front-end content management interface. <b>Alphanumeric + underscore chars only!</b></em></label>
+				<label title="Field Label" for="label"><strong>Field Label:</strong></label>
 				<input type="text" class="text required _702" id="label" name="label" value="" maxlength="64" />
+				<em class="ui-tooltip">A form-label [e.g. &quot;Article heading&quot;, &quot;Hotel name&quot; etc]. It will be used in the front-end content management interface. <b>Alphanumeric + underscore chars only!</b></em>
 			</fieldset>
 			<fieldset class="type">
-				<label title="Data-Type" for="type"><strong>Data-Type:</strong><em>Select one from the list.</em></label>
+				<label title="Data-Type" for="type"><strong>Data-Type:</strong></label>
 				<select class="required js__trigger_on_change _703" id="type" name="type">
 					<option value="alphanumeric">Alphanumeric</option>
 					<option value="file">File</option>
 					<option value="link">Link with other module</option>
 				</select>
+				<em class="ui-tooltip">Select one from the list.</em>
 			</fieldset>
 			<fieldset class="links_with ondemand">
-				<label title="Link with ..." for="links_with"><strong>Link with ...</strong><em>Links this module with some other module.</em></label>
+				<label title="Link with ..." for="links_with"><strong>Link with ...</strong></label>
 				<select name="links_with" id="links_with" class="js__trigger_on_change _704">
 					<option value="">-- select a module --</option>
 					{{foreach from=$CONTENT.others item=MODULE}}
@@ -29,76 +32,88 @@
 					{{/if}}
 					{{/foreach}}
 				</select>
+				<em class="ui-tooltip">Links this module with some other module.</em>
 			</fieldset>
 			<fieldset class="links_with__e_data_definition ondemand">
-				<label title="Link via ..." for="links_with__e_data_definition"><strong>Link via ...</strong><em>Using CTRL (CMD on Mac) key, select one or more data-fields to fetch a data from.</em></label>
+				<label title="Link via ..." for="links_with__e_data_definition"><strong>Link via ...</strong></label>
 				<select class="required _705" id="links_with__e_data_definition" name="links_with__e_data_definition[]" multiple="multiple" size="5">
 					<option></option>
 				</select>
+				<em class="ui-tooltip">Using CTRL (CMD on Mac) key, select one or more data-fields to fetch a data from.</em>
 			</fieldset>
 			<fieldset class="subtype ondemand">
-				<label title="Data-Subtype" for="subtype"><strong>Data-Subtype:</strong><em>Select one from the list.</em></label>
+				<label title="Data-Subtype" for="subtype"><strong>Data-Subtype:</strong></label>
 				<select class="required js__trigger_on_change _706" id="subtype" name="subtype">
 					<option></option>
 				</select>
+				<em class="ui-tooltip">Select one from the list.</em>
 			</fieldset>
 			<fieldset class="allowed_filetypes ondemand">
-				<label title="Allowed File-types" for="allowed_filetypes"><strong>Allowed File-types:</strong><em>The list of file-types allowed for file-uploads.</em></label>
+				<label title="Allowed File-types" for="allowed_filetypes"><strong>Allowed File-types:</strong></label>
 				<select class="required _707" id="allowed_filetypes" name="allowed_filetypes[]" multiple="multiple" size="5">
 					<option></option>
 				</select>
+				<em class="ui-tooltip">The list of file-types allowed for file-uploads.</em>
 			</fieldset>
 			<fieldset class="default_options ondemand">
-				<label title="Default Options" for="default_options"><strong>Default Options:</strong><em>'<b><i>key</i></b>'='<b><i>value</i></b>' pairs, one per line; e.g.:<br />'m=Male<br />f=Female<br />u=Not Telling'<br />'<i><b>key</b></i>'s can only contain alphanumeric, underscore (_) and dash (-).</em></label>
+				<label title="Default Options" for="default_options"><strong>Default Options:</strong></label>
 				<textarea class="required _708" name="default_options" id="default_options" style="height: 80px" cols="" rows=""></textarea>
+				<em class="ui-tooltip">'<b><i>key</i></b>'='<b><i>value</i></b>' pairs, one per line; e.g.:<br />'m=Male<br />f=Female<br />u=Not Telling'<br />'<i><b>key</b></i>'s can only contain alphanumeric, underscore (_) and dash (-).</em>
 			</fieldset>
 			<fieldset class="maxlength ondemand">
-				<label title="" for="maxlength"><strong></strong><em></em></label>
+				<label title="" for="maxlength"><strong></strong></label>
 				<input type="text" class="text _709" id="maxlength" name="maxlength" value="" />
+				<em class="ui-tooltip"></em>
 			</fieldset>
 			<fieldset class="default_value ondemand">
-				<label title="Default Value" for="default_value"><strong>Default Value:</strong><em>Default value(s) (more than one for '<b><i>Multiple Select</i></b>'). Separate multiple values with comma or space. Leave empty for no defaults.</em></label>
+				<label title="Default Value" for="default_value"><strong>Default Value:</strong></label>
 				<input type="text" class="text _710" id="default_value" name="default_value" value="" />
+				<em class="ui-tooltip">Default value(s) (more than one for '<b><i>Multiple Select</i></b>'). Separate multiple values with comma or space. Leave empty for no defaults.</em>
 			</fieldset>
 			<fieldset class="connector_enabled ondemand">
-				<label title="Enable Connector?"><strong>Enable Connector?</strong><em>Whether to enable Connector feature (multiple entries for this field, per row), or not.</em></label>
+				<label title="Enable Connector?"><strong>Enable Connector?</strong></label>
 				<span class="input ui-buttonset">
 					<input type="radio" class="js__trigger_on_change" name="connector_enabled" id="yes_for__connector_enabled" value="1" />
 					<input type="radio" class="js__trigger_on_change" name="connector_enabled" id="no_for__connector_enabled" value="0" />
 					<label for="yes_for__connector_enabled" class="js__trigger_on_change" title="Yes">Yes</label>
 					<label for="no_for__connector_enabled" class="js__trigger_on_change" title="No">No</label>
 				</span>
+				<em class="ui-tooltip">Whether to enable Connector feature (multiple entries for this field, per row), or not.</em>
 			</fieldset>
 			<fieldset class="connector_length_cap ondemand">
-				<label title="Maximum Number of Items" for="connector_length_cap"><strong>Maximum Number of Items:</strong><em>Maximum number of items allowed. Enter &quot;0&quot; to disable this restriction.</em></label>
+				<label title="Maximum Number of Items" for="connector_length_cap"><strong>Maximum Number of Items:</strong></label>
 				<input type="text" class="text" id="connector_length_cap" name="connector_length_cap" value="0" />
+				<em class="ui-tooltip">Maximum number of items allowed. Enter &quot;0&quot; to disable this restriction.</em>
 			</fieldset>
 			<fieldset class="is_html_allowed ondemand">
-				<label title="Allow HTML Input?"><strong>Allow HTML Input?</strong><em>Whether to allow HTML input in this field or not.<br />Works for <i>String</i> sub-types and only when Max-Length&gt;255.</em></label>
+				<label title="Allow HTML Input?"><strong>Allow HTML Input?</strong></label>
 				<span class="input ui-buttonset">
 					<input type="radio" name="is_html_allowed" id="yes_for__is_html_allowed" value="1" />
 					<input type="radio" name="is_html_allowed" id="no_for__is_html_allowed" value="0" />
 					<label for="yes_for__is_html_allowed" title="Yes">Yes</label>
 					<label for="no_for__is_html_allowed" title="No">No</label>
 				</span>
+				<em class="ui-tooltip">Whether to allow HTML input in this field or not.<br />Works for <i>String</i> sub-types and only when Max-Length&gt;255.</em>
 			</fieldset>
 			<fieldset class="is_required ondemand">
-				<label title="Is a Required Field?"><strong>Is a Required Field?</strong><em>Whether the field can or cannot be left empty.</em></label>
+				<label title="Is a Required Field?"><strong>Is a Required Field?</strong></label>
 				<span class="input ui-buttonset">
 					<input type="radio" name="is_required" id="yes_for__is_required" value="1" />
 					<input type="radio" name="is_required" id="no_for__is_required" value="0" />
 					<label for="yes_for__is_required" title="Yes">Yes</label>
 					<label for="no_for__is_required" title="No">No</label>
 				</span>
+				<em class="ui-tooltip">Whether the field can or cannot be left empty.</em>
 			</fieldset>
 			<fieldset class="is_unique ondemand">
-				<label title="Is Unique?"><strong>Is Unique?</strong><em>Whether the data this field holds is unique or not. <i>Use with caution</i> since you won't be able to insert duplicate (repeating) data!</em></label>
+				<label title="Is Unique?"><strong>Is Unique?</strong></label>
 				<span class="input ui-buttonset">
 					<input type="radio" name="is_unique" id="yes_for__is_unique" value="1" />
 					<input type="radio" name="is_unique" id="no_for__is_unique" value="0" />
 					<label for="yes_for__is_unique" title="Yes">Yes</label>
 					<label for="no_for__is_unique" title="No">No</label>
 				</span>
+				<em class="ui-tooltip">Whether the data this field holds is unique or not. <i>Use with caution</i> since you won't be able to insert duplicate (repeating) data!</em>
 			</fieldset>
 
 			<div class="system_console"></div>
@@ -120,17 +135,20 @@
 
 		<form id="forms__components__sr__create" class="js__go_ajax" action="" method="post">
 			<fieldset class="s_name">
-				<label title="Subroutine Unix Name" for="sr__s_name"><strong>Subroutine Unix Name:</strong><em>Lowercase alphanumeric [ASCII codebase] + underscore characters only!</em></label>
+				<label title="Subroutine Unix Name" for="sr__s_name"><strong>Subroutine Unix Name:</strong></label>
 				<input type="text" class="text required _701" id="sr__s_name" name="s_name" value="" maxlength="32" style="text-transform: lowercase;" />
+				<em class="ui-tooltip">Lowercase alphanumeric [ASCII codebase] + underscore characters only!</em>
 			</fieldset>
 			<fieldset class="s_pathinfo_uri_schema">
-				<label class="full_size" title="Path-Info URI-Schema" for="sr__s_pathinfo_uri_schema"><strong>Path-Info URI-Schema:</strong><em>URL-Schema assigned to this subroutine (required when Request-Mode = Path-Info). E.g.: '<i>/id-{id}/{timestamp}</i>'</em></label>
-				<span class="input full_size">
-					<span style="font-weight:bold; float:left;">{{$CONTENT.me.m_url_prefix}}/</span><input type="text" class="text required _702" id="sr__s_pathinfo_uri_schema" name="s_pathinfo_uri_schema" style="width:55%;" value="" maxlength="255" />
+				<label title="Path-Info URI-Schema" for="sr__s_pathinfo_uri_schema"><strong>Path-Info URI-Schema:</strong></label>
+				<span class="input">
+					<span style="font-weight:bold; float:left;">{{$CONTENT.me.m_url_prefix}}/</span>
+					<input type="text" class="text required _702" id="sr__s_pathinfo_uri_schema" name="s_pathinfo_uri_schema" style="width: 300px;" value="" maxlength="255" />
 				</span>
+				<em class="ui-tooltip">URL-Schema assigned to this subroutine (required when Request-Mode = Path-Info). E.g.: '<i>/id-{id}/{timestamp}</i>'</em>
 			</fieldset>
 
-			<fieldset class="ui-tabs {newOptions:{cookie:null,disabled:[1,2,3]}} sr_alter_add__s_data_flow_config">
+			<fieldset class="ui-tabs {tabs:{cookie:null,disabled:[1,2,3]}} sr_alter_add__s_data_flow_config">
 				<ul>
 					<li><a href="#tabs__sr_alter_add__s_help">Data-flow Configuration</a></li>
 					<li><a href="#tabs__sr_alter_add__s_data_source">Data-source</a></li>
@@ -139,7 +157,7 @@
 				</ul>
 				<fieldset id="tabs__sr_alter_add__s_help">
 					<fieldset class="s_data_source">
-						<label title="Data-source" for="sr__s_data_source"><strong>Data-source:</strong><em>Where to fetch the content from?</em></label>
+						<label title="Data-source" for="sr__s_data_source"><strong>Data-source:</strong></label>
 						<select id="sr__s_data_source" name="s_data_source" class="js__trigger_on_change">
 							<option value="no-fetch">-- no content fetching --</option>
 							<option value="rdbms">Module RDBMS data-repository</option>
@@ -152,18 +170,20 @@
 
 							<option value="json">External,JSON/P-based source [over HTTP]</option>
 						</select>
+						<em class="ui-tooltip">Where to fetch the content from?</em>
 					</fieldset>
 					<fieldset class="s_data_target">
-						<label title="Data-target" for="sr__s_data_target"><strong>Data-target:</strong><em>Where to redirect the processed content?</em></label>
+						<label title="Data-target" for="sr__s_data_target"><strong>Data-target:</strong></label>
 						<select id="sr__s_data_target" name="s_data_target">
 							<option value="tpl">Template engine</option>
 							<option value="rdbms">Module RDBMS data-repository</option>
 						</select>
+						<em class="ui-tooltip">Where to redirect the processed content?</em>
 					</fieldset>
 				</fieldset>
 				<fieldset id="tabs__sr_alter_add__s_data_source">
 					<fieldset class="s_data_definition ondemand">
-						<label title="Columns to Fetch" for="sr__s_data_definition"><strong>Columns to Fetch:</strong><em>Columns/fields to fetch.</em></label>
+						<label title="Columns to Fetch" for="sr__s_data_definition"><strong>Columns to Fetch:</strong></label>
 						<select id="sr__s_data_definition" name="s_data_definition[]" multiple="multiple" size="5" class="required _700">
 							<optgroup label="Select one or more:">
 								{{foreach from=$CONTENT.me.m_data_definition item=FIELD}}
@@ -190,19 +210,17 @@
 								<option value="status_locked" disabled="disabled">Is Locked? [status_locked]</option>
 							</optgroup>
 						</select>
+						<em class="ui-tooltip">Columns/fields to fetch.</em>
 					</fieldset>
 
 					<fieldset class="s_fetch_criteria__all_or_selected ondemand">
-						<label class="full_size" title="Fetch Criteria - Queries &amp; Query Groups (Policies)" for="s_fetch_criteria__all_or_selected">
-							<strong>Fetch Criteria - Queries &amp; Query Groups (Policies):</strong>
-							<em>What to fetch? Determine rules by adding one or more queries. Then group those queries. If more than one groups provided, using <i>UNION DISTINCT</i> logic, each fetched data collection will be merged together.</em>
-						</label>
+						<label title="Fetch Criteria - Queries &amp; Policies" for="s_fetch_criteria__all_or_selected"><strong>Fetch Criteria - Queries &amp; Policies:</strong></label>
+						<select id="s_fetch_criteria__all_or_selected" class="js__trigger_on_change" name="s_fetch_criteria__all_or_selected">
+							<option value="all">-- fetch all records --</option>
+							<option value="selected">-- fetch selected records --</option>
+						</select>
+						<em class="ui-tooltip full_size">What to fetch? Determine rules by adding one or more queries. Then group those queries. If more than one groups provided, using <i>UNION DISTINCT</i> logic, each fetched data collection will be merged together.</em>
 						<span class="input s_fetch_criteria__all_or_selected full_size">
-							<select id="s_fetch_criteria__all_or_selected" class="js__trigger_on_change" name="s_fetch_criteria__all_or_selected">
-								<option value="all">-- fetch all records --</option>
-								<option value="selected">-- fetch selected records --</option>
-							</select>
-
 							<span class="s_fetch_criteria__policies ondemand">
 								<label for="s_fetch_criteria__policies__0">Query Policy 1</label>
 								<textarea class="text required _704-0" name="s_fetch_criteria[policies][0]" id="s_fetch_criteria__policies__0" style="width: 662px; height: 70px; text-transform: uppercase; clear: left;" cols="" rows="">1</textarea>
@@ -259,24 +277,25 @@
 					</fieldset>
 
 					<fieldset class="s_fetch_criteria__limit ondemand">
-						<label title="Fetch Criteria - Limit" for="s_fetch_criteria__limit"><strong>Fetch Criteria -  Limit:</strong><em>Total number of fetched rows. Leave empty to fetch everything that matches the request criteria.</em></label>
+						<label title="Fetch Criteria - Limit" for="s_fetch_criteria__limit"><strong>Fetch Criteria -  Limit:</strong></label>
 						<input type="text" name="s_fetch_criteria[limit]" id="s_fetch_criteria__limit" class="text _706" />
+						<em class="ui-tooltip">Total number of fetched rows. Leave empty to fetch everything that matches the request criteria.</em>
 					</fieldset>
 
 					<fieldset class="s_fetch_criteria__pagination ondemand">
-						<label title="Fetch Criteria - Pagination" for="s_fetch_criteria__pagination"><strong>Fetch Criteria - Pagination:</strong><em>Number of fetched rows per page. Leave empty for no pagination.</em></label>
+						<label title="Fetch Criteria - Pagination" for="s_fetch_criteria__pagination"><strong>Fetch Criteria - Pagination:</strong></label>
 						<input type="text" name="s_fetch_criteria[pagination]" id="s_fetch_criteria__pagination" class="text _707" maxlength="3" />
+						<em class="ui-tooltip">Number of fetched rows per page. Leave empty for no pagination.</em>
 					</fieldset>
 
 					<fieldset class="s_fetch_criteria__do_perform_sorting ondemand">
-						<label class="full_size" title="Fetch Criteria - Sorting" for="s_fetch_criteria__do_perform_sorting">
-							<strong>Fetch Criteria - Sorting:</strong><em>Sort (order) fetched data by one or more columns in certain direction(s) (ascending or descending, sequence-sensitive).</em>
-						</label>
+						<label title="Fetch Criteria - Sorting" for="s_fetch_criteria__do_perform_sorting"><strong>Fetch Criteria - Sorting:</strong></label>
+						<select id="s_fetch_criteria__do_perform_sorting" name="s_fetch_criteria__do_perform_sorting" class="js__trigger_on_change">
+							<option value="0">-- disable sorting --</option>
+							<option value="1">-- enable sorting --</option>
+						</select>
+						<em class="ui-tooltip full_size">Sort (order) fetched data by one or more columns in certain direction(s) (ascending or descending, sequence-sensitive).</em>
 						<span class="input s_fetch_criteria__do_perform_sorting full_size">
-							<select id="s_fetch_criteria__do_perform_sorting" name="s_fetch_criteria__do_perform_sorting" class="js__trigger_on_change">
-								<option value="0">-- disable sorting --</option>
-								<option value="1">-- enable sorting --</option>
-							</select>
 							<span class="sr__sort_by ondemand">
 								<select name="s_fetch_criteria[sort_by][0][field_name]" class="_708-0">
 									{{if count( $CONTENT.me.m_data_definition)}}
@@ -416,7 +435,7 @@
 				<tr>
 					<th style="width: 30%; white-space: nowrap;">Field Name</th>
 					<th style="width: 65%; white-space: nowrap;">Data Type</th>
-					<th style="width: 5%;"></th>
+					<th style="width: 5%;" class="{sorter: false}"></th>
 				</tr>
 			</thead>
 			<tfoot>
