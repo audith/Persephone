@@ -100,6 +100,12 @@ class Input
 	public $request = array();
 
 	/**
+	 * Safe version of $_SERVER
+	 * @var array
+	 */
+	public $server = array();
+
+	/**
 	 * Session cookies of high priority, sensitivity and importance - Only managed through $_SESSION superglobal
 	 * @var array
 	 */
