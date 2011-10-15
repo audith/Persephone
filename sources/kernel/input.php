@@ -139,7 +139,7 @@ class Input
 		$_name_of_superglobal = "_" . strtoupper( $name );
 		$_max_iteration_level_for_cleanup = in_array( $name, array( "server", "env" ) ) ? 1 : 10;
 
-		if ( !empty( $arguments[0] ) and isset( $this->$name[ $arguments[0] ] ) )
+		if ( !empty( $arguments[0] ) and array_key_exists( $arguments[0], $this->$name ) )
 		{
 			return $this->$name[ $arguments[0] ];
 		}
