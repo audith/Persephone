@@ -17,10 +17,10 @@ if ( ! defined( "INIT_DONE" ) )
 final class Data_Processors__File__Image__Gd
 {
 	/**
-	 * API Object reference
+	 * Registry reference
 	 * @var object
 	 */
-	public $API;
+	public $Registry;
 
 	/**
 	 * Ratio of original image's dimension in a given direction to that of the watermark image
@@ -31,12 +31,12 @@ final class Data_Processors__File__Image__Gd
 
 	/**
 	 * Contructor
-	 * @param    API    API object reference
+	 * @param    Registry    Registry object reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		$this->API = $API;
-		$this->API->logger__do_log( "Loaded GD library." , "INFO" );
+		$this->Registry = $Registry;
+		$this->Registry->logger__do_log( "Loaded GD library." , "INFO" );
 	}
 
 
@@ -139,7 +139,7 @@ final class Data_Processors__File__Image__Gd
 		// Write to file
 		//------------------
 
-		$_file_save_as = $this->API->Input->file__filename__attach_suffix( $file_resource['_f_location'] , $file_suffix );
+		$_file_save_as = $this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , $file_suffix );
 		$return        = FALSE;
 		switch ( $file_resource['_f_subtype'] )
 		{
@@ -223,24 +223,24 @@ final class Data_Processors__File__Image__Gd
 		// Is it below watermark-able image dimension limit?
 		//-----------------------------------------------------
 
-		if ( is_string( $this->API->config['medialibrary']['watermark_threshold'] ) and strpos( $this->API->config['medialibrary']['watermark_threshold'], "x" ) !== FALSE )
+		if ( is_string( $this->Registry->config['medialibrary']['watermark_threshold'] ) and strpos( $this->Registry->config['medialibrary']['watermark_threshold'], "x" ) !== FALSE )
 		{
-			$this->API->config['medialibrary']['watermark_threshold'] = explode( "x" , $this->API->config['medialibrary']['watermark_threshold'] );
+			$this->Registry->config['medialibrary']['watermark_threshold'] = explode( "x" , $this->Registry->config['medialibrary']['watermark_threshold'] );
 		}
 		if
 		(
-			$_image_to_watermark__geometry['width'] <= $this->API->config['medialibrary']['watermark_threshold'][0]
+			$_image_to_watermark__geometry['width'] <= $this->Registry->config['medialibrary']['watermark_threshold'][0]
 			and
-			$_image_to_watermark__geometry['height'] <= $this->API->config['medialibrary']['watermark_threshold'][1]
+			$_image_to_watermark__geometry['height'] <= $this->Registry->config['medialibrary']['watermark_threshold'][1]
 		)
 		{
 			# Apparently it is - duplicate the original image without watermarking it, but mark it as if it is so.
 			if
 			(
-				! copy( $file_resource['_f_location'] , $this->API->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" ) )
+				! copy( $file_resource['_f_location'] , $this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" ) )
 			)
 			{
-				$this->API->logger__do_log(
+				$this->Registry->logger__do_log(
 						"Modules - Data_Processors - FILE - IMAGE - GD: "
 							. ( $_chdir === FALSE ? "Failed" : "Succeeded" )
 							. " to COPY image '" . $file_resource['_f_location'] . "'" ,
@@ -280,7 +280,7 @@ final class Data_Processors__File__Image__Gd
 
 		$_watermark_position__x = 0;
 		$_watermark_position__y = 0;
-		switch ( $this->API->config['medialibrary']['watermark_position'] )
+		switch ( $this->Registry->config['medialibrary']['watermark_position'] )
 		{
 			case 'sw':
 				$_watermark_position__y = $_image_to_watermark__geometry['height'] - $_watermark__geometry__after_resize['height'];
@@ -315,7 +315,7 @@ final class Data_Processors__File__Image__Gd
 		// Write to file
 		//------------------
 
-		$_file_save_as = $this->API->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" );
+		$_file_save_as = $this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" );
 		$return        = FALSE;
 		switch ( $file_resource['_f_subtype'] )
 		{

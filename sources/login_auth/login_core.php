@@ -16,10 +16,10 @@ if ( ! defined( "INIT_DONE" ) )
 abstract class Login_Core
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	**/
-	protected $API;
+	protected $Registry;
 
 	/**
 	 * Unlock account time left
@@ -61,13 +61,13 @@ abstract class Login_Core
 	/**
 	 * Constructor
 	 *
-	 * @param   object   API object reference
+	 * @param   object   Registry object reference
 	 * @return  void
 	 */
 	public function __construct ()
 	{
 		# Member details
-		$this->member =& $this->API->member;
+		$this->member =& $this->Registry->member;
 	}
 
 
@@ -113,16 +113,16 @@ abstract class Login_Core
 		switch ( $type )
 		{
 			case 'username':
-				if ( $this->API->Input->mb_strlen( $username ) > 32 )
+				if ( $this->Registry->Input->mb_strlen( $username ) > 32 )
 				{
 					$this->return_code = 'NO_USER';
 					return FALSE;
 				}
-				$this->member = $this->API->Session->load_member( $username, 'groups', 'username' );
+				$this->member = $this->Registry->Session->load_member( $username, 'groups', 'username' );
 				break;
 
 			case 'email':
-				$this->member = $this->API->Session->load_member( $email_address, 'groups', 'email' );
+				$this->member = $this->Registry->Session->load_member( $email_address, 'groups', 'email' );
 				break;
 		}
 
@@ -149,7 +149,7 @@ abstract class Login_Core
 		// Check password...
 		//---------------------
 
-		if ( $this->API->Session->authenticate_member( $this->member['id'], $password ) != TRUE )
+		if ( $this->Registry->Session->authenticate_member( $this->member['id'], $password ) != TRUE )
 		{
 			if ( ! $this->_append_failed_login() )
 			{
@@ -188,10 +188,10 @@ abstract class Login_Core
 	 */
 	private function _append_failed_login ()
 	{
-		if ( $this->API->config['security']['bruteforce_attempts'] > 0 )
+		if ( $this->Registry->config['security']['bruteforce_attempts'] > 0 )
 		{
-			$failed_logins 	 = explode( "," , $this->API->Input->clean__excessive_separators( $this->member['failed_logins'], "," ) );
-			$failed_logins[] = UNIX_TIME_NOW . '-' . $this->API->Session->ip_address;
+			$failed_logins 	 = explode( "," , $this->Registry->Input->clean__excessive_separators( $this->member['failed_logins'], "," ) );
+			$failed_logins[] = UNIX_TIME_NOW . '-' . $this->Registry->Session->ip_address;
 
 			$failed_count    = 0;
 			$total_failed    = 0;
@@ -208,15 +208,15 @@ abstract class Login_Core
 
 				$total_failed++;
 
-				if ( $ipaddress != $this->API->Session->ip_address )
+				if ( $ipaddress != $this->Registry->Session->ip_address )
 				{
 					continue;
 				}
 
 				if (
-					$this->API->config['security']['bruteforce_period'] > 0
+					$this->Registry->config['security']['bruteforce_period'] > 0
 					and
-					$timestamp < time() - ( $this->API->config['security']['bruteforce_period'] * 60 )
+					$timestamp < time() - ( $this->Registry->config['security']['bruteforce_period'] * 60 )
 				)
 				{
 					continue;
@@ -228,7 +228,7 @@ abstract class Login_Core
 
 			if( $this->member['id'] )
 			{
-				$this->API->Session->save_member( $this->member['email'], array(
+				$this->Registry->Session->save_member( $this->member['email'], array(
 						'members' => array(
 								'failed_logins'      => implode( ",", $non_expired_att ),
 								'failed_login_count' => $total_failed,
@@ -237,9 +237,9 @@ abstract class Login_Core
 					);
 			}
 
-			if ( $failed_count >= $this->API->config['security']['bruteforce_attempts'] )
+			if ( $failed_count >= $this->Registry->config['security']['bruteforce_attempts'] )
 			{
-				if ( $this->API->config['security']['bruteforce_unlock'] )
+				if ( $this->Registry->config['security']['bruteforce_unlock'] )
 				{
 					sort($non_expired_att);
 					$oldest_entry  = array_shift( $non_expired_att );
@@ -263,9 +263,9 @@ abstract class Login_Core
 	 */
 	private function _check_failed_logins ()
 	{
-		if ( $this->API->config['security']['bruteforce_attempts'] > 0 )
+		if ( $this->Registry->config['security']['bruteforce_attempts'] > 0 )
 		{
-			$failed_attempts = explode( "," , $this->API->Input->clean__excessive_separators( $this->member['failed_logins'] , "," ) );
+			$failed_attempts = explode( "," , $this->Registry->Input->clean__excessive_separators( $this->member['failed_logins'] , "," ) );
 			$failed_count    = 0;
 			$total_failed    = 0;
 			$_this_ip_failed   = 0;
@@ -289,7 +289,7 @@ abstract class Login_Core
 
 					$total_failed++;
 
-					if ( $ip_address != $this->API->Session->ip_address )
+					if ( $ip_address != $this->Registry->Session->ip_address )
 					{
 						continue;
 					}
@@ -297,9 +297,9 @@ abstract class Login_Core
 					$_this_ip_failed++;
 
 					if (
-						$this->API->config['security']['bruteforce_period']
+						$this->Registry->config['security']['bruteforce_period']
 						and
-						$timestamp < UNIX_TIME_NOW - ( $this->API->config['security']['bruteforce_period'] * 60 )
+						$timestamp < UNIX_TIME_NOW - ( $this->Registry->config['security']['bruteforce_period'] * 60 )
 					)
 					{
 						continue;
@@ -314,11 +314,11 @@ abstract class Login_Core
 				list( $oldest, ) = explode( "-", $oldest_entry );
 			}
 
-			if ( $_this_ip_failed >= $this->API->config['security']['bruteforce_attempts'] )
+			if ( $_this_ip_failed >= $this->Registry->config['security']['bruteforce_attempts'] )
 			{
-				if ( $this->API->config['security']['bruteforce_unlock'] )
+				if ( $this->Registry->config['security']['bruteforce_unlock'] )
 				{
-					if ( $failed_count >= $this->API->config['security']['bruteforce_attempts'] )
+					if ( $failed_count >= $this->Registry->config['security']['bruteforce_attempts'] )
 					{
 						$this->account_unlock  = $oldest;
 						$this->return_code     = 'ACCOUNT_LOCKED';
@@ -351,7 +351,7 @@ abstract class Login_Core
 		$member['members']['created_remote'] = TRUE;
 		$member['members']['display_name']   = ( $member['members']['display_name'] ) ? $member['members']['display_name'] : $member['members']['name'];
 
-		return $this->API->Session->create_member( $member );
+		return $this->Registry->Session->create_member( $member );
 	}
 
 

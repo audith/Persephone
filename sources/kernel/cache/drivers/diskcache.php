@@ -19,11 +19,11 @@ require_once( dirname( __FILE__ ) . "/_interface.php" );
 class Cache__Drivers__Diskcache implements iCache_Drivers
 {
 	/**
-	 * API Object reference
+	 * Registry Reference
 	 *
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Unique ID for cache-filenames
@@ -40,10 +40,10 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 	public $crashed = 0;
 
 
-	public function __construct ( API $API, $identifier = "" )
+	public function __construct ( Registry $Registry, $identifier = "" )
 	{
 		# Prelim
-		$this->API = $API;
+		$this->Registry = $Registry;
 
 		# Cont.
 		if ( ! is_writeable( PATH_CACHE ) )
@@ -54,7 +54,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 
 		if ( ! $identifier )
 		{
-			$this->identifier = $this->API->Input->server('SERVER_NAME');
+			$this->identifier = $this->Registry->Input->server('SERVER_NAME');
 		}
 		else
 		{
@@ -62,7 +62,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 		}
 
 		# Logging
-		$this->API->logger__do_performance_log( "Cache-Abstraction - Diskcache Identifier: " . $this->identifier , "INFO" );
+		$this->Registry->logger__do_performance_log( "Cache-Abstraction - Diskcache Identifier: " . $this->identifier , "INFO" );
 
 		unset( $identifier );
 
@@ -98,12 +98,12 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 		$_cache_file_path = PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php";
 		if ( file_exists(  $_cache_file_path ) and is_file( $_cache_file_path ) and ! is_writable( $_cache_file_path ) )
 		{
-			$this->API->logger__do_log( "Cache Abstraction - Diskcache: Cache file for key '" . $key . "' is NOT WRITABLE!" , "ERROR" );
+			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: Cache file for key '" . $key . "' is NOT WRITABLE!" , "ERROR" );
 		}
 
 		# Open file for writing
 		$fh = fopen( $_cache_file_path , "wb" );
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Cache Abstraction - Diskcache: FOPEN "
 					. ( $fh === FALSE ? "failed" : "succeeded" )
 					. " for key '" . $key . "'" ,
@@ -137,7 +137,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 
 		# LOCK
 		$_flock = flock( $fh, LOCK_EX );
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Cache Abstraction - Diskcache: FLOCK "
 					. ( $_flock === FALSE ? "failed" : "succeeded" )
 					. " for key '" . $key . "'" ,
@@ -146,7 +146,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 
 		# Write
 		$_fwrite = fwrite( $fh, $file_content );
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Cache Abstraction - Diskcache: FWRITE "
 					. ( $_fwrite === FALSE ? "failed" : "succeeded" )
 					. " for key '" . $key . "'" ,
@@ -155,7 +155,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 
 		# Unlock
 		$_flock = flock( $fh, LOCK_UN );
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Cache Abstraction - Diskcache: FUNLOCK "
 					. ( $_flock === FALSE ? "failed" : "succeeded" )
 					. " for key '" . $key . "'" ,
@@ -164,7 +164,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 
 		# Close file handler
 		$_fclose = fclose( $fh );
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Cache Abstraction - Diskcache: FCLOSE "
 					. ( $_fclose === FALSE ? "failed" : "succeeded" )
 					. " for key '" . $key . "'" ,
@@ -173,7 +173,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 
 		# ChMod
 		$_chmod = chmod( $_cache_file_path , 0777 );
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Cache Abstraction - Diskcache: CHMOD "
 					. ( $_chmod === FALSE ? "failed" : "succeeded" )
 					. " for key '" . $key . "'" ,

@@ -25,16 +25,16 @@ class Login_Method extends Login_Core
 	/**
 	 * Constructor
 	 *
-	 * @param   object   REFERENCE: API object
+	 * @param   object   REFERENCE: Registry object
 	 * @param   array    Configuration info for this method
 	 * @param   array    Custom configuration info for this method
 	 * @return  void
 	**/
-	public function __construct ( & $API, $method, $conf = array() )
+	public function __construct ( Registry $Registry, $method, $conf = array() )
 	{
 		# Prelim
 		$this->method_config = $method;
-		$this->API = $API;
+		$this->Registry = $Registry;
 		parent::__construct();
 	}
 
@@ -66,14 +66,14 @@ class Login_Method extends Login_Core
 	 */
 	public function email_exists_check ( $email )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select_row",
 				'fields' => array( "id" ),
 				'table'  => "members",
-				'where'  => "email=" . $this->API->Db->db->quote( $email ),
+				'where'  => "email=" . $this->Registry->Db->db->quote( $email ),
 			);
 
-		$email_check = $this->API->Db->simple_exec_query();
+		$email_check = $this->Registry->Db->simple_exec_query();
 
 		$this->return_code = $email_check['id'] ? 'EMAIL_IN_USE' : 'EMAIL_NOT_IN_USE';
 		return TRUE;

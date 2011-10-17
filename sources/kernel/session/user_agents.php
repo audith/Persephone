@@ -24,11 +24,11 @@ if ( ! defined( "INIT_DONE" ) )
 class Session__User_Agents
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 *
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Error handle
@@ -47,16 +47,16 @@ class Session__User_Agents
 	/**
 	 * Constructor
 	 *
-	 * @param    object    REFERENCE: API Object Reference
+	 * @param    object    REFERENCE: Registry Object Reference
 	 * @return   void
 	 */
-	public function __construct ( & $API )
+	public function __construct ( & $Registry )
 	{
 		//---------
 		// Init
 		//---------
 
-		$this->API = $API;
+		$this->Registry = $Registry;
 	}
 
 
@@ -161,12 +161,12 @@ class Session__User_Agents
 		// Delete old 'uns
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "delete",
 				'table'  => "user_agents",
 				'where'  => "uagent_key IN (" . implode( ",", $names ) . ")",
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//-----------------------------------------
 		// Add new 'uns
@@ -180,7 +180,7 @@ class Session__User_Agents
 				$_capture = $d;
 			}
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "insert",
 					'table'  => "user_agents",
 					'set'    => array(
@@ -192,7 +192,7 @@ class Session__User_Agents
 							'uagent_type'          => "search",
 						)
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
 			$count++;
 		}
@@ -213,7 +213,7 @@ class Session__User_Agents
 				$count = $data['b_position'];
 			}
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "insert",
 					'table'  => "user_agents",
 					'set'    => array(
@@ -225,7 +225,7 @@ class Session__User_Agents
 							'uagent_type'          => "browser",
 						)
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
 			$count++;
 		}
@@ -272,20 +272,20 @@ class Session__User_Agents
 
 		if ( $ugroup_id )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "update",
 					'tables' => "user_agents_groups",
 					'set'    => array(
 							'ugroup_title' => $ugroup_title,
 							'ugroup_array' => serialize( $data ),
 						),
-					'where'  => "ugroup_id=" . $this->API->Db->db->quote( $ugroup_id, "INTEGER" ),
+					'where'  => "ugroup_id=" . $this->Registry->Db->db->quote( $ugroup_id, "INTEGER" ),
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 		}
 		else
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					"do"	 => "insert",
 					"table"  => "user_agents_groups",
 					"set"    => array(
@@ -293,9 +293,9 @@ class Session__User_Agents
 							'ugroup_array' => serialize( $data ),
 						)
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
-			$ugroup_id = $this->API->Db->last_insert_id();
+			$ugroup_id = $this->Registry->Db->last_insert_id();
 		}
 
 		$this->rebuild_user_agent_group_caches();
@@ -320,13 +320,13 @@ class Session__User_Agents
 		// Get em!!
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "select",
 				'table'  => "user_agents_groups",
 				'order'  => array( "ugroup_title ASC" ),
 			);
 
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		foreach ( $result as $row )
 		{
@@ -360,12 +360,12 @@ class Session__User_Agents
 
 		if ( ! $group_id )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "select",
 					'table'  => "user_agents",
 					'order'  => array( "uagent_position ASC", "uagent_key ASC" ),
 				);
-			$result = $this->API->Db->simple_exec_query();
+			$result = $this->Registry->Db->simple_exec_query();
 
 			foreach ( $result as $row )
 			{
@@ -374,13 +374,13 @@ class Session__User_Agents
 		}
 		else
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "select_row",
 					'table'  => "user_agents_groups",
-					'where'  => "ugroup_id=" . $this->API->Db->db->quote( $group_id, "INTEGER" ),
+					'where'  => "ugroup_id=" . $this->Registry->Db->db->quote( $group_id, "INTEGER" ),
 				);
 
-			$u_group = $this->API->Db->simple_exec_query();
+			$u_group = $this->Registry->Db->simple_exec_query();
 
 			$user_agents = ( $u_group['ugroup_array'] ) ? unserialize( $u_group['ugroup_array'] ) : array();
 		}
@@ -396,7 +396,7 @@ class Session__User_Agents
 	 */
 	public function rebuild_user_agent_caches ()
 	{
-		$this->API->Cache->cache__do_load( array("useragents") );
+		$this->Registry->Cache->cache__do_load( array("useragents") );
 
 		//-----------------------------------------
 		// Now rebuild groups
@@ -412,7 +412,7 @@ class Session__User_Agents
 	 */
 	public function rebuild_user_agent_group_caches ()
 	{
-		$this->API->Cache->cache__do_load( array("useragentgroups") );
+		$this->Registry->Cache->cache__do_load( array("useragentgroups") );
 	}
 
 
@@ -442,11 +442,11 @@ class Session__User_Agents
 		//-----------------------------------------
 
 		$uagent_id              = intval( $uagent_id );
-		$uagent_key             = strtolower( $this->API->Input->clean__makesafe_alphanumerical( $uagent_key ) );
+		$uagent_key             = strtolower( $this->Registry->Input->clean__makesafe_alphanumerical( $uagent_key ) );
 		$uagent_name            = $uagent_name;
 		$uagent_regex           = $uagent_regex;
 		$uagent_regex_capture   = intval( $uagent_regex_capture );
-		$uagent_type            = $this->API->Input->clean__makesafe_alphanumerical( $uagent_type );
+		$uagent_type            = $this->Registry->Input->clean__makesafe_alphanumerical( $uagent_type );
 		$uagent_position        = intval( $uagent_position );
 
 		if ( ! $uagent_id or ! $uagent_key or ! $uagent_name or ! $uagent_regex or ! $uagent_type )
@@ -458,12 +458,12 @@ class Session__User_Agents
 		// Fetch user agent data
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "select_row",
 				"table"  => "user_agents",
-				"where"  => "uagent_id=" . $this->API->Db->db->quote( $uagent_id, "INTEGER" ),
+				"where"  => "uagent_id=" . $this->Registry->Db->db->quote( $uagent_id, "INTEGER" ),
 			);
-		$useragent = $this->API->Db->simple_exec_query();
+		$useragent = $this->Registry->Db->simple_exec_query();
 
 		if ( ! $useragent['uagent_id'] )
 		{
@@ -476,12 +476,12 @@ class Session__User_Agents
 
 		if ( $useragent['uagent_key'] != $uagent_key )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					"do"	 => "select_row",
 					"table"  => "user_agents",
-					"where"  => "uagent_key=" . $this->API->Db->db->quote( $uagent_key ),
+					"where"  => "uagent_key=" . $this->Registry->Db->db->quote( $uagent_key ),
 				);
-			$user_agent_test = $this->API->Db->simple_exec_query();
+			$user_agent_test = $this->Registry->Db->simple_exec_query();
 
 			if ( $user_agent_test['uagent_id'] )
 			{
@@ -502,7 +502,7 @@ class Session__User_Agents
 		// Update
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "update",
 				'tables' => "user_agents",
 				'set'    => array(
@@ -513,9 +513,9 @@ class Session__User_Agents
 						'uagent_position'      => $uagent_position,
 						'uagent_type'          => $uagent_type
 					),
-				'where'  => "uagent_id=" . $this->API->Db->db->quote( $uagent_id, "INTEGER" ),
+				'where'  => "uagent_id=" . $this->Registry->Db->db->quote( $uagent_id, "INTEGER" ),
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//-----------------------------------------
 		// Recache
@@ -552,11 +552,11 @@ class Session__User_Agents
 		// INIT
 		//-----------------------------------------
 
-		$uagent_key             = strtolower( $this->API->Input->clean__makesafe_alphanumerical( $uagent_key ) );
+		$uagent_key             = strtolower( $this->Registry->Input->clean__makesafe_alphanumerical( $uagent_key ) );
 		$uagent_name            = $uagent_name;
 		$uagent_regex           = $uagent_regex;
 		$uagent_regex_capture   = intval( $uagent_regex_capture );
-		$uagent_type            = $this->API->Input->clean__makesafe_alphanumerical( $uagent_type );
+		$uagent_type            = $this->Registry->Input->clean__makesafe_alphanumerical( $uagent_type );
 		$uagent_position        = intval( $uagent_position );
 
 		if ( ! $uagent_key or ! $uagent_name or ! $uagent_regex or ! $uagent_type )
@@ -568,12 +568,12 @@ class Session__User_Agents
 		// Check for an existing user agent
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "select_row",
 				"table"  => "user_agents",
-				"where"  => "uagent_key=" . $this->API->Db->db->quote( $uagent_key ),
+				"where"  => "uagent_key=" . $this->Registry->Db->db->quote( $uagent_key ),
 			);
-		$user_agent_test = $this->API->Db->simple_exec_query();
+		$user_agent_test = $this->Registry->Db->simple_exec_query();
 
 		if ( $user_agent_test['uagent_id'] )
 		{
@@ -585,7 +585,7 @@ class Session__User_Agents
 		// Update
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "insert",
 				"table"  => "user_agents_groups",
 				"set"    => array(
@@ -597,9 +597,9 @@ class Session__User_Agents
 						'uagent_type'          => $uagent_type
 					)
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
-		$uagent_id = $$this->API->Db->last_insert_id();
+		$uagent_id = $$this->Registry->Db->last_insert_id();
 
 		//-----------------------------------------
 		// Recache
@@ -627,12 +627,12 @@ class Session__User_Agents
 		// Remove it
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "delete",
 				'table'  => "user_agents_groups",
-				'where'  => "ugroup_id=" . $this->API->Db->db->quote( $ugroup_id, "INTEGER" ),
+				'where'  => "ugroup_id=" . $this->Registry->Db->db->quote( $ugroup_id, "INTEGER" ),
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//-----------------------------------------
 		// Recache
@@ -658,12 +658,12 @@ class Session__User_Agents
 		// Fetch replacement data
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "select_row",
 				"table"  => "user_agents",
-				"where"  => "uagent_id=" . $this->API->Db->db->quote( $uagent_id, "INTEGER" ),
+				"where"  => "uagent_id=" . $this->Registry->Db->db->quote( $uagent_id, "INTEGER" ),
 			);
-		$user_agent_test = $this->API->Db->simple_exec_query();
+		$user_agent_test = $this->Registry->Db->simple_exec_query();
 
 		if ( ! $user_agent_test['uagent_id'] )
 		{
@@ -674,12 +674,12 @@ class Session__User_Agents
 		// Remove it...
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "delete",
 				'table'  => "user_agents",
-				'where'  => "uagent_id=" . $this->API->Db->db->quote( $uagent_id, "INTEGER" ),
+				'where'  => "uagent_id=" . $this->Registry->Db->db->quote( $uagent_id, "INTEGER" ),
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//-----------------------------------------
 		// Recache
@@ -712,7 +712,7 @@ class Session__User_Agents
 		// INIT
 		//-----------------------------------------
 
-		$user_agent    = ( $user_agent ) ? $user_agent : $this->API->Session->user_agent;
+		$user_agent    = ( $user_agent ) ? $user_agent : $this->Registry->Session->user_agent;
 		$user_agent_return = array(
 				'uagent_id'      => 0,
 				'uagent_key'     => null,
@@ -725,7 +725,7 @@ class Session__User_Agents
 		// Test in the DB
 		//-----------------------------------------
 
-		$user_agent_cache = $this->API->Cache->cache__do_get( "useragents" );
+		$user_agent_cache = $this->Registry->Cache->cache__do_get( "useragents" );
 
 		foreach( $user_agent_cache as $key => $data )
 		{

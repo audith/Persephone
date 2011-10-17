@@ -9,10 +9,10 @@ if ( ! defined( "INIT_DONE" ) )
 class Display
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Cache id for engine
@@ -84,12 +84,12 @@ class Display
 	/**
 	 * Constructor
 	 *
-	 * @param    object    API Object Reference
+	 * @param    object    Registry Object Reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		# Bring-in API Object reference
-		$this->API = $API;
+		# Bring-in Registry Object reference
+		$this->Registry = $Registry;
 
 		# Still here? Output then... Get default skin
 		$this->skin__get_current();
@@ -104,7 +104,7 @@ class Display
 	 */
 	public function _my_destruct ()
 	{
-		$this->API->logger__do_log( __CLASS__ . "::__destruct: Destroying class" );
+		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class" );
 	}
 
 
@@ -124,13 +124,13 @@ class Display
 		//--------------
 
 		# Module-based Cache-Id [for bit caches which are request (or content) independent]
-		$this->cache_id['module_based'] = md5( $this->API->Modules->cur_module['m_unique_id_clean'] );
+		$this->cache_id['module_based'] = md5( $this->Registry->Modules->cur_module['m_unique_id_clean'] );
 
 		# Request-based Cache-Id [for bit caches which are request (or content) dependent]
-		$_cache_id__request_based__raw = $this->API->Modules->cur_module['m_unique_id_clean'] . $this->API->Modules->cur_module['running_subroutine']['s_name'];
-		if ( isset( $this->API->Modules->cur_module['running_subroutine']['request'] ) )
+		$_cache_id__request_based__raw = $this->Registry->Modules->cur_module['m_unique_id_clean'] . $this->Registry->Modules->cur_module['running_subroutine']['s_name'];
+		if ( isset( $this->Registry->Modules->cur_module['running_subroutine']['request'] ) )
 		{
-			$_cache_id__request_based__raw .= serialize( $this->API->Modules->cur_module['running_subroutine']['request'] );
+			$_cache_id__request_based__raw .= serialize( $this->Registry->Modules->cur_module['running_subroutine']['request'] );
 		}
 		$this->cache_id['request_based'] = md5( $_cache_id__request_based__raw );
 		unset( $_cache_id__request_based__raw );
@@ -139,7 +139,7 @@ class Display
 		// HTTP Response Headers - Build
 		//----------------------------------
 
-		$this->API->Input->headers['response'] = $this->API->Modules->content__build_http_headers( $this->API->Modules->cur_module );
+		$this->Registry->Input->headers['response'] = $this->Registry->Modules->content__build_http_headers( $this->Registry->Modules->cur_module );
 
 		//----------------------------
 		// Content Delivery - Build
@@ -154,11 +154,11 @@ class Display
 
 		# Get it...
 
-		$this->content = $this->API->Modules->content__do( $this->API->Modules->cur_module );
+		$this->content = $this->Registry->Modules->content__do( $this->Registry->Modules->cur_module );
 
-		if ( $this->API->Input->headers['request']['_is_ajax'] or $this->output_mode == 'json' )
+		if ( $this->Registry->Input->headers['request']['_is_ajax'] or $this->output_mode == 'json' )
 		{
-			$this->API->loader("Zend_Json", false);
+			$this->Registry->loader("Zend_Json", false);
 
 			# @see http://www.ietf.org/rfc/rfc4627.txt
 			header("Content-type: application/json");
@@ -172,7 +172,7 @@ class Display
 
 				header("HTTP/1.1 404 Content not found");                      // Don't put exit() here, we still have other headers to add!!!
 
-				// $this->API->http_redirect( $this->API->Modules->cur_module['m_url_prefix'] );
+				// $this->Registry->http_redirect( $this->Registry->Modules->cur_module['m_url_prefix'] );
 			}
 		}
 
@@ -181,14 +181,14 @@ class Display
 		//----------------------------------------------------------
 
 		# HTTP Response Headers
-		foreach ( $this->API->Input->headers['response'] as $_k=>$_v )
+		foreach ( $this->Registry->Input->headers['response'] as $_k=>$_v )
 		{
 			header( $_k . ":" . $_v );
 		}
 		header( "X-Powered-By: Audith CMS codename Persephone" );
 
 		# We are done here if the request is of JSON-type
-		if ( $this->API->Input->headers['request']['_is_ajax'] or $this->output_mode == 'json' )
+		if ( $this->Registry->Input->headers['request']['_is_ajax'] or $this->output_mode == 'json' )
 		{
 			return true;
 		}
@@ -217,7 +217,7 @@ class Display
 	private function skin__prepare_assets ()
 	{
 		# Populate current request [subroutine] skin-assets list, by merging that of skin-set's with the one of running-subroutine's.
-		foreach ( $this->API->Modules->cur_module['running_subroutine']['s_additional_skin_assets'] as $_additional_asset )
+		foreach ( $this->Registry->Modules->cur_module['running_subroutine']['s_additional_skin_assets'] as $_additional_asset )
 		{
 			if ( ! in_array( $_additional_asset, $this->cur_skin['set_assets'], true ) )
 			{
@@ -269,9 +269,9 @@ class Display
 	private function skin__get_current ()
 	{
 		# Fetch working...
-		if ( isset( $this->API->Cache->cache['skins']['_default_skin'] ) and count( $this->API->Cache->cache['skins']['_default_skin'] ) )
+		if ( isset( $this->Registry->Cache->cache['skins']['_default_skin'] ) and count( $this->Registry->Cache->cache['skins']['_default_skin'] ) )
 		{
-			$this->cur_skin =& $this->API->Cache->cache['skins']['_default_skin'];
+			$this->cur_skin =& $this->Registry->Cache->cache['skins']['_default_skin'];
 		}
 		else
 		{
@@ -282,15 +282,15 @@ class Display
 
 		# Check if the current member has a preferred skin - if he/she does, set it as working skin
 		// @todo   Permission checks
-		if ( isset( $this->API->Session->member['skin_choice'] ) and array_key_exists( $this->API->Session->member['skin_choice'], $this->API->Cache->cache['skins'] ) )
+		if ( isset( $this->Registry->Session->member['skin_choice'] ) and array_key_exists( $this->Registry->Session->member['skin_choice'], $this->Registry->Cache->cache['skins'] ) )
 		{
-			$this->cur_skin = $this->API->Cache->cache['skins'][ $this->API->Session->member['skin_choice'] ];
+			$this->cur_skin = $this->Registry->Cache->cache['skins'][ $this->Registry->Session->member['skin_choice'] ];
 		}
 
 // @todo REMOVE
-if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
+if ( $this->Registry->Modules->cur_module['m_name'] == 'acp' )
 {
-	$this->cur_skin = $this->API->Cache->cache['skins'][1];
+	$this->cur_skin = $this->Registry->Cache->cache['skins'][1];
 	return;
 }
 
@@ -313,7 +313,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 				"owner"            => "hostmaster@audith.com",
 				"author"           => "Audith Designs",
 				"robots"           => "index,follow,archive",
-				"google_verify_v1" => $this->API->config['general']['google_verify_v1'] ? $this->API->config['general']['google_verify_v1'] : ""
+				"google_verify_v1" => $this->Registry->config['general']['google_verify_v1'] ? $this->Registry->config['general']['google_verify_v1'] : ""
 			);
 
 		$this->smarty->assign( "GENERATOR", $_generator );
@@ -322,19 +322,19 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		// Primary assignments
 		//----------------------
 
-		$_url =& $this->API->config['page']['request'];
-		$this->smarty->assign( "SITE_URL", $_url['scheme'] . "://" . $this->API->config['url']['hostname'][ $_url['scheme'] ] );
+		$_url =& $this->Registry->config['page']['request'];
+		$this->smarty->assign( "SITE_URL", $_url['scheme'] . "://" . $this->Registry->config['url']['hostname'][ $_url['scheme'] ] );
 		$this->smarty->assign( "SITE_DIR", PATH_ROOT_WEB );
-		$this->smarty->assign( "SITE_NAME", $this->API->config['general']['site_name'] );
-		$this->smarty->assign( "SITE_MOTTO", $this->API->config['general']['site_motto'] );
-		$this->smarty->assign( "MODULE_URL", $this->API->Modules->cur_module['m_url_prefix'] );
-		$this->smarty->assign( "REQUEST_URL", $this->API->config['page']['request']['request_uri'] );
+		$this->smarty->assign( "SITE_NAME", $this->Registry->config['general']['site_name'] );
+		$this->smarty->assign( "SITE_MOTTO", $this->Registry->config['general']['site_motto'] );
+		$this->smarty->assign( "MODULE_URL", $this->Registry->Modules->cur_module['m_url_prefix'] );
+		$this->smarty->assign( "REQUEST_URL", $this->Registry->config['page']['request']['request_uri'] );
 
 		$this->smarty->assign( "STYLE_IMAGES_URL", "/public/style/" . $this->cur_skin['set_id'] . "/images" );
 
-		$this->smarty->assign( "MEMBER", $this->API->member );
-		$this->smarty->assign( "CONFIG", $this->API->config );
-		$this->smarty->assign( "PAGE", $this->API->config['page'] );
+		$this->smarty->assign( "MEMBER", $this->Registry->member );
+		$this->smarty->assign( "CONFIG", $this->Registry->config );
+		$this->smarty->assign( "PAGE", $this->Registry->config['page'] );
 
 		//----------------------------------------
 		// Parse template bits : Global + Local
@@ -347,7 +347,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		$this->skin__prepare_assets();
 
 		# Prepare local assets
-		$this->request = $this->API->Modules->cur_module['m_unique_id_clean'] . "-" . $this->API->Modules->cur_module['running_subroutine']['s_name'];
+		$this->request = $this->Registry->Modules->cur_module['m_unique_id_clean'] . "-" . $this->Registry->Modules->cur_module['running_subroutine']['s_name'];
 		$_bit_name_w_prefix = "bits:" . $this->request;
 		if ( $this->smarty->templateExists( $_bit_name_w_prefix . "-css" ) )
 		{
@@ -365,7 +365,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		}
 
 		# Favicon + the rest...
-		$_m_unique_id_clean = $this->API->Modules->cur_module['m_unique_id_clean'];
+		$_m_unique_id_clean = $this->Registry->Modules->cur_module['m_unique_id_clean'];
 		$this->smarty->assign( "FAVICON" , $this->cur_skin['set_favicon'] );
 		$this->smarty->assign( "RSS" , array() );                              // @todo RSS
 		$this->output__parsed = array(
@@ -682,8 +682,8 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		}
 
 		# Some SMARTY settings
-		$this->smarty->cache_lifetime         = $this->API->config['display']['cache_lifetime'];
-		$this->smarty->caching                = $this->API->Modules->cur_module['m_enable_caching']
+		$this->smarty->cache_lifetime         = $this->Registry->config['display']['cache_lifetime'];
+		$this->smarty->caching                = $this->Registry->Modules->cur_module['m_enable_caching']
 			?
 			Smarty::CACHING_LIFETIME_CURRENT
 			:
@@ -691,7 +691,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		$this->smarty->cache_modified_check   = true;
 		$this->smarty->compile_check          = true;
 		$this->smarty->auto_literal           = false;
-		$this->smarty->debugging              = ( ! IN_DEV ) ? false : $this->API->config['display']['debugging'];
+		$this->smarty->debugging              = ( ! IN_DEV ) ? false : $this->Registry->config['display']['debugging'];
 
 		# Reassigning Smarty Delimiters
 		$this->smarty->left_delimiter         = '{{';
@@ -733,9 +733,9 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		// EXTENDING SMARTY - Custom modifiers
 		//---------------------------------------
 
-		$this->smarty->registerPlugin( "modifier" , "text2form"            , array( $this->API->Input, "text2form"                         ) );
-		$this->smarty->registerPlugin( "modifier" , "filesize_h"           , array( $this->API->Input, "file__filesize__do_parse"          ) );
-		$this->smarty->registerPlugin( "modifier" , "filetype"             , array( $this->API->Input, "file__filetype__do_parse"          ) );
+		$this->smarty->registerPlugin( "modifier" , "text2form"            , array( $this->Registry->Input, "text2form"                         ) );
+		$this->smarty->registerPlugin( "modifier" , "filesize_h"           , array( $this->Registry->Input, "file__filesize__do_parse"          ) );
+		$this->smarty->registerPlugin( "modifier" , "filetype"             , array( $this->Registry->Input, "file__filetype__do_parse"          ) );
 		$this->smarty->registerPlugin( "modifier" , "array_display_range"  , array( $this, "smarty__plugin__modifier__array_display_range" ) );
 		$this->smarty->registerPlugin( "modifier" , "m_unique_id_clean"    , array( $this, "smarty__plugin__modifier__m_unique_id_clean"   ) );
 
@@ -771,25 +771,25 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 	 */
 	public function smarty__plugin__function__recaptcha ( $params, $smarty_object )
 	{
-		if ( $this->API->config['security']['enable_captcha'] )
+		if ( $this->Registry->config['security']['enable_captcha'] )
 		{
 			try {
 				if (
-					( ! isset( $this->API->config['security']['recaptcha_public_key'] ) or empty( $this->API->config['security']['recaptcha_public_key'] ) )
+					( ! isset( $this->Registry->config['security']['recaptcha_public_key'] ) or empty( $this->Registry->config['security']['recaptcha_public_key'] ) )
 					or
-					( ! isset( $this->API->config['security']['recaptcha_private_key'] ) or empty( $this->API->config['security']['recaptcha_private_key'] ) )
+					( ! isset( $this->Registry->config['security']['recaptcha_private_key'] ) or empty( $this->Registry->config['security']['recaptcha_private_key'] ) )
 				)
 				{
 					throw new Exception( "Public and/or private key not found! Make sure both are set in order to use ReCaptcha feature..." );
 				}
-				$_recaptcha_obj = $this->API->loader("Zend_Captcha_ReCaptcha");
-				$_recaptcha_obj->setPubKey( $this->API->config['security']['recaptcha_public_key'] );
-				$_recaptcha_obj->setPrivKey( $this->API->config['security']['recaptcha_private_key'] );
+				$_recaptcha_obj = $this->Registry->loader("Zend_Captcha_ReCaptcha");
+				$_recaptcha_obj->setPubKey( $this->Registry->config['security']['recaptcha_public_key'] );
+				$_recaptcha_obj->setPrivKey( $this->Registry->config['security']['recaptcha_private_key'] );
 				return $_recaptcha_obj->getService()->getHTML();
 			}
 			catch ( Exception $e )
 			{
-				$this->API->logger__do_log( "Display - smarty__plugin__function__recaptcha() : " . $e->getMessage() , "ERROR" );
+				$this->Registry->logger__do_log( "Display - smarty__plugin__function__recaptcha() : " . $e->getMessage() , "ERROR" );
 			}
 		}
 
@@ -808,7 +808,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 	{
 		if ( ! isset( $params['instance'] ) )
 		{
-			$params['instance'] = $this->API->Modules->cur_module['running_subroutine']['s_name'];
+			$params['instance'] = $this->Registry->Modules->cur_module['running_subroutine']['s_name'];
 		}
 
 		//--------------------------------------------------------------------------------
@@ -927,7 +927,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 	 */
 	public function smarty__plugin__function__http_build_query ( $params , $smarty_object )
 	{
-		return $this->API->Input->query_string__do_process( array( 'key' => $params['key'], 'value' => $params['value'] ), $params['action'], false );
+		return $this->Registry->Input->query_string__do_process( array( 'key' => $params['key'], 'value' => $params['value'] ), $params['action'], false );
 
 	}
 
@@ -1056,20 +1056,20 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		if ( !$template_bit_information['fs__exists'] )
 		{
 			# Retrieve template-bit from Db
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'       => "select",
 					'table'    => "skin_templates",
 					'fields'   => array( "t_id", "s_set_id", "m_unique_id", "t_group_name", "t_bit_name", "t_timestamp", "t_source", "t_type", "t_can_remove" ),
 					'where'    => array(
-								//array( "( m_unique_id=" . $this->API->Db->quote( $template_bit_information['m_unique_id'] ) . " OR m_unique_id IS NULL ) OR t_bit_name='" . $template_bit_information['bit_name'] . "'" ),
-								array( "( m_unique_id=" . $this->API->Db->quote( $template_bit_information['m_unique_id'] ) . " OR m_unique_id IS NULL )" ),
-								array( "s_set_id="      . $this->API->Db->quote( $this->cur_skin['set_id'], "INTEGER"  ) ),
-								array( "t_bit_name="    . $this->API->Db->quote( $template_bit_information['t_bit_name'] ) ),
-								array( "t_type="        . $this->API->Db->quote( $template_bit_information['t_type']     ) ),
+								//array( "( m_unique_id=" . $this->Registry->Db->quote( $template_bit_information['m_unique_id'] ) . " OR m_unique_id IS NULL ) OR t_bit_name='" . $template_bit_information['bit_name'] . "'" ),
+								array( "( m_unique_id=" . $this->Registry->Db->quote( $template_bit_information['m_unique_id'] ) . " OR m_unique_id IS NULL )" ),
+								array( "s_set_id="      . $this->Registry->Db->quote( $this->cur_skin['set_id'], "INTEGER"  ) ),
+								array( "t_bit_name="    . $this->Registry->Db->quote( $template_bit_information['t_bit_name'] ) ),
+								array( "t_type="        . $this->Registry->Db->quote( $template_bit_information['t_type']     ) ),
 							),
 					'order'    => array( "t_type ASC", "m_unique_id ASC" )
 				);
-			$_result = $this->API->Db->simple_exec_query();
+			$_result = $this->Registry->Db->simple_exec_query();
 
 			# Did we get template data?
 			if ( empty( $_result ) )
@@ -1104,19 +1104,19 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 
 			if ( !( $_fh = fopen( $template_bit_information['fs__full_path'] , "wb" ) ) )
 			{
-				$this->API->logger__do_log( "Display: Couldn't create/open template-file ['" . $tpl_name . "'] for writing!", "WARNING" );
+				$this->Registry->logger__do_log( "Display: Couldn't create/open template-file ['" . $tpl_name . "'] for writing!", "WARNING" );
 			}
 			if ( !flock( $_fh, LOCK_EX ) )
 			{
-				$this->API->logger__do_log( "Display: Couldn't lock template-file ['" . $tpl_name . "'] for writing!", "WARNING" );
+				$this->Registry->logger__do_log( "Display: Couldn't lock template-file ['" . $tpl_name . "'] for writing!", "WARNING" );
 			}
 			if ( !fwrite( $_fh, $template_bit_information['t_source'] ) )
 			{
-				$this->API->logger__do_log( "Display: Couldn't write into template-file ['" . $tpl_name . "']!", "WARNING" );
+				$this->Registry->logger__do_log( "Display: Couldn't write into template-file ['" . $tpl_name . "']!", "WARNING" );
 			}
 			if ( !flock( $_fh, LOCK_UN ) )
 			{
-				$this->API->logger__do_log( "Display: Couldn't unlock template-file ['" . $tpl_name . "']!", "WARNING" );
+				$this->Registry->logger__do_log( "Display: Couldn't unlock template-file ['" . $tpl_name . "']!", "WARNING" );
 			}
 			fclose( $_fh );
 			$template_bit_information['fs__exists'] = true;
@@ -1127,7 +1127,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		{
 			if ( !chmod( $template_bit_information['fs__full_path'], 0777 ) )
 			{
-				$this->API->logger__do_log( "Display: Couldn't chmod() template-file ['" . $tpl_name . "']!", "WARNING" );
+				$this->Registry->logger__do_log( "Display: Couldn't chmod() template-file ['" . $tpl_name . "']!", "WARNING" );
 			}
 		}
 
@@ -1158,7 +1158,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		{
 			if ( ( $tpl_source = $template_bit_information['t_source'] = file_get_contents( $template_bit_information['fs__full_path'] ) ) === false )
 			{
-				$this->API->logger__do_log( "Display: Couldn't read template-file ['" . $tpl_name . "']!", "ERROR" );
+				$this->Registry->logger__do_log( "Display: Couldn't read template-file ['" . $tpl_name . "']!", "ERROR" );
 				return false;
 			}
 
@@ -1192,7 +1192,7 @@ if ( $this->API->Modules->cur_module['m_name'] == 'acp' )
 		{
 			if ( ( $template_bit_information['t_timestamp'] = filemtime( $template_bit_information['fs__full_path'] ) ) === false )
 			{
-				$this->API->logger__do_log( "Display: Couldn't determine timestamp for template-file ['" . $tpl_name . "']!", "ERROR" );
+				$this->Registry->logger__do_log( "Display: Couldn't determine timestamp for template-file ['" . $tpl_name . "']!", "ERROR" );
 				return false;
 			}
 		}

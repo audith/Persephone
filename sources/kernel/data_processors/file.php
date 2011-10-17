@@ -19,10 +19,10 @@ require_once( PATH_SOURCES . "/kernel/data_processors.php" );
 class Data_Processors__File extends Data_Processors
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	 */
-	public $API;
+	public $Registry;
 
 	/**
 	 * Faults/errors/exceptions container
@@ -45,11 +45,11 @@ class Data_Processors__File extends Data_Processors
 
 	/**
 	 * Contructor
-	 * @param    API    API object reference
+	 * @param    Registry    Registry object reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		parent::__construct( $API );
+		parent::__construct( $Registry );
 
 		//-------------------------------
 		// Graphic library being used
@@ -69,30 +69,30 @@ class Data_Processors__File extends Data_Processors
 		{
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( "Neither GD, nor Imagick is available! Install at least one of these two for the application to work!" , "ERROR" );
+				$this->Registry->logger__do_log( "Neither GD, nor Imagick is available! Install at least one of these two for the application to work!" , "ERROR" );
 			}
 			return false;
 		}
-		if ( $this->API->config['medialibrary']['graphic_library_preferred'] == 'imagick' )
+		if ( $this->Registry->config['medialibrary']['graphic_library_preferred'] == 'imagick' )
 		{
 			if ( $_is_imagick_available )
 			{
-				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Imagick" );
+				$this->graphic_library_used = $this->Registry->loader( "Data_Processors__File__Image__Imagick" );
 			}
 			else
 			{
-				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Gd" );
+				$this->graphic_library_used = $this->Registry->loader( "Data_Processors__File__Image__Gd" );
 			}
 		}
-		elseif (  $this->API->config['medialibrary']['graphic_library_preferred'] == 'gd' )
+		elseif (  $this->Registry->config['medialibrary']['graphic_library_preferred'] == 'gd' )
 		{
 			if ( $_is_gd_available )
 			{
-				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Gd" );
+				$this->graphic_library_used = $this->Registry->loader( "Data_Processors__File__Image__Gd" );
 			}
 			else
 			{
-				$this->graphic_library_used = $this->API->loader( "Data_Processors__File__Image__Imagick" );
+				$this->graphic_library_used = $this->Registry->loader( "Data_Processors__File__Image__Imagick" );
 			}
 		}
 	}
@@ -124,10 +124,10 @@ class Data_Processors__File extends Data_Processors
 		//---------------------
 
 		# Running module
-		$m =& $this->API->Modules->cur_module;
+		$m =& $this->Registry->Modules->cur_module;
 
 		# Running subroutine
-		$s =& $this->API->Modules->cur_module['running_subroutine'];
+		$s =& $this->Registry->Modules->cur_module['running_subroutine'];
 
 		//-----------------
 		// Processing...
@@ -328,7 +328,7 @@ class Data_Processors__File extends Data_Processors
 
 		# ALLOWED-FILETYPES: Validation...
 		$dft_allowed_filetypes = $input['allowed_filetypes'];
-		$_mimelist_cache = $this->API->Cache->cache__do_get("mimelist");
+		$_mimelist_cache = $this->Registry->Cache->cache__do_get("mimelist");
 		if ( isset( $dft_allowed_filetypes ) and !empty( $dft_allowed_filetypes ) )
 		{
 			foreach ( $dft_allowed_filetypes as $_ft )
@@ -351,7 +351,7 @@ class Data_Processors__File extends Data_Processors
 		$dft_maxlength = $_skel_subtype_node['maxlength'];
 		if ( isset( $input['maxlength'] ) )
 		{
-			if ( false === $dft_maxlength = $this->API->Input->file__filesize__do_parse( $input['maxlength'] ) )
+			if ( false === $dft_maxlength = $this->Registry->Input->file__filesize__do_parse( $input['maxlength'] ) )
 			{
 				$faults[] = array( 'faultCode' => 709, 'faultMessage' => "MAXFILESIZE__INVALID_SYNTAX" ); // Invalid syntax for &quot;Maximum Filesize&quot; field! At least, enter &quot;0&quot; to disable the setting.
 			}
@@ -486,7 +486,7 @@ class Data_Processors__File extends Data_Processors
 		// Fetch file-info
 		//-------------------
 
-		if ( ( $file_info = $this->API->Cache->cache__do_get( "fileinfo_" . $identifier ) ) === false )
+		if ( ( $file_info = $this->Registry->Cache->cache__do_get( "fileinfo_" . $identifier ) ) === false )
 		{
 			return false;
 		}
@@ -532,11 +532,11 @@ class Data_Processors__File extends Data_Processors
 			$file_info['_f_thumbs_medium'] = false;
 			$file_info['_f_wtrmrk']        = false;
 
-			if ( file_exists( $_location = $this->API->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_S" ) ) and is_file( $_location ) and is_readable( $_location ) )
+			if ( file_exists( $_location = $this->Registry->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_S" ) ) and is_file( $_location ) and is_readable( $_location ) )
 			{
 				$file_info['_f_thumbs_small'] = true;
 			}
-			if ( file_exists( $_location = $this->API->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_M" ) ) and is_file( $_location ) and is_readable( $_location ) )
+			if ( file_exists( $_location = $this->Registry->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_M" ) ) and is_file( $_location ) and is_readable( $_location ) )
 			{
 				$file_info['_f_thumbs_medium'] = true;
 			}
@@ -546,7 +546,7 @@ class Data_Processors__File extends Data_Processors
 			}
 
 			# Watermark
-			if ( file_exists( $_location = $this->API->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_W" ) ) and is_file( $_location ) and is_readable( $_location ) )
+			if ( file_exists( $_location = $this->Registry->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_W" ) ) and is_file( $_location ) and is_readable( $_location ) )
 			{
 				$file_info['_f_wtrmrk'] = true;
 			}
@@ -582,7 +582,7 @@ class Data_Processors__File extends Data_Processors
 		# Don't Re-cache!!!
 		if
 		(
-			( $_link_info = $this->API->Cache->cache__do_get(
+			( $_link_info = $this->Registry->Cache->cache__do_get(
 					"linkinfo_"
 						. $file_resource['f_hash']
 						. "_"
@@ -622,7 +622,7 @@ class Data_Processors__File extends Data_Processors
 		if ( ! file_exists( PATH_ROOT_WEB . $_dirname ) or ! is_dir( PATH_ROOT_WEB . $_dirname ) )
 		{
 			$_mkdir = mkdir( PATH_ROOT_WEB . $_dirname , 0777 , true );
-			$this->API->logger__do_log(
+			$this->Registry->logger__do_log(
 					"Modules - Data_Processors - FILE: "
 						. ( $_mkdir === false ? "Failed" : "Succeeded" )
 						. " to MKDIR '" . PATH_ROOT_WEB . $_dirname . "'" ,
@@ -631,7 +631,7 @@ class Data_Processors__File extends Data_Processors
 		}
 
 		$_chdir = chdir( PATH_ROOT_WEB . $_dirname );
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Modules - Data_Processors - FILE: "
 					. ( $_chdir === false ? "Failed" : "Succeeded" )
 					. " to CHDIR to '" . PATH_ROOT_WEB . $_dirname . "'" ,
@@ -664,7 +664,7 @@ class Data_Processors__File extends Data_Processors
 			if ( ! is_writable( $_link_info['l_hash'] ) )
 			{
 				# No?! Bad, log it...
-				$this->API->logger__do_log(
+				$this->Registry->logger__do_log(
 						"Modules - Data_Processors - FILE: Symbolic-link marked for deletion is not writable: '/static/" . $_link_info['l_hash'] . "'",
 						"WARNING"
 					);
@@ -673,7 +673,7 @@ class Data_Processors__File extends Data_Processors
 			# Good, delete it
 			if ( ( $_unlink = unlink( $_link_info['l_hash'] ) ) === false )
 			{
-				$this->API->logger__do_log(
+				$this->Registry->logger__do_log(
 						"Modules - Data_Processors - FILE: Symbolic-link marked for deletion could not be deleted: '/static/" . $_link_info['l_hash'] . "'",
 						"ERROR"
 					);
@@ -690,7 +690,7 @@ class Data_Processors__File extends Data_Processors
 		if ( $_link === true )
 		{
 			$_link_info['l_name'] = $_dirname . "/" . $_link_info['l_hash'];
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'               =>  "replace",
 					'table'            =>  "media_library_links",
 					'set'              =>  array(
@@ -701,7 +701,7 @@ class Data_Processors__File extends Data_Processors
 							'm_id'           => $_link_info['m_id'],
 							'm_ip_address'   => new Zend_Db_Expr(
 									"CONV( INET_ATON( "
-										. $this->API->Db->db->quote( $_link_info['m_ip_address'] )
+										. $this->Registry->Db->db->quote( $_link_info['m_ip_address'] )
 										. " ), 10, 2 )"
 								),
 						),
@@ -709,8 +709,8 @@ class Data_Processors__File extends Data_Processors
 							'm_id'           => "int",
 						),
 				);
-			$_db_result = $this->API->Db->simple_exec_query_shutdown();
-			$this->API->logger__do_log(
+			$_db_result = $this->Registry->Db->simple_exec_query_shutdown();
+			$this->Registry->logger__do_log(
 					"Modules - Data_Processors - FILE: "
 						. ( $_db_result === false ? "Failed" : "Succeeded" )
 						. " to STORE link-info for '" . "linkinfo_" . $_link_info['f_hash'] . "_" . $_link_info['m_id'] . "' in Db." ,
@@ -718,7 +718,7 @@ class Data_Processors__File extends Data_Processors
 				);
 
 			# Recache
-			$_recache_processor_obj = $this->API->loader( "Cache__Recache" );
+			$_recache_processor_obj = $this->Registry->loader( "Cache__Recache" );
 			$_recache_processor_obj->main( "linkinfo_" . $_link_info['f_hash'] . "_" . $_link_info['m_id'] );
 
 			# Return the link details
@@ -753,7 +753,7 @@ class Data_Processors__File extends Data_Processors
 
 		if ( ! $file_resource['_diagnostics']['file_exists'] )
 		{
-			$this->API->logger__do_log( "Media ['" . $file_resource['_f_location'] . "'] not exists or inaccessible!" , "ERROR" );
+			$this->Registry->logger__do_log( "Media ['" . $file_resource['_f_location'] . "'] not exists or inaccessible!" , "ERROR" );
 			return false;
 		}
 
@@ -763,7 +763,7 @@ class Data_Processors__File extends Data_Processors
 
 		if ( $file_resource['_f_type'] != 'image' )
 		{
-			$this->API->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
+			$this->Registry->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
 			return false;
 		}
 
@@ -774,34 +774,34 @@ class Data_Processors__File extends Data_Processors
 		switch ( $file_suffix )
 		{
 			case '_S':
-				$_position_of_x_in_dimension_string = strpos( $this->API->config['medialibrary']['thumb_small_dimensions'] , "x" );
+				$_position_of_x_in_dimension_string = strpos( $this->Registry->config['medialibrary']['thumb_small_dimensions'] , "x" );
 				if ( strpos( $_position_of_x_in_dimension_string , "x" ) !== false and strpos( $_position_of_x_in_dimension_string , "x" ) !== 0 )
 				{
-					$_dimensions = explode( "x" , strtolower( $this->API->config['medialibrary']['thumb_small_dimensions'] ) );
+					$_dimensions = explode( "x" , strtolower( $this->Registry->config['medialibrary']['thumb_small_dimensions'] ) );
 				}
 				else
 				{
 					# We have problematic thumbnail dimension setting, let's revert to default value
-					$_cache__dimensions = $this->API->Cache->cache__do_get_part( "settings" , "by_key,medialibrary,thumb_small_dimensions,conf_default" );
+					$_cache__dimensions = $this->Registry->Cache->cache__do_get_part( "settings" , "by_key,medialibrary,thumb_small_dimensions,conf_default" );
 					$_dimensions = explode( "x" , $_cache__dimensions );
 				}
 				break;
 
 			case '_M':
-				$_position_of_x_in_dimension_string = strpos( $this->API->config['medialibrary']['thumb_medium_dimensions'] , "x" );
+				$_position_of_x_in_dimension_string = strpos( $this->Registry->config['medialibrary']['thumb_medium_dimensions'] , "x" );
 				if ( strpos( $_position_of_x_in_dimension_string , "x" ) !== false and strpos( $_position_of_x_in_dimension_string , "x" ) !== 0 )
 				{
-					$_dimensions = explode( "x" , strtolower( $this->API->config['medialibrary']['thumb_medium_dimensions'] ) );
+					$_dimensions = explode( "x" , strtolower( $this->Registry->config['medialibrary']['thumb_medium_dimensions'] ) );
 				}
 				else
 				{
 					# We have problematic thumbnail dimension setting, let's revert to default value
-					$_cache__dimensions = $this->API->Cache->cache__do_get_part( "settings" , "by_key,medialibrary,thumb_medium_dimensions,conf_default" );
+					$_cache__dimensions = $this->Registry->Cache->cache__do_get_part( "settings" , "by_key,medialibrary,thumb_medium_dimensions,conf_default" );
 					$_dimensions = explode( "x" , $_cache__dimensions );
 				}
 				break;
 			default:
-				$this->API->logger__do_log( "Modules - Data Processors - FILE::image__do_thumbnails() : Invalid thumbnail file-prefix provided!" );
+				$this->Registry->logger__do_log( "Modules - Data Processors - FILE::image__do_thumbnails() : Invalid thumbnail file-prefix provided!" );
 				return false;
 				break;
 
@@ -835,7 +835,7 @@ class Data_Processors__File extends Data_Processors
 
 		if ( ! $file_resource['_diagnostics']['file_exists'] )
 		{
-			$this->API->logger__do_log( "Media ['" . $file_resource['_f_location'] . "'] not exists or inaccessible!" , "ERROR" );
+			$this->Registry->logger__do_log( "Media ['" . $file_resource['_f_location'] . "'] not exists or inaccessible!" , "ERROR" );
 			return false;
 		}
 
@@ -845,7 +845,7 @@ class Data_Processors__File extends Data_Processors
 
 		if ( $file_resource['_f_type'] != 'image' )
 		{
-			$this->API->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
+			$this->Registry->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] is not an image file!" , "ERROR" );
 			return false;
 		}
 

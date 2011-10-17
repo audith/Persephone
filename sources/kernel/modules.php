@@ -16,10 +16,10 @@ if ( ! defined( "INIT_DONE" ) )
 class Modules
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var Object
 	**/
-	private $API;
+	private $Registry;
 
 	/**
 	 * Array of active modules
@@ -55,13 +55,13 @@ class Modules
 	/**
 	 * Constructor
 	 *
-	 * @param    object    API Object Reference
+	 * @param    object    Registry Object Reference
 	 * @param    array     $params  Incoming data
 	 */
-	public function __construct ( API $API, $params = "" )
+	public function __construct ( Registry $Registry, $params = "" )
 	{
-		# Bring-in API object reference
-		$this->API = $API;
+		# Bring-in Registry object reference
+		$this->Registry = $Registry;
 
 		# Get active modules from DB
 		$this->active_modules = $this->modules__fetch_active();
@@ -75,7 +75,7 @@ class Modules
 		if ( ! defined( "SITE_URL" ) )
 		{
 			$_connection_type = $this->cur_module['m_enforce_ssl'] ? "https" : "http";
-			define( "SITE_URL", $_connection_type . "://" . $this->API->config['url']['hostname'][ $_connection_type ] );
+			define( "SITE_URL", $_connection_type . "://" . $this->Registry->config['url']['hostname'][ $_connection_type ] );
 		}
 	}
 
@@ -85,7 +85,7 @@ class Modules
 	 */
 	public function _my_destruct ()
 	{
-		$this->API->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
+		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
 	}
 
 
@@ -98,7 +98,7 @@ class Modules
 	{
 		# Load current module
 		$this->modules__do_load( $this->cur_module );
-		$this->API->config['page']['running_subroutine'] =& $this->cur_module['running_subroutine'];
+		$this->Registry->config['page']['running_subroutine'] =& $this->cur_module['running_subroutine'];
 	}
 
 
@@ -170,7 +170,7 @@ class Modules
 		$action = "";
 		if ( filter_has_var( INPUT_GET, "do" ) or filter_has_var( INPUT_POST, "do" ) )  // For security reasons, let's check original GET and POST data
 		{
-			$action = preg_replace( '#[^a-z_-]#' , "" , $this->API->Input->request("do") );
+			$action = preg_replace( '#[^a-z_-]#' , "" , $this->Registry->Input->request("do") );
 		}
 		if ( !$action )
 		{
@@ -232,7 +232,7 @@ class Modules
 			. md5(
 					$m['m_unique_id']
 					. $m['running_subroutine']['s_name']
-					. $this->API->config['page']['request']['path']
+					. $this->Registry->config['page']['request']['path']
 					. $m['running_subroutine']['page_nr_requested']
 				);
 
@@ -241,14 +241,14 @@ class Modules
 			. md5(
 					$m['m_unique_id']
 					. $m['running_subroutine']['s_name']
-					. $this->API->config['page']['request']['path']
+					. $this->Registry->config['page']['request']['path']
 				);
 
 		if
 		(
-			! $m['running_subroutine']['content']['parsed'] = $this->API->Cache->cache__do_get( $_cache_key_name__subroutines__content_for , TRUE )
+			! $m['running_subroutine']['content']['parsed'] = $this->Registry->Cache->cache__do_get( $_cache_key_name__subroutines__content_for , TRUE )
 			or
-			! $_cache_of_keys_for_the_result_set = $this->API->Cache->cache__do_get( $_cache_key_name__subroutines__keys_for , TRUE )
+			! $_cache_of_keys_for_the_result_set = $this->Registry->Cache->cache__do_get( $_cache_key_name__subroutines__keys_for , TRUE )
 		)
 		{
 			//-----------------------------------------------------------------------------------------------
@@ -370,20 +370,20 @@ class Modules
 						{
 							$_attach_prefix_reference_makes_us_do_this = "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $_table_alias;
 							$_connector_joins[] = array(
-									array( $_table_alias => $this->API->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
-									$this->API->Db->db->quoteIdentifier( "master.id" )
+									array( $_table_alias => $this->Registry->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
+									$this->Registry->Db->db->quoteIdentifier( "master.id" )
 										. " = "
-										. $this->API->Db->db->quoteIdentifier( $_table_alias . ".ref_id" ),
+										. $this->Registry->Db->db->quoteIdentifier( $_table_alias . ".ref_id" ),
 									array(),                                        // No list of columns to fetch, we place that in WHERE clause
 								);
 						}
 					}
 
 					$_attach_prefix_reference_makes_us_do_this = "mod_" . $m['m_unique_id_clean'] . "_master_repo";
-					$_subquery = $this->API->Db->db
+					$_subquery = $this->Registry->Db->db
 						->select()
 						->from(
-								array( 'master' => $this->API->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
+								array( 'master' => $this->Registry->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
 								$_fields_to_fetch
 							);
 
@@ -408,20 +408,20 @@ class Modules
 					{
 						$_attach_prefix_reference_makes_us_do_this = "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $_table_alias;
 						$_connector_joins[] = array(
-								array( $_table_alias => $this->API->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
-								$this->API->Db->db->quoteIdentifier( "master.id" )
+								array( $_table_alias => $this->Registry->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
+								$this->Registry->Db->db->quoteIdentifier( "master.id" )
 									. " = "
-									. $this->API->Db->db->quoteIdentifier( $_table_alias . ".ref_id" ),
+									. $this->Registry->Db->db->quoteIdentifier( $_table_alias . ".ref_id" ),
 								array(),                                            // No list of columns to fetch, we place that in WHERE clause
 							);
 					}
 				}
 
 				$_attach_prefix_reference_makes_us_do_this = "mod_" . $m['m_unique_id_clean'] . "_master_repo";
-				$_subquery = $this->API->Db->db
+				$_subquery = $this->Registry->Db->db
 					->select()
 					->from(
-							array( 'master' => $this->API->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
+							array( 'master' => $this->Registry->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
 							$_fields_to_fetch
 						);
 
@@ -441,7 +441,7 @@ class Modules
 			}
 
 			# + UNION
-			$_base_query = $this->API->Db->db->select()->union( $_subqueries );
+			$_base_query = $this->Registry->Db->db->select()->union( $_subqueries );
 
 			# + ORDER
 			if ( count( $m['running_subroutine']['s_fetch_criteria_parsed']['sort_by'] ) )
@@ -458,34 +458,34 @@ class Modules
 				. md5(
 						$m['m_unique_id']
 						. $m['running_subroutine']['s_name']
-						. $this->API->config['page']['request']['path']
+						. $this->Registry->config['page']['request']['path']
 					);
 
 			if (
 				! $_cache_of_keys_for_the_result_set =
-					$this->API->Cache->cache__do_get(
+					$this->Registry->Cache->cache__do_get(
 							$_cache_key_name__subroutines__keys_for,
 							TRUE
 						)
 			)
 			{
-				$this->API->Db->cur_query = $this->API->Db->db
+				$this->Registry->Db->cur_query = $this->Registry->Db->db
 					->select()
 					->from(
 							new Zend_Db_Expr( "( " . strval( $_base_query ) . " )" ),
 							array(
-									'list'  => new Zend_Db_Expr( "DISTINCT( " . $this->API->Db->db->quoteIdentifier( "id" ) . " )" ),
-									// 'count' => new Zend_Db_Expr( "COUNT( DISTINCT( " . $this->API->Db->db->quoteIdentifier( "id" ) . " ) )" ),
+									'list'  => new Zend_Db_Expr( "DISTINCT( " . $this->Registry->Db->db->quoteIdentifier( "id" ) . " )" ),
+									// 'count' => new Zend_Db_Expr( "COUNT( DISTINCT( " . $this->Registry->Db->db->quoteIdentifier( "id" ) . " ) )" ),
 								)
 						);
 				try
 				{
-					$_r = $this->API->Db->db->query( $this->API->Db->cur_query )->fetchAll();
-					$this->API->Db->query_count++;
+					$_r = $this->Registry->Db->db->query( $this->Registry->Db->cur_query )->fetchAll();
+					$this->Registry->Db->query_count++;
 				}
 				catch ( Zend_Db_Exception $e )
 				{
-					$this->API->Db->exception_handler( $e );
+					$this->Registry->Db->exception_handler( $e );
 					return false;
 				}
 
@@ -495,7 +495,7 @@ class Modules
 					$_cache_of_keys_for_the_result_set[] = $_i['list'];
 				}
 
-				$this->API->Cache->cache__do_update(
+				$this->Registry->Cache->cache__do_update(
 						array(
 								'name'    => $_cache_key_name__subroutines__keys_for,
 								'value'   => $_cache_of_keys_for_the_result_set,
@@ -518,7 +518,7 @@ class Modules
 						array_map(
 								create_function(
 										'$value' ,
-										'return $GLOBALS["API"]->Db->quote( $value , "INTEGER" );'
+										'return $GLOBALS["Registry"]->Db->quote( $value , "INTEGER" );'
 									),
 								array_slice(
 										$_cache_of_keys_for_the_result_set,
@@ -536,7 +536,7 @@ class Modules
 						array_map(
 								create_function(
 										'$value' ,
-										'return $GLOBALS["API"]->Db->quote( $value , "INTEGER" );'
+										'return $GLOBALS["Registry"]->Db->quote( $value , "INTEGER" );'
 									),
 								$_cache_of_keys_for_the_result_set
 							)
@@ -544,32 +544,32 @@ class Modules
 			}
 
 			# Append WHERE clause which emulated LIMIT and PAGINATION + ORDER clause
-			$this->API->Db->cur_query = $this->API->Db->db
+			$this->Registry->Db->cur_query = $this->Registry->Db->db
 				->select()
 				->from(
 						new Zend_Db_Expr( "( " . strval( $_base_query ) . " )" )
 					);
 			if ( ! empty( $_keys_to_fetch ) )
 			{
-				$this->API->Db->cur_query->where(  $this->API->Db->db->quoteIdentifier( "id" ) . " IN ( " . $_keys_to_fetch . " )" );
+				$this->Registry->Db->cur_query->where(  $this->Registry->Db->db->quoteIdentifier( "id" ) . " IN ( " . $_keys_to_fetch . " )" );
 			}
 			else
 			{
 				# No content in this page? Redirect to page 1 then...
 				if ( ! $m['running_subroutine']['content']['count'] and $m['running_subroutine']['page_nr_requested'] > 1 )
 				{
-					$this->API->http_redirect( $this->API->config['page']['request']['scheme'] . '://' . $this->API->config['page']['request']['host'] . $this->API->config['page']['request']['path'] );
+					$this->Registry->http_redirect( $this->Registry->config['page']['request']['scheme'] . '://' . $this->Registry->config['page']['request']['host'] . $this->Registry->config['page']['request']['path'] );
 				}
 			}
 
 			try
 			{
-				$result = $this->API->Db->db->query( $this->API->Db->cur_query )->fetchAll();
-				$this->API->Db->query_count++;
+				$result = $this->Registry->Db->db->query( $this->Registry->Db->cur_query )->fetchAll();
+				$this->Registry->Db->query_count++;
 			}
 			catch ( Zend_Db_Exception $e )
 			{
-				$this->API->Db->exception_handler( $e );
+				$this->Registry->Db->exception_handler( $e );
 				return false;
 			}
 
@@ -613,7 +613,7 @@ class Modules
 					{
 						# Data-processor instance
 						$_data_type = $m['running_subroutine']['s_data_definition'][ $_field_name ]['type'];
-						$_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $_data_type ) );
+						$_processor_instance = $this->Registry->loader( "Data_Processors__" . ucwords( $_data_type ) );
 
 						//-------------------------------
 						// Organize content container
@@ -666,7 +666,7 @@ class Modules
 			// Cache the content
 			//---------------------
 
-			$this->API->Cache->cache__do_update(
+			$this->Registry->Cache->cache__do_update(
 					array(
 							'name'    => $_cache_key_name__subroutines__content_for,
 							'value'   => $return['content'] = $m['running_subroutine']['content']['parsed'],
@@ -745,30 +745,30 @@ class Modules
 			{
 				$_attach_prefix_reference_makes_us_do_this = "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $_table_alias;
 				$_connector_joins[] = array(
-						array( $_table_alias => $this->API->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
-						$this->API->Db->db->quoteIdentifier( "master.id" )
+						array( $_table_alias => $this->Registry->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
+						$this->Registry->Db->db->quoteIdentifier( "master.id" )
 							. " = "
-							. $this->API->Db->db->quoteIdentifier( $_table_alias . ".ref_id" ),
+							. $this->Registry->Db->db->quoteIdentifier( $_table_alias . ".ref_id" ),
 						array(),  // No list of columns to fetch, we place that in WHERE clause
 					);
 			}
 		}
 
 		$_attach_prefix_reference_makes_us_do_this = "mod_" . $m['m_unique_id_clean'] . "_master_repo";
-		$this->API->Db->cur_query = $this->API->Db->db
+		$this->Registry->Db->cur_query = $this->Registry->Db->db
 			->select()
 			->from(
-					array( 'master' => $this->API->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
+					array( 'master' => $this->Registry->Db->attach_prefix( $_attach_prefix_reference_makes_us_do_this ) ),
 					$_fields_to_fetch
 				);
 
 		foreach ( $_connector_joins as $_j )
 		{
-			$this->API->Db->cur_query->joinLeft( $_j[0] , $_j[1] , $_j[2] );
+			$this->Registry->Db->cur_query->joinLeft( $_j[0] , $_j[1] , $_j[2] );
 		}
 
 		# + Where
-		$this->API->Db->cur_query->where( $this->API->Db->db->quoteIdentifier( "master.id" ) . "=" . $this->API->Db->db->quote( $ref_id , "INTEGER" ) );
+		$this->Registry->Db->cur_query->where( $this->Registry->Db->db->quoteIdentifier( "master.id" ) . "=" . $this->Registry->Db->db->quote( $ref_id , "INTEGER" ) );
 
 		//---------------------------------------------------------
 		// Execute final fetch query and retrieve requested data
@@ -776,12 +776,12 @@ class Modules
 
 		try
 		{
-			$result = $this->API->Db->db->query( $this->API->Db->cur_query )->fetchAll();
-			$this->API->Db->query_count++;
+			$result = $this->Registry->Db->db->query( $this->Registry->Db->cur_query )->fetchAll();
+			$this->Registry->Db->query_count++;
 		}
 		catch ( Zend_Db_Exception $e )
 		{
-			$this->API->Db->exception_handler( $e );
+			$this->Registry->Db->exception_handler( $e );
 			return false;
 		}
 
@@ -855,7 +855,7 @@ class Modules
 					{
 						continue;
 					}
-					$_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $_field_node['type'] ) );
+					$_processor_instance = $this->Registry->loader( "Data_Processors__" . ucwords( $_field_node['type'] ) );
 
 					//-------------------------------
 					// Organize content container
@@ -925,7 +925,7 @@ class Modules
 				# Fetch ACP Handler
 				require_once( $_han_class_lib );
 
-				$m['han'] = new Module_Handler( $this->API );
+				$m['han'] = new Module_Handler( $this->Registry );
 				$m['m_subroutines'] =& $m['han']->structural_map['m_subroutines'];
 			}
 			else
@@ -952,7 +952,7 @@ class Modules
 
 		# Module URL prefix
 		$_connection_type = $m['m_enforce_ssl'] ? "https" : "http";
-		$m['m_url_prefix'] = $_connection_type . "://" . $this->API->config['url']['hostname'][ $_connection_type ] . "/" . $m['m_name'];
+		$m['m_url_prefix'] = $_connection_type . "://" . $this->Registry->config['url']['hostname'][ $_connection_type ] . "/" . $m['m_name'];
 
 		//------------------------------------------------------------------------------------
 		// Process SUBROUTINES and determine the working one and the request coming with it
@@ -972,9 +972,9 @@ class Modules
 	 */
 	private function modules__fetch_active ()
 	{
-		if ( isset( $this->API->Cache->cache['modules']['by_name'] ) and is_array( $this->API->Cache->cache['modules']['by_name'] ) and count( $this->API->Cache->cache['modules']['by_name'] ) )
+		if ( isset( $this->Registry->Cache->cache['modules']['by_name'] ) and is_array( $this->Registry->Cache->cache['modules']['by_name'] ) and count( $this->Registry->Cache->cache['modules']['by_name'] ) )
 		{
-			foreach ( $this->API->Cache->cache['modules']['by_name'] as $m_name=>$m_data )
+			foreach ( $this->Registry->Cache->cache['modules']['by_name'] as $m_name=>$m_data )
 			{
 				if ( $m_data['m_is_enabled'] == 1 or IN_DEV )
 				{
@@ -1001,7 +1001,7 @@ class Modules
 	private function modules__fetch_working ()
 	{
 		# Checking PATH_INFO
-		$possible_module_name_from_path_info = $this->API->config['page']['request']['path_exploded'][0];
+		$possible_module_name_from_path_info = $this->Registry->config['page']['request']['path_exploded'][0];
 
 		# Do we have the requested module amongst our Active (enabled) modules?
 		if ( array_key_exists( $possible_module_name_from_path_info, $this->active_modules ) )
@@ -1033,7 +1033,7 @@ class Modules
 		# Continue...
 		foreach ( $m['m_subroutines'] as $_s_name=>$_s_data )
 		{
-			if ( preg_match( '#^' . $_s_data['s_pathinfo_uri_schema_parsed'] . '$#i', str_replace( "/" . $m['m_name'] . "/" , "" , $this->API->config['page']['request']['path'] ) , $_match ) )
+			if ( preg_match( '#^' . $_s_data['s_pathinfo_uri_schema_parsed'] . '$#i', str_replace( "/" . $m['m_name'] . "/" , "" , $this->Registry->config['page']['request']['path'] ) , $_match ) )
 			{
 				# Got it...
 				$m['running_subroutine'] =& $m['m_subroutines'][ $_s_name ];
@@ -1122,7 +1122,7 @@ class Modules
 				//---------------
 
 				$_rule__parsed =
-					$this->API->Db->db->quoteIdentifier( $_rule['field_name'] )
+					$this->Registry->Db->db->quoteIdentifier( $_rule['field_name'] )
 					. " "
 					. html_entity_decode( $_rule['math_operator'] , ENT_COMPAT , "UTF-8" );
 
@@ -1148,14 +1148,14 @@ class Modules
 						)
 						{
 							# FLOAT/DECIMAL
-							$_rule['value'] = $this->API->Input->clean__makesafe_mathematical( $_rule['value'], true );    // Cleanup
-							$_rule__parsed .= $this->API->Db->quote( eval( "return " . $_rule['value'] . ";"), "FLOAT" );
+							$_rule['value'] = $this->Registry->Input->clean__makesafe_mathematical( $_rule['value'], true );    // Cleanup
+							$_rule__parsed .= $this->Registry->Db->quote( eval( "return " . $_rule['value'] . ";"), "FLOAT" );
 						}
 						else
 						{
 							# INTEGER
-							$_rule['value'] = $this->API->Input->clean__makesafe_mathematical( $_rule['value'] );          // Cleanup
-							$_rule__parsed .= $this->API->Db->quote( eval( "return " . $_rule['value'] . ";"), "INTEGER" );
+							$_rule['value'] = $this->Registry->Input->clean__makesafe_mathematical( $_rule['value'] );          // Cleanup
+							$_rule__parsed .= $this->Registry->Db->quote( eval( "return " . $_rule['value'] . ";"), "INTEGER" );
 						}
 					}
 					elseif ( $_rule['type_of_expr_in_value'] == 'zend_db_expr' )
@@ -1166,7 +1166,7 @@ class Modules
 					else
 					{
 						# GENERIC
-						$_rule__parsed .= $this->API->Db->quote( $_rule['value'] );
+						$_rule__parsed .= $this->Registry->Db->quote( $_rule['value'] );
 					}
 				}
 
@@ -1237,7 +1237,7 @@ class Modules
 			}
 			else
 			{
-				$this->API->http_redirect( $this->API->config['page']['request']['scheme'] . '://' . $this->API->config['page']['request']['host'] . $this->API->config['page']['request']['path'] , 301 );
+				$this->Registry->http_redirect( $this->Registry->config['page']['request']['scheme'] . '://' . $this->Registry->config['page']['request']['host'] . $this->Registry->config['page']['request']['path'] , 301 );
 			}
 
 		}
@@ -1247,13 +1247,13 @@ class Modules
 		{
 			if ( $m['running_subroutine']['s_fetch_criteria']['limit'] == 1 and $_page_number > 1 )
 			{
-				$this->API->http_redirect( $this->API->config['page']['request']['scheme'] . '://' . $this->API->config['page']['request']['host'] . $this->API->config['page']['request']['path'] , 301 );
+				$this->Registry->http_redirect( $this->Registry->config['page']['request']['scheme'] . '://' . $this->Registry->config['page']['request']['host'] . $this->Registry->config['page']['request']['path'] , 301 );
 			}
 			if ( $m['running_subroutine']['s_fetch_criteria']['pagination'] )
 			{
 				if ( ( $_page_number - 1 ) * $m['running_subroutine']['s_fetch_criteria']['pagination'] > $m['running_subroutine']['s_fetch_criteria']['limit'] )
 				{
-					$this->API->http_redirect( $this->API->config['page']['request']['scheme'] . '://' . $this->API->config['page']['request']['host'] . $this->API->config['page']['request']['path'] , 302 );
+					$this->Registry->http_redirect( $this->Registry->config['page']['request']['scheme'] . '://' . $this->Registry->config['page']['request']['host'] . $this->Registry->config['page']['request']['path'] , 302 );
 				}
 				$m['running_subroutine']['s_fetch_criteria_parsed']['limit']['offset'] = ( $_page_number - 1 ) * $m['running_subroutine']['s_fetch_criteria']['pagination'];
 				$m['running_subroutine']['s_fetch_criteria_parsed']['limit']['count'] = $m['running_subroutine']['s_fetch_criteria']['pagination'];

@@ -18,11 +18,11 @@ require_once( dirname( __FILE__ ) . "/_interface.php" );
 class Cache__Drivers__Memcache implements iCache_Drivers
 {
 	/**
-	 * API Object reference
+	 * Registry reference
 	 *
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Unique ID for cache-filenames
@@ -46,10 +46,10 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 	public $link;
 
 
-	public function __construct ( API $API, $identifier = "" )
+	public function __construct ( Registry $Registry, $identifier = "" )
 	{
 		# Prelim
-		$this->API = $API;
+		$this->Registry = $Registry;
 
 		# Cont.
 		if ( ! class_exists( "Memcache" ) )
@@ -60,7 +60,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 
 		if ( !$identifier )
 		{
-			$this->identifier = $this->API->Input->server('SERVER_NAME');
+			$this->identifier = $this->Registry->Input->server('SERVER_NAME');
 		}
 		else
 		{
@@ -73,7 +73,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 		$this->link = new Memcache();
 
 		# Connection
-		$this->_connect( $this->API->config['performance']['cache']['memcache']['connection_pool'] );
+		$this->_connect( $this->Registry->config['performance']['cache']['memcache']['connection_pool'] );
 	}
 
 
@@ -114,7 +114,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 		catch ( Exception $e )
 		{
 			$_log_message = "Cache - memcache - _connect():" . $e->getMessage();
-			$this->API->logger__do_log( $_log_message , "WARNING" );
+			$this->Registry->logger__do_log( $_log_message , "WARNING" );
 			$this->crashed = 1;
 			return false;
 		}
@@ -124,7 +124,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 			$this->link->setCompressThreshold( 51200, 0.2 );
 		}
 
-		$this->API->logger__do_log( "Cache - Memcache - _connect(): Succeeded to ADD servers to the server pool." , "INFO" );
+		$this->Registry->logger__do_log( "Cache - Memcache - _connect(): Succeeded to ADD servers to the server pool." , "INFO" );
 
 		return true;
 	}
@@ -156,7 +156,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 	 */
 	public function do_put ( $key , $value , $ttl = 0 , $_no_logging = FALSE )
 	{
-		if (  in_array( "zlib", $this->API->config['runtime']['loaded_extensions'] ) )
+		if (  in_array( "zlib", $this->Registry->config['runtime']['loaded_extensions'] ) )
 		{
 			$return = $this->link->set( md5( $this->identifier . $key ), $value, MEMCACHE_COMPRESSED, intval( $ttl ) );
 		}
@@ -168,7 +168,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 		if ( $_no_logging === FALSE )
 		{
 			$_log_message = "Cache - Memcache - do_put(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to STORE (PUT) item '" . $key . "'.";
-			$this->API->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+			$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
 		}
 
 		return $return;
@@ -188,7 +188,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 		$this->do_remove( $key );
 		$return = $this->do_put( $key , $value, $ttl, TRUE );
 		$_log_message = "Cache - Memcache - do_update(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to REPLACE item '" . $key . "'.";
-		$this->API->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+		$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
 		return $return;
 	}
 
@@ -203,7 +203,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 	{
 		$return = $this->link->get( md5( $this->identifier . $key ) );
 		$_log_message = "Cache - Memcache - do_get(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to GET item '" . $key . "'.";
-		$this->API->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+		$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
 		return $return;
 	}
 
@@ -218,7 +218,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 	{
 		$return = $this->link->delete( md5( $this->identifier . $key ) );
 		$_log_message = "Cache - Memcache - do_remove(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to REMOVE item '" . $key . "'.";
-		$this->API->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+		$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
 		return $return;
 	}
 }

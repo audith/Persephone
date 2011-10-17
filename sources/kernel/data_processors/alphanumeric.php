@@ -19,10 +19,10 @@ require_once( PATH_SOURCES . "/kernel/data_processors.php" );
 class Data_Processors__Alphanumeric extends Data_Processors
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	**/
-	public $API;
+	public $Registry;
 
 	/**
 	 * Faults/errors/exceptions container
@@ -39,11 +39,11 @@ class Data_Processors__Alphanumeric extends Data_Processors
 
 	/**
 	 * Contructor
-	 * @param    API    API object reference
+	 * @param    Registry    Registry object reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		parent::__construct( $API );
+		parent::__construct( $Registry );
 	}
 
 
@@ -73,7 +73,7 @@ class Data_Processors__Alphanumeric extends Data_Processors
 		//---------------------
 
 		# Running module
-		$m =& $this->API->Modules->cur_module;
+		$m =& $this->Registry->Modules->cur_module;
 
 		//-----------------
 		// Processing...

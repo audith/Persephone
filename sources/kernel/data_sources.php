@@ -16,26 +16,26 @@ if ( ! defined( "INIT_DONE" ) )
 abstract class Data_Sources
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	**/
-	public $API;
+	public $Registry;
 
 
 	/**
 	 * Constructor
 	 *
-	 * @param  object  API reference.
+	 * @param  object  Registry reference.
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		$this->API = $API;
+		$this->Registry = $Registry;
 	}
 
 	/**
-	 * __toString()
+	 * Disable __toString() magic-function
 	 */
-	public function __toString ()
+	private function __toString ()
 	{
 		return false;
 	}

@@ -19,11 +19,11 @@ if ( ! defined( "INIT_DONE" ) )
 class Ips_Converge
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 *
 	 * @var Object
 	**/
-	private $API;
+	private $Registry;
 
 	/**
 	* Converge member array
@@ -34,14 +34,14 @@ class Ips_Converge
 
 
 	/**
-	 * Constructor, accepts API object
+	 * Constructor, accepts Registry object
 	 *
 	 * @param	object Database object
 	**/
-	public function __construct ( & $API )
+	public function __construct ( & $Registry )
 	{
-		# Bring-in API object reference
-		$this->API = $API;
+		# Bring-in Registry object reference
+		$this->Registry = $Registry;
 	}
 
 
@@ -53,14 +53,14 @@ class Ips_Converge
 	**/
 	public function converge_check_for_member_by_email ( $email )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"      => "select",
 				"fields"  => array( "converge_id" ),
 				"table"   => "members_converge",
 				"where"   => array( array( "converge_email=?", $email ) )
 			);
 
-		if ( count( $result = $this->API->Db->simple_exec_query() ) )
+		if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 		{
 			foreach ( $result as $test )
 			{
@@ -98,13 +98,13 @@ class Ips_Converge
 
 		if ( $email != $this->member['converge_email'] )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					"do"     => "select",
 					"table"  => "members_converge",
 					"where"  => array( array( "converge_email=?", $email ) )
 				);
 
-			if ( count( $result = $this->API->Db->simple_exec_query() ) )
+			if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 			{
 				foreach ( $result as $row )
 				{
@@ -115,14 +115,14 @@ class Ips_Converge
 
 		$new_pass = md5( md5( $temp_member['converge_pass_salt'] ) . $new_md5_pass );
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"       => "update",
 				"tables"   => array( "members_converge" ),
 				"set"      => array( "converge_pass_hash" => $new_pass ),
 				"where"    => "converge_id='" . $temp_member['converge_id'] . "'"
 			);
 
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 	}
 
 
@@ -150,14 +150,14 @@ class Ips_Converge
 			}
 		}
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"       => "update",
 				"tables"   => array( "members_converge" ),
 				"set"      => array( "converge_email" => $new_email ),
 				"where"    => "converge_id='" . $this->member['converge_id'] . "'"
 			);
 
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		return TRUE;
 	}
@@ -174,13 +174,13 @@ class Ips_Converge
 
 		if ( $email )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					"do"     => "select",
 					"table"  => "members_converge",
 					"where"  => array( array( "converge_email=?", $email ) )
 				);
 
-			if ( count( $result = $this->API->Db->simple_exec_query() ) )
+			if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 			{
 				foreach ( $result as $row )
 				{
@@ -204,13 +204,13 @@ class Ips_Converge
 
 		if ( $id )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					"do"     => "select",
 					"table"  => "members_converge",
-					"where"  => array( array( "converge_id=?", $this->API->Db->quote( $id, "INTEGER" ) ) )
+					"where"  => array( array( "converge_id=?", $this->Registry->Db->quote( $id, "INTEGER" ) ) )
 				);
 
-			if ( count( $result = $this->API->Db->simple_exec_query() ) )
+			if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 			{
 				foreach ( $result as $row )
 				{

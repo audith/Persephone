@@ -18,11 +18,11 @@ abstract class Data_Processors
 	/**
 	 * Constructor
 	 *
-	 * @param  object  API reference.
+	 * @param  object  Registry reference.
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		$this->API = $API;
+		$this->Registry = $Registry;
 	}
 
 

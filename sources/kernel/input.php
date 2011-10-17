@@ -16,10 +16,10 @@ if ( ! defined( "INIT_DONE" ) )
 class Input
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Safe version of $_COOKIE
@@ -115,15 +115,15 @@ class Input
 	/**
 	 * Constructor
 	 *
-	 * @param array  API object reference
+	 * @param array  Registry object reference
 	 */
-	public function __construct ( & $API )
+	public function __construct ( & $Registry )
 	{
 		//----------
 		// Prelim
 		//----------
 
-		$this->API = $API;
+		$this->Registry = $Registry;
 	}
 
 
@@ -174,7 +174,7 @@ class Input
 	 */
 	public function _my_destruct ()
 	{
-		$this->API->logger__do_log( __CLASS__ . "::__destruct: Destroying class" );
+		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class" );
 	}
 
 
@@ -230,10 +230,10 @@ class Input
 		// SERVER['PATH_INFO'] "exploded"
 		//----------------------------------
 
-		$this->API->config['page']['request'] = $this->my_parse_url();
+		$this->Registry->config['page']['request'] = $this->my_parse_url();
 
 		# Request path
-		$this->API->logger__do_log( "Input::init() : Request-path = '" . $this->API->config['page']['request']['path'] . "'" , "INFO" );
+		$this->Registry->logger__do_log( "Input::init() : Request-path = '" . $this->Registry->config['page']['request']['path'] . "'" , "INFO" );
 
 		//-----------------------------
 		// Make a safe QUERY STRING
@@ -325,7 +325,7 @@ class Input
 	 */
 	public function clean__control_characters ( $t )
 	{
-		if ( isset( $this->API->config['security']['strip_space_chr'] ) and $this->API->config['security']['strip_space_chr'] )
+		if ( isset( $this->Registry->config['security']['strip_space_chr'] ) and $this->Registry->config['security']['strip_space_chr'] )
 		{
 	    	/**
     		 * @see	http://en.wikipedia.org/wiki/Space_(punctuation)
@@ -1202,7 +1202,7 @@ class Input
 	 */
 	public function mbstring_check_encoding ( $string, $target_encoding, $secondary_encoding = null )
 	{
-		if ( !in_array( "mbstring", $this->API->config['runtime']['loaded_extensions'] ) )
+		if ( !in_array( "mbstring", $this->Registry->config['runtime']['loaded_extensions'] ) )
 		{
 			return -1;
 		}
@@ -1272,7 +1272,7 @@ class Input
 			return $this->_cookie_set[ $name ];
 		}
 
-		$cookie_id = $this->API->config['cookies']['cookie_id'];
+		$cookie_id = $this->Registry->config['cookies']['cookie_id'];
 
 		if ( isset( $_COOKIE[ $cookie_id . $name ] ) )
 		{
@@ -1318,9 +1318,9 @@ class Input
 		}
 
 		# Cookie domain and path
-		$cookie_id       = $this->API->config['cookies']['cookie_id'];
-		$cookie_domain   = $this->API->config['cookies']['cookie_domain'];
-		$cookie_path     = $this->API->config['cookies']['cookie_path'];
+		$cookie_id       = $this->Registry->config['cookies']['cookie_id'];
+		$cookie_domain   = $this->Registry->config['cookies']['cookie_domain'];
+		$cookie_path     = $this->Registry->config['cookies']['cookie_path'];
 		$cookie_secure   = false;
 		$cookie_httponly = false;
 
@@ -1387,15 +1387,15 @@ class Input
 		$_parsed_url['request_uri'] =
 				$_parsed_url['scheme'] . "://" .
 				( ( @$_parsed_url['user'] and @$_parsed_url['pass'] ) ? $_parsed_url['user'] . ":" . $_parsed_url['pass'] . "@" : "" ) .
-				$this->API->config['url']['hostname'][ $_parsed_url['scheme'] ] .
+				$this->Registry->config['url']['hostname'][ $_parsed_url['scheme'] ] .
 				$_parsed_url['path'] .
 				( @$_parsed_url['query'] ? "?" . $_parsed_url['query'] : "" );
 
 		# Redirect to default domain-name if request was sent to different domain
-		if ( $_parsed_url['host'] != $this->API->config['url']['hostname'][ $_parsed_url['scheme'] ] )
+		if ( $_parsed_url['host'] != $this->Registry->config['url']['hostname'][ $_parsed_url['scheme'] ] )
 		{
-			$this->API->logger__do_log( "API: Request redirection to location: " . $_parsed_url['request_uri'] , "INFO" );
-			//$this->API->http_redirect( $_parsed_url['request_uri'] , 301 );
+			$this->Registry->logger__do_log( "Registry: Request redirection to location: " . $_parsed_url['request_uri'] , "INFO" );
+			//$this->Registry->http_redirect( $_parsed_url['request_uri'] , 301 );
 		}
 
 		return $_parsed_url;
@@ -1422,7 +1422,7 @@ class Input
 		{
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - " . $full_path_to_file . " is NOT a REGULAR FILE or does NOT EXIST at all!" , "ERROR" );
+				$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - " . $full_path_to_file . " is NOT a REGULAR FILE or does NOT EXIST at all!" , "ERROR" );
 			}
 			return "IS_NOT_FILE";
 		}
@@ -1432,7 +1432,7 @@ class Input
 		{
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - Cannot READ file: " . $full_path_to_file , "ERROR" );
+				$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - Cannot READ file: " . $full_path_to_file , "ERROR" );
 			}
 			return "IS_NOT_READABLE";
 		}
@@ -1442,7 +1442,7 @@ class Input
 		$_file_path__parsed['extension'] = strtolower( $_file_path__parsed['extension'] );
 
 		# MIMELIST cache
-		$_mimelist_cache = $this->API->Cache->cache__do_get_part( "mimelist" , "by_ext" );
+		$_mimelist_cache = $this->Registry->Cache->cache__do_get_part( "mimelist" , "by_ext" );
 
 		//-----------------
 		// Continue...
@@ -1452,7 +1452,7 @@ class Input
 		{
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - " . $_file_path__parsed['extension'] . " - NO SUCH FILETYPE IN our MIMELIST records!" , "ERROR" );
+				$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - " . $_file_path__parsed['extension'] . " - NO SUCH FILETYPE IN our MIMELIST records!" , "ERROR" );
 			}
 			return "FILETYPE_INVALID";
 		}
@@ -1479,7 +1479,7 @@ class Input
 
 		if ( IN_DEV )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - File: " . $full_path_to_file . " FAILED VALIDATION!" , "ERROR" );
+			$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - File: " . $full_path_to_file . " FAILED VALIDATION!" , "ERROR" );
 		}
 		return false;
 	}

@@ -19,11 +19,11 @@ require_once( dirname( __FILE__ ) . "/_interface.php" );
 class Cache__Drivers__Eaccelerator implements iCache_Drivers
 {
 	/**
-	 * API Object reference
+	 * Registry reference
 	 *
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Unique ID for cache-filenames
@@ -40,10 +40,10 @@ class Cache__Drivers__Eaccelerator implements iCache_Drivers
 	public $crashed = 0;
 
 
-	public function __construct ( API $API, $identifier = "" )
+	public function __construct ( Registry $Registry, $identifier = "" )
 	{
 		# Prelim
-		$this->API = $API;
+		$this->Registry = $Registry;
 
 		# Cont.
 		if ( ! function_exists( "eaccelerator_get" ) )
@@ -54,7 +54,7 @@ class Cache__Drivers__Eaccelerator implements iCache_Drivers
 
 		if ( !$identifier )
 		{
-			$this->identifier = $this->API->Input->server('SERVER_NAME');
+			$this->identifier = $this->Registry->Input->server('SERVER_NAME');
 		}
 		else
 		{

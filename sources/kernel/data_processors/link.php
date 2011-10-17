@@ -19,10 +19,10 @@ require_once( PATH_SOURCES . "/kernel/data_processors.php" );
 class Data_Processors__Link extends Data_Processors
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	 */
-	public $API;
+	public $Registry;
 
 	/**
 	 * Faults/errors/exceptions container
@@ -45,11 +45,11 @@ class Data_Processors__Link extends Data_Processors
 
 	/**
 	 * Contructor
-	 * @param    API    API object reference
+	 * @param    Registry    Registry object reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		parent::__construct( $API );
+		parent::__construct( $Registry );
 	}
 
 
@@ -74,19 +74,19 @@ class Data_Processors__Link extends Data_Processors
 		$this->data = $data;
 
 		# Linked module
-		$_linked_module = $this->API->Modules->modules__do_load( $this->API->Cache->cache['modules']['by_unique_id'][ $this->data['field']['e_data_definition']['m_unique_id'] ] );
+		$_linked_module = $this->Registry->Modules->modules__do_load( $this->Registry->Cache->cache['modules']['by_unique_id'][ $this->data['field']['e_data_definition']['m_unique_id'] ] );
 
 		# Do we have a data-source-handler for the linked module? If not, create one!
-		if ( !isset( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) or !is_object( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) )
+		if ( !isset( $this->Registry->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) or !is_object( $this->Registry->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] ) )
 		{
-			if ( ( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] = $this->API->loader( "data_sources__" . $m['m_data_source'] ) ) === false )
+			if ( ( $this->Registry->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] = $this->Registry->loader( "data_sources__" . $m['m_data_source'] ) ) === false )
 			{
-				unset( $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] );
+				unset( $this->Registry->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ] );
 				throw new Exception( "Failed to initialize data-source library: '" . $_linked_module['m_data_source'] . "'!" );
 			}
-			$this->API->logger__do_log( "Successfully initialized data-source library: '" . $_linked_module['m_data_source'] . "'." , "INFO" );
+			$this->Registry->logger__do_log( "Successfully initialized data-source library: '" . $_linked_module['m_data_source'] . "'." , "INFO" );
 		}
-		$_data_source_handler__for_linked_module =& $this->API->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ];  // Alias-shortcut
+		$_data_source_handler__for_linked_module =& $this->Registry->Modules->data_sources['by_module'][ $_linked_module['m_unique_id_clean'] ];  // Alias-shortcut
 
 		# Actual GET
 		$this->data['content'] = $_data_source_handler__for_linked_module->get__do_process__by_ref_id(
@@ -148,12 +148,12 @@ class Data_Processors__Link extends Data_Processors
 		{
 			$input['links_with'] = "{" . implode( "-", str_split( strtoupper( $input['links_with'] ), 8 ) ) . "}";
 		}
-		if ( ! array_key_exists( $input['links_with'] , $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( ! array_key_exists( $input['links_with'] , $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			$faults[] = array( 'faultCode' => 704 , 'faultMessage' => "MODULE_NAME__IS_INVALID" );
 			return $faults;
 		}
-		$l =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['links_with'] ];
+		$l =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['links_with'] ];
 
 		$_list_of_corrupt_fields                    = array();
 		$_list_of_fields_with_nonlinked_connectors  = array();

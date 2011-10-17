@@ -21,11 +21,11 @@ require_once( dirname( __FILE__ ) . "/_interface.php" );
 class Cache__Drivers__Memcached implements iCache_Drivers
 {
 	/**
-	 * API Object reference
+	 * Registry reference
 	 *
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Unique ID for cache-filenames
@@ -49,10 +49,10 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 	public $link;
 
 
-	public function __construct ( API $API, $identifier = "" )
+	public function __construct ( Registry $Registry, $identifier = "" )
 	{
 		# Prelim
-		$this->API = $API;
+		$this->Registry = $Registry;
 
 		# Cont.
 		if ( !extension_loaded("memcached") )
@@ -63,7 +63,7 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 
 		if ( !$identifier )
 		{
-			$this->identifier = $this->API->Input->server('SERVER_NAME');
+			$this->identifier = $this->Registry->Input->server('SERVER_NAME');
 		}
 		else
 		{
@@ -75,7 +75,7 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 		$this->link = new Memcached( $this->identifier );
 
 		# Connection
-		$this->_connect( $this->API->config['performance']['cache']['memcache']['connection_pool'] );
+		$this->_connect( $this->Registry->config['performance']['cache']['memcache']['connection_pool'] );
 	}
 
 
@@ -148,7 +148,7 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 
 		if ( $do_perform_log )
 		{
-			$this->API->logger__do_log( $message_to_log , $priority );
+			$this->Registry->logger__do_log( $message_to_log , $priority );
 		}
 
 		return $message_to_log;
@@ -179,7 +179,7 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 		}
 		catch ( Exception $e )
 		{
-			$this->API->logger__do_log( $e->getMessage() , "WARNING" );
+			$this->Registry->logger__do_log( $e->getMessage() , "WARNING" );
 			$this->crashed = 1;
 			return false;
 		}

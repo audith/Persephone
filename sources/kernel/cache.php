@@ -16,10 +16,10 @@ if ( ! defined( "INIT_DONE" ) )
 class Cache
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Cached data
@@ -43,12 +43,12 @@ class Cache
 	/**
 	 * Constructor - Loads and instantiates necessary libraries
 	 *
-	 * @param    object    API Object Reference
+	 * @param    object    Registry Object Reference
 	**/
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		# API object reference
-		$this->API = $API;
+		# Registry object reference
+		$this->Registry = $Registry;
 	}
 
 
@@ -57,7 +57,7 @@ class Cache
 	 */
 	public function _my_destruct ()
 	{
-		$this->API->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
+		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
 	}
 
 
@@ -69,9 +69,9 @@ class Cache
 
 		if( ! defined( 'PATH_CACHE' ) )
 		{
-			if ( ! empty( $this->API->config['performance']['cache']['diskcache']['cache_path'] ) )
+			if ( ! empty( $this->Registry->config['performance']['cache']['diskcache']['cache_path'] ) )
 			{
-				define( 'PATH_CACHE', $this->API->config['performance']['cache']['diskcache']['cache_path'] );
+				define( 'PATH_CACHE', $this->Registry->config['performance']['cache']['diskcache']['cache_path'] );
 			}
 			else
 			{
@@ -85,12 +85,12 @@ class Cache
 			// php-memcached
 			//-----------------
 
-			if ( $this->API->config['performance']['cache']['_method'] == 'memcached' )
+			if ( $this->Registry->config['performance']['cache']['_method'] == 'memcached' )
 			{
 				if ( extension_loaded( "memcached" ) )
 				{
 					require PATH_SOURCES . "/kernel_extensions/cache/abstraction/memcached.php";
-					$this->cachelib = $this->API->loader("Cache__Drivers__Memcached");
+					$this->cachelib = $this->Registry->loader("Cache__Drivers__Memcached");
 					if ( $this->cachelib->crashed )
 					{
 						throw new Exception( "Cache: Memcached failed to connect!" );
@@ -98,8 +98,8 @@ class Cache
 				}
 				else
 				{
-					$this->API->config['performance']['cache']['_method'] = "diskcache";
-					$this->API->logger__do_log( "Cache: PHP-Memcached not found! Reverting to Disk-cache...", "WARNING" );
+					$this->Registry->config['performance']['cache']['_method'] = "diskcache";
+					$this->Registry->logger__do_log( "Cache: PHP-Memcached not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -107,11 +107,11 @@ class Cache
 			// php-memcache
 			//-----------------
 
-			if ( $this->API->config['performance']['cache']['_method'] == 'memcache' )
+			if ( $this->Registry->config['performance']['cache']['_method'] == 'memcache' )
 			{
 				if ( class_exists( "Memcache" ) )
 				{
-					$this->cachelib = $this->API->loader("Cache__Drivers__Memcache");
+					$this->cachelib = $this->Registry->loader("Cache__Drivers__Memcache");
 					if ( $this->cachelib->crashed )
 					{
 						throw new Exception( "Cache: Memcache failed to connect!" );
@@ -119,8 +119,8 @@ class Cache
 				}
 				else
 				{
-					$this->API->config['performance']['cache']['_method'] = "diskcache";
-					$this->API->logger__do_log( "Cache: PHP-Memcache not found! Reverting to Disk-cache...", "WARNING" );
+					$this->Registry->config['performance']['cache']['_method'] = "diskcache";
+					$this->Registry->logger__do_log( "Cache: PHP-Memcache not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -128,16 +128,16 @@ class Cache
 			// eaccelerator
 			//----------------
 
-			elseif ( $this->API->config['performance']['cache']['_method'] == 'eaccelerator' )
+			elseif ( $this->Registry->config['performance']['cache']['_method'] == 'eaccelerator' )
 			{
 				if ( function_exists( "eaccelerator_get" ) )
 				{
-					$this->cachelib = $this->API->loader("Cache__Drivers__Eaccelerator");
+					$this->cachelib = $this->Registry->loader("Cache__Drivers__Eaccelerator");
 				}
 				else
 				{
-					$this->API->config['performance']['cache']['_method'] = "diskcache";
-					$this->API->logger__do_log( "Cache: PHP-eAccelerator not found! Reverting to Disk-cache...", "WARNING" );
+					$this->Registry->config['performance']['cache']['_method'] = "diskcache";
+					$this->Registry->logger__do_log( "Cache: PHP-eAccelerator not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -146,16 +146,16 @@ class Cache
 			// apc
 			//-------
 
-			elseif ( $this->API->config['performance']['cache']['_method'] == 'apc' )
+			elseif ( $this->Registry->config['performance']['cache']['_method'] == 'apc' )
 			{
 				if ( function_exists( "apc_fetch" ) )
 				{
-					$this->cachelib = $this->API->loader("Cache__Drivers__Apc");
+					$this->cachelib = $this->Registry->loader("Cache__Drivers__Apc");
 				}
 				else
 				{
-					$this->API->config['performance']['cache']['_method'] = "diskcache";
-					$this->API->logger__do_log( "Cache: PHP-APC not found! Reverting to Disk-cache...", "WARNING" );
+					$this->Registry->config['performance']['cache']['_method'] = "diskcache";
+					$this->Registry->logger__do_log( "Cache: PHP-APC not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -163,15 +163,15 @@ class Cache
 			// diskcache - fallback
 			//------------------------
 
-			if ( $this->API->config['performance']['cache']['_method'] == 'diskcache' )
+			if ( $this->Registry->config['performance']['cache']['_method'] == 'diskcache' )
 			{
-				$this->cachelib = $this->API->loader("Cache__Drivers__Diskcache");
+				$this->cachelib = $this->Registry->loader("Cache__Drivers__Diskcache");
 			}
 
 		}
 		catch ( Exception $e )
 		{
-			$this->API->logger__do_log( "Cache - init() : " . $e->getMessage() , "WARNING" );
+			$this->Registry->logger__do_log( "Cache - init() : " . $e->getMessage() , "WARNING" );
 		}
 
 		//-----------------
@@ -182,7 +182,7 @@ class Cache
 		{
 			unset( $this->cachelib );
 			$this->cachelib = null;
-			$this->API->logger__do_log( "Cache - All available caching mechanisms CRASHED!" , "ERROR" );
+			$this->Registry->logger__do_log( "Cache - All available caching mechanisms CRASHED!" , "ERROR" );
 		}
 
 		//----------------------
@@ -213,11 +213,11 @@ class Cache
 		}
 
 		# Log
-		$this->API->logger__do_log(
+		$this->Registry->logger__do_log(
 				"Cache: "
 				. ( $return === TRUE ? "SUCCEEDED" : "FAILED" )
 				. " loading initial cache for keys: "
-				. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $_cache_list ) ),
+				. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $_cache_list ) ),
 				$return === TRUE ? "INFO" : "ERROR"
 			);
 
@@ -294,19 +294,19 @@ class Cache
 
 			if ( count( $_cache_array ) )
 			{
-				$_cache_list = implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $_cache_array ) );
+				$_cache_list = implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $_cache_array ) );
 
 				//-------------------------------------------------------------
 				// Missing cache - part 1: Get from DB... and Put in place
 				//-------------------------------------------------------------
 
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						"do"	 => "select",
 						"table"  => "cache_store",
 						"where"  => "cs_key IN (" . $_cache_list . ")",
 					);
 
-				$result = $this->API->Db->simple_exec_query();
+				$result = $this->Registry->Db->simple_exec_query();
 
 				if ( count( $result ) )
 				{
@@ -346,7 +346,7 @@ class Cache
 				{
 					foreach ( $_cache_array as $_k )
 					{
-						$_recache = $this->API->loader("Cache__Recache");
+						$_recache = $this->Registry->loader("Cache__Recache");
 						$_cache[ $_k ] = $_recache->main( $_k );
 					}
 				}
@@ -354,7 +354,7 @@ class Cache
 		}
 		else
 		{
-			$this->API->logger__do_log( __CLASS__ . "::cache__do_get(): No cache abstraction! Can't fetch cache!" , "ERROR" );
+			$this->Registry->logger__do_log( __CLASS__ . "::cache__do_get(): No cache abstraction! Can't fetch cache!" , "ERROR" );
 		}
 
 		return is_array( $key ) ? $_cache : $_cache[ $key ];
@@ -435,7 +435,7 @@ class Cache
 		if ( count( $_problematic_keys ) )
 		{
 			$_msg = "Cache loading completed with some problems! Following keys didn't have valid cache-data associated with them: ";
-			$this->API->logger__do_log( __CLASS__ . "::cache__do_load(): " . $_msg . implode( ", " , $_problematic_keys ), "WARNING" );
+			$this->Registry->logger__do_log( __CLASS__ . "::cache__do_load(): " . $_msg . implode( ", " , $_problematic_keys ), "WARNING" );
 		}
 
 		return TRUE;
@@ -457,7 +457,7 @@ class Cache
 
 		$_problematic_keys = array();
 
-		$_recache_obj = $this->API->loader("Cache__Recache");
+		$_recache_obj = $this->Registry->loader("Cache__Recache");
 
 		if ( is_array( $key ) )
 		{
@@ -479,12 +479,12 @@ class Cache
 
 		if ( empty( $_problematic_keys ) )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::cache__do_recache: Recache completed SUCCESSFULLY without any problems for keys: " . ( is_array( $key ) ? implode( ", " , $key ) : $key ) , "INFO" );
+			$this->Registry->logger__do_log( __CLASS__ . "::cache__do_recache: Recache completed SUCCESSFULLY without any problems for keys: " . ( is_array( $key ) ? implode( ", " , $key ) : $key ) , "INFO" );
 			return TRUE;
 		}
 		else
 		{
-			$this->API->logger__do_log( __CLASS__ . "::cache__do_recache: Recache completed with PARTIAL-to-NO SUCCESS with problems for keys: " . ( is_array( $key ) ? implode( ", " , $key ) : $key ) . ". Problematic keys: " . implode( ", " , $_problematic_keys ) , "ERROR" );
+			$this->Registry->logger__do_log( __CLASS__ . "::cache__do_recache: Recache completed with PARTIAL-to-NO SUCCESS with problems for keys: " . ( is_array( $key ) ? implode( ", " , $key ) : $key ) . ". Problematic keys: " . implode( ", " , $_problematic_keys ) , "ERROR" );
 			return FALSE;
 		}
 	}
@@ -519,7 +519,7 @@ class Cache
 			}
 			else
 			{
-				$this->API->logger__do_log( "Cache: UPDATE failed; no value provided!" , "ERROR" );
+				$this->Registry->logger__do_log( "Cache: UPDATE failed; no value provided!" , "ERROR" );
 				return FALSE;
 			}
 
@@ -538,7 +538,7 @@ class Cache
 				$_cachelib_return = $this->cachelib->do_update( $v['name'], $value );
 
 				# Log
-				$this->API->logger__do_log(
+				$this->Registry->logger__do_log(
 						"Cache: UPDATE via Abstraction "
 							. ( $_cachelib_return === FALSE ? "failed" : "succeeded" )
 							. " for key '" . $v['name'] . "'" ,
@@ -552,7 +552,7 @@ class Cache
 				$value = serialize( $value );
 			}
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	           => "replace",
 					'table'            => "cache_store",
 					'set'              => array(
@@ -567,10 +567,10 @@ class Cache
 
 			if ( $v['donow'] )
 			{
-				$_db_return = $this->API->Db->simple_exec_query();
+				$_db_return = $this->Registry->Db->simple_exec_query();
 
 				# Log
-				$this->API->logger__do_log(
+				$this->Registry->logger__do_log(
 						"Cache: UPDATE on Database "
 							. ( $_db_return === FALSE ? "failed" : "succeeded" )
 							. " for key '" . $v['name'] . "'" ,
@@ -582,13 +582,13 @@ class Cache
 			}
 			else
 			{
-				$this->API->Db->simple_exec_query_shutdown();
+				$this->Registry->Db->simple_exec_query_shutdown();
 			}
 		}
 		else
 		{
 			# Log
-			$this->API->logger__do_log(	"Cache: UPDATE failed; no key provided! - " . var_export( $v , TRUE ) , "ERROR" );
+			$this->Registry->logger__do_log(	"Cache: UPDATE failed; no key provided! - " . var_export( $v , TRUE ) , "ERROR" );
 
 			return FALSE;
 		}
@@ -604,12 +604,12 @@ class Cache
 	public function cache__do_remove ( $key )
 	{
 		# Cleanup at Db level
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "delete",
 				'table'  => "cache_store",
-				'where'  => "cs_key=" . $this->API->Db->db->quote( $key ),
+				'where'  => "cs_key=" . $this->Registry->Db->db->quote( $key ),
 			);
-		$this->API->Db->simple_exec_query_shutdown();
+		$this->Registry->Db->simple_exec_query_shutdown();
 
 		# Cleanup at Cache abstraction level
 		return $this->cachelib->do_remove( $key );

@@ -16,11 +16,11 @@ if ( ! defined( "INIT_DONE" ) )
 class Session
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 *
 	 * @var Object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Client browser User-Agent
@@ -195,50 +195,50 @@ class Session
 	/**
 	 * Constructor
 	 *
-	 * @param  array  REFERENCE: API Object
+	 * @param  array  REFERENCE: Registry Object
 	 */
-	public function __construct( API $API )
+	public function __construct( Registry $Registry )
 	{
 		//-----------
 		// Prelim
 		//-----------
 
-		$this->API = $API;
-		$this->member =& $this->API->member;   // A shortcut :)
+		$this->Registry = $Registry;
+		$this->member =& $this->Registry->member;   // A shortcut :)
 
 		//--------------------------
 		// Session save handler
 		//--------------------------
 
-		if ( $this->API->config['performance']['cache']['_method'] == "memcached" and ! is_null( $this->API->Cache->cachelib ) )
+		if ( $this->Registry->config['performance']['cache']['_method'] == "memcached" and ! is_null( $this->Registry->Cache->cachelib ) )
 		{
 			ini_set( "session.save_handler" , "memcached" );
 			$_server_list = array();
-			foreach ( $this->API->config['performance']['cache']['memcache']['connection_pool'] as $_server )
+			foreach ( $this->Registry->config['performance']['cache']['memcache']['connection_pool'] as $_server )
 			{
 				$_server_array[] = implode( ":" , $_server );
 			}
 			$_ini_set_status = ini_set( "session.save_path" , $_server_list = implode( "," , $_server_array ) );
-			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcached-compatible)" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
+			$this->Registry->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcached-compatible)" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
 
 		}
-		elseif ( $this->API->config['performance']['cache']['_method'] == "memcache" and ! is_null( $this->API->Cache->cachelib ) )
+		elseif ( $this->Registry->config['performance']['cache']['_method'] == "memcache" and ! is_null( $this->Registry->Cache->cachelib ) )
 		{
 			ini_set( "session.save_handler" , "memcache" );
 			$_server_list = array();
-			foreach ( $this->API->config['performance']['cache']['memcache']['connection_pool'] as $_server )
+			foreach ( $this->Registry->config['performance']['cache']['memcache']['connection_pool'] as $_server )
 			{
 				$_server_array[] = "tcp://" . implode( ":" , $_server );
 			}
 			$_ini_set_status = ini_set( "session.save_path" , $_server_list = implode( "," , $_server_array ) );
-			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcache-compatible)" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
+			$this->Registry->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to set" : "Successfully set" ) . " ini-directive 'session.save_path' = '" . $_server_list . "' (php-memcache-compatible)" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
 
 		}
 		else
 		{
 			ini_set( "session.save_handler" , "files" );
 			$_ini_set_status = ini_set( "session.save_path" , "" );
-			$this->API->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to revert" : "Successfully reverted" ) . " ini-directive 'session.save_path' = 'files'" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
+			$this->Registry->logger__do_log( "Session: " . ( $_ini_set_status === false ? "Failed to revert" : "Successfully reverted" ) . " ini-directive 'session.save_path' = 'files'" , ( $_ini_set_status === false ? "ERROR" : "INFO" ) );
 		}
 	}
 
@@ -254,13 +254,13 @@ class Session
 		// Sensitive cookies list
 		//--------------------------
 
-		$this->API->Input->sensitive_cookies = array_merge( $this->API->Input->sensitive_cookies, array( 'stronghold', 'session_id', 'admin_session_id', 'member_id', 'pass_hash' ) );
+		$this->Registry->Input->sensitive_cookies = array_merge( $this->Registry->Input->sensitive_cookies, array( 'stronghold', 'session_id', 'admin_session_id', 'member_id', 'pass_hash' ) );
 
 		//----------------------
 		// Client information
 		//----------------------
 
-		$this->user_agent = substr( $this->API->Input->clean__makesafe_value( $this->API->Input->my_getenv( 'HTTP_USER_AGENT' ), array(), true ) , 0 , 200 );
+		$this->user_agent = substr( $this->Registry->Input->clean__makesafe_value( $this->Registry->Input->my_getenv( 'HTTP_USER_AGENT' ), array(), true ) , 0 , 200 );
 		$this->operating_system = $this->fetch_os();
 		$this->fetch_ip_address();
 
@@ -268,21 +268,21 @@ class Session
 		// Init Session Management
 		//-------------------------------
 
-		$this->API->config['security']['session_expiration'] =
-			( $this->API->config['security']['session_expiration'] )
+		$this->Registry->config['security']['session_expiration'] =
+			( $this->Registry->config['security']['session_expiration'] )
 			?
-			$this->API->config['security']['session_expiration']
+			$this->Registry->config['security']['session_expiration']
 			:
 			3600;
 
 		# Session name
-		$this->session_name = $this->API->config['cookies']['cookie_id'] . "session_id";
+		$this->session_name = $this->Registry->config['cookies']['cookie_id'] . "session_id";
 
 		# Set session cookie params
 		$this->session_set_cookie_params(
-			$this->API->config['security']['session_expiration'],
-			$this->API->config['cookies']['cookie_path'],
-			$this->API->config['cookies']['cookie_domain'],
+			$this->Registry->config['security']['session_expiration'],
+			$this->Registry->config['cookies']['cookie_path'],
+			$this->Registry->config['cookies']['cookie_domain'],
 			false,   // 'cookie_secure'
 			true     // 'cookie_httponly'
 		);
@@ -296,7 +296,7 @@ class Session
 		ini_set( "session.use_trans_sid"    , "0" );
 
 		# ... and we override them with more unsecure ones, if it is requested explicitly, and only.
-		if ( $this->API->config['security']['session_via_url'] )
+		if ( $this->Registry->config['security']['session_via_url'] )
 		{
 			ini_set( "session.use_cookies"      , "1" );
 			ini_set( "session.use_only_cookies" , "0" );
@@ -313,9 +313,9 @@ class Session
 		// Continue!
 		//-----------------------------------------
 
-		$cookie['session_id']  = $this->API->Input->my_getcookie( "session_id" );
-		$cookie['member_id']  = $this->API->Input->my_getcookie( "member_id" );
-		$cookie['pass_hash']  = $this->API->Input->my_getcookie( "pass_hash" );
+		$cookie['session_id']  = $this->Registry->Input->my_getcookie( "session_id" );
+		$cookie['member_id']  = $this->Registry->Input->my_getcookie( "member_id" );
+		$cookie['pass_hash']  = $this->Registry->Input->my_getcookie( "pass_hash" );
 
 		if ( $cookie['session_id'] )
 		{
@@ -324,12 +324,12 @@ class Session
 		}
 		elseif
 		(
-			$this->API->config['security']['session_via_url']
+			$this->Registry->config['security']['session_via_url']
 			and
 			isset( $_GET[ $this->session_name ] )
 		)
 		{
-			$this->get_session( $this->API->Input->get( $this->session_name ) );
+			$this->get_session( $this->Registry->Input->get( $this->session_name ) );
 			$this->session_type = "url";
 		}
 		else
@@ -397,7 +397,7 @@ class Session
 				$_ok        = 1;
 				$_days      = 0;
 				$_sticky    = 1;
-				$_time      = ( $this->API->config['security']['login_key_expire'] ) ? ( UNIX_TIME_NOW + ( intval( $this->API->config['security']['login_key_expire'] ) * 86400 ) ) : 0;
+				$_time      = ( $this->Registry->config['security']['login_key_expire'] ) ? ( UNIX_TIME_NOW + ( intval( $this->Registry->config['security']['login_key_expire'] ) * 86400 ) ) : 0;
 
 				if ( ! $this->member['id'] or $this->member['id'] == 0 )
 				{
@@ -412,10 +412,10 @@ class Session
 						// Key expired?
 						//------------------
 
-						if ( $this->API->config['security']['login_key_expire'] )
+						if ( $this->Registry->config['security']['login_key_expire'] )
 						{
 							$_sticky    = 0;
-							$_days      = $this->API->config['security']['login_key_expire'];
+							$_days      = $this->Registry->config['security']['login_key_expire'];
 
 							if ( UNIX_TIME_NOW > $this->member['login_key_expire'] )
 							{
@@ -433,13 +433,13 @@ class Session
 							// stolen, the hacker can only use the auth once.
 							//-------------------------------------------------------
 
-							if ( $this->API->config['security']['login_change_key'] )
+							if ( $this->Registry->config['security']['login_change_key'] )
 							{
 								$this->member['login_key'] = $this->generate_autologin_key();
 
 								$this->save_member( $this->member['id'], array( 'members' => array( 'login_key' => $this->member['login_key'], 'login_key_expire' => $_time ) ) );
 
-								$this->API->Input->my_setcookie( "pass_hash", $this->member['login_key'], $_sticky, $_days );
+								$this->Registry->Input->my_setcookie( "pass_hash", $this->member['login_key'], $_sticky, $_days );
 							}
 						}
 						else
@@ -465,11 +465,11 @@ class Session
 		// Knock out Google Web Accelerator
 		//-----------------------------------------
 
-		if( $this->API->config['performance']['disable_prefetching'] )
+		if( $this->Registry->config['performance']['disable_prefetching'] )
 		{
-			if ( $this->API->Input->my_getenv('HTTP_X_MOZ') and strstr( strtolower( $this->API->Input->my_getenv('HTTP_X_MOZ')), "prefetch" ) and $this->member['id'] )
+			if ( $this->Registry->Input->my_getenv('HTTP_X_MOZ') and strstr( strtolower( $this->Registry->Input->my_getenv('HTTP_X_MOZ')), "prefetch" ) and $this->member['id'] )
 			{
-				if ( PHP_SAPI == 'cgi-fcgi' or PHP_SAPI == 'cgi' )
+				if ( PHP_SRegistry == 'cgi-fcgi' or PHP_SRegistry == 'cgi' )
 				{
 					@header('Status: 403 Forbidden');
 				}
@@ -503,7 +503,7 @@ class Session
 		// Set a session ID cookie
 		//----------------------------
 
-		$this->API->Input->my_setcookie( "session_id", $this->session_id, -1 );
+		$this->Registry->Input->my_setcookie( "session_id", $this->session_id, -1 );
 
 		//--------------------
 		// Set user agent
@@ -512,7 +512,7 @@ class Session
 		$this->member['user_agent_key']     = $this->session_data['uagent_key'];
 		$this->member['user_agent_type']    = $this->session_data['uagent_type'];
 		$this->member['user_agent_version'] = $this->session_data['uagent_version'];
-		$this->member['user_agent_bypass']  = ( $this->API->Input->my_getcookie( "uagent_bypass" ) )
+		$this->member['user_agent_bypass']  = ( $this->Registry->Input->my_getcookie( "uagent_bypass" ) )
 			?
 			true
 			:
@@ -550,21 +550,21 @@ class Session
     	//-----------------
 
 		/* @todo
-		if ( $this->API->config['facebookconnect']['fbc_enable'] )
+		if ( $this->Registry->config['facebookconnect']['fbc_enable'] )
 		{
-			$this->API->config['facebookconnect']['fbc_enable'] = 0;
+			$this->Registry->config['facebookconnect']['fbc_enable'] = 0;
 
 			if ( $this->member['user_agent_key'] == 'explorer' and $this->member['user_agent_version'] >= 6 )
 			{
-				$this->API->config['facebookconnect']['fbc_enable'] = 1;
+				$this->Registry->config['facebookconnect']['fbc_enable'] = 1;
 			}
 			elseif ( $this->member['user_agent_key'] == 'safari' and $this->member['user_agent_version'] >= 3 )
 			{
-				$this->API->config['facebookconnect']['fbc_enable'] = 1;
+				$this->Registry->config['facebookconnect']['fbc_enable'] = 1;
 			}
 			elseif ( $this->member['user_agent_key'] == 'firefox' and $this->member['user_agent_version'] >= 3 )
 			{
-				$this->API->config['facebookconnect']['fbc_enable'] = 1;
+				$this->Registry->config['facebookconnect']['fbc_enable'] = 1;
 			}
 		}
 		*/
@@ -595,15 +595,15 @@ class Session
 						}
 					}
 
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'	 => "update",
 							'tables' => "sessions",
 							'set'    => $data,
-							'where'  => "id=" . $this->API->Db->db->quote( $sid ),
+							'where'  => "id=" . $this->Registry->Db->db->quote( $sid ),
 
 							'force_data_type' => array( 'member_name' => "string" )
 						);
-					$_saved += $this->API->Db->simple_exec_query();
+					$_saved += $this->Registry->Db->simple_exec_query();
 				}
 			}
 			$this->sessions_to_save = array();
@@ -613,17 +613,17 @@ class Session
 		$_killed = 0;
 		if ( is_array( $this->sessions_to_kill ) and count( $this->sessions_to_kill ) )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "delete",
 					'table'  => "sessions",
 					'where'  => "id IN('" . implode( "','", array_keys( $this->sessions_to_kill ) ) . "')",
 				);
-			$_killed += $this->API->Db->simple_exec_query();
+			$_killed += $this->Registry->Db->simple_exec_query();
 		}
 		$this->sessions_to_kill = array();
 
-		$this->API->logger__do_log( __CLASS__ . ": " . $_saved . " sessions updated, " . $_killed . " sessions deleted" , "INFO" );
-		$this->API->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
+		$this->Registry->logger__do_log( __CLASS__ . ": " . $_saved . " sessions updated, " . $_killed . " sessions deleted" , "INFO" );
+		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
 	}
 
 
@@ -637,7 +637,7 @@ class Session
 	 */
 	public function add_query_key ( $key, $value, $session_id = "" )
 	{
-		$session_id = ( $session_id ) ? $this->API->Input->clean__md5_hash( $session_id ) : $this->session_id;
+		$session_id = ( $session_id ) ? $this->Registry->Input->clean__md5_hash( $session_id ) : $this->session_id;
 
 		if ( $key )
 		{
@@ -662,7 +662,7 @@ class Session
 
 		if ( IN_DEV )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = " . $session_id . ", Member ID = " . $this->session_data['member_id'] , "INFO" );
+			$this->Registry->logger__do_log( __CLASS__ . "::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = " . $session_id . ", Member ID = " . $this->session_data['member_id'] , "INFO" );
 		}
 
 		return true;
@@ -685,7 +685,7 @@ class Session
 
 		if ( IN_DEV )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::kill_authorize_attempt: Authorization attempt FAILED: Session ID = " . $session_id , "INFO" );
+			$this->Registry->logger__do_log( __CLASS__ . "::kill_authorize_attempt: Authorization attempt FAILED: Session ID = " . $session_id , "INFO" );
 		}
 
 		return false;
@@ -882,15 +882,15 @@ class Session
 				if ( $auto_create_name === true )
 				{
 					# Now, make sure we have a unique display name
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'     => "select_row",
 							'fields' => array(
 									'max' => new Zend_Db_Expr( "MAX(id)" ),
 								),
 							'table'  => "members",
-							'where'  => "l_display_name LIKE " . $this->API->Db->db->quote( strtolower( $_final_tables['members']['display_name'] ) . "%" ),
+							'where'  => "l_display_name LIKE " . $this->Registry->Db->db->quote( strtolower( $_final_tables['members']['display_name'] ) . "%" ),
 						);
-					$max = $this->API->Db->simple_exec_query();
+					$max = $this->Registry->Db->simple_exec_query();
 
 					if ( $max['max'] )
 					{
@@ -912,16 +912,16 @@ class Session
 				if ( $auto_create_name === true )
 				{
 					# Now, make sure we have a unique display name
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'     => "select_row",
 							'fields' => array(
 									'max' => new Zend_Db_Expr( "MAX(id)" ),
 								),
 							'table'  => "members",
-							'where'  => "l_username LIKE " . $this->API->Db->db->quote( strtolower( $_final_tables['members']['name'] ) . "%" ),
+							'where'  => "l_username LIKE " . $this->Registry->Db->db->quote( strtolower( $_final_tables['members']['name'] ) . "%" ),
 						);
 
-					$max = $this->API->Db->simple_exec_query();
+					$max = $this->Registry->Db->simple_exec_query();
 
 					if ( $max['max'] )
 					{
@@ -943,11 +943,11 @@ class Session
 		$_final_tables['members']['l_username']             = isset( $_final_tables['members']['name'] ) ? strtolower($_final_tables['members']['name']) : '';
 		$_final_tables['members']['joined']	                = $_final_tables['members']['joined'] ? $_final_tables['members']['joined'] : UNIX_TIME_NOW;
 		$_final_tables['members']['email']                  = $_final_tables['members']['email'] ? $_final_tables['members']['email'] : $_final_tables['members']['name'] . '@' . $_final_tables['members']['joined'];
-		$_final_tables['members']['mgroup']                 = $_final_tables['members']['mgroup'] ? $_final_tables['members']['mgroup'] : $this->API->config['security']['member_group'];
+		$_final_tables['members']['mgroup']                 = $_final_tables['members']['mgroup'] ? $_final_tables['members']['mgroup'] : $this->Registry->config['security']['member_group'];
 		$_final_tables['members']['ip_address']             = $_final_tables['members']['ip_address'] ? $_final_tables['members']['ip_address'] : $this->ip_address;
 		$_final_tables['members']['created_remote']         = isset( $_final_tables['members']['created_remote'] ) ? intval( $_final_tables['members']['created_remote'] ) : 0;
 		$_final_tables['members']['login_key']              = $this->generate_autologin_key();
-		$_final_tables['members']['login_key_expire']       = ( $this->API->config['security']['login_key_expire'] ) ? ( UNIX_TIME_NOW + ( intval( $this->API->config['security']['login_key_expire'] ) * 86400 ) ) : 0;
+		$_final_tables['members']['login_key_expire']       = ( $this->Registry->config['security']['login_key_expire'] ) ? ( UNIX_TIME_NOW + ( intval( $this->Registry->config['security']['login_key_expire'] ) * 86400 ) ) : 0;
 		$_final_tables['members']['email_pm']               = 1;
 		// $_final_tables['members']['view_avs']               = 1;
 		$_final_tables['members']['restrict_post']          = isset( $_final_tables['members']['restrict_post'] ) ? intval( $_final_tables['members']['restrict_post'] ) : 0;
@@ -960,21 +960,21 @@ class Session
 		$_final_tables['members']['last_visit']             = isset( $_final_tables['members']['last_visit'] ) ? intval( $_final_tables['members']['last_visit'] ) : UNIX_TIME_NOW;
 		$_final_tables['members']['last_activity']          = isset( $_final_tables['members']['last_activity'] ) ? intval( $_final_tables['members']['last_activity'] ) : UNIX_TIME_NOW;
 		// @todo $_final_tables['members']['language']         = IPSLib::getDefaultLanguage();
-		$_final_tables['members']['editor_choice']          = $this->API->config['userprofiles']['default_editor'];
+		$_final_tables['members']['editor_choice']          = $this->Registry->config['userprofiles']['default_editor'];
 		$_final_tables['members']['pass_salt']              = $this->generate_password_salt( 5 );
 		$_final_tables['members']['pass_hash']              = $this->generate_compiled_pass_hash( $_final_tables['members']['pass_salt'], $md_5_password );
 		$_final_tables['members']['display_name']           = isset($_final_tables['members']['display_name']) ? $_final_tables['members']['display_name'] : "";
 		$_final_tables['members']['l_display_name']         = isset($_final_tables['members']['display_name']) ? strtolower( $_final_tables['members']['display_name'] ) : "";
 		//$_final_tables['members']['fb_uid']                  = isset($_final_tables['members']['fb_uid']) ? $_final_tables['members']['fb_uid'] : 0;
 		//$_final_tables['members']['fb_emailhash']            = isset($_final_tables['members']['fb_emailhash']) ? strtolower($_final_tables['members']['fb_emailhash']) : '';
-		$_final_tables['members']['seo_name']               = $this->API->Input->make_seo_title( $_final_tables['members']['display_name'] );
+		$_final_tables['members']['seo_name']               = $this->Registry->Input->make_seo_title( $_final_tables['members']['display_name'] );
 		//$_final_tables['members']['bw_is_spammer']           = intval( $_final_tables['members']['bw_is_spammer'] );
 
 		//--------------------
 		// Insert: MEMBERS
 		//--------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "insert",
 				'table'  => "members",
 				'set'    => $_final_tables['members'],
@@ -992,8 +992,8 @@ class Session
 		// Get the member id
 		//---------------------
 
-		$this->API->Db->simple_exec_query();
-		$_final_tables['members']['id'] = $this->API->Db->last_insert_id();
+		$this->Registry->Db->simple_exec_query();
+		$_final_tables['members']['id'] = $this->Registry->Db->last_insert_id();
 
 		/* @todo
 		//---------------------------
@@ -1032,7 +1032,7 @@ class Session
 
 		if ( ! $full_account )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "insert",
 					'table'  => "members_partial",
 					'set'    => array(
@@ -1042,7 +1042,7 @@ class Session
 						),
 				);
 
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 		}
 
 		// @todo IPSMember::updateSearchIndex( $_final_tables['members']['id'] );
@@ -1100,7 +1100,7 @@ class Session
 			{
 				if ( strstr( $member_key, '@' ) )
 				{
-					$_member_value = $this->API->Db->db->quote( strtolower( $member_key ) );
+					$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
 					$_member_field = 'email';
 				}
 				else
@@ -1142,36 +1142,36 @@ class Session
 				case 'email':
 					if ( is_array( $member_key ) )
 					{
-						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->API->Db->db->quote( strtolower( $v ) );' ) );
+						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->db->quote( strtolower( $v ) );' ) );
 						$_multiple_ids = $member_key;
 					}
 					else
 					{
-						$_member_value = $this->API->Db->db->quote( strtolower( $member_key ) );
+						$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
 					}
 					$_member_field = 'email';
 					break;
 				case 'username':
 					if ( is_array( $member_key ) )
 					{
-						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->API->Db->db->quote( strtolower( $v ) );' ) );
+						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->db->quote( strtolower( $v ) );' ) );
 						$_multiple_ids = $member_key;
 					}
 					else
 					{
-						$_member_value = $this->API->Db->db->quote( strtolower( $member_key ) );
+						$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
 					}
 					$_member_field = 'l_username';
 					break;
 				case 'displayname':
 					if ( is_array( $member_key ) )
 					{
-						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->API->Db->db->quote( strtolower( $v ) );' ) );
+						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->db->quote( strtolower( $v ) );' ) );
 						$_multiple_ids = $member_key;
 					}
 					else
 					{
-						$_member_value = $this->API->Db->db->quote( strtolower( $member_key ) );
+						$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
 					}
 					$_member_field = 'l_display_name';
 					break;
@@ -1250,7 +1250,7 @@ class Session
 
 		if ( count( $_joins ) )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	    => "select",
 					'fields'    => array( "*", 'my_member_id' => "id" ),
 					'table'     => array( 'm' => "members" ),
@@ -1260,7 +1260,7 @@ class Session
 		}
 		else
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	    => "select",
 					'table'     => array( 'm' => 'members' ),
 					'where'     => ( is_array( $_multiple_ids ) and count( $_multiple_ids ) ) ? $_member_field . ' IN (' . implode( ',', $_multiple_ids ) . ')' : $_member_field . '=' . $_member_value,
@@ -1271,7 +1271,7 @@ class Session
 		// Execute
 		//------------
 
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		foreach ( $result as $_mem )
 		{
@@ -1349,7 +1349,7 @@ class Session
 			if ( strstr( $member_key, '@' ) )
 			{
 				$member_k_array['members'] = array( 'field' => "email",
-				 									'value' => $this->API->Db->db->quote( strtolower( $member_key ) ) );
+				 									'value' => $this->Registry->Db->db->quote( strtolower( $member_key ) ) );
 
 				/* Check to see if we've got more than the 'members' table to save on. */
 
@@ -1419,17 +1419,17 @@ class Session
 				// Does row exist?
 				//-------------------
 
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'     => "select_row",
 						'fields' => array( "member_id" ),
 						'table'  => array( "members_pfields_content" ),
-						'where'  => 'member_id=' . $this->API->Db->db->quote( $data['id'] , "INTEGER" )
+						'where'  => 'member_id=' . $this->Registry->Db->db->quote( $data['id'] , "INTEGER" )
 					);
-				$check = $this->API->Db->simple_exec_query();
+				$check = $this->Registry->Db->simple_exec_query();
 
 				if( ! $check['member_id'] )
 				{
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							"do"	 => "insert",
 							"table"  => $table,
 							"set"    => $data
@@ -1437,14 +1437,14 @@ class Session
 				}
 				else
 				{
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'	 => "update",
 							'tables' => $table,
 							'set'    => $data,
-							'where'  => 'member_id=' . $this->API->Db->db->quote( $data['id'] , "INTEGER" )
+							'where'  => 'member_id=' . $this->Registry->Db->db->quote( $data['id'] , "INTEGER" )
 						);
 				}
-				$_updated += $this->API->Db->simple_exec_query();
+				$_updated += $this->Registry->Db->simple_exec_query();
 			}
 			else
 			{
@@ -1459,7 +1459,7 @@ class Session
 					/* Some stuff that can end up  here */
 					unset( $data['_can_be_ignored'] );
 
-					$this->API->Db->cur_query['force_data_type'] = array(
+					$this->Registry->Db->cur_query['force_data_type'] = array(
 							'name'              => "string",
 							'title'             => "string",
 							'l_username'        => "string",
@@ -1471,13 +1471,13 @@ class Session
 						);
 				}
 
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'	 => "update",
 						'tables' => $table,
 						'set'    => $data,
 						'where'  => $member_k_array[ $table ]['field'] . '=' . $member_k_array[ $table ]['value']
 					);
-				$_updated += $this->API->Db->simple_exec_query();
+				$_updated += $this->Registry->Db->simple_exec_query();
 			}
 		}
 
@@ -1498,7 +1498,7 @@ class Session
 
 		$query        = array();
 		$member_name  = "";
-		$member_group = $this->API->config['security']['guest_group'];
+		$member_group = $this->Registry->config['security']['guest_group'];
 		$login_type   = 0;
 
 		//--------------------------------
@@ -1507,12 +1507,12 @@ class Session
 
 		if ( $this->session_dead_id )
 		{
-			$query[] = "id=" . $this->API->Db->db->quote( $this->session_dead_id );
+			$query[] = "id=" . $this->Registry->Db->db->quote( $this->session_dead_id );
 		}
 
-		if ( $this->API->config['security']['match_ipaddress'] == 1 )
+		if ( $this->Registry->config['security']['match_ipaddress'] == 1 )
 		{
-			$query[] = "ip_address=" . $this->API->Db->db->quote( $this->ip_address );
+			$query[] = "ip_address=" . $this->Registry->Db->db->quote( $this->ip_address );
 		}
 
 		$this->session_id = md5( uniqid( microtime(), true ) . $this->ip_address . $this->user_agent );
@@ -1536,21 +1536,21 @@ class Session
 		{
 			$this->session_id  = substr( $user_agent['uagent_key'] . "=" . str_replace( ".", "", $this->ip_address ) . '_session', 0, 60 );
 			$member_name       = $user_agent['uagent_name'];
-			$member_group      = $this->API->config['searchenginespiders']['spider_group'];
-			$login_type        = intval( $this->API->config['searchenginespiders']['spider_anon'] );
+			$member_group      = $this->Registry->config['searchenginespiders']['spider_group'];
+			$login_type        = intval( $this->Registry->config['searchenginespiders']['spider_anon'] );
 
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::create_guest_session: Creating SEARCH ENGINE session: " . $this->session_id , "INFO" );
+				$this->Registry->logger__do_log( __CLASS__ . "::create_guest_session: Creating SEARCH ENGINE session: " . $this->session_id , "INFO" );
 			}
 
-			$query[] = "id=" . $this->API->Db->db->quote( $this->session_id );
+			$query[] = "id=" . $this->Registry->Db->db->quote( $this->session_id );
 		}
 		else
 		{
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::create_guest_session: Creating GUEST session: " . $this->session_id , "INFO" );
+				$this->Registry->logger__do_log( __CLASS__ . "::create_guest_session: Creating GUEST session: " . $this->session_id , "INFO" );
 			}
 		}
 
@@ -1584,14 +1584,14 @@ class Session
 						'uagent_bypass'     => intval( $user_agent['uagent_bypass'] )
 			);
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "insert",
 				'table'  => "sessions",
 				'set'    => $data,
 
 				'force_data_type' => array( 'member_name' => "string" ),
 			);
-		$this->API->Db->simple_exec_query_shutdown();
+		$this->Registry->Db->simple_exec_query_shutdown();
 
 		//---------------
 		// Force data
@@ -1660,7 +1660,7 @@ class Session
 
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::create_member_session: Creating MEMBER session: " . $this->session_id , "INFO" );
+				$this->Registry->logger__do_log( __CLASS__ . "::create_member_session: Creating MEMBER session: " . $this->session_id , "INFO" );
 			}
 
 			//--------------------------
@@ -1692,14 +1692,14 @@ class Session
 				);
 
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "insert",
 					'table'  => "sessions",
 					'set'    => $data,
 
 					'force_data_type' => array( 'member_name' => "string" ),
 				);
-			$this->API->Db->simple_exec_query_shutdown();
+			$this->Registry->Db->simple_exec_query_shutdown();
 
 			//----------------
 			// Force data
@@ -1717,7 +1717,7 @@ class Session
 			// If this is a member, update their last visit times, etc.
 			//--------------------------------------------------------------
 
-			if ( UNIX_TIME_NOW - $this->member['last_activity'] > $this->API->config['security']['session_expiration'] )
+			if ( UNIX_TIME_NOW - $this->member['last_activity'] > $this->Registry->config['security']['session_expiration'] )
 			{
 				//-----------------------------------------
 				// Reset the topics read cookie..
@@ -1739,9 +1739,9 @@ class Session
 				$this->member['last_visit']    = $this->member['last_activity'];
 			}
 
-			$this->API->Input->my_setcookie( "pass_hash", $this->member['login_key'], ( $this->API->config['security']['login_key_expire'] ? 0 : 1 ), $this->API->config['security']['login_key_expire'] );
+			$this->Registry->Input->my_setcookie( "pass_hash", $this->member['login_key'], ( $this->Registry->config['security']['login_key_expire'] ? 0 : 1 ), $this->Registry->config['security']['login_key_expire'] );
 
-			$update['login_key_expire']	= UNIX_TIME_NOW + ( $this->API->config['security']['login_key_expire'] * 86400 );
+			$update['login_key_expire']	= UNIX_TIME_NOW + ( $this->Registry->config['security']['login_key_expire'] * 86400 );
 
 			$this->save_member( $this->member['id'], array( 'members' => $update ) );
 		}
@@ -1815,20 +1815,20 @@ class Session
 		$member = $this->load_member( $data['member_id'], 'members' );
 
 		/* Update this session directly */
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "update",
 				'tables' => "sessions",
 				'set'    => array(
 						'member_name'			=> $data['member_name'],
-						'seo_name'				=> $this->API->Input->make_seo_title( $data['member_name'] ),
+						'seo_name'				=> $this->Registry->Input->make_seo_title( $data['member_name'] ),
 						'member_id'				=> $data['member_id'],
 						'running_time'			=> UNIX_TIME_NOW,
 						'member_group'			=> $data['member_group'],
 						'login_type'			=> $data['login_type'],
 					),
-				'where'  => "id=" . $this->API->Db->db->quote( $this->session_id )
+				'where'  => "id=" . $this->Registry->Db->db->quote( $this->session_id )
 			);
-		$this->API->Db->simple_exec_query_shutdown();
+		$this->Registry->Db->simple_exec_query_shutdown();
 
 		/* Remove from update and delete array */
 		unset( $this->sessions_to_save[ $this->session_id ] );
@@ -1849,11 +1849,11 @@ class Session
 		$this->save_member( $data['member_id'], array( 'members' => $_update ) );
 
 		/* Set cookie */
-		$this->API->Input->my_setcookie( "session_id", $this->session_id, -1 );
+		$this->Registry->Input->my_setcookie( "session_id", $this->session_id, -1 );
 
 		if ( IN_DEV )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::convert_guest_to_member(): " . $data['member_id'] . ", " . $this->session_id . " " . serialize( $data ) /* . 'sessions-' . $this->_memberData['member_id'] */ , "INFO" );
+			$this->Registry->logger__do_log( __CLASS__ . "::convert_guest_to_member(): " . $data['member_id'] . ", " . $this->session_id . " " . serialize( $data ) /* . 'sessions-' . $this->_memberData['member_id'] */ , "INFO" );
 		}
 
 		/* Set type */
@@ -1871,10 +1871,10 @@ class Session
 	public function convert_member_to_guest ()
 	{
 		/* Delete old sessions */
-		$this->destroy_sessions( "ip_address=" . $this->API->Db->db->quote( $this->ip_address ) . " AND id != " . $this->API->Db->db->quote( $this->session_id ) );
+		$this->destroy_sessions( "ip_address=" . $this->Registry->Db->db->quote( $this->ip_address ) . " AND id != " . $this->Registry->Db->db->quote( $this->session_id ) );
 
 		/* Update this session directly */
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "update",
 				'tables' => "sessions",
 				'set'    => array(
@@ -1882,18 +1882,18 @@ class Session
 						'seo_name'				=> "",
 						'member_id'				=> 0,
 						'running_time'			=> UNIX_TIME_NOW,
-						'member_group'			=> $this->API->config['security']['guest_group'],
+						'member_group'			=> $this->Registry->config['security']['guest_group'],
 					),
-				'where'  => "id=" . $this->API->Db->db->quote( $this->session_id )
+				'where'  => "id=" . $this->Registry->Db->db->quote( $this->session_id )
 			);
-		$this->API->Db->simple_exec_query_shutdown();
+		$this->Registry->Db->simple_exec_query_shutdown();
 
 		/* Remove from update and delete array */
 		unset( $this->sessions_to_save[ $this->session_id ] );
 		unset( $this->sessions_to_kill[ $this->session_id ] );
 
 		/* Set cookie */
-		$this->API->Input->my_setcookie( "session_id", $this->session_id, -1 );
+		$this->Registry->Input->my_setcookie( "session_id", $this->session_id, -1 );
 
 		/* Save markers... */
 		// @todo  KEEPING here for later reference
@@ -1901,7 +1901,7 @@ class Session
 
 		if ( IN_DEV )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::convert_member_to_guest: " . $this->session_id , "INFO" );
+			$this->Registry->logger__do_log( __CLASS__ . "::convert_member_to_guest: " . $this->session_id , "INFO" );
 		}
 
 		/* Set type */
@@ -1920,19 +1920,19 @@ class Session
 	private function destroy_sessions ( $where = "" )
 	{
 		$where .= ( $where ) ? ' OR ' : '';
-		$where .= 'running_time < ' . ( UNIX_TIME_NOW - $this->API->config['security']['session_expiration'] );
+		$where .= 'running_time < ' . ( UNIX_TIME_NOW - $this->Registry->config['security']['session_expiration'] );
 
 		//-------------------------------------------
 		// Grab session data to delete on destruct
 		//-------------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select",
 				'table'  => "sessions",
 				'where'  => $where
 			);
 
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		foreach ( $result as $row )
 		{
@@ -1941,7 +1941,7 @@ class Session
 
 		if ( IN_DEV )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::destroy_sessions: " . $where , "INFO" );
+			$this->Registry->logger__do_log( __CLASS__ . "::destroy_sessions: " . $where , "INFO" );
 		}
 	}
 
@@ -1973,9 +1973,9 @@ class Session
 	{
 		$addrs = array();
 
-		if ( $this->API->config['security']['xforward_matching'] )
+		if ( $this->Registry->config['security']['xforward_matching'] )
 		{
-			foreach ( array_reverse( explode( ',', $this->API->Input->my_getenv( 'HTTP_X_FORWARDED_FOR' ) ) ) as $x_f )
+			foreach ( array_reverse( explode( ',', $this->Registry->Input->my_getenv( 'HTTP_X_FORWARDED_FOR' ) ) ) as $x_f )
 			{
 				$x_f = trim( $x_f );
 
@@ -1985,12 +1985,12 @@ class Session
 				}
 			}
 
-			$addrs[] = $this->API->Input->my_getenv( 'HTTP_CLIENT_IP' );
-			$addrs[] = $this->API->Input->my_getenv( 'HTTP_X_CLUSTER_CLIENT_IP' );
-			$addrs[] = $this->API->Input->my_getenv( 'HTTP_PROXY_USER' );
+			$addrs[] = $this->Registry->Input->my_getenv( 'HTTP_CLIENT_IP' );
+			$addrs[] = $this->Registry->Input->my_getenv( 'HTTP_X_CLUSTER_CLIENT_IP' );
+			$addrs[] = $this->Registry->Input->my_getenv( 'HTTP_PROXY_USER' );
 		}
 
-		$addrs[] = $this->API->Input->my_getenv( 'REMOTE_ADDR' );
+		$addrs[] = $this->Registry->Input->my_getenv( 'REMOTE_ADDR' );
 
 		# Do we have one yet?
 		foreach ( $addrs as $ip )
@@ -2007,7 +2007,7 @@ class Session
 		// if not, check for valid DNS
 		//----------------------------------------
 
-		if ( empty( $this->ip_address ) and !$this->API->Input->my_getenv('SHELL') and $this->API->Input->my_getenv('SESSIONNAME') != 'Console' )
+		if ( empty( $this->ip_address ) and !$this->Registry->Input->my_getenv('SHELL') and $this->Registry->Input->my_getenv('SESSIONNAME') != 'Console' )
 		{
 			if ( filter_has_var( INPUT_SERVER, "REMOTE_HOST" ) )
 			{
@@ -2031,7 +2031,7 @@ class Session
 	 */
 	private function fetch_os ()
 	{
-		$useragent = strtolower( $this->API->Input->my_getenv( 'HTTP_USER_AGENT' ) );
+		$useragent = strtolower( $this->Registry->Input->my_getenv( 'HTTP_USER_AGENT' ) );
 
 		if ( strstr( $useragent, 'mac' ) )
 		{
@@ -2066,17 +2066,17 @@ class Session
 		}
 		elseif ( isset( $m_data['display_name'] ) and ( $m_data['display_name'] ) )
 		{
-			$_seo_name = $this->API->Input->make_seo_title( $m_data['display_name'] );
+			$_seo_name = $this->Registry->Input->make_seo_title( $m_data['display_name'] );
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "update",
 					'tables' => "members",
 					'set'    => array(
 							'seo_name' => $_seo_name,
 						),
-					'where'  => "id=" . $this->API->Db->db->quote( $m_data['id'], "INTEGER" ),
+					'where'  => "id=" . $this->Registry->Db->db->quote( $m_data['id'], "INTEGER" ),
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
 			return $_seo_name;
 		}
@@ -2149,16 +2149,16 @@ class Session
 		//----------
 
 		$result     = array();
-		$session_id = $this->API->Input->clean__md5_hash( $session_id );
+		$session_id = $this->Registry->Input->clean__md5_hash( $session_id );
 
 		if ( $session_id )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "select_row",
 					'table'  => "sessions",
-					'where'  => "id=" . $this->API->Db->db->quote( $session_id ),
+					'where'  => "id=" . $this->Registry->Db->db->quote( $session_id ),
 				);
-			$_session = $this->API->Db->simple_exec_query();
+			$_session = $this->Registry->Db->simple_exec_query();
 
 			if ( $_session['id'] )
 			{
@@ -2178,7 +2178,7 @@ class Session
 				*/
 
 				/* Test for browser.... */
-				if ( $this->API->config['security']['match_browser'] )
+				if ( $this->Registry->config['security']['match_browser'] )
 				{
 					if ( $_session['browser'] != $this->user_agent )
 					{
@@ -2187,7 +2187,7 @@ class Session
 				}
 
 				/* Test for IP Address... */
-				if ( $this->API->config['security']['match_ipaddress'] )
+				if ( $this->Registry->config['security']['match_ipaddress'] )
 				{
 					if ( $_session['ip_address'] != $this->ip_address )
 					{
@@ -2239,11 +2239,11 @@ class Session
 	 */
 	public function ignored_users__is_ignorable ( $mgroup, $mgroup_others )
 	{
-		if ( ! is_array( $this->API->config['userprofiles']['cannot_ignore_groups'] ) )
+		if ( ! is_array( $this->Registry->config['userprofiles']['cannot_ignore_groups'] ) )
 		{
-			$this->API->config['userprofiles']['cannot_ignore_groups'] = ! empty ( $this->API->config['userprofiles']['cannot_ignore_groups'] )
+			$this->Registry->config['userprofiles']['cannot_ignore_groups'] = ! empty ( $this->Registry->config['userprofiles']['cannot_ignore_groups'] )
 				?
-				explode( ",", $this->API->config['userprofiles']['cannot_ignore_groups'] )
+				explode( ",", $this->Registry->config['userprofiles']['cannot_ignore_groups'] )
 				:
 				array();
 		}
@@ -2257,7 +2257,7 @@ class Session
 
  		foreach ( $_my_groups as $member_group )
  		{
-	 		if ( in_array( $mgroup, $this->API->config['userprofiles']['cannot_ignore_groups'] ) )
+	 		if ( in_array( $mgroup, $this->Registry->config['userprofiles']['cannot_ignore_groups'] ) )
 	 		{
 		 		return false;
 	 		}
@@ -2276,7 +2276,7 @@ class Session
 	 */
 	public function is_banned ( $type, $string )
 	{
-		$_banfilters_cache = $this->API->Cache->cache__do_get( "banfilters" );
+		$_banfilters_cache = $this->Registry->Cache->cache__do_get( "banfilters" );
 
 		if ( is_array( $_banfilters_cache ) and count( $_banfilters_cache ) )
 		{
@@ -2344,7 +2344,7 @@ class Session
 	{
 		if ( isset( $m_data['mgroup_others'] ) and $m_data['mgroup_others'] )
 		{
-			$cache			= $this->API->Cache->cache['groups'];
+			$cache			= $this->Registry->Cache->cache['groups'];
 			$groups_id		= explode( ',', $m_data['mgroup_others'] );
 			$exclude		= array( 'g_title', 'g_icon', 'g_prefix', 'g_suffix', 'g_photo_max_vars' );
 			$less_is_more	= array( 'g_search_flood' );
@@ -2414,7 +2414,7 @@ class Session
 			//-----------------
 
 			$rmp = array();
-			$tmp = explode( ',', $this->API->Input->clean__excessive_separators( $m_data['g_perm_id'], "," ) );
+			$tmp = explode( ',', $this->Registry->Input->clean__excessive_separators( $m_data['g_perm_id'], "," ) );
 
 			if ( count( $tmp ) )
 			{
@@ -2481,13 +2481,13 @@ class Session
 
 		if ( ACCESS_TO_AREA != 'admin' and $ignore != true )
 		{
-			if ( ! $this->API->config['namesettings']['auth_allow_dnames'] or $member['g_dname_changes'] < 1 or $member['g_dname_date'] < 1 )
+			if ( ! $this->Registry->config['namesettings']['auth_allow_dnames'] or $member['g_dname_changes'] < 1 or $member['g_dname_date'] < 1 )
 			{
 				throw new Exception( "NO_PERMISSION" );
 			}
 
 			/* Check new permissions */
-			$_g = $this->API->Cache->cache__do_get_part( "member_groups" , $member['mgroup'] );
+			$_g = $this->Registry->Cache->cache__do_get_part( "member_groups" , $member['mgroup'] );
 
 			if ( $_g['g_dname_change']['cond_value'] )
 			{
@@ -2515,7 +2515,7 @@ class Session
 
 			if ( $member['id'] )
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'     => "select_row",
 						'fields' => array(
 								'count'     => new Zend_Db_Expr( "COUNT(*)" ),
@@ -2523,12 +2523,12 @@ class Session
 							),
 						'table'  => "members_dname_changes",
 						'where'  => array(
-								"dname_member_id = " . $this->API->Db->db->quote( $member['id'] , "INTEGER" ),
+								"dname_member_id = " . $this->Registry->Db->db->quote( $member['id'] , "INTEGER" ),
 								"dname_date > " . $_time_check,
 							),
 					);
 
-				$name_count = $this->API->Db->simple_exec_query();
+				$name_count = $this->Registry->Db->simple_exec_query();
 
 				$name_count['count']    = intval( $name_count['count'] );
 				$name_count['min_date'] = intval( $name_count['min_date'] ) ? intval( $name_count['min_date'] ) : $_time_check;
@@ -2544,7 +2544,7 @@ class Session
 		// Are they banned [NAMES]?
 		//-----------------------------
 
-		$ban_filters = $this->API->Cache->cache__do_get( "banfilters" );
+		$ban_filters = $this->Registry->Cache->cache__do_get( "banfilters" );
 
 		if ( ACCESS_TO_AREA != 'admin' )
 		{
@@ -2572,16 +2572,16 @@ class Session
 		// Check for existing name.
 		//-----------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select_row",
 				'fields' => array( $field, "id" ),
 				'table'  => "members",
 				'where'  => array(
-						array( $_check_field . " = ?"  , $this->API->Db->db->quote( strtolower( $name ) )        ),
-						array( "id != ?"               , $this->API->Db->db->quote( $member['id'], "INTEGER" )   ),
+						array( $_check_field . " = ?"  , $this->Registry->Db->db->quote( strtolower( $name ) )        ),
+						array( "id != ?"               , $this->Registry->Db->db->quote( $member['id'], "INTEGER" )   ),
 					),
 			);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 		if ( ! empty( $result ) )
  		{
  			return true;
@@ -2591,15 +2591,15 @@ class Session
 		// Not allowed to select another's user- or display- name
 		//------------------------------------------------------------
 
-		if ( $this->API->config['namesettings']['auth_dnames_nologinname'] )
+		if ( $this->Registry->config['namesettings']['auth_dnames_nologinname'] )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "select_row",
 					'fields' => array( $field, "id" ),
 					'table'  => "members",
-					'where'  => $_check_field . "=" . $this->API->Db->db->quote( strtolower( $name ) ),
+					'where'  => $_check_field . "=" . $this->Registry->Db->db->quote( strtolower( $name ) ),
 				);
-			$check_name = $this->API->Db->simple_exec_query();
+			$check_name = $this->Registry->Db->simple_exec_query();
 			if ( ! empty( $check_name ) )
 	 		{
 	 			if ( $member['id'] and $check_name['id'] != $member['id'] )
@@ -2620,14 +2620,14 @@ class Session
 			// Check for existing name.
 			//-----------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "select_row",
 					'fields' => array( "id" , "display_name" , "email" ),
 					'table'  => "members",
-					'where'  => $_check_field . "=" . $this->API->Db->db->quote( strtolower( $_unicode_name ) )
-						. " AND id != " . $this->API->Db->db->quote( $member['id'] , "INTEGER" ),
+					'where'  => $_check_field . "=" . $this->Registry->Db->db->quote( strtolower( $_unicode_name ) )
+						. " AND id != " . $this->Registry->Db->db->quote( $member['id'] , "INTEGER" ),
 				);
-			$result = $this->API->Db->simple_exec_query();
+			$result = $this->Registry->Db->simple_exec_query();
 			if ( ! empty( $result ) )
 			{
 				return true;
@@ -2655,9 +2655,9 @@ class Session
 		// Remove line breaks
 		//------------------------
 
-		if ( $this->API->config['namesettings']['usernames_nobr'] )
+		if ( $this->Registry->config['namesettings']['usernames_nobr'] )
 		{
-			$name = $this->API->Input->br2nl( $name );
+			$name = $this->Registry->Input->br2nl( $name );
 			$name = str_replace( array( "\n", "\r" ), "", $name );
 		}
 
@@ -2665,10 +2665,10 @@ class Session
 		// Remove sneaky spaces
 		//-----------------------------------------
 
-		if ( $this->API->config['security']['strip_space_chr'] )
+		if ( $this->Registry->config['security']['strip_space_chr'] )
 		{
 			/* use hexdec to convert between '0xAD' and chr */
-			$name = $this->API->Input->clean__control_characters( $name );
+			$name = $this->Registry->Input->clean__control_characters( $name );
 		}
 
 		//-------------------------
@@ -2687,13 +2687,13 @@ class Session
 		// Do we have a name?
 		//------------------------
 
-		if ( $field == 'name' or ( $field == 'display_name' and $this->API->config['namesettings']['auth_allow_dnames'] ) )
+		if ( $field == 'name' or ( $field == 'display_name' and $this->Registry->config['namesettings']['auth_allow_dnames'] ) )
 		{
-			if ( ! $name or $this->API->Input->mb_strlen( $name ) < 3 or $this->API->Input->mb_strlen( $name ) > $this->API->config['namesettings']['max_user_name_length'] )
+			if ( ! $name or $this->Registry->Input->mb_strlen( $name ) < 3 or $this->Registry->Input->mb_strlen( $name ) > $this->Registry->config['namesettings']['max_user_name_length'] )
 			{
 				$key = ( $field == 'display_name' ) ? 'Display name' : 'Username';
 
-				return array( 'name' => $original, 'errors' => array( $key . " exceeds length limit of 3-" . $this->API->config['namesettings']['max_user_name_length'] . " characters!" ) );
+				return array( 'name' => $original, 'errors' => array( $key . " exceeds length limit of 3-" . $this->Registry->config['namesettings']['max_user_name_length'] . " characters!" ) );
 			}
 		}
 
@@ -2701,13 +2701,13 @@ class Session
 		// Blocking certain chars in username?
 		//-----------------------------------------
 
-		if ( ! empty( $this->API->config['namesettings']['username_characters'] ) )
+		if ( ! empty( $this->Registry->config['namesettings']['username_characters'] ) )
 		{
-			$check_against = preg_quote( $this->API->config['namesettings']['username_characters'], "/" );
+			$check_against = preg_quote( $this->Registry->config['namesettings']['username_characters'], "/" );
 
 			if ( ! preg_match( "/^[" . $check_against . "]+$/i", $name ) )
 			{
-				return array( 'name' => $original, 'errors' => array( "Username contains illegal characters! " . $this->API->config['namesettings']['username_errormsg'] . $this->API->config['namesettings']['username_characters'] ) );
+				return array( 'name' => $original, 'errors' => array( "Username contains illegal characters! " . $this->Registry->config['namesettings']['username_errormsg'] . $this->Registry->config['namesettings']['username_characters'] ) );
 			}
 		}
 
@@ -2838,7 +2838,7 @@ class Session
 	 */
 	public function names__do_format ( $name="", $group_id="", $prefix="", $suffix="" )
 	{
-		if ( $this->API->config['userprofiles']['disable_group_psformat'] )
+		if ( $this->Registry->config['userprofiles']['disable_group_psformat'] )
 		{
 			return $name;
 		}
@@ -2848,7 +2848,7 @@ class Session
 			$group_id = 0;
 		}
 
-		$group_cache = $this->API->Cache->cache__do_get( "member_groups" );
+		$group_cache = $this->Registry->Cache->cache__do_get( "member_groups" );
 
 		if ( ! $prefix )
 		{
@@ -2923,14 +2923,14 @@ class Session
 		{
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::process_user_agent: Retrieving user agent information from the DB" , "INFO" );
+				$this->Registry->logger__do_log( __CLASS__ . "::process_user_agent: Retrieving user agent information from the DB" , "INFO" );
 			}
 
 			//-----------------------------------------
 			// Get useragent stuff
 			//-----------------------------------------
 
-			$user_agent = $this->API->loader( "Session__User_Agents" )->find_user_agent_id( $this->user_agent );
+			$user_agent = $this->Registry->loader( "Session__User_Agents" )->find_user_agent_id( $this->user_agent );
 
 			if ( $user_agent['uagent_key'] === null )
 			{
@@ -2995,7 +2995,7 @@ class Session
 	 */
 	public function set_search_engine( $user_agent )
 	{
-		$group = $this->API->Cache->cache__do_get_part( "member_groups", intval( $this->API->config['searchenginespiders']['spider_group'] ) );
+		$group = $this->Registry->Cache->cache__do_get_part( "member_groups", intval( $this->Registry->config['searchenginespiders']['spider_group'] ) );
 
 		foreach ( $group as $k => $v )
 		{
@@ -3027,9 +3027,9 @@ class Session
 		$this->is_not_human = true;
 
 		# Logging?
-		if ( $this->API->config['searchenginespiders']['spider_visit'] )
+		if ( $this->Registry->config['searchenginespiders']['spider_visit'] )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "insert",
 					'table'  => "spider_logs",
 					'set'    => array(
@@ -3039,7 +3039,7 @@ class Session
 							'entry_date'   => UNIX_TIME_NOW,
 						)
 				);
-			$this->API->Db->simple_exec_query_shutdown();
+			$this->Registry->Db->simple_exec_query_shutdown();
 		}
 	}
 
@@ -3111,17 +3111,17 @@ class Session
 			# Form hash
 			$this->form_hash = md5("this is only here to prevent it breaking on guests");
 
-			$this->API->Input->my_setcookie( "member_id" , "0", -1  );
-			$this->API->Input->my_setcookie( "pass_hash" , "0", -1  );
+			$this->Registry->Input->my_setcookie( "member_id" , "0", -1  );
+			$this->Registry->Input->my_setcookie( "pass_hash" , "0", -1  );
 		}
 
 		if ( $this->member['id'] )
 		{
 			$this->language_id = $this->member['language'];
 		}
-		elseif ( $this->API->Input->my_getcookie('language') )
+		elseif ( $this->Registry->Input->my_getcookie('language') )
 		{
-			$this->language_id = $this->API->Input->my_getcookie('language');
+			$this->language_id = $this->Registry->Input->my_getcookie('language');
 		}
 	}
 
@@ -3134,19 +3134,19 @@ class Session
 	 */
 	private function set_up_guest ( $name = "Guest" )
 	{
-		$cache = $this->API->Cache->cache__do_load( array("member_groups") );
+		$cache = $this->Registry->Cache->cache__do_load( array("member_groups") );
 
 		$array = array(
 				'name'              => $name,
 				'display_name'      => $name,
 				'_display_name'     => $name,
-				'seo_name'          => $this->API->Input->make_seo_title( $name ),
+				'seo_name'          => $this->Registry->Input->make_seo_title( $name ),
 				'id'                => 0,
 				'password'          => "",
 				'email'             => "",
 				'title'             => "",
-				'mgroup'            => $this->API->config['security']['guest_group'],
-				'g_title'           => $cache[ $this->API->config['security']['guest_group'] ]['g_title'],
+				'mgroup'            => $this->Registry->config['security']['guest_group'],
+				'g_title'           => $cache[ $this->Registry->config['security']['guest_group'] ]['g_title'],
 				'joined'            => "",
 				'location'          => "",
 				'auto_dst'          => 0,
@@ -3158,10 +3158,10 @@ class Session
 				'_cache'            => array( 'qr_open' => 0, 'friends' => array() ),
 				'ignored_users'     => null,
 				'editor_choice'     => "std",
-				'_group_formatted'  => $this->names__do_format( $cache[ $this->API->config['security']['guest_group'] ]['g_title'], $this->API->config['security']['guest_group'] ),
+				'_group_formatted'  => $this->names__do_format( $cache[ $this->Registry->config['security']['guest_group'] ]['g_title'], $this->Registry->config['security']['guest_group'] ),
 			);
 
-		return is_array( $cache[ $this->API->config['security']['guest_group'] ] ) ? array_merge( $array, $cache[ $this->API->config['security']['guest_group'] ] ) : $array;
+		return is_array( $cache[ $this->Registry->config['security']['guest_group'] ] ) ? array_merge( $array, $cache[ $this->Registry->config['security']['guest_group'] ] ) : $array;
 	}
 
 
@@ -3176,7 +3176,7 @@ class Session
 		// INIT
 		//----------
 
-		$cache = $this->API->Cache->cache__do_load( array("member_groups") );
+		$cache = $this->Registry->Cache->cache__do_load( array("member_groups") );
 
 		//-----------------
 		// Unpack cache
@@ -3239,16 +3239,16 @@ class Session
 			// No last visit set, do so now!
 			//----------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "update",
 					'tables' => "members",
 					'set'    => array(
 							'last_visit'    => $this->member['last_activity'],
 							'last_activity' => UNIX_TIME_NOW,
 						),
-					'where'  => "id=" . $this->API->Db->db->quote( $this->member['id'], "INTEGER" ),
+					'where'  => "id=" . $this->Registry->Db->db->quote( $this->member['id'], "INTEGER" ),
 				);
-			$this->API->Db->simple_exec_query_shutdown();
+			$this->Registry->Db->simple_exec_query_shutdown();
 			$this->member['last_visit'] = $this->member['last_activity'];
 		}
 		elseif ( ( UNIX_TIME_NOW - $this->member['last_activity'] ) > 300 )
@@ -3260,16 +3260,16 @@ class Session
 
 			list( $be_anon, $loggedin ) = explode( '&', $this->member['login_anonymous'] );
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "update",
 					'tables' => "members",
 					'set'    => array(
 							'login_anonymous'  => $be_anon . "&1",
 							'last_activity'    => UNIX_TIME_NOW,
 						),
-					'where'  => "id=" . $this->API->Db->db->quote( $this->member['id'], "INTEGER" ),
+					'where'  => "id=" . $this->Registry->Db->db->quote( $this->member['id'], "INTEGER" ),
 				);
-			$this->API->Db->simple_exec_query_shutdown();
+			$this->Registry->Db->simple_exec_query_shutdown();
 		}
 
 		//----------------------------------------
@@ -3293,8 +3293,8 @@ class Session
 		//---------
 
 		$member_name  = "";
-		$mgroup = $this->API->config['security']['guest_group'];
-		$login_type = intval( $this->API->Cache->cache['member_groups'][ $this->API->config['security']['guest_group'] ]['g_hide_from_list'] );
+		$mgroup = $this->Registry->config['security']['guest_group'];
+		$login_type = intval( $this->Registry->Cache->cache['member_groups'][ $this->Registry->config['security']['guest_group'] ]['g_hide_from_list'] );
 
 		//-----------------------------------------
 		// Make sure we have a session id.
@@ -3331,19 +3331,19 @@ class Session
 		{
 			$this->session_id = substr( $user_agent['uagent_key'] . "=" . str_replace( '.', '', $this->ip_address ) . "_session", 0, 60 );
 			$member_name      = $user_agent['uagent_name'];
-			$mgroup           = $this->API->config['searchenginespiders']['spider_group'];
-			$login_type       = intval( $this->API->config['searchenginespiders']['spider_anon'] );
+			$mgroup           = $this->Registry->config['searchenginespiders']['spider_group'];
+			$login_type       = intval( $this->Registry->config['searchenginespiders']['spider_anon'] );
 
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::update_guest_session: Updating SEARCH ENGINE session: " . $this->session_data['id'] , "INFO" );
+				$this->Registry->logger__do_log( __CLASS__ . "::update_guest_session: Updating SEARCH ENGINE session: " . $this->session_data['id'] , "INFO" );
 			}
 		}
 		else
 		{
 			if ( IN_DEV )
 			{
-				$this->API->logger__do_log( __CLASS__ . "::update_guest_session: Updating GUEST session: " . $this->session_data['id'] , "INFO" );
+				$this->Registry->logger__do_log( __CLASS__ . "::update_guest_session: Updating GUEST session: " . $this->session_data['id'] , "INFO" );
 			}
 		}
 
@@ -3408,7 +3408,7 @@ class Session
 			return false;
 		}
 
-		if ( ( UNIX_TIME_NOW - $this->member['last_activity'] ) > $this->API->config['security']['session_expiration'] )
+		if ( ( UNIX_TIME_NOW - $this->member['last_activity'] ) > $this->Registry->config['security']['session_expiration'] )
 		{
 			// Session is expired - create new session
 			$this->create_member_session();
@@ -3432,12 +3432,12 @@ class Session
 
 		if ( IN_DEV )
 		{
-			$this->API->logger__do_log( __CLASS__ . "::update_guest_session: Updating MEMBER session: " . $this->session_data['id'] , "INFO" );
+			$this->Registry->logger__do_log( __CLASS__ . "::update_guest_session: Updating MEMBER session: " . $this->session_data['id'] , "INFO" );
 		}
 
 		$user_agent = $this->process_user_agent( "update" );
 
-		$this->API->Input->my_setcookie( "pass_hash", $this->member['login_key'], ( $this->API->config['security']['login_key_expire'] ? 0 : 1 ), $this->API->config['security']['login_key_expire'] );
+		$this->Registry->Input->my_setcookie( "pass_hash", $this->member['login_key'], ( $this->Registry->config['security']['login_key_expire'] ? 0 : 1 ), $this->Registry->config['security']['login_key_expire'] );
 
 		/* Save the last click */
 		$this->member['last_click'] = $this->session_data['running_time'];

@@ -19,12 +19,23 @@ require_once( PATH_SOURCES . "/kernel/data_sources.php" );
 class Data_Sources__Rdbms extends Data_Sources
 {
 	/**
-	 * Contructor
-	 * @param    API     API object reference
+	 * List of alowed Data-targets for Rdbms-data-source
+	 *
+	 * @var array
 	 */
-	public function __construct ( API $API )
+	private $allowed_data_targets = array(
+			'rdbms' => "",
+			'tpl'   => ""
+		);
+
+
+	/**
+	 * Contructor
+	 * @param    Registry     Registry object reference
+	 */
+	public function __construct ( Registry $Registry )
 	{
-		parent::__construct( $API );
+		parent::__construct( $Registry );
 	}
 
 	/**
@@ -37,7 +48,7 @@ class Data_Sources__Rdbms extends Data_Sources
 	public function modules__subroutines__do_validate ( &$subroutine , &$input )
 	{
 		$faults = array();
-		$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+		$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 		//-------------------------------------------------------------
 		// DDL Information - Only required if Data-source is RDBMS.
@@ -153,7 +164,7 @@ class Data_Sources__Rdbms extends Data_Sources
 			}
 
 			# Do parentheses match?
-			if ( $this->API->Input->check_enclosing_parentheses( $subroutine['s_pathinfo_uri_schema'] ) === false )
+			if ( $this->Registry->Input->check_enclosing_parentheses( $subroutine['s_pathinfo_uri_schema'] ) === false )
 			{
 				$faults[] = array( 'faultCode' => 702, 'faultMessage' => "Parentheses within <em>Path Info - URI Schema</em> do not match!" );
 			}
@@ -402,7 +413,7 @@ class Data_Sources__Rdbms extends Data_Sources
 					}
 					else
 					{
-						if ( !$this->API->Input->check_enclosing_parentheses( $_rule['value'] ) )
+						if ( !$this->Registry->Input->check_enclosing_parentheses( $_rule['value'] ) )
 						{
 							$faults[] = array( 'faultCode' => "705-" . $_i, 'faultMessage' => "Opening and closing parentheses do not match inside <em>Fetch Criteria - Queries &amp; Query Groups (Policies)</em> fieldset! Queries related to numeric data-fields require this criteria!" );
 							$_list_of_broken_rules[ $_i ] = true;

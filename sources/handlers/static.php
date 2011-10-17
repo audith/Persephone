@@ -16,10 +16,10 @@ if ( ! defined( "INIT_DONE" ) )
 class Module_Handler
 {
 	/**
-	 * API Object Reference
+	 * Registry Reference
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Main container for retrieved content
@@ -55,14 +55,14 @@ class Module_Handler
     /**
 	 * Constructor - Inits Handler
 	 *
-	 * @param    API    API Object Reference
+	 * @param    Registry    Registry Object Reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
     {
 		//-----------
 		// Prelim
 		//-----------
-    	$this->API = $API;
+    	$this->Registry = $Registry;
 
 		//------------------
 		// STRUCTURAL MAP
@@ -219,7 +219,7 @@ class Module_Handler
 			// Is it a duplicate?
 			//----------------------
 
-			$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
+			$_file_processor_obj = $this->Registry->loader( "Data_Processors__File" );
 			if ( ( $_file_info = $_file_processor_obj->file__info__do_get( $this->running_subroutine['request']['f_id'] ) ) == FALSE )
 			{
 				throw new Exception( "Delete failed! File does not exist..." );
@@ -246,7 +246,7 @@ class Module_Handler
 				# _M
 				if ( $_file_info['_f_thumbs_medium'] )
 				{
-					if ( ! is_writable( $_path_to_delete = $this->API->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_M" ) ) )
+					if ( ! is_writable( $_path_to_delete = $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_M" ) ) )
 					{
 						throw new Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
 					}
@@ -255,7 +255,7 @@ class Module_Handler
 				# _S
 				if ( $_file_info['_f_thumbs_small'] )
 				{
-					if ( ! is_writable( $_path_to_delete = $this->API->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_S" ) ) )
+					if ( ! is_writable( $_path_to_delete = $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_S" ) ) )
 					{
 						throw new Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
 					}
@@ -264,7 +264,7 @@ class Module_Handler
 				# _W
 				if ( $_file_info['_f_wtrmrk'] )
 				{
-					if ( ! is_writable( $_path_to_delete = $this->API->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_W" ) ) )
+					if ( ! is_writable( $_path_to_delete = $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_W" ) ) )
 					{
 						throw new Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
 					}
@@ -276,22 +276,22 @@ class Module_Handler
 			//--------------------
 
 			@unlink( $_file_info['_f_location'] );
-			@unlink( $this->API->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_M" ) );
-			@unlink( $this->API->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_S" ) );
-			@unlink( $this->API->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_W" ) );
+			@unlink( $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_M" ) );
+			@unlink( $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_S" ) );
+			@unlink( $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_W" ) );
 
-			$this->API->logger__do_log( "Modules - Static - delete() : Successfully deleted file [hash: " . $_file_info['f_hash']. "]" , "INFO" );
+			$this->Registry->logger__do_log( "Modules - Static - delete() : Successfully deleted file [hash: " . $_file_info['f_hash']. "]" , "INFO" );
 
 			//----------------
 			// Db cleanup
 			//----------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "delete",
 					'table'  => "media_library",
-					'where'  => "f_id=" . $this->API->Db->db->quote( $_file_info['f_id'] , "INTEGER" ),
+					'where'  => "f_id=" . $this->Registry->Db->db->quote( $_file_info['f_id'] , "INTEGER" ),
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( ! $this->Registry->Db->simple_exec_query() )
 			{
 				throw new Exception( "Delete failed! Couldn't remove Db-record..." );
 			}
@@ -300,9 +300,9 @@ class Module_Handler
 			// Cache cleanup
 			//-----------------
 
-			$this->API->Cache->cache__do_remove( "fileinfo_" . $_file_info['f_id'] );
-			$this->API->Cache->cache__do_remove( "fileinfo_" . $_file_info['f_hash'] );
-			$this->API->Cache->cache__do_recache( "total_nr_of_attachments" );
+			$this->Registry->Cache->cache__do_remove( "fileinfo_" . $_file_info['f_id'] );
+			$this->Registry->Cache->cache__do_remove( "fileinfo_" . $_file_info['f_hash'] );
+			$this->Registry->Cache->cache__do_recache( "total_nr_of_attachments" );
 
 			//-----------------------
 			// Still here? Good...
@@ -312,7 +312,7 @@ class Module_Handler
 		}
 		catch ( Exception $e )
 		{
-			$this->API->logger__do_log( "Modules - Static - delete() : " . $e->getMessage() , "ERROR" );
+			$this->Registry->logger__do_log( "Modules - Static - delete() : " . $e->getMessage() , "ERROR" );
 			return array( 'faultCode' => 0, 'faultMessage' => $e->getMessage() );
 		}
 	}
@@ -330,11 +330,11 @@ class Module_Handler
 		// Prelim
 		//-----------
 
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$_partition_size = 0;
-		if ( intval( $this->API->config['performance']['upload_chunk_size'] ) > 0 )
+		if ( intval( $this->Registry->config['performance']['upload_chunk_size'] ) > 0 )
 		{
-			$_partition_size = intval( $this->API->config['performance']['upload_chunk_size'] ) * 1024;
+			$_partition_size = intval( $this->Registry->config['performance']['upload_chunk_size'] ) * 1024;
 		}
 		$_source_file_handle = null;
 		$_target_file_handle = null;
@@ -375,7 +375,7 @@ class Module_Handler
 
 			$_filename_parsed          = pathinfo( $_file_name );
 			$_file_extension           = strtolower( $_filename_parsed['extension'] );
-			$_file_mime                = $this->API->Cache->cache__do_get_part( "mimelist" , "by_ext," . $_file_extension . ",type_mime" );
+			$_file_mime                = $this->Registry->Cache->cache__do_get_part( "mimelist" , "by_ext," . $_file_extension . ",type_mime" );
 
 			$_target_file              = PATH_DATA . "/_temp/" . md5( $_file_length . $_file_name ) . "." . $_file_extension;
 			$_partition_file_name      = $_FILES['file']['tmp_name'];
@@ -384,7 +384,7 @@ class Module_Handler
 			// Is it a duplicate?
 			//----------------------
 
-			$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
+			$_file_processor_obj = $this->Registry->loader( "Data_Processors__File" );
 			if ( ( $_existing_file_record = $_file_processor_obj->file__info__do_get( $_file_md5_checksum ) ) !== FALSE )
 			{
 				if ( in_array( $_file_name, $_existing_file_record['f_name'] ) )
@@ -398,23 +398,23 @@ class Module_Handler
 						@unlink( $_target_file );
 					}
 
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'        =>  "update",
 							'tables'    =>  "media_library",
 							'set'       =>  array(
 									'f_name'      => trim( implode( "\n" , array_merge( $_existing_file_record['f_name'] , array( $_file_name ) ) ) ),
 								),
-							'where'     =>  "f_hash=" . $this->API->Db->db->quote( $_file_md5_checksum ),
+							'where'     =>  "f_hash=" . $this->Registry->Db->db->quote( $_file_md5_checksum ),
 						);
-					if ( ! $this->API->Db->simple_exec_query() )
+					if ( ! $this->Registry->Db->simple_exec_query() )
 					{
 						throw new Exception( "Failed to update Db-record!" );
 					}
 
-					$this->API->Cache->cache__do_remove( "fileinfo_" . $_existing_file_record['f_hash'] );
-					$this->API->Cache->cache__do_remove( "fileinfo_" . $_existing_file_record['f_id']   );
+					$this->Registry->Cache->cache__do_remove( "fileinfo_" . $_existing_file_record['f_hash'] );
+					$this->Registry->Cache->cache__do_remove( "fileinfo_" . $_existing_file_record['f_id']   );
 
-					$this->API->logger__do_log( "Modules - Static - upload() : Successfully updated file-record [hash: " . $_file_md5_checksum . "]" , "INFO" );
+					$this->Registry->logger__do_log( "Modules - Static - upload() : Successfully updated file-record [hash: " . $_file_md5_checksum . "]" , "INFO" );
 					echo "Message: File ('" . $_file_name . "') successfully uploaded!\n";
 					echo "MessageTitle: Upload successful!";
 					exit();
@@ -469,7 +469,7 @@ class Module_Handler
 			# Note: do not just use mode 'a' and always append to end of file. Due to corruption or other resume behavior, we might
 			# need to overrwrite some parts of the file! Additionally, we must use a safe variant of seek, to avoid integer limit problems
 			$where = bcmul( $_partition_index , $_partition_size );
-			if ( $this->API->Input->file__fseek_safe( $_target_file_handle , $where ) != 0 )
+			if ( $this->Registry->Input->file__fseek_safe( $_target_file_handle , $where ) != 0 )
 			{
 				throw new Exception( "Failed to find resume position!" );
 			}
@@ -506,11 +506,11 @@ class Module_Handler
 				// Validate file mime and type
 				//--------------------------------
 
-				if ( $this->API->Input->file__extension__do_validate( $_target_file ) === TRUE )
+				if ( $this->Registry->Input->file__extension__do_validate( $_target_file ) === TRUE )
 				{
 					// $_image_size = getimagesize( $_f );
 					$_file_mtime = filemtime( $_target_file );
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'   =>  "replace",
 							'table' => "media_library",
 							'set'  =>  array(
@@ -523,7 +523,7 @@ class Module_Handler
 
 								),
 						);
-					if ( ! $this->API->Db->simple_exec_query() )
+					if ( ! $this->Registry->Db->simple_exec_query() )
 					{
 						@unlink( $_target_file );
 						throw new Exception( "Failed to insert Db-record!" );
@@ -540,7 +540,7 @@ class Module_Handler
 						}
 					}
 
-					$this->API->logger__do_log( "Modules - Static - upload() : Successfully uploaded file [hash: " . $_file_md5_checksum . "]" , "INFO" );
+					$this->Registry->logger__do_log( "Modules - Static - upload() : Successfully uploaded file [hash: " . $_file_md5_checksum . "]" , "INFO" );
 					echo "Message: File ('" . $_file_name . "') successfully uploaded!\n";
 					echo "MessageTitle: Upload successful!";
 					exit;
@@ -552,7 +552,7 @@ class Module_Handler
 			}
 			else
 			{
-				$this->API->logger__do_log( "Modules - Static - upload() : Successfully uploaded partition [file-id: '" . $_file_name . "'; partition: " . ( $_partition_index + 1 ) . "/" . $_partition_count . "]" , "INFO" );
+				$this->Registry->logger__do_log( "Modules - Static - upload() : Successfully uploaded partition [file-id: '" . $_file_name . "'; partition: " . ( $_partition_index + 1 ) . "/" . $_partition_count . "]" , "INFO" );
 			}
 		}
 		catch ( Exception $e )
@@ -565,7 +565,7 @@ class Module_Handler
 			{
 				fclose( $_target_file_handle );
 			}
-			$this->API->logger__do_log( "Modules - Static - upload() : " . $e->getMessage() , "ERROR" );
+			$this->Registry->logger__do_log( "Modules - Static - upload() : " . $e->getMessage() , "ERROR" );
 			echo "Error: " . $e->getMessage();
 		}
 		exit();
@@ -585,9 +585,9 @@ class Module_Handler
 		//-----------
 
 		$_partition_size = 0;
-		if ( intval( $this->API->config['performance']['upload_chunk_size'] ) > 0 )
+		if ( intval( $this->Registry->config['performance']['upload_chunk_size'] ) > 0 )
 		{
-			$_partition_size = intval( $this->API->config['performance']['upload_chunk_size'] ) * 1024;
+			$_partition_size = intval( $this->Registry->config['performance']['upload_chunk_size'] ) * 1024;
 		}
 		$_source_file_handle = null;
 		$_target_file_handle = null;
@@ -625,7 +625,7 @@ class Module_Handler
 				}
 
 				# Get file size
-				$_file_size = $this->API->Input->file__filesize__do_get( $_target_file );
+				$_file_size = $this->Registry->Input->file__filesize__do_get( $_target_file );
 
 				# Calculate partition-index
 				$_partition_index = bcdiv( $_file_size, $_partition_size, 0 );
@@ -639,11 +639,11 @@ class Module_Handler
 			echo "fileId: " . $_file_id . "\n";
 			echo "partitionIndex: " . $_partition_index;
 
-			$this->API->logger__do_log( "Modules - Static - upload() : Successfully resumed file-upload [file-name: '" . $_file_name . "'] at index: " . $_partition_index , "INFO" );
+			$this->Registry->logger__do_log( "Modules - Static - upload() : Successfully resumed file-upload [file-name: '" . $_file_name . "'] at index: " . $_partition_index , "INFO" );
 		}
 		catch ( Exception $e )
 		{
-			$this->API->logger__do_log( "Modules - Static - upload() : " . $e->getMessage() , "ERROR" );
+			$this->Registry->logger__do_log( "Modules - Static - upload() : " . $e->getMessage() , "ERROR" );
 			echo "Error: " . $e->getMessage();
 		}
 		exit();
@@ -658,7 +658,7 @@ class Module_Handler
 	private function download ()
 	{
 		# Prelim
-		$_file_processor_object = $this->API->loader("Data_Processors__File");
+		$_file_processor_object = $this->Registry->loader("Data_Processors__File");
 		$file_info = $_file_processor_object->file__info__do_get( $this->running_subroutine['request']['identifier'] );
 
 		if ( ! isset( $this->running_subroutine['request']['f_name'] ) )
@@ -692,7 +692,7 @@ class Module_Handler
 						# @todo User authorization [ACL]
 						$_file_variation = null;
 						/*
-						$this->API->http_redirect(
+						$this->Registry->http_redirect(
 								SITE_URL
 									. "/static/download/l-"
 									. $this->running_subroutine['request']['identifier']
@@ -705,7 +705,7 @@ class Module_Handler
 			}
 			$_file_location = ! empty( $_file_variation )
 				?
-				$this->API->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_" . strtoupper( $_file_variation ) )
+				$this->Registry->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_" . strtoupper( $_file_variation ) )
 				:
 				$file_info['_f_location']
 				;
@@ -714,7 +714,7 @@ class Module_Handler
 		$_file_stats['etag'] = $file_info['f_hash'] . ( isset( $_file_variation ) ? "-" . $_file_variation : "" ) . "-" . $_file_stats['mtime'];
 
 		# If-Modified-Since
-		$_request_headers =& $this->API->Input->headers['request'];
+		$_request_headers =& $this->Registry->Input->headers['request'];
 		if ( isset( $_request_headers['IF-NONE-MATCH'] ) and $_request_headers['IF-NONE-MATCH'] == $_file_stats['etag'] )
 		{
 			header( "ETag: " . $_file_stats['etag'] );
@@ -741,9 +741,9 @@ class Module_Handler
 		}
 
 		# Disable output-buffering
-		if ( $this->API->ob_status )
+		if ( $this->Registry->ob_status )
 		{
-			if ( $this->API->ob_compression )
+			if ( $this->Registry->ob_compression )
 			{
 				ini_set( "zlib.output_handler" , "0" );
 			}
@@ -807,13 +807,13 @@ class Module_Handler
 
 		# File-cursor
 		$_file_cursor = $_transmission_begin;
-		$this->API->Input->file__fseek_safe( $_fh , $_transmission_begin , SEEK_SET );
+		$this->Registry->Input->file__fseek_safe( $_fh , $_transmission_begin , SEEK_SET );
 
 		# Send data with bandwidth management
-		$_chunk_size      = intval( $this->API->config['performance']['download_chunk_size'] ) * 1024;
-		$_transfer_quota  = intval( $this->API->config['performance']['download_speed_limit'] ) * 1024;
+		$_chunk_size      = intval( $this->Registry->config['performance']['download_chunk_size'] ) * 1024;
+		$_transfer_quota  = intval( $this->Registry->config['performance']['download_speed_limit'] ) * 1024;
 		$_time_quota      = 1000000;
-		$_timestart       = intval( $this->API->debug__timer_start() );
+		$_timestart       = intval( $this->Registry->debug__timer_start() );
 		while( ! feof( $_fh ) and $_file_cursor < $_transmission_end and ( connection_status() == 0 ) )
 		{
 			# File-send
@@ -821,7 +821,7 @@ class Module_Handler
 			$_file_cursor    += $_chunk_size;
 
 			# Bandwidth quota management
-			$_time_quota     -= intval( $this->API->debug__timer_stop( $_timestart ) );
+			$_time_quota     -= intval( $this->Registry->debug__timer_stop( $_timestart ) );
 			$_transfer_quota -= $_chunk_size;
 
 			# Out of quota? Then wait for the remainder of 1 second :) and reset counters
@@ -829,7 +829,7 @@ class Module_Handler
 			{
 				usleep( $_time_quota );
 				$_time_quota      = 1000000;
-				$_transfer_quota  = intval( $this->API->config['performance']['download_speed_limit'] ) * 1024;
+				$_transfer_quota  = intval( $this->Registry->config['performance']['download_speed_limit'] ) * 1024;
 			}
 		}
 
@@ -847,7 +847,7 @@ class Module_Handler
 	private function stream ()
 	{
 		# Prelim
-		$_file_processor_object = $this->API->loader("Data_Processors__File");
+		$_file_processor_object = $this->Registry->loader("Data_Processors__File");
 		$file_info = $_file_processor_object->file__info__do_get( $this->running_subroutine['request']['identifier'] );
 
 		if ( ! isset( $this->running_subroutine['request']['f_name'] ) )
@@ -881,7 +881,7 @@ class Module_Handler
 						# @todo User authorization [ACL]
 						$_file_variation = null;
 						/*
-						$this->API->http_redirect(
+						$this->Registry->http_redirect(
 								SITE_URL
 									. "/static/download/l-"
 									. $this->running_subroutine['request']['identifier']
@@ -894,7 +894,7 @@ class Module_Handler
 			}
 			$_file_location = ! empty( $_file_variation )
 				?
-				$this->API->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_" . strtoupper( $_file_variation ) )
+				$this->Registry->Input->file__filename__attach_suffix( $file_info['_f_location'] , "_" . strtoupper( $_file_variation ) )
 				:
 				$file_info['_f_location']
 				;
@@ -903,7 +903,7 @@ class Module_Handler
 		$_file_stats['etag'] = $file_info['f_hash'] . ( isset( $_file_variation ) ? "-" . $_file_variation : "" ) . "-" . $_file_stats['mtime'];
 
 		# If-Modified-Since
-		$_request_headers =& $this->API->Input->headers['request'];
+		$_request_headers =& $this->Registry->Input->headers['request'];
 		if ( isset( $_request_headers['IF-NONE-MATCH'] ) and $_request_headers['IF-NONE-MATCH'] == $_file_stats['etag'] )
 		{
 			header( "ETag: " . $_file_stats['etag'] );
@@ -930,9 +930,9 @@ class Module_Handler
 		}
 
 		# Disable output-buffering
-		if ( $this->API->ob_status )
+		if ( $this->Registry->ob_status )
 		{
-			if ( $this->API->ob_compression )
+			if ( $this->Registry->ob_compression )
 			{
 				ini_set( "zlib.output_handler" , "0" );
 			}
@@ -996,13 +996,13 @@ class Module_Handler
 
 		# File-cursor
 		$_file_cursor = $_transmission_begin;
-		$this->API->Input->file__fseek_safe( $_fh , $_transmission_begin , SEEK_SET );
+		$this->Registry->Input->file__fseek_safe( $_fh , $_transmission_begin , SEEK_SET );
 
 		# Send data with bandwidth management
-		$_chunk_size      = intval( $this->API->config['performance']['download_chunk_size'] ) * 1024;
-		$_transfer_quota  = intval( $this->API->config['performance']['download_speed_limit'] ) * 1024;
+		$_chunk_size      = intval( $this->Registry->config['performance']['download_chunk_size'] ) * 1024;
+		$_transfer_quota  = intval( $this->Registry->config['performance']['download_speed_limit'] ) * 1024;
 		$_time_quota      = 1000000;
-		$_timestart       = intval( $this->API->debug__timer_start() );
+		$_timestart       = intval( $this->Registry->debug__timer_start() );
 		while( ! feof( $_fh ) and $_file_cursor < $_transmission_end and ( connection_status() == 0 ) )
 		{
 			# File-send
@@ -1010,7 +1010,7 @@ class Module_Handler
 			$_file_cursor    += $_chunk_size;
 
 			# Bandwidth quota management
-			$_time_quota     -= intval( $this->API->debug__timer_stop( $_timestart ) );
+			$_time_quota     -= intval( $this->Registry->debug__timer_stop( $_timestart ) );
 			$_transfer_quota -= $_chunk_size;
 
 			# Out of quota? Then wait for the remainder of 1 second :) and reset counters
@@ -1018,7 +1018,7 @@ class Module_Handler
 			{
 				usleep( $_time_quota );
 				$_time_quota      = 1000000;
-				$_transfer_quota  = intval( $this->API->config['performance']['download_speed_limit'] ) * 1024;
+				$_transfer_quota  = intval( $this->Registry->config['performance']['download_speed_limit'] ) * 1024;
 			}
 		}
 
@@ -1029,8 +1029,8 @@ class Module_Handler
 		$_params = array(
 				'f_name'            => $this->running_subroutine['request']['f_name'],
 				'time_to_die'       => null,                                                       // @todo Later to be manipulated by Zend_ACL
-				'm_id'              => $this->API->member['id'],
-				'm_ip_address'      => $this->API->Session->ip_address,
+				'm_id'              => $this->Registry->member['id'],
+				'm_ip_address'      => $this->Registry->Session->ip_address,
 				'_enable_ip_check'  => FALSE,
 			);
 		$_link_info = $_file_processor_object->file__link__do_get( $file_info, $_params );
@@ -1063,7 +1063,7 @@ class Module_Handler
 		if ( ! $file_info['_diagnostics']['thumbs_ok'] )
 		{
 			# FILE data-processor object instance
-			$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
+			$_file_processor_obj = $this->Registry->loader( "Data_Processors__File" );
 
 			# Small thumbs
 			if ( $file_info['_f_thumbs_small'] === FALSE )
@@ -1105,7 +1105,7 @@ class Module_Handler
 	private function _file__image__do_watermark ( $file_info )
 	{
 		# FILE data-processor object instance
-		$_file_processor_obj = $this->API->loader( "Data_Processors__File" );
+		$_file_processor_obj = $this->Registry->loader( "Data_Processors__File" );
 
 		# Continue
 		return $_file_processor_obj->image__do_watermark( $file_info );

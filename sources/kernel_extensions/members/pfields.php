@@ -127,23 +127,23 @@ class members_pfields
 	/**
 	 * CONSTRUCTOR
 	 *
-	 * @param    object    API object reference
+	 * @param    object    Registry object reference
 	 * @return   void
 	 */
-	public function __construct ( &$API )
+	public function __construct ( &$Registry )
 	{
 		# Prelim
-		$this->API = $API;
-		if ( !isset( $this->API->Cache->cache['profilefields'] ) )
+		$this->Registry = $Registry;
+		if ( !isset( $this->Registry->Cache->cache['profilefields'] ) )
 		{
-			$this->API->Cache->cache__do_load( array( "profilefields" ) );
+			$this->Registry->Cache->cache__do_load( array( "profilefields" ) );
 		}
-		$this->cache_data = &$this->API->Cache->cache['profilefields'];
+		$this->cache_data = &$this->Registry->Cache->cache['profilefields'];
 
 		/* User Setup */
-		$this->member_id  = $this->API->Session->member['id'];
-		$this->admin      = intval( $this->API->Session->member['g_access_cp'] );
-		$this->supmod     = intval( $this->API->Session->member['g_is_supmod'] );
+		$this->member_id  = $this->Registry->Session->member['id'];
+		$this->admin      = intval( $this->Registry->Session->member['g_access_cp'] );
+		$this->supmod     = intval( $this->Registry->Session->member['g_is_supmod'] );
 	}
 
 	/**
@@ -161,13 +161,13 @@ class members_pfields
 		/* Get Member */
 		if( ! count( $this->member_data ) and $this->mem_data_id and ! $mlist )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	  => "select_row",
 					'table'   => array( 'd' => 'members_pfields_content' ),
-					'where'   => "member_id=" . $this->API->Db->db->quote( $this->mem_data_id, "INTEGER" ),
+					'where'   => "member_id=" . $this->Registry->Db->db->quote( $this->mem_data_id, "INTEGER" ),
 				);
 
-			$this->member_data = $this->API->Db->simple_exec_query();
+			$this->member_data = $this->Registry->Db->simple_exec_query();
 		}
 
 		if ( count( $this->member_data ) )
@@ -186,7 +186,7 @@ class members_pfields
 						'conditions'  => 'g.pf_group_id=d.pf_group_id',
 						'join_type'   => 'LEFT'
 					);
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'	    => "select",
 						'fields'    => "d.*",
 						'table'     => array( 'd' => 'members_pfields_data' ),
@@ -194,17 +194,17 @@ class members_pfields
 						'order'     => array( "d.pf_group_id ASC", "d.pf_position ASC", "d.pf_id ASC" )
 					);
 
-				if ( count( $result = $this->API->Db->simple_exec_query() ) )
+				if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 				{
 					foreach ( $result as $row )
 					{
-						$this->API->Cache->cache['profilefields'][ $row['pf_id'] ] = $row;
+						$this->Registry->Cache->cache['profilefields'][ $row['pf_id'] ] = $row;
 					}
 				}
 
-				$this->API->Cache->cache__do_update( array( "name" => "profilefields", "array" => 1, "donow" => 1, "deletefirst" => 1 ) );
+				$this->Registry->Cache->cache__do_update( array( "name" => "profilefields", "array" => 1, "donow" => 1, "deletefirst" => 1 ) );
 
-				$this->cache_data = &$this->API->Cache->cache['profilefields'];
+				$this->cache_data = &$this->Registry->Cache->cache['profilefields'];
 			}
 		}
 
@@ -222,11 +222,11 @@ class members_pfields
 				{
 					if ( $mlist )
 					{
-						$this->in_fields[ $id ] = $this->API->Input->input[ 'field_' . $id ];
+						$this->in_fields[ $id ] = $this->Registry->Input->input[ 'field_' . $id ];
 					}
 					else
 					{
-						$this->in_fields[ $id ] = isset( $this->member_data[ 'field_' . $id ] ) ? $this->member_data[ 'field_' . $id ] : $this->API->Input->input[ 'field_' . $id ];
+						$this->in_fields[ $id ] = isset( $this->member_data[ 'field_' . $id ] ) ? $this->member_data[ 'field_' . $id ] : $this->Registry->Input->input[ 'field_' . $id ];
 					}
 				}
 			}

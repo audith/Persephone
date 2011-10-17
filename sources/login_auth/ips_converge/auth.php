@@ -32,7 +32,7 @@ class Login_Method extends Login_Core
 	protected $method_config = array();
 
 	/**
-	 * API Server object
+	 * Registry Server object
 	 *
 	 * @var object
 	 */
@@ -47,11 +47,11 @@ class Login_Method extends Login_Core
 	 * @param     array      Custom configuration info for this method
 	 * @return    void
 	 */
-	public function __construct ( & $API, $method, $conf = array() )
+	public function __construct ( Registry $Registry, $method, $conf = array() )
 	{
 		# Prelim
 		$this->method_config = $method;
-		$this->API = $API;
+		$this->Registry = $Registry;
 		parent::__construct();
 	}
 
@@ -87,15 +87,15 @@ class Login_Method extends Login_Core
 		}
 
 		//-----------------------------------------
-		// Get product ID and code from API
+		// Get product ID and code from Registry
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 					'do'	    => "select_row",
 					'table'     => "converge_local",
-					'where'     => "converge_active=" . $this->API->Db->db->quote( 1, "INTEGER" ),
+					'where'     => "converge_active=" . $this->Registry->Db->quote( 1, "INTEGER" ),
 				);
-		$converge = $this->API->Db->simple_exec_query();
+		$converge = $this->Registry->Db->simple_exec_query();
 
 		if ( ! $converge['converge_api_code'] )
 		{
@@ -109,7 +109,7 @@ class Login_Method extends Login_Core
 
 		if ( $username and !$email_address )
 		{
-			$temp = $this->API->Session->load_member( $username, 'extendedProfile', 'username' );
+			$temp = $this->Registry->Session->load_member( $username, 'extendedProfile', 'username' );
 
 			if ( $temp['email'] )
 			{
@@ -215,11 +215,11 @@ class Login_Method extends Login_Core
 	 */
 	private function _load_member ( $email_address )
 	{
-		$this->member = $this->API->Session->load_member( $email_address, 'groups' );
+		$this->member = $this->Registry->Session->load_member( $email_address, 'groups' );
 
 		if ( $this->member['id'] )
 		{
-			$this->API->Session->set_member( $this->member['id'] );
+			$this->Registry->Session->set_member( $this->member['id'] );
 		}
 	}
 
@@ -232,10 +232,10 @@ class Login_Method extends Login_Core
 	public function email_exists_check ( $email )
 	{
 		//-----------------------------------------
-		// Get product ID and code from API
+		// Get product ID and code from Registry
 		//-----------------------------------------
 
-		$converge = $this->API->Cache->cache__do_get( "converge" );
+		$converge = $this->Registry->Cache->cache__do_get( "converge" );
 
 		if ( ! $converge['converge_api_code'] )
 		{
@@ -294,10 +294,10 @@ class Login_Method extends Login_Core
 	public function change_email ( $old_email, $new_email )
 	{
 		//-----------------------------------------
-		// Get product ID and code from API
+		// Get product ID and code from Registry
 		//-----------------------------------------
 
-		$converge = $this->API->Cache->cache__do_get( "converge" );
+		$converge = $this->Registry->Cache->cache__do_get( "converge" );
 
 		if ( ! $converge['converge_api_code'] )
 		{
@@ -389,10 +389,10 @@ class Login_Method extends Login_Core
 	public function change_pass ( $email, $new_pass )
 	{
 		//--------------------------------------
-		// Get product ID and code from API
+		// Get product ID and code from Registry
 		//--------------------------------------
 
-		$converge = $this->API->Cache->cache__do_get( "converge" );
+		$converge = $this->Registry->Cache->cache__do_get( "converge" );
 
 		if ( ! $converge['converge_api_code'] )
 		{
@@ -453,10 +453,10 @@ class Login_Method extends Login_Core
 	public function change_name ( $old_name, $new_name, $email_address )
 	{
 		//-----------------------------------------
-		// Get product ID and code from API
+		// Get product ID and code from Registry
 		//-----------------------------------------
 
-		$converge = $this->API->Cache->cache__do_get( "converge" );
+		$converge = $this->Registry->Cache->cache__do_get( "converge" );
 
 		if ( ! $converge['converge_api_code'] )
 		{
@@ -522,10 +522,10 @@ class Login_Method extends Login_Core
 		}
 
 		//-----------------------------------------
-		// Get product ID and code from API
+		// Get product ID and code from Registry
 		//-----------------------------------------
 
-		$converge = $this->API->Cache->cache__do_get( "converge" );
+		$converge = $this->Registry->Cache->cache__do_get( "converge" );
 
 		if ( ! $converge['converge_api_code'] )
 		{

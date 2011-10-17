@@ -16,10 +16,10 @@ if ( !defined( "INIT_DONE" ) )
 class Module_Handler
 {
 	/**
-	 * API Object Reference
+	 * Registry Reference
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Main container for retrieved content
@@ -55,14 +55,14 @@ class Module_Handler
     /**
 	 * Constructor - Inits Handler
 	 *
-	 * @param    API    API Object Reference
+	 * @param    Registry    Registry Object Reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
     {
 		//-----------
 		// Prelim
 		//-----------
-    	$this->API = $API;
+    	$this->Registry = $Registry;
     	if ( !defined( "ACCESS_TO_AREA" ) )
     	{
     		define( "ACCESS_TO_AREA" , "admin" );
@@ -323,7 +323,7 @@ class Module_Handler
 		set_time_limit(0);
 
 		/*
-		$this->API->Cache->cache__do_load( array('mimelist') );
+		$this->Registry->Cache->cache__do_load( array('mimelist') );
 		# DIR to process
 		$_d = PATH_ROOT_VHOST . "/data/monthly_for_2004_04/";
 		# OPEN DIR
@@ -337,12 +337,12 @@ class Module_Handler
 				continue;
 			}
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'   =>  "select_row",
 					'table' => "media_library",
-					'where'  =>  'f_name=' . $this->API->Db->quote( $_f ),
+					'where'  =>  'f_name=' . $this->Registry->Db->quote( $_f ),
 				);
-			$file_info = $this->API->Db->simple_exec_query();
+			$file_info = $this->Registry->Db->simple_exec_query();
 			if ( rename( $_f , $file_info['f_hash'] . "." . $file_info['f_extension'] ) )
 			{
 				print "SUCCESSFULLY renamed $_f\n<br>";
@@ -351,7 +351,7 @@ class Module_Handler
 		closedir(  $_dh );
 		*/
 
-		$this->API->Cache->cache__do_load( array('mimelist') );
+		$this->Registry->Cache->cache__do_load( array('mimelist') );
 		# DIR to process
 		$_d = PATH_ROOT_VHOST . "/data/";
 		# OPEN DIR
@@ -364,13 +364,13 @@ class Module_Handler
 			{
 				continue;
 			}
-			if ( ( $_validation_result = $this->API->Input->file__extension__do_validate( $_d . $_f ) ) === true )
+			if ( ( $_validation_result = $this->Registry->Input->file__extension__do_validate( $_d . $_f ) ) === true )
 			{
 				// $_image_size = getimagesize( $_f );
 				$_filename_parse = pathinfo( $_f );
 				$_filename_parse['extension'] = strtolower( $_filename_parse['extension'] );
 				$_mtime = filemtime( $_f );
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'   =>  "replace",
 						'table' => "media_library",
 						'set'  =>  array(
@@ -379,13 +379,13 @@ class Module_Handler
 								'f_extension' => $_filename_parse['extension'],
 								'f_size' => filesize( $_f ),
 								// 'f_dimensions' => $_image_size[0] . "x" . $_image_size[1],
-								'f_mime' => $this->API->Cache->cache['mimelist']['by_ext'][ $_filename_parse['extension'] ]['type_mime'],
+								'f_mime' => $this->Registry->Cache->cache['mimelist']['by_ext'][ $_filename_parse['extension'] ]['type_mime'],
 								'f_timestamp' => new Zend_Db_Expr( "UNIX_TIMESTAMP('" . date( "Ymd" , $_mtime ) .  "')" ),
 
 							),
 					);
 				print "<br />\nV-SUCCESS: " . $_file_hash . " - " . $_f;
-				if ( !$this->API->Db->simple_exec_query() )
+				if ( !$this->Registry->Db->simple_exec_query() )
 				{
 					echo "OOPS! goes for " . $_f;
 				}
@@ -425,11 +425,11 @@ class Module_Handler
 		}
 		$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 
-		if ( !array_key_exists( $m_unique_id, $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $m_unique_id, $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return false;
 		}
-		$m = $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ];
+		$m = $this->Registry->Cache->cache['modules']['by_unique_id'][ $m_unique_id ];
 
 		//-----------------------------
 		// Prepare final fetch query
@@ -437,7 +437,7 @@ class Module_Handler
 
 		$_subqueries = array();
 		$_fields_to_fetch = array_merge( array( 'id', 'tags', 'timestamp', 'submitted_by', 'status_published', 'status_locked' ) , array_keys( $m['m_data_definition'] ) );
-		$this->API->Db->cur_query = $this->API->Db->db
+		$this->Registry->Db->cur_query = $this->Registry->Db->db
 			->select()
 			->from( "mod_" . $m['m_unique_id_clean'] . "_master_repo" , $_fields_to_fetch );
 
@@ -447,12 +447,12 @@ class Module_Handler
 
 		try
 		{
-			$result = $this->API->Db->db->query( $this->API->Db->cur_query )->fetchAll();
-			$this->API->Db->query_count++;
+			$result = $this->Registry->Db->db->query( $this->Registry->Db->cur_query )->fetchAll();
+			$this->Registry->Db->query_count++;
 		}
 		catch ( Zend_Db_Exception $e )
 		{
-			$this->API->Db->exception_handler( $e );
+			$this->Registry->Db->exception_handler( $e );
 			return false;
 		}
 		$m['running_subroutine']['content']['count'] = count( $result );
@@ -483,7 +483,7 @@ class Module_Handler
 			$_page_nr = intval( $_GET['_page'][ $this->running_subroutine['s_name'] ] );
 		}
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'          =>  "select",
 				'fields'      =>  array(
 						"f_id" , "f_hash" , "f_extension" , "f_name" , "f_size" , "f_dimensions" , "f_duration" ,
@@ -493,7 +493,7 @@ class Module_Handler
 				'order'       =>  array( "f_timestamp ASC" ),
 				'limit_page'  =>  array( $_page_nr, 20 ),
 			);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		foreach ( $result as &$_row )
 		{
@@ -501,7 +501,7 @@ class Module_Handler
 		}
 
 		$return['media_library__file_list']           =  $result;
-		$return['media_library__total_nr_of_items']   =  $this->API->Cache->cache__do_get( "total_nr_of_attachments" );
+		$return['media_library__total_nr_of_items']   =  $this->Registry->Cache->cache__do_get( "total_nr_of_attachments" );
 
 		return $return;
 	}
@@ -513,14 +513,14 @@ class Module_Handler
 		// Is our cache content empty?
 		//-------------------------------
 
-		if ( !is_array( $this->API->Cache->cache['modules'] ) or !count( $this->API->Cache->cache['modules'] ) )
+		if ( !is_array( $this->Registry->Cache->cache['modules'] ) or !count( $this->Registry->Cache->cache['modules'] ) )
 		{
 			# Empty cache
 			$return = null;
 		}
 		else
 		{
-			$return = $this->API->Cache->cache['modules']['by_name'];
+			$return = $this->Registry->Cache->cache['modules']['by_name'];
 		}
 
 		return $return;
@@ -539,15 +539,15 @@ class Module_Handler
 			$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 		}
 
-		if ( array_key_exists( $m_unique_id , $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $m_unique_id , $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			if ( isset( $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ]['m_data_definition'][ $this->running_subroutine['request']['c_name'] ] ) )
+			if ( isset( $this->Registry->Cache->cache['modules']['by_unique_id'][ $m_unique_id ]['m_data_definition'][ $this->running_subroutine['request']['c_name'] ] ) )
 			{
-				$return['m_data__me']     =  $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ];
-				$return['m_data__others'] =  $this->API->Cache->cache['modules']['by_unique_id'];
+				$return['m_data__me']     =  $this->Registry->Cache->cache['modules']['by_unique_id'][ $m_unique_id ];
+				$return['m_data__others'] =  $this->Registry->Cache->cache['modules']['by_unique_id'];
 				unset( $return['m_data__others'][ $m_unique_id ] );                      // Removing 'me'-self from among 'others' :D
 				$return['_request'] = $this->running_subroutine['request'];
-				$return['c_data'] = $this->API->Cache->cache__do_get_part(
+				$return['c_data'] = $this->Registry->Cache->cache__do_get_part(
 						"modules_connectors",
 						$return['m_data__me']['m_data_definition'][ $this->running_subroutine['request']['c_name'] ]['connector_linked']
 					);
@@ -559,7 +559,7 @@ class Module_Handler
 		else
 		{
 			# No such module? Redirect back to Components
-			$this->API->http_redirect( SITE_URL . "/acp/components/viewmodule-" . $this->running_subroutine['request']['m_unique_id_clean'] );
+			$this->Registry->http_redirect( SITE_URL . "/acp/components/viewmodule-" . $this->running_subroutine['request']['m_unique_id_clean'] );
 		}
 	}
 
@@ -571,10 +571,10 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_create ()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$faults = array();
-		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
-		$_connector_modules_cache = $this->API->Cache->cache__do_get( "modules_connectors" );
+		$_parent_module_cache =& $this->Registry->Cache->cache['modules']['by_unique_id'];
+		$_connector_modules_cache = $this->Registry->Cache->cache__do_get( "modules_connectors" );
 		if ( array_key_exists( $input['connector_linked'], $_connector_modules_cache ) )
 		{
 			$m =& $_parent_module_cache[ $input['m_unique_id'] ];
@@ -590,7 +590,7 @@ class Module_Handler
 			//--------------------------------------------------------------------
 
 			# TYPE: Validation...
-			if ( ( $_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $input['dft_type'] ) ) ) === false )
+			if ( ( $_processor_instance = $this->Registry->loader( "Data_Processors__" . ucwords( $input['dft_type'] ) ) ) === false )
 			{
 				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['dft_type'] . "</em>!" );
 			}
@@ -601,24 +601,24 @@ class Module_Handler
 			}
 
 			# Continue...
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'         =>  "alter",
 					'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $input['connected_field'],
 					'action'     =>  "add_column",
-					'col_info'   =>  $this->API->Db->modules__ddl_column_type_translation( $_processor_instance->ddl_config__validated , true )
+					'col_info'   =>  $this->Registry->Db->modules__ddl_column_type_translation( $_processor_instance->ddl_config__validated , true )
 				);
-			if ( $this->API->Db->simple_exec_query() )
+			if ( $this->Registry->Db->simple_exec_query() )
 			{
 				# INSERT - modules_data_definition
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'     =>  "insert",
 						'table'  =>  "modules_data_definition",
 						'set'    =>  $_processor_instance->ddl_config__validated,
 					);
-				if ( $this->API->Db->simple_exec_query() )
+				if ( $this->Registry->Db->simple_exec_query() )
 				{
 					# On SUCCESS, update cache and respond
-					$_recache = $this->API->loader("Cache__Recache");
+					$_recache = $this->Registry->loader("Cache__Recache");
 					$_recache->main( "modules" );
 					$_recache->main( "modules_connectors" );
 					return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field-registry successfully added!<br />Refreshing..." );
@@ -647,7 +647,7 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_sort ()
 	{
-		$_position_information = $this->API->Input->post("position");
+		$_position_information = $this->Registry->Input->post("position");
 		if ( is_null( $_position_information ) or !is_array( $_position_information ) or empty( $_position_information ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Empty data-set! Request aborted..." );
@@ -661,16 +661,16 @@ class Module_Handler
 		{
 			$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 		}
-		if ( !array_key_exists( $m_unique_id , $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $m_unique_id , $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid parent (master) module provided! Request aborted..." );
 		}
-		$_m_cache_node =& $this->API->Cache->cache['modules']['by_unique_id'];
+		$_m_cache_node =& $this->Registry->Cache->cache['modules']['by_unique_id'];
 		if ( !isset( $_m_cache_node[ $m_unique_id ]['m_data_definition'][ $this->running_subroutine['request']['c_name'] ] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid connector provided! Request aborted..." );
 		}
-		$_connector_unit__m_unique_id = $this->API->Cache->cache__do_get_part(
+		$_connector_unit__m_unique_id = $this->Registry->Cache->cache__do_get_part(
 				"modules_connectors",
 				$_m_cache_node[ $m_unique_id ]['m_data_definition'][ $this->running_subroutine['request']['c_name'] ]['connector_linked'] . ",m_unique_id"
 			);
@@ -682,20 +682,20 @@ class Module_Handler
 		$_rows_affected  = 0;
 		foreach ( $_position_information as $_position=>$_name )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'      =>  "update",
 					'tables'  =>  "modules_data_definition",
 					'set'     =>  array( 'position' => $_position + 1 ),
 					'where'   =>  array(
-							"name="        . $this->API->Db->quote( $_name ),
-							"m_unique_id=" . $this->API->Db->quote( $_connector_unit__m_unique_id ),
+							"name="        . $this->Registry->Db->quote( $_name ),
+							"m_unique_id=" . $this->Registry->Db->quote( $_connector_unit__m_unique_id ),
 						),
 				);
-			$_rows_affected += $this->API->Db->simple_exec_query();
+			$_rows_affected += $this->Registry->Db->simple_exec_query();
 		}
 		if ( $_rows_affected )
 		{
-			$this->API->loader("Cache__Recache")->main( "modules_connectors" );
+			$this->Registry->loader("Cache__Recache")->main( "modules_connectors" );
 		}
 
 		return array( 'responseCode' => 1, 'responseMessage' => "Re-order successful! Refreshing in 2 seconds..." );
@@ -724,11 +724,11 @@ class Module_Handler
 		else
 		{
 			# Regular REQUEST
-			$input = $this->API->Input->post();
+			$input = $this->Registry->Input->post();
 		}
 
-		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
-		$_connector_modules_cache = $this->API->Cache->cache__do_get( "modules_connectors" );
+		$_parent_module_cache =& $this->Registry->Cache->cache['modules']['by_unique_id'];
+		$_connector_modules_cache = $this->Registry->Cache->cache__do_get( "modules_connectors" );
 		if ( array_key_exists( $input['connector_linked'], $_connector_modules_cache ) )
 		{
 			$m =& $_parent_module_cache[ $input['m_unique_id'] ];
@@ -787,7 +787,7 @@ class Module_Handler
 			$list_of_c_unique_ids_to_process        = array();                 // Connector-Unit IDs, for future reference
 			foreach ( $list_of_columns_to_process as $name )
 			{
-				$list_of_columns_to_process__translated[ $name ] = $this->API->Db->modules__ddl_column_type_translation(
+				$list_of_columns_to_process__translated[ $name ] = $this->Registry->Db->modules__ddl_column_type_translation(
 						$c['m_data_definition'][ $name ] ,
 						true
 					);
@@ -803,7 +803,7 @@ class Module_Handler
 			# Execute...
 			if ( $input['do_backup_dropped_field'] )
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'        =>  "alter",
 						'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $input['connected_field'],
 						'action'    =>  "change_column",
@@ -812,14 +812,14 @@ class Module_Handler
 			}
 			else
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'        =>  "alter",
 						'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $input['connected_field'],
 						'action'    =>  "drop_column",
 						'col_info'  =>  $list_of_columns_to_process__translated
 					);
 			}
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (ALTER-MODULE-DDL) failed!" );
 			}
@@ -831,32 +831,32 @@ class Module_Handler
 
 			if ( $input['do_backup_dropped_field'] )
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'      =>  "update",
 						'tables'  =>  "modules_data_definition",
 						'set'     =>  array( 'is_backup' => 1 ),
 						'where'   =>  array(
-								"m_unique_id=" . $this->API->Db->quote( $input['connector_linked'] ),
+								"m_unique_id=" . $this->Registry->Db->quote( $input['connector_linked'] ),
 								"name IN ("
-									. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+									. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 									. ")",
 							),
 					);
 			}
 			else
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'      =>  "delete",
 						'table'   =>  "modules_data_definition",
 						'where'   =>  array(
-								"m_unique_id=" . $this->API->Db->quote( $input['connector_linked'] ),
+								"m_unique_id=" . $this->Registry->Db->quote( $input['connector_linked'] ),
 								"name IN ("
-									. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+									. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 									. ")",
 							),
 					);
 			}
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-DDL-RECORD) failed!" );
 			}
@@ -865,7 +865,7 @@ class Module_Handler
 			// SUCCESS : Still here :) Update cache
 			//-----------------------------------------
 
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field-registry successfully dropped!<br />Refreshing..." );
@@ -884,9 +884,9 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_drop_backup ()
 	{
-		$input = $this->API->Input->post();
-		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
-		$_connector_modules_cache = $this->API->Cache->cache__do_get( "modules_connectors" );
+		$input = $this->Registry->Input->post();
+		$_parent_module_cache =& $this->Registry->Cache->cache['modules']['by_unique_id'];
+		$_connector_modules_cache = $this->Registry->Cache->cache__do_get( "modules_connectors" );
 		if ( array_key_exists( $input['connector_linked'], $_connector_modules_cache ) )
 		{
 			$m =& $_parent_module_cache[ $input['m_unique_id'] ];
@@ -923,7 +923,7 @@ class Module_Handler
 			$list_of_columns_to_process__translated = array();
 			foreach ( $list_of_columns_to_process as $name )
 			{
-				$list_of_columns_to_process__translated[ $name ] = $this->API->Db->modules__ddl_column_type_translation(
+				$list_of_columns_to_process__translated[ $name ] = $this->Registry->Db->modules__ddl_column_type_translation(
 						$c['m_data_definition_bak'][ $name ] ,
 						true
 					);
@@ -931,14 +931,14 @@ class Module_Handler
 			}
 
 			# Execute...
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'        =>  "alter",
 					'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $input['connected_field'],
 					'action'    =>  "drop_column",
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
 
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-CONNECTOR-FIELD) failed!" );
 			}
@@ -948,17 +948,17 @@ class Module_Handler
 			// DELETE: modules_data_definition
 			//-------------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'      =>  "delete",
 					'table'   =>  "modules_data_definition",
 					'where'   =>  array(
-							"m_unique_id=" . $this->API->Db->quote( $input['connector_linked'] ),
+							"m_unique_id=" . $this->Registry->Db->quote( $input['connector_linked'] ),
 							"name IN ("
-								. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+								. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 							. ")",
 						),
 				);
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (DELETE-DDL-RECORD) failed!" );
 			}
@@ -967,7 +967,7 @@ class Module_Handler
 			// SUCCESS : Update cache and respond
 			//--------------------------------------
 
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully dropped!<br />Refreshing...' );
@@ -986,9 +986,9 @@ class Module_Handler
 	 */
 	private function modules__connector_unit__ddl__do_restore_backup ()
 	{
-		$input = $this->API->Input->post();
-		$_parent_module_cache =& $this->API->Cache->cache['modules']['by_unique_id'];
-		$_connector_modules_cache = $this->API->Cache->cache__do_get( "modules_connectors" );
+		$input = $this->Registry->Input->post();
+		$_parent_module_cache =& $this->Registry->Cache->cache['modules']['by_unique_id'];
+		$_connector_modules_cache = $this->Registry->Cache->cache__do_get( "modules_connectors" );
 		if ( array_key_exists( $input['connector_linked'], $_connector_modules_cache ) )
 		{
 			$m =& $_parent_module_cache[ $input['m_unique_id'] ];
@@ -1023,7 +1023,7 @@ class Module_Handler
 			$list_of_columns_to_process__translated = array();
 			foreach ( $list_of_columns_to_process as $name )
 			{
-				$list_of_columns_to_process__translated[ $name ] = $this->API->Db->modules__ddl_column_type_translation(
+				$list_of_columns_to_process__translated[ $name ] = $this->Registry->Db->modules__ddl_column_type_translation(
 						$c['m_data_definition_bak'][ $name ] ,
 						true
 					);
@@ -1032,13 +1032,13 @@ class Module_Handler
 			}
 
 			# CHANGEs
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'        =>  "alter",
 					'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . $input['connected_field'],
 					'action'    =>  "change_column",
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (RESTORE-MODULE-FIELD) failed!" );
 			}
@@ -1047,22 +1047,22 @@ class Module_Handler
 			// UPDATE :  module_data_definition
 			//------------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'      =>  "update",
 					'tables'  =>  "modules_data_definition",
 					'set'     =>  array( 'is_backup' => 0 ),
 					'where'   =>  array(
-							"m_unique_id=" . $this->API->Db->quote( $input['connector_linked'] ),
+							"m_unique_id=" . $this->Registry->Db->quote( $input['connector_linked'] ),
 							"name IN ("
-								. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+								. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 								. ")",
 						),
 				);
 
-			if ( $this->API->Db->simple_exec_query() )
+			if ( $this->Registry->Db->simple_exec_query() )
 			{
 				# On SUCCESS, update cache and respond
-				$_recache = $this->API->loader("Cache__Recache");
+				$_recache = $this->Registry->loader("Cache__Recache");
 				$_recache->main( "modules" );
 				$_recache->main( "modules_connectors" );
 				return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully restored!<br />Refreshing...' );
@@ -1175,14 +1175,14 @@ class Module_Handler
 	 */
 	private function modules__do_list ()
 	{
-		if ( !is_array( $this->API->Cache->cache['modules'] ) or !count( $this->API->Cache->cache['modules'] ) )
+		if ( !is_array( $this->Registry->Cache->cache['modules'] ) or !count( $this->Registry->Cache->cache['modules'] ) )
 		{
 			# Empty cache
 			return null;
 		}
 		else
 		{
-			return $this->API->Cache->cache['modules']['by_name'];
+			return $this->Registry->Cache->cache['modules']['by_name'];
 		}
 	}
 
@@ -1195,12 +1195,12 @@ class Module_Handler
 	private function modules__do_create__master_unit ()
 	{
 		# Input
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$faults = array();
 		$struct = array();
 
 		# Clean-up
-		$m_name = $this->API->Input->clean__makesafe_alphanumerical( $input['m_name'] );
+		$m_name = $this->Registry->Input->clean__makesafe_alphanumerical( $input['m_name'] );
 		if ( empty( $m_name ) )
 		{
 			$faults[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Module Name</em> is a required field!" );
@@ -1245,14 +1245,14 @@ class Module_Handler
 		}
 
 		# Calculate module Unique-Id
-		$m_unique_id = "{" . implode( "-", str_split( strtoupper( md5( md5( md5( md5( md5( $m_name ) . $this->API->config['general']['admin_email'] . UNIX_TIME_NOW ) . $this->API->config['general']['admin_name'] ) . $this->API->config['url']['hostname']['http']['full'] ) ) ), 8 ) ) . "}";
+		$m_unique_id = "{" . implode( "-", str_split( strtoupper( md5( md5( md5( md5( md5( $m_name ) . $this->Registry->config['general']['admin_email'] . UNIX_TIME_NOW ) . $this->Registry->config['general']['admin_name'] ) . $this->Registry->config['url']['hostname']['http']['full'] ) ) ), 8 ) ) . "}";
 
 		# Insert
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "insert",
 				"table"  => "modules",
 				"set"    => array(
-						'm_name'                 => ( $this->API->config['modules']['m_names_strtolower'] ) ? strtolower( $m_name ) : $m_name,
+						'm_name'                 => ( $this->Registry->config['modules']['m_names_strtolower'] ) ? strtolower( $m_name ) : $m_name,
 						'm_unique_id'            => $m_unique_id,
 						'm_description'          => $m_description,
 						'm_type'                 => "master",
@@ -1264,10 +1264,10 @@ class Module_Handler
 					)
 			);
 
-		if ( $this->API->Db->simple_exec_query() )
+		if ( $this->Registry->Db->simple_exec_query() )
 		{
 			$_m_unique_id_clean = preg_replace( '#[^a-z0-9]#', "", strtolower( $m_unique_id ) );
-			$struct['tables']['mod_' . $_m_unique_id_clean . '_master_repo'] = $this->API->Db->modules__default_table_structure( "master_repo" );
+			$struct['tables']['mod_' . $_m_unique_id_clean . '_master_repo'] = $this->Registry->Db->modules__default_table_structure( "master_repo" );
 			$struct['tables']['mod_' . $_m_unique_id_clean . '_master_repo']['comment'] = $m_description;
 
 			# Features : COMMENTS
@@ -1277,10 +1277,10 @@ class Module_Handler
 			}
 
 			# CREATE TABLEs
-			$this->API->Db->simple_exec_create_table_struct ( $struct );
+			$this->Registry->Db->simple_exec_create_table_struct ( $struct );
 
 			# On SUCCESS, update cache and respond
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			return array( 'responseCode' => 1, 'responseMessage' => "Module successfully created!", 'responseAction' => "refresh" );
 		}
@@ -1299,7 +1299,7 @@ class Module_Handler
 	private function modules__do_create__connector_unit ()
 	{
 		# Prelim
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$faults = array();
 		$struct = array();
 
@@ -1307,7 +1307,7 @@ class Module_Handler
 		// Continue...
 		//---------------
 
-		if ( ! array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( ! array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
@@ -1324,7 +1324,7 @@ class Module_Handler
 			}
 		}
 
-		$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+		$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 		# Calculate module Unique-Id
 		foreach ( $input['ddl_checklist'] as $_f )
@@ -1351,7 +1351,7 @@ class Module_Handler
 			// INSERT Connector-Unit data and accompanying DDL info
 			//--------------------------------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "insert",
 					'table'  => "modules",
 					'set'    => array(
@@ -1363,12 +1363,12 @@ class Module_Handler
 							'm_is_enabled'           => null,
 						),
 				);
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (INSERT-CONNECTOR-DATA) failed!" );
 			}
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "insert",
 					'table'  => "modules_data_definition",
 					'set'    => array(
@@ -1393,7 +1393,7 @@ class Module_Handler
 							'is_backup'              => $_connector_field['is_backup'],
 						),
 				);
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (INSERT-CONNECTOR-DDL) failed!" );
 			}
@@ -1403,33 +1403,33 @@ class Module_Handler
 
 			# _conn_repo table default structure
 			$struct['tables']['mod_' . $_parent_m_unique_id_clean . '_conn_repo__' . $_connector_field['name'] ] =
-				$this->API->Db->modules__default_table_structure( "connector_repo" );
+				$this->Registry->Db->modules__default_table_structure( "connector_repo" );
 
 			# Attaching connector-enabled field's data-definition to _conn_repo table structire
 			$struct['tables']['mod_' . $_parent_m_unique_id_clean . '_conn_repo__' . $_connector_field['name'] ]['col_info'][ $_connector_field['name'] ] =
-				$this->API->Db->modules__ddl_column_type_translation( $_connector_field );
+				$this->Registry->Db->modules__ddl_column_type_translation( $_connector_field );
 
 			# CREATE TABLEs
-			$this->API->Db->simple_exec_create_table_struct( $struct );
+			$this->Registry->Db->simple_exec_create_table_struct( $struct );
 
 			# Set connector_linked value
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "update",
 					'tables' => "modules_data_definition",
 					'set'    => array( 'connector_linked' => $m_unique_id ),
 					'where'  => array(
-							"name=" . $this->API->Db->quote( $_connector_field['name'] ),
-							"m_unique_id=" . $this->API->Db->quote( $_connector_field['m_unique_id'] ),
+							"name=" . $this->Registry->Db->quote( $_connector_field['name'] ),
+							"m_unique_id=" . $this->Registry->Db->quote( $_connector_field['m_unique_id'] ),
 						),
 				);
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-MODULE-DDL-CONNECTOR-LINKED) failed!" ) );
 			}
 		}
 
 		# Update cache and respond
-		$_recache = $this->API->loader("Cache__Recache");
+		$_recache = $this->Registry->loader("Cache__Recache");
 		$_recache->main( "modules" );
 		$_recache->main( "modules_connectors" );
 
@@ -1446,10 +1446,10 @@ class Module_Handler
 	 */
 	private function modules__do_create__check_availability ( $m_name , $m_unique_id = null )
 	{
-		if ( array_key_exists( strtolower( $m_name ), $this->API->Cache->cache['modules']['by_name'] ) )
+		if ( array_key_exists( strtolower( $m_name ), $this->Registry->Cache->cache['modules']['by_name'] ) )
 		{
 			# Was module name changed at all? Maybe not... Continue in that case.
-			if ( !is_null( $m_unique_id ) and $this->API->Cache->cache['modules']['by_name'][ $m_name ]['m_unique_id'] == $m_unique_id )
+			if ( !is_null( $m_unique_id ) and $this->Registry->Cache->cache['modules']['by_name'][ $m_name ]['m_unique_id'] == $m_unique_id )
 			{
 				return true;
 			}
@@ -1471,18 +1471,18 @@ class Module_Handler
 	private function modules__do_edit ()
 	{
 		# Input
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$faults = array();
 
 		# Is it a valid module?
-		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			$faults[] = array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
-		$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+		$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 		# Clean-up
-		$m_name = $this->API->Input->clean__makesafe_alphanumerical( $input['m_name'] );
+		$m_name = $this->Registry->Input->clean__makesafe_alphanumerical( $input['m_name'] );
 		if ( empty( $m_name ) )
 		{
 			$faults[] = array( 'faultCode' => 701, 'faultMessage' => "<em>Module Name</em> is a required field!" );
@@ -1536,30 +1536,30 @@ class Module_Handler
 		}
 
 		# UPDATE
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "update",
 				'tables' => "modules",
 				'set'    => array(
-						'm_name'                 => ( $this->API->config['modules']['m_names_strtolower'] ) ? strtolower( $m_name ) : $m_name,
+						'm_name'                 => ( $this->Registry->config['modules']['m_names_strtolower'] ) ? strtolower( $m_name ) : $m_name,
 						'm_description'          => $m_description,
 						'm_enforce_ssl'          => $input['m_enforce_ssl'] ? 1 : 0,
 						'm_extras'               => serialize( $m_extras_new ),
 						'm_enable_caching'       => $input['m_enable_caching'] ? 1 : 0,
 						'm_is_enabled'           => 0
 					),
-				'where'  => "m_unique_id = " . $this->API->Db->quote( $m['m_unique_id'] )
+				'where'  => "m_unique_id = " . $this->Registry->Db->quote( $m['m_unique_id'] )
 			);
 
-		if ( $this->API->Db->simple_exec_query() )
+		if ( $this->Registry->Db->simple_exec_query() )
 		{
 			# Updating table COMMENT
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	   => "alter",
 					'table'    => "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 					'action'   => "comment",
 					'comment'  => $m_description,
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
 			# Dropping tables of removed extras
 			$tables = array();
@@ -1577,14 +1577,14 @@ class Module_Handler
 			}
 			if ( count( $tables ) )
 			{
-				$this->API->Db->simple_exec_drop_table( $tables );
+				$this->Registry->Db->simple_exec_drop_table( $tables );
 			}
 
 			# Newly added features : TAGS
 			$struct = array();
 			if ( in_array( "tags" , $_list_of_added_extras ) )
 			{
-				$struct['tables']['mod_' . $m['m_unique_id_clean'] . '_tags'] = $this->API->Db->modules__default_table_structure( "tags" );
+				$struct['tables']['mod_' . $m['m_unique_id_clean'] . '_tags'] = $this->Registry->Db->modules__default_table_structure( "tags" );
 			}
 
 			# Features : COMMENTS
@@ -1596,11 +1596,11 @@ class Module_Handler
 			# CREATE TABLEs
 			if ( count( $struct ) )
 			{
-				$this->API->Db->simple_exec_create_table_struct ( $struct );
+				$this->Registry->Db->simple_exec_create_table_struct ( $struct );
 			}
 
 			# On SUCCESS, update cache and respond
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			return array( 'responseCode' => 1, 'responseMessage' => "Module successfully modified! Please note that the module also has been disabled!<br />Refreshing...", 'responseAction' => "refresh" );
 		}
@@ -1622,7 +1622,7 @@ class Module_Handler
 		// Prelim
 		//----------
 
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 
 		//-----------
 		// Cleanup
@@ -1632,11 +1632,11 @@ class Module_Handler
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "No module was selected! Please select one..." );
 		}
-		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
-		$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+		$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 		//----------------------------------------------------------------------------------------------------
 		// Let's determine the list of m_unique_id's and c_unique_id's, and the tables associated with them
@@ -1659,20 +1659,20 @@ class Module_Handler
 		//print_r($_list_of_unique_ids_to_process); print_r($_list_of_tables_to_drop); exit;
 
 		# Quoted $_list_of_unique_ids_to_process
-		$_list_of_unique_ids_to_process = array_map( array( $this->API->Db->db , "quote" ) , $_list_of_unique_ids_to_process );
+		$_list_of_unique_ids_to_process = array_map( array( $this->Registry->Db->db , "quote" ) , $_list_of_unique_ids_to_process );
 
 		//---------------------------
 		// Remove Module Record(s)
 		//---------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	  =>  "delete",
 				'table'   =>  "modules",
 				'where'   =>  "m_unique_id IN ("
 					. implode( "," , $_list_of_unique_ids_to_process )
 					. ")",
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//------------------------------
 		// ... and all related tables
@@ -1680,52 +1680,52 @@ class Module_Handler
 
 		if ( count( $_list_of_tables_to_drop ) )
 		{
-			$this->API->Db->simple_exec_drop_table( $_list_of_tables_to_drop );
+			$this->Registry->Db->simple_exec_drop_table( $_list_of_tables_to_drop );
 		}
 
 		//---------------------------------------------------------------------------
 		// ... and all related data-definitions [incl. those of container-units'
 		//---------------------------------------------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'      =>  "delete",
 				'table'   =>  "modules_data_definition",
 				'where'   =>  "m_unique_id IN ("
 					. implode( "," , $_list_of_unique_ids_to_process )
 					. ")",
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//---------------------------
 		// ... and all subroutines
 		//---------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 =>  "delete",
 				'table'  =>  "modules_subroutines",
-				'where'  =>  array( "m_unique_id = " . $this->API->Db->quote( $m['m_unique_id'] ) ),
+				'where'  =>  array( "m_unique_id = " . $this->Registry->Db->quote( $m['m_unique_id'] ) ),
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//--------------------
 		// ... and all tags
 		//--------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 =>  "delete",
 				'table'  =>  "data_repos__tags",
 				'where'   =>  "m_unique_id IN ("
 					. implode( "," , $_list_of_unique_ids_to_process )
 					. ")",
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//------------
 		// Return
 		//------------
 
 		# Update cache
-		$_recache = $this->API->loader("Cache__Recache");
+		$_recache = $this->Registry->loader("Cache__Recache");
 		$_recache->main( "modules" );
 		$_recache->main( "modules_connectors" );
 		return array( 'responseCode' => 1, 'responseMessage' => "Module (and its subroutines) successfully removed! Skin templates are still remaining in system!", 'responseAction' => "refresh" );
@@ -1751,16 +1751,16 @@ class Module_Handler
 			return false;
 		}
 
-		if ( array_key_exists( $m_unique_id , $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $m_unique_id , $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$return['me'] = $this->API->Modules->modules__do_load( $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ] );
-			$return['others'] = $this->API->Cache->cache['modules']['by_unique_id'];
+			$return['me'] = $this->Registry->Modules->modules__do_load( $this->Registry->Cache->cache['modules']['by_unique_id'][ $m_unique_id ] );
+			$return['others'] = $this->Registry->Cache->cache['modules']['by_unique_id'];
 			unset( $return['others'][ $m_unique_id ] );                        // Removing 'me'-self from among 'others' :D
 		}
 		else
 		{
 			# No such module? Redirect back to Components
-			$this->API->http_redirect( SITE_URL . "/acp/components" );
+			$this->Registry->http_redirect( SITE_URL . "/acp/components" );
 		}
 
 		return $return;
@@ -1774,12 +1774,12 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_create ()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$faults = array();
 
-		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+			$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 			//-------------------------
 			// Modules Cache Cleanup
@@ -1793,7 +1793,7 @@ class Module_Handler
 
 			$_list_of_reserved_names = array( "id" , "tags" , "timestamp" , "submitted_by" , "status_published" , "status_locked" );
 			$ddl_config__validated = array(
-					'name'         => $this->API->config['modules']['m_names_strtolower'] ? strtolower( $input['name'] ) : $input['name'],
+					'name'         => $this->Registry->config['modules']['m_names_strtolower'] ? strtolower( $input['name'] ) : $input['name'],
 					'label'        => $input['label'],
 					'is_required'  => $input['is_required'] ? 1 : 0,
 					'position'     => count( $m['m_data_definition'] ) + 1,
@@ -1833,7 +1833,7 @@ class Module_Handler
 			//--------------------------------------------------------------------
 
 			# TYPE: Validation...
-			if ( ( $_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $input['type'] ) ) ) === false )
+			if ( ( $_processor_instance = $this->Registry->loader( "Data_Processors__" . ucwords( $input['type'] ) ) ) === false )
 			{
 				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['type'] . "</em>!" );
 			}
@@ -1846,25 +1846,25 @@ class Module_Handler
 			}
 
 			# Continue...
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'         =>  "alter",
 					'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 					'action'     =>  "add_column",
-					'col_info'   =>  $this->API->Db->modules__ddl_column_type_translation( $ddl_config__validated , true )
+					'col_info'   =>  $this->Registry->Db->modules__ddl_column_type_translation( $ddl_config__validated , true )
 				);
 
-			if ( $this->API->Db->simple_exec_query() )
+			if ( $this->Registry->Db->simple_exec_query() )
 			{
 				# INSERT - modules_data_definition
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'     =>  "insert",
 						'table'  =>  "modules_data_definition",
 						'set'    =>  $ddl_config__validated,
 					);
-				if ( $this->API->Db->simple_exec_query() )
+				if ( $this->Registry->Db->simple_exec_query() )
 				{
 					# On SUCCESS, update cache and respond
-					$_recache = $this->API->loader("Cache__Recache");
+					$_recache = $this->Registry->loader("Cache__Recache");
 					$_recache->main( "modules" );
 					return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully added!<br />Refreshing...' , 'responseAction' => 'refresh' );
 				}
@@ -1892,13 +1892,13 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_edit__pre_processing ()
 	{
-		if ( !is_null( $this->API->Input->post("m_unique_id") ) and $m = $this->modules__do_view( $this->API->Input->post("m_unique_id") ) )
+		if ( !is_null( $this->Registry->Input->post("m_unique_id") ) and $m = $this->modules__do_view( $this->Registry->Input->post("m_unique_id") ) )
 		{
-			if ( $m['me']['m_data_definition'][ $this->API->Input->post("ddl_checklist") ]['is_backup'] )
+			if ( $m['me']['m_data_definition'][ $this->Registry->Input->post("ddl_checklist") ]['is_backup'] )
 			{
 				return null;
 			}
-			$_field =& $m['me']['m_data_definition'][ $this->API->Input->post("ddl_checklist") ];  // Just for convenience...
+			$_field =& $m['me']['m_data_definition'][ $this->Registry->Input->post("ddl_checklist") ];  // Just for convenience...
 			$return = array(
 					'name'                           => $_field['name'],
 					'label'                          => $_field['label'],
@@ -1935,12 +1935,12 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_edit ()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$faults = array();
 
-		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+			$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 			//-------------------------
 			// Modules Cache Cleanup
@@ -1954,7 +1954,7 @@ class Module_Handler
 
 			$_list_of_reserved_names = array( "id", "tags", "timestamp", "submitted_by", "status_published", "status_locked" );
 			$ddl_config__validated = array(
-					'name'         => $this->API->config['modules']['m_names_strtolower'] ? strtolower( $input['name__old'] ) : $input['name__old'],
+					'name'         => $this->Registry->config['modules']['m_names_strtolower'] ? strtolower( $input['name__old'] ) : $input['name__old'],
 					'label'        => $input['label'],
 				);
 
@@ -1998,7 +1998,7 @@ class Module_Handler
 			//--------------------------------------------------------------------
 
 			# TYPE: Validation...
-			if ( ( $_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $input['type'] ) ) ) === false )
+			if ( ( $_processor_instance = $this->Registry->loader( "Data_Processors__" . ucwords( $input['type'] ) ) ) === false )
 			{
 				$faults[] = array( 'faultCode' => 703, 'faultMessage' => "Invalid data-type: <em>" . $input['type'] . "</em>!" );
 			}
@@ -2043,16 +2043,16 @@ class Module_Handler
 			// Database : ALTER *_master_repo table
 			//-----------------------------------------
 
-			$ddl_config__validated__translated = $this->API->Db->modules__ddl_column_type_translation( $ddl_config__validated , true );
+			$ddl_config__validated__translated = $this->Registry->Db->modules__ddl_column_type_translation( $ddl_config__validated , true );
 			$ddl_config__validated__translated['old_name'] = $ddl_config__validated__translated['name']; // For SQL 'ALTER CHANGE' operation
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'         =>  "alter",
 					'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 					'action'     =>  "change_column",
 					'col_info'   =>  array( $ddl_config__validated__translated['name'] => $ddl_config__validated__translated )
 				);
-			if ( ! $this->API->Db->simple_exec_query() )
+			if ( ! $this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to alter Master-Repo table for reasons unknown!" );
 			}
@@ -2063,22 +2063,22 @@ class Module_Handler
 
 			if ( $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_enabled'] and ! empty( $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_linked'] ) )
 			{
-				$ddl_config__validated__translated_for_conn = $this->API->Db->modules__ddl_column_type_translation( $ddl_config__validated );
+				$ddl_config__validated__translated_for_conn = $this->Registry->Db->modules__ddl_column_type_translation( $ddl_config__validated );
 				$ddl_config__validated__translated_for_conn['old_name'] = $ddl_config__validated__translated_for_conn['name']; // For SQL 'ALTER CHANGE' operation
 
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'         =>  "alter",
 						'table'      =>  "mod_" . $m['m_unique_id_clean'] . "_conn_repo__" . strtolower( $ddl_config__validated['name'] ),
 						'action'     =>  "change_column",
 						'col_info'   =>  array( $ddl_config__validated__translated_for_conn['name'] => $ddl_config__validated__translated_for_conn )
 					);
-				if ( ! $this->API->Db->simple_exec_query() )
+				if ( ! $this->Registry->Db->simple_exec_query() )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "DB-handler Failed to alter Conn-Repo table for reasons unknown!" );
 				}
 
 				# Update DDL-record of Title-field for corresponding connector unit
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'     =>  "update",
 						'tables' =>  "modules_data_definition",
 						'set'    =>  array_merge( // Updating ...
@@ -2091,31 +2091,31 @@ class Module_Handler
 									)
 							),
 						'where'  =>  array(
-								"m_unique_id=" . $this->API->Db->quote( $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_linked'] ),
-								"name=" . $this->API->Db->quote( $ddl_config__validated['name'] ),
+								"m_unique_id=" . $this->Registry->Db->quote( $m['m_data_definition'][ $ddl_config__validated['name'] ]['connector_linked'] ),
+								"name=" . $this->Registry->Db->quote( $ddl_config__validated['name'] ),
 							),
 					);
-				$this->API->Db->simple_exec_query();
+				$this->Registry->Db->simple_exec_query();
 
-				$this->API->loader("Cache__Recache")->main( "modules_connectors" );
+				$this->Registry->loader("Cache__Recache")->main( "modules_connectors" );
 			}
 
 			//------------------------------------------------
 			// Database : INSERT - modules_data_definition
 			//------------------------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     =>  "update",
 					'tables' =>  "modules_data_definition",
 					'set'    =>  $ddl_config__validated,
 					'where'  =>  array(
-							"m_unique_id=" . $this->API->Db->quote( $ddl_config__validated['m_unique_id'] ),
-							"name=" . $this->API->Db->quote( $ddl_config__validated['name'] ),
+							"m_unique_id=" . $this->Registry->Db->quote( $ddl_config__validated['m_unique_id'] ),
+							"name=" . $this->Registry->Db->quote( $ddl_config__validated['name'] ),
 						),
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully altered!<br />Refreshing...' , 'responseAction' => 'refresh' );
@@ -2135,13 +2135,13 @@ class Module_Handler
 	private function modules__ddl__mimelist__do_fetch ()
 	{
 		# Fetch MIMELIST cache
-		$_mimelist_cache = $this->API->Cache->cache__do_get("mimelist");
+		$_mimelist_cache = $this->Registry->Cache->cache__do_get("mimelist");
 
 		# Fetch what we need
 		$_mimelist_cache__subset =
-			( !is_null( $this->API->Input->request("mimetype") ) and in_array( $this->API->Input->request("mimetype") , array( "image", "audio", "video" ) ) )
+			( !is_null( $this->Registry->Input->request("mimetype") ) and in_array( $this->Registry->Input->request("mimetype") , array( "image", "audio", "video" ) ) )
 			?
-			array_values( $_mimelist_cache['by_type'][ $this->API->Input->request("mimetype") ] )
+			array_values( $_mimelist_cache['by_type'][ $this->Registry->Input->request("mimetype") ] )
 			:
 			array_values( $_mimelist_cache['by_ext'] );
 
@@ -2165,7 +2165,7 @@ class Module_Handler
 	{
 		$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine['request']['m_unique_id_clean'] ), 8 ) ) . "}";
 
-		$_position_information = $this->API->Input->post("position");
+		$_position_information = $this->Registry->Input->post("position");
 		/**
 		 * If we don't have position-information, we guess it, based on DDL-information, since DDL-info is fetched with sorting.
 		 *
@@ -2175,7 +2175,7 @@ class Module_Handler
 		{
 			$_position_information = array();
 			$_i = 0;
-			foreach ( $this->API->Cache->cache['modules']['by_unique_id'][ $m_unique_id ]['m_data_definition'] as $_field_info )
+			foreach ( $this->Registry->Cache->cache['modules']['by_unique_id'][ $m_unique_id ]['m_data_definition'] as $_field_info )
 			{
 				$_position_information[ $_i ] = $_field_info['name'];
 				$_i++;
@@ -2185,20 +2185,20 @@ class Module_Handler
 		$_rows_affected = 0;
 		foreach ( $_position_information as $_position=>$_name )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'      =>  "update",
 					'tables'  =>  "modules_data_definition",
 					'set'     =>  array( 'position' => $_position + 1 ),
 					'where'   =>  array(
-							"name="        . $this->API->Db->quote( $_name ),
-							"m_unique_id=" . $this->API->Db->quote( $m_unique_id ),
+							"name="        . $this->Registry->Db->quote( $_name ),
+							"m_unique_id=" . $this->Registry->Db->quote( $m_unique_id ),
 						),
 				);
-			$_rows_affected += $this->API->Db->simple_exec_query();
+			$_rows_affected += $this->Registry->Db->simple_exec_query();
 		}
 		if ( $_rows_affected )
 		{
-			$this->API->loader("Cache__Recache")->main( "modules" );
+			$this->Registry->loader("Cache__Recache")->main( "modules" );
 		}
 
 		return array( 'responseCode' => 1, 'responseMessage' => "Re-order successful! Refreshing in 2 seconds..." );
@@ -2227,12 +2227,12 @@ class Module_Handler
 		else
 		{
 			# Regular REQUEST
-			$input = $this->API->Input->post();
+			$input = $this->Registry->Input->post();
 		}
 
-		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+			$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 			# Continue...
 			if ( !isset( $input['ddl_checklist'] ) or !is_array( $input['ddl_checklist'] ) or !count( $input['ddl_checklist'] ) )
@@ -2275,7 +2275,7 @@ class Module_Handler
 			$list_of_c_unique_ids_to_process        = array(); // Connector-Unit IDs, for future reference
 			foreach ( $list_of_columns_to_process as $name )
 			{
-				$list_of_columns_to_process__translated[ $name ] = $this->API->Db->modules__ddl_column_type_translation(
+				$list_of_columns_to_process__translated[ $name ] = $this->Registry->Db->modules__ddl_column_type_translation(
 						$m['m_data_definition'][ $name ] ,
 						true
 					);
@@ -2296,7 +2296,7 @@ class Module_Handler
 			# Execute...
 			if ( $input['do_backup_dropped_field'] )
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'        =>  "alter",
 						'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 						'action'    =>  "change_column",
@@ -2305,14 +2305,14 @@ class Module_Handler
 			}
 			else
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'        =>  "alter",
 						'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 						'action'    =>  "drop_column",
 						'col_info'  =>  $list_of_columns_to_process__translated
 					);
 			}
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (ALTER-MODULE-DDL) failed!" );
 			}
@@ -2324,14 +2324,14 @@ class Module_Handler
 
 			if ( $input['do_backup_dropped_field'] )
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'      =>  "update",
 						'tables'  =>  "modules_data_definition",
 						'set'     =>  array( 'is_backup' => 1 ),
 						'where'   =>  array(
-								"m_unique_id=" . $this->API->Db->quote( $input['m_unique_id'] ),
+								"m_unique_id=" . $this->Registry->Db->quote( $input['m_unique_id'] ),
 								"name IN ("
-									. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+									. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 								. ")",
 							),
 					);
@@ -2342,33 +2342,33 @@ class Module_Handler
 				{
 					$_where_clause =
 						"m_unique_id IN ("
-							. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
+							. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
 						. ")"
 						. " OR "
 						. "("
-							. "m_unique_id=" . $this->API->Db->quote( $input['m_unique_id'] )
+							. "m_unique_id=" . $this->Registry->Db->quote( $input['m_unique_id'] )
 							. " AND "
 							. "name IN ("
-								. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+								. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 							. ")"
 						. ")";
 				}
 				else
 				{
 					$_where_clause = array(
-							"m_unique_id=" . $this->API->Db->quote( $input['m_unique_id'] ),
+							"m_unique_id=" . $this->Registry->Db->quote( $input['m_unique_id'] ),
 							"name IN ("
-								. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+								. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 							. ")",
 						);
 				}
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'      =>  "delete",
 						'table'   =>  "modules_data_definition",
 						'where'   =>  $_where_clause,
 					);
 			}
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-DDL-RECORD) failed!" );
 			}
@@ -2380,16 +2380,16 @@ class Module_Handler
 			if ( !$input['do_backup_dropped_field'] and count( $list_of_c_unique_ids_to_process ) )
 			{
 				# Connector-Unit data removal
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'      =>  "delete",
 						'table'   =>  "modules",
 						'where'   =>  array(
 								"m_unique_id IN ("
-									. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
+									. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
 								. ")",
 							),
 					);
-				$this->API->Db->simple_exec_query();
+				$this->Registry->Db->simple_exec_query();
 
 				# Connector-Unit table(s) removal
 				$_list_of_tables_to_drop = array();                            // List of Connector-Unit tables to drop
@@ -2399,7 +2399,7 @@ class Module_Handler
 				}
 				if ( count( $_list_of_tables_to_drop ) )
 				{
-					if ( !$this->API->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
+					if ( !$this->Registry->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
 					{
 						return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-CONNECTOR-TABLES) failed!" );
 					}
@@ -2413,13 +2413,13 @@ class Module_Handler
 
 			if ( in_array( $m['m_title_column'] , $list_of_columns_to_process ) )
 			{
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'       =>  "update",
 						'tables'   =>  "modules",
 						'set'      =>  array( 'm_title_column' => null ),
-						'where'    =>  "m_unique_id = " . $this->API->Db->quote( $input['m_unique_id'] )
+						'where'    =>  "m_unique_id = " . $this->Registry->Db->quote( $input['m_unique_id'] )
 					);
-				if ( !$this->API->Db->simple_exec_query() )
+				if ( !$this->Registry->Db->simple_exec_query() )
 				{
 					return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-MODULES-TITLE-FIELD-RECORD) failed!" );
 				}
@@ -2429,7 +2429,7 @@ class Module_Handler
 			// SUCCESS : Update cache and reorder DDL
 			//------------------------------------------
 
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			$this->modules__ddl__do_sort();
@@ -2448,11 +2448,11 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_drop_backup ()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 
-		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+			$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 			# Little cleanup - Cache-wise
 			$this->modules__do_cleanup( $m );
@@ -2489,7 +2489,7 @@ class Module_Handler
 			$list_of_c_unique_ids_to_process        = array();                 // Connector-Unit IDs, for future reference
 			foreach ( $list_of_columns_to_process as $name )
 			{
-				$list_of_columns_to_process__translated[ $name ] = $this->API->Db->modules__ddl_column_type_translation(
+				$list_of_columns_to_process__translated[ $name ] = $this->Registry->Db->modules__ddl_column_type_translation(
 						$m['m_data_definition_bak'][ $name ] ,
 						true
 					);
@@ -2502,14 +2502,14 @@ class Module_Handler
 			}
 
 			# Execute...
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'        =>  "alter",
 					'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 					'action'    =>  "drop_column",
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
 
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-MODULE-FIELD) failed!" );
 			}
@@ -2523,32 +2523,32 @@ class Module_Handler
 			{
 				$_where_clause =
 					"m_unique_id IN ("
-						. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
+						. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
 					. ")"
 					. " OR "
 					. "("
-						. "m_unique_id=" . $this->API->Db->quote( $input['m_unique_id'] )
+						. "m_unique_id=" . $this->Registry->Db->quote( $input['m_unique_id'] )
 						. " AND "
 						. "name IN ("
-							. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+							. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 						. ")"
 					. ")";
 			}
 			else
 			{
 				$_where_clause = array(
-						"m_unique_id=" . $this->API->Db->quote( $input['m_unique_id'] ),
+						"m_unique_id=" . $this->Registry->Db->quote( $input['m_unique_id'] ),
 						"name IN ("
-							. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+							. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 						. ")",
 					);
 			}
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'      =>  "delete",
 					'table'   =>  "modules_data_definition",
 					'where'   =>  $_where_clause,
 				);
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (UPDATE-DDL-RECORD) failed!" );
 			}
@@ -2560,16 +2560,16 @@ class Module_Handler
 			if ( count( $list_of_c_unique_ids_to_process ) )
 			{
 				# Connector-Unit data removal
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'      =>  "delete",
 						'table'   =>  "modules",
 						'where'   =>  array(
 								"m_unique_id IN ("
-									. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
+									. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_c_unique_ids_to_process ) )
 								. ")",
 							),
 					);
-				$this->API->Db->simple_exec_query();
+				$this->Registry->Db->simple_exec_query();
 
 				# Connector-Unit table(s) removal
 				$_list_of_tables_to_drop = array();                            // List of Connector-Unit tables to drop
@@ -2579,7 +2579,7 @@ class Module_Handler
 				}
 				if ( count( $_list_of_tables_to_drop ) )
 				{
-					if ( !$this->API->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
+					if ( !$this->Registry->Db->simple_exec_drop_table( $_list_of_tables_to_drop ) )
 					{
 						return array( 'faultCode' => 0, 'faultMessage' => "Database query (DROP-CONNECTOR-TABLES) failed!" );
 					}
@@ -2591,7 +2591,7 @@ class Module_Handler
 			// SUCCESS : Update cache and respond
 			//--------------------------------------
 
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully dropped!<br />Refreshing...' , 'responseAction' => "refresh" );
@@ -2610,11 +2610,11 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_restore_backup ()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 
-		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+			$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 			# Little cleanup - Cache-wise
 			$this->modules__do_cleanup( $m );
@@ -2649,7 +2649,7 @@ class Module_Handler
 			$list_of_columns_to_process__translated = array();
 			foreach ( $list_of_columns_to_process as $name )
 			{
-				$list_of_columns_to_process__translated[ $name ] = $this->API->Db->modules__ddl_column_type_translation(
+				$list_of_columns_to_process__translated[ $name ] = $this->Registry->Db->modules__ddl_column_type_translation(
 						$m['m_data_definition_bak'][ $name ] ,
 						true
 					);
@@ -2658,13 +2658,13 @@ class Module_Handler
 			}
 
 			# CHANGEs
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'        =>  "alter",
 					'table'     =>  "mod_" . $m['m_unique_id_clean'] . "_master_repo",
 					'action'    =>  "change_column",
 					'col_info'  =>  $list_of_columns_to_process__translated
 				);
-			if ( !$this->API->Db->simple_exec_query() )
+			if ( !$this->Registry->Db->simple_exec_query() )
 			{
 				return array( 'faultCode' => 0, 'faultMessage' => "Database query (RESTORE-MODULE-FIELD) failed!" );
 			}
@@ -2673,22 +2673,22 @@ class Module_Handler
 			// UPDATE :  module_data_definition
 			//------------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'      =>  "update",
 					'tables'  =>  "modules_data_definition",
 					'set'     =>  array( 'is_backup' => 0 ),
 					'where'   =>  array(
-							"m_unique_id=" . $this->API->Db->quote( $input['m_unique_id'] ),
+							"m_unique_id=" . $this->Registry->Db->quote( $input['m_unique_id'] ),
 							"name IN ("
-								. implode( "," , array_map( array( $this->API->Db->db , "quote" ) , $list_of_columns_to_process ) )
+								. implode( "," , array_map( array( $this->Registry->Db->db , "quote" ) , $list_of_columns_to_process ) )
 								. ")",
 						),
 				);
 
-			if ( $this->API->Db->simple_exec_query() )
+			if ( $this->Registry->Db->simple_exec_query() )
 			{
 				# On SUCCESS, update cache and respond
-				$_recache = $this->API->loader("Cache__Recache");
+				$_recache = $this->Registry->loader("Cache__Recache");
 				$_recache->main( "modules" );
 				$_recache->main( "modules_connectors" );
 				return array( 'responseCode' => 1 , 'responseMessage' => 'Success! Field-registry successfully restored!<br />Refreshing...' , 'responseAction' => "refresh" );
@@ -2712,11 +2712,11 @@ class Module_Handler
 	 */
 	private function modules__ddl__do_set_title_column ()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 
-		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
-			$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+			$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 			if ( empty( $input['ddl_checklist'] ) )
 			{
@@ -2736,19 +2736,19 @@ class Module_Handler
 					//----------------------------------------------------------
 
 					$_ddl_information =& $m['m_data_definition'][ $input['ddl_checklist'] ];
-					$_processor_instance = $this->API->loader( "Data_Processors__" . ucwords( $_ddl_information['type'] ) );
+					$_processor_instance = $this->Registry->loader( "Data_Processors__" . ucwords( $_ddl_information['type'] ) );
 					if ( $_processor_instance->modules__ddl__is_eligible_for_title( $_ddl_information ) )
 					{
-						$this->API->Db->cur_query = array(
+						$this->Registry->Db->cur_query = array(
 								'do'       =>  "update",
 								'tables'   =>  "modules",
 								'set'      =>  array( 'm_title_column' => $input['ddl_checklist'] ),
-								'where'    =>  "m_unique_id = " . $this->API->Db->quote( $input['m_unique_id'] )
+								'where'    =>  "m_unique_id = " . $this->Registry->Db->quote( $input['m_unique_id'] )
 							);
-						if ( $this->API->Db->simple_exec_query() )
+						if ( $this->Registry->Db->simple_exec_query() )
 						{
 							# On SUCCESS, update cache and respond
-							$_recache = $this->API->loader("Cache__Recache");
+							$_recache = $this->Registry->loader("Cache__Recache");
 							$_recache->main( "modules" );
 							return array( 'responseCode' => 1 , 'responseMessage' => "Success! Field successfully set as Title!<br />Refreshing..." , 'responseAction' => "refresh" );
 						}
@@ -2785,11 +2785,11 @@ class Module_Handler
 	{
 		if ( is_null( $input ) )
 		{
-			$input = $this->API->Input->post();
+			$input = $this->Registry->Input->post();
 		}
 		$faults = array();
 
-		if ( array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			//------------------
 			// Main container
@@ -2804,7 +2804,7 @@ class Module_Handler
 			$subroutine['s_data_source'] = $input['s_data_source'];
 			$subroutine['s_data_target'] = $input['s_data_target'];
 
-			$faults = $this->API->loader( "Data_Sources__" . ucwords( $subroutine['s_data_source'] ) )->modules__subroutines__do_validate( $subroutine, $input );
+			$faults = $this->Registry->loader( "Data_Sources__" . ucwords( $subroutine['s_data_source'] ) )->modules__subroutines__do_validate( $subroutine, $input );
 
 		}
 		else
@@ -2830,15 +2830,15 @@ class Module_Handler
 		$subroutine['s_fetch_criteria']     = serialize( $subroutine['s_fetch_criteria'] );
 		$subroutine['m_unique_id']          = $input['m_unique_id'];
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "insert",
 				'table'  => "modules_subroutines",
 				'set'    => $subroutine
 			);
 
-		if ( $this->API->Db->simple_exec_query() )
+		if ( $this->Registry->Db->simple_exec_query() )
 		{
-			$_recache = $this->API->loader("Cache__Recache");
+			$_recache = $this->Registry->loader("Cache__Recache");
 			$_recache->main( "modules" );
 			return array( 'responseCode' => 1 , 'responseMessage' => 'Subroutine successfully created!<br />Refreshing...' );
 		}
@@ -2856,14 +2856,14 @@ class Module_Handler
 	 */
 	private function modules__subroutines__do_remove ()
 	{
-		$input =& $this->API->Input->request();
+		$input =& $this->Registry->Input->request();
 
-		if ( !array_key_exists( $input['m_unique_id'], $this->API->Cache->cache['modules']['by_unique_id'] ) )
+		if ( !array_key_exists( $input['m_unique_id'], $this->Registry->Cache->cache['modules']['by_unique_id'] ) )
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
 
-		$m =& $this->API->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
+		$m =& $this->Registry->Cache->cache['modules']['by_unique_id'][ $input['m_unique_id'] ];
 
 		if ( isset( $input['s_name'] ) and !empty( $input['s_name'] ) )
 		{
@@ -2885,15 +2885,15 @@ class Module_Handler
 		// Still here? Continue processing the request
 		//-----------------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "delete",
 				'table'  => "modules_subroutines",
 				'where'  => array( "s_name = '" . $input['s_name'] . "'" , "m_unique_id = '" . $input['m_unique_id'] . "'" )
 			);
 
-		if ( $this->API->Db->simple_exec_query() )
+		if ( $this->Registry->Db->simple_exec_query() )
 		{
-			$this->API->loader("Cache__Recache")->main( "modules" );
+			$this->Registry->loader("Cache__Recache")->main( "modules" );
 
 			return array( 'responseCode' => 1 , 'responseMessage' => "Success! Subroutine successfully removed!<br />Refreshing...", 'responseAction' => "refresh" );
 		}
@@ -2912,16 +2912,16 @@ class Module_Handler
 	private function settings__do_show ()
 	{
 	$data = array();
-		if ( isset( $this->API->Cache->cache['settings'] ) and count( $this->API->Cache->cache['settings'] ) )
+		if ( isset( $this->Registry->Cache->cache['settings'] ) and count( $this->Registry->Cache->cache['settings'] ) )
 		{
-			foreach ( $this->API->Cache->cache['settings']['by_id'] as $_group_id=>$_group_data )
+			foreach ( $this->Registry->Cache->cache['settings']['by_id'] as $_group_id=>$_group_data )
 			{
 				if ( $_group_data['conf_group_noshow'] )
 				{
 					continue;
 				}
 
-				$_settings_by_group = $this->API->Cache->cache['settings']['by_id'][ $_group_id ];
+				$_settings_by_group = $this->Registry->Cache->cache['settings']['by_id'][ $_group_id ];
 				foreach ( $_settings_by_group as $_k=>&$_v )
 				{
 					if ( is_array( $_v ) )
@@ -2939,14 +2939,14 @@ class Module_Handler
 							{
 								if ( $_v['conf_extra'] == '#show_groups#' )
 								{
-									foreach ( $this->API->Cache->cache['member_groups'] as $__k=>$__v )
+									foreach ( $this->Registry->Cache->cache['member_groups'] as $__k=>$__v )
 									{
 										$_conf_extra[ $__v['g_id'] ] = $__v['g_title'];
 									}
 								}
 								elseif ( $_v['conf_extra'] == '#show_skins#' )
 								{
-									foreach ( $this->API->Cache->cache['skins'] as $__k=>$__v )
+									foreach ( $this->Registry->Cache->cache['skins'] as $__k=>$__v )
 									{
 										$_conf_extra[ $__v['set_id'] ] = $__v['set_name'];
 									}
@@ -2995,7 +2995,7 @@ class Module_Handler
 								break;
 
 							case 'multi':
-								$_v['conf_default'] = $this->API->Input->clean__excessive_separators( $_v['conf_default'], "," );
+								$_v['conf_default'] = $this->Registry->Input->clean__excessive_separators( $_v['conf_default'], "," );
 								$_v['conf_default'] = explode( "," , $_v['conf_default'] );
 								if ( strval( $_v['conf_value'] ) == '' )
 								{
@@ -3003,7 +3003,7 @@ class Module_Handler
 								}
 								else
 								{
-									$_v['conf_value'] = $this->API->Input->clean__excessive_separators( $_v['conf_value'], "," );
+									$_v['conf_value'] = $this->Registry->Input->clean__excessive_separators( $_v['conf_value'], "," );
 									$_conf_real_value = explode( "," , $_v['conf_value'] );
 								}
 								break;
@@ -3038,23 +3038,23 @@ class Module_Handler
 	 */
 	private function settings__do_edit ()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		$_rows_affected = 0;
 
 		foreach ( $input['conf_key'] as $_k=>$_v )
 		{
 			$_v = is_array( $_v ) ? implode( "," , $_v ) : $_v;
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "update",
 					'tables' => array("conf_settings"),
 					'set'    => array( "conf_value" => $_v ),
 					'where'  => "conf_key = '" . $_k . "'"
 				);
-			$_rows_affected += $this->API->Db->simple_exec_query();
+			$_rows_affected += $this->Registry->Db->simple_exec_query();
 		}
 		if ( $_rows_affected )
 		{
-			$this->API->loader("Cache__Recache")->main( "settings" );
+			$this->Registry->loader("Cache__Recache")->main( "settings" );
 			return array( 'responseCode' => 1, 'responseMessage' => "Settings successfully updated! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}
 
@@ -3069,19 +3069,19 @@ class Module_Handler
 	 */
 	private function settings__do_revert()
 	{
-		$input = $this->API->Input->post();
+		$input = $this->Registry->Input->post();
 		if ( !empty( $input['revert__for'] ) )
 		{
 			$setting_id = intval( $input['revert__for'] );
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					"do"     => "update",
 					"tables" => array("conf_settings"),
 					"set"    => array( "conf_value" => new Zend_Db_Expr("NULL") ),
-					"where"  => "conf_id = " . $this->API->Db->quote( $setting_id, "INTEGER" ),
+					"where"  => "conf_id = " . $this->Registry->Db->quote( $setting_id, "INTEGER" ),
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
-			$this->API->loader("Cache__Recache")->main( "settings" );
+			$this->Registry->loader("Cache__Recache")->main( "settings" );
 
 			return array( 'responseCode' => 1 , 'responseMessage' => "Setting successfully reverted to its default value! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}

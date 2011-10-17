@@ -25,15 +25,15 @@ class Db__Drivers__Mysqli extends Database
 	/**
 	 * Constructor
 	 *
-	 * @param    object    REFERENCE: API Object
+	 * @param    object    REFERENCE: Registry Object
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		# Bring-in API Object
-		$this->API = $API;
+		# Bring-in Registry Object
+		$this->Registry = $Registry;
 
 		# Zend Db
-		$this->API->loader( "Zend_Db", false );
+		$this->Registry->loader( "Zend_Db", false );
 
 		# Db options
 		$driver_options = array(
@@ -46,10 +46,10 @@ class Db__Drivers__Mysqli extends Database
 
 		# Preparing DSN and Options for PEAR DB::connect
 		$params = array(
-				'host'            => &$this->API->config['sql']['host'],
-				'username'        => &$this->API->config['sql']['user'],
-				'password'        => &$this->API->config['sql']['passwd'],
-				'dbname'          => &$this->API->config['sql']['dbname'],
+				'host'            => &$this->Registry->config['sql']['host'],
+				'username'        => &$this->Registry->config['sql']['user'],
+				'password'        => &$this->Registry->config['sql']['passwd'],
+				'dbname'          => &$this->Registry->config['sql']['dbname'],
 				'driver_options'  => $driver_options,
 				'options'         => $options
 			);
@@ -59,7 +59,7 @@ class Db__Drivers__Mysqli extends Database
 		# Db Profiler
 		if ( IN_DEV )
 		{
-			$this->API->loader( "Zend_Db_Profiler_Firebug", false );
+			$this->Registry->loader( "Zend_Db_Profiler_Firebug", false );
 			$_profiler = new Zend_Db_Profiler_Firebug('All DB Queries');
 			$_profiler->setEnabled( true );
 
@@ -68,7 +68,7 @@ class Db__Drivers__Mysqli extends Database
 
 			# Check connection
 			$_connection = $this->db->getConnection();
-			$this->API->logger__do_log( "Database: Connection " . ( $_connection !== FALSE ? "successful!" : "failed!" ) , $_connection !== FALSE ? "INFO" : "ERROR" );
+			$this->Registry->logger__do_log( "Database: Connection " . ( $_connection !== FALSE ? "successful!" : "failed!" ) , $_connection !== FALSE ? "INFO" : "ERROR" );
 		}
 	}
 
@@ -502,7 +502,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		else
 		{
-			$this->API->loader( "Zend_Db_Exception", false );
+			$this->Registry->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No or bad table references specified for DELETE query");
 		}
 
@@ -528,7 +528,7 @@ class Db__Drivers__Mysqli extends Database
 			}
 			catch ( Zend_Db_Exception $e )
 			{
-				$this->API->exception_handler( $e );
+				$this->Registry->exception_handler( $e );
 				return false;
 			}
 			return $return;
@@ -541,7 +541,7 @@ class Db__Drivers__Mysqli extends Database
 			}
 			catch ( Zend_Db_Exception $e )
 			{
-				$this->API->exception_handler( $e );
+				$this->Registry->exception_handler( $e );
 				return false;
 			}
 			return $return;
@@ -565,7 +565,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		else
 		{
-			$this->API->loader( "Zend_Db_Exception", false );
+			$this->Registry->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No or bad table references specified for INSERT query");
 		}
 
@@ -576,7 +576,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		else
 		{
-			$this->API->loader( "Zend_Db_Exception", false );
+			$this->Registry->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No data specified for SETting in INSERT query");
 		}
 
@@ -587,7 +587,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		catch ( Zend_Db_Exception $e )
 		{
-			$this->API->exception_handler( $e );
+			$this->Registry->exception_handler( $e );
 			return false;
 		}
 	}
@@ -608,14 +608,14 @@ class Db__Drivers__Mysqli extends Database
 		}
 		else
 		{
-			$this->API->loader( "Zend_Db_Exception", false );
+			$this->Registry->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No or bad table references specified for REPLACE query");
 		}
 
 		# "SET"
 		if ( ! isset( $sql['set'] ) or ! is_array( $sql['set'] ) or ! count( $sql['set'] ) )
 		{
-			$this->API->loader( "Zend_Db_Exception", false );
+			$this->Registry->loader( "Zend_Db_Exception", false );
 			throw new Zend_Db_Exception("No data specified for SETting in REPLACE query");
 			return false;
 		}
@@ -652,7 +652,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		catch ( Zend_Db_Exception $e )
 		{
-			$this->API->exception_handler( $e );
+			$this->Registry->exception_handler( $e );
 			return false;
 		}
 	}
@@ -688,7 +688,7 @@ class Db__Drivers__Mysqli extends Database
 	protected final function simple_select_query ( $sql )
 	{
 		$select = $this->db->select();
-		$this->API->loader( "Zend_Db_Select_Exception", false );
+		$this->Registry->loader( "Zend_Db_Select_Exception", false );
 
 		# Columns
 		$fields = array();
@@ -931,7 +931,7 @@ class Db__Drivers__Mysqli extends Database
 				}
 				catch ( Zend_Db_Select_Exception $e )
 				{
-					$this->API->exception_handler( $e );
+					$this->Registry->exception_handler( $e );
 					return false;
 				}
 				return $return;
@@ -944,7 +944,7 @@ class Db__Drivers__Mysqli extends Database
 				}
 				catch ( Zend_Db_Select_Exception $e )
 				{
-					$this->API->exception_handler( $e );
+					$this->Registry->exception_handler( $e );
 					return false;
 				}
 				return $return;
@@ -957,7 +957,7 @@ class Db__Drivers__Mysqli extends Database
 				}
 				catch ( Zend_Db_Select_Exception $e )
 				{
-					$this->API->exception_handler( $e );
+					$this->Registry->exception_handler( $e );
 					return false;
 				}
 				return $return;
@@ -1093,7 +1093,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		catch ( Zend_Db_Exception $e )
 		{
-			$this->API->exception_handler( $e );
+			$this->Registry->exception_handler( $e );
 			return false;
 		}
 	}
@@ -1306,7 +1306,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		catch ( Zend_Db_Exception $e )
 		{
-			$this->API->exception_handler( $e );
+			$this->Registry->exception_handler( $e );
 			return false;
 		}
 	}
@@ -1353,7 +1353,7 @@ class Db__Drivers__Mysqli extends Database
 		}
 		catch ( Zend_Db_Exception $e )
 		{
-			$this->API->exception_handler( $e );
+			$this->Registry->exception_handler( $e );
 			return false;
 		}
 	}
@@ -1498,7 +1498,7 @@ class Db__Drivers__Mysqli extends Database
 			}
 			catch ( Zend_Db_Exception $e )
 			{
-				$this->API->exception_handler( $e );
+				$this->Registry->exception_handler( $e );
 				return false;
 			}
 		}

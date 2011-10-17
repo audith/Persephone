@@ -55,9 +55,9 @@ abstract class Database
 	/**
 	 * Constructor
 	 *
-	 * @param    object    API Object Reference
+	 * @param    object    Registry Object Reference
 	 */
-	abstract public function __construct ( API $API );
+	abstract public function __construct ( Registry $Registry );
 
 
 	/**
@@ -72,10 +72,10 @@ abstract class Database
 		{
 			$message  = "MESSAGE: Problems occured during Database::simple_exec_query_shutdown().";
 			$message .= "\nDUMP: " . var_export( $_problematic_queries_during_simple_exec_query_shutdown, true ) . "\n\n";
-			$this->API->logger__do_log( $message, "ERROR" );
+			$this->Registry->logger__do_log( $message, "ERROR" );
 		}
 
-		$this->API->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
+		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
 	}
 
 
@@ -91,7 +91,7 @@ abstract class Database
 			?
 			array_walk( $t, array( $this, "attach_prefix" ) )
 			:
-			$t = $this->API->config['sql']['table_prefix'] . $t;
+			$t = $this->Registry->config['sql']['table_prefix'] . $t;
 
 		return $t;
 	}

@@ -16,22 +16,22 @@ if ( ! defined( "INIT_DONE" ) )
 class Cache__Recache
 {
 	/**
-	 * API Object Reference
+	 * Registry reference
 	 * @var object
 	 */
-	private $API;
+	private $Registry;
 
 
 	/**
 	 * Constructor
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
 		//-----------
 		// Prelim
 		//-----------
 
-		$this->API = $API;
+		$this->Registry = $Registry;
 	}
 
 
@@ -69,7 +69,7 @@ class Cache__Recache
 			else
 			{
 				# Log and return
-				$this->API->logger__do_log( "Cache - Recache: No re-cache mechanism defined for key '" . $key . "'" , "ERROR" );
+				$this->Registry->logger__do_log( "Cache - Recache: No re-cache mechanism defined for key '" . $key . "'" , "ERROR" );
 				return FALSE;
 			}
 		}
@@ -80,12 +80,12 @@ class Cache__Recache
 		if ( $_cache )
 		{
 			# Cache Abstraction - Do your thing :) and log the result
-			$return = $this->API->Cache->cache__do_update( array( 'name' => $key, 'value' => $_cache, 'array' => is_array( $_cache ) ? 1 : 0 ) );
-			if ( array_key_exists( $key , $this->API->Cache->cache ) )  // Update Cache->cache container if applicable.
+			$return = $this->Registry->Cache->cache__do_update( array( 'name' => $key, 'value' => $_cache, 'array' => is_array( $_cache ) ? 1 : 0 ) );
+			if ( array_key_exists( $key , $this->Registry->Cache->cache ) )  // Update Cache->cache container if applicable.
 			{
-				$this->API->Cache->cache[ $key ] = $_cache;
+				$this->Registry->Cache->cache[ $key ] = $_cache;
 			}
-			$this->API->logger__do_log( "Cache - Recache " . ( $return !== FALSE ? "succeeded" : "completely or partially failed" ) . " for key '" . $key . "'" , $return !== FALSE ? "INFO" : "ERROR" );
+			$this->Registry->logger__do_log( "Cache - Recache " . ( $return !== FALSE ? "succeeded" : "completely or partially failed" ) . " for key '" . $key . "'" , $return !== FALSE ? "INFO" : "ERROR" );
 		}
 
 		return $_cache;
@@ -99,13 +99,13 @@ class Cache__Recache
 	 */
 	private function banfilters__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 					'do'	    => "select",
 					'table'     => "ban_filters",
 					'fields'    => array( "ban_id", "ban_type", "ban_content", "ban_date", "ban_nocache" ),
-					'where'     => "ban_nocache=" . $this->API->Db->quote( 0, "INTEGER" ),
+					'where'     => "ban_nocache=" . $this->Registry->Db->quote( 0, "INTEGER" ),
 				);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $_r )
@@ -131,14 +131,14 @@ class Cache__Recache
 				'conditions'  => 't.type_name=d.type_name',
 			);
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 					'do'	    => "select",
 					'fields'    => array( '_is_enabled' => "is_enabled" ),
 					'table'     => array( 't' => "components_ddl_skel_types" ),
 					'add_join'  => $_join,
 					'order'     => array( "t.type_name ASC", "d.order ASC" )
 				);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $_r )
@@ -159,12 +159,12 @@ class Cache__Recache
 	 */
 	private function converge__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 					'do'	    => "select_row",
 					'table'     => "converge_local",
-					'where'     => "converge_active=" . $this->API->Db->quote( 1, "INTEGER" ),
+					'where'     => "converge_active=" . $this->Registry->Db->quote( 1, "INTEGER" ),
 				);
-		return $this->API->Db->simple_exec_query();
+		return $this->Registry->Db->simple_exec_query();
 	}
 
 
@@ -175,15 +175,15 @@ class Cache__Recache
 	 */
 	private function fileinfo__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 					'do'	 => "select_row",
 					'table'  => "media_library",
 					'where'  => is_numeric( $params['identifier'] ) ?
-						"f_id=" . $this->API->Db->quote( $params['identifier'] , "INTEGER" )
+						"f_id=" . $this->Registry->Db->quote( $params['identifier'] , "INTEGER" )
 						:
-						"f_hash=" . $this->API->Db->quote( $params['identifier'] ),
+						"f_hash=" . $this->Registry->Db->quote( $params['identifier'] ),
 				);
-		$_cache = $this->API->Db->simple_exec_query();
+		$_cache = $this->Registry->Db->simple_exec_query();
 
 		# Parsing dimensions
 		if ( strpos( $_cache['f_dimensions'] , "x" ) !== FALSE and $_cache['f_dimensions'] != 'x' )
@@ -205,15 +205,15 @@ class Cache__Recache
 	 */
 	private function ignored_users__do_recache ( $params = array() )
 	{
-		$member_data = ( ! is_array( $params['member_data'] ) ) ? $this->API->Session->load_member( $params['member_data'], "all" ) : $params['member_data'];
+		$member_data = ( ! is_array( $params['member_data'] ) ) ? $this->Registry->Session->load_member( $params['member_data'], "all" ) : $params['member_data'];
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select",
 				'table'  => "ignored_users",
-				'where'  => "ignore_owner_id=" . $this->API->Db->quote( $member_data['id'], "INTEGER" ),
+				'where'  => "ignore_owner_id=" . $this->Registry->Db->quote( $member_data['id'], "INTEGER" ),
 			);
 
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $_r )
@@ -236,19 +236,19 @@ class Cache__Recache
 	 */
 	private function linkinfo__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "select_row",
 				'table'  => "media_library_links",
 				'fields' => array(
 						"f_hash" , "l_hash" , "l_time_to_die" , "m_id" , "l_name" ,
-						'm_ip_address' => new Zend_Db_Expr( "INET_NTOA( CONV( " . $this->API->Db->db->quoteIdentifier( "m_ip_address" ) . ", 2, 10 ) )" ),
+						'm_ip_address' => new Zend_Db_Expr( "INET_NTOA( CONV( " . $this->Registry->Db->db->quoteIdentifier( "m_ip_address" ) . ", 2, 10 ) )" ),
 					),
 				'where'  => array(
-						array( "f_hash = " . $this->API->Db->quote( $params['f_hash'] ) ),
-						array( "m_id = "   . $this->API->Db->quote( $params['m_id']   ) ),
+						array( "f_hash = " . $this->Registry->Db->quote( $params['f_hash'] ) ),
+						array( "m_id = "   . $this->Registry->Db->quote( $params['m_id']   ) ),
 					),
 			);
-		return $this->API->Db->simple_exec_query();
+		return $this->Registry->Db->simple_exec_query();
 	}
 
 
@@ -259,14 +259,14 @@ class Cache__Recache
 	 */
 	private function login_methods__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select",
 				'table'  => "login_methods",
-				'where'  => "login_enabled=" . $this->API->Db->quote( 1, "INTEGER" ),
+				'where'  => "login_enabled=" . $this->Registry->Db->quote( 1, "INTEGER" ),
 				'order'  => array( "login_order ASC" )
 			);
 
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $_r )
@@ -285,13 +285,13 @@ class Cache__Recache
 	 */
 	private function member_groups__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "select",
 				"table"  => "groups",
 			);
 
 		$_cache = array();
-		if ( count( $result = $this->API->Db->simple_exec_query() ) )
+		if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 		{
 			foreach ( $result as $row )
 			{
@@ -299,7 +299,7 @@ class Cache__Recache
 				{
 					if ( $_k == 'g_dname_change' )
 					{
-						$_g_displayname_unit = explode( ":", $this->API->Input->clean__excessive_separators( $_v , ":" ) );
+						$_g_displayname_unit = explode( ":", $this->Registry->Input->clean__excessive_separators( $_v , ":" ) );
 						$_r['g_dname_change']['amount']     = intval( $_g_displayname_unit[0] );
 						$_r['g_dname_change']['timedelta']  = intval( $_g_displayname_unit[1] );
 						$_r['g_dname_change']['cond_value'] = intval( $_g_displayname_unit[2] );
@@ -327,13 +327,13 @@ class Cache__Recache
 	{
 		# Fetch data-types
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	    => "select",
 				'fields'    => array( "type_extension" , "type_extension_other" , "type_description" , "type_mime" , "type_library" ),
 				'table'     => "data_processors__types",
 				'order'     => array( "type_extension ASC" , "type_mime ASC" )
 			);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $r )
@@ -342,19 +342,19 @@ class Cache__Recache
 			// Hex Signatures
 			//------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	    => "select",
 					'fields'    => array(
 							"type_extension",
 							"type_hex_id"
-								=> new Zend_Db_Expr("HEX(" . $this->API->Db->db->quoteIdentifier("type_hex_id") . ")" ),
+								=> new Zend_Db_Expr("HEX(" . $this->Registry->Db->db->quoteIdentifier("type_hex_id") . ")" ),
 							"type_hex_id_offset",
 							"type_signature_description",
 						),
 					'table'     => "data_processors__signatures",
-					'where'     => "type_extension=" . $this->API->Db->quote( $r['type_extension'] ),
+					'where'     => "type_extension=" . $this->Registry->Db->quote( $r['type_extension'] ),
 				);
-			$result_ = $this->API->Db->simple_exec_query();
+			$result_ = $this->Registry->Db->simple_exec_query();
 
 			$_signatures = array();
 			foreach ( $result_ as $r_ )
@@ -392,18 +392,18 @@ class Cache__Recache
 	 */
 	private function modules__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select",
 				'fields' => array(
 						"m_unique_id", "m_name", "m_description", "m_type", "m_enforce_ssl", "m_title_column",
 						"m_extras", "m_cache_array", "m_handler_class", "m_enable_caching", "m_can_disable", "m_can_remove", "m_is_enabled"
 					),
 				'table'  => "modules",
-				'where'  => "m_type != " . $this->API->Db->quote( "connector" ),
+				'where'  => "m_type != " . $this->Registry->Db->quote( "connector" ),
 			);
 
 		$_cache = array();
-		if ( count( $result = $this->API->Db->simple_exec_query() ) )
+		if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 		{
 			foreach ( $result as $row )
 			{
@@ -464,7 +464,7 @@ class Cache__Recache
 					$_m_data_definition_bak        = array();
 					$_m_data_definition_merged     = array();
 
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'      =>  "select",
 							'fields' => array(
 									"m_unique_id", "name", "label", "type", "subtype", "maxlength", "allowed_filetypes", "connector_length_cap",
@@ -472,17 +472,17 @@ class Cache__Recache
 									"e_data_definition" , "is_html_allowed", "position" , "is_required", "is_unique", "is_numeric", "is_backup"
 								),
 							'table'   =>  "modules_data_definition",
-							'where'   =>  "m_unique_id=" . $this->API->Db->quote( $row['m_unique_id'] ),
+							'where'   =>  "m_unique_id=" . $this->Registry->Db->quote( $row['m_unique_id'] ),
 							'order'   =>  array( "position ASC", "is_backup ASC" ),
 						);
-					if ( count( $result_ = $this->API->Db->simple_exec_query() ) )
+					if ( count( $result_ = $this->Registry->Db->simple_exec_query() ) )
 					{
 						foreach ( $result_ as $row_ )
 						{
 							# Connector-Units
 							if ( $row_['connector_enabled'] and ! empty( $row_['connector_linked'] ) )
 							{
-								$this->API->Db->cur_query = array(
+								$this->Registry->Db->cur_query = array(
 										'do'      =>  "select",
 										'fields'  => array(
 												"m_unique_id", "name", "label", "type", "subtype", "maxlength", "allowed_filetypes",
@@ -490,10 +490,10 @@ class Cache__Recache
 												"e_data_definition", "is_html_allowed", "is_required", "is_unique", "is_numeric", "is_backup"
 											),
 										'table'   =>  "modules_data_definition",
-										'where'   =>  "m_unique_id=" . $this->API->Db->quote( $row_['connector_linked'] ),
+										'where'   =>  "m_unique_id=" . $this->Registry->Db->quote( $row_['connector_linked'] ),
 										'order'   =>  array( "position ASC", "name ASC" ),
 									);
-								if ( count( $result__ = $this->API->Db->simple_exec_query() ) )
+								if ( count( $result__ = $this->Registry->Db->simple_exec_query() ) )
 								{
 									foreach ( $result__ as $row__ )
 									{
@@ -573,7 +573,7 @@ class Cache__Recache
 					//----------------------
 
 					$_subroutines = array();
-					$this->API->Db->cur_query = array(
+					$this->Registry->Db->cur_query = array(
 							'do'     => "select",
 							'table'  => "modules_subroutines",
 							'fields' => array( "s_name" , "s_data_source", "s_data_target" , "s_pathinfo_uri_schema" , "s_pathinfo_uri_schema_parsed" ,
@@ -582,7 +582,7 @@ class Cache__Recache
 							'where'  => array( array( "m_unique_id=?", $row['m_unique_id'] ) )
 						);
 
-					if ( count( $_result = $this->API->Db->simple_exec_query() ) )
+					if ( count( $_result = $this->Registry->Db->simple_exec_query() ) )
 					{
 						foreach ( $_result as $_row )
 						{
@@ -663,15 +663,15 @@ class Cache__Recache
 	 */
 	private function modules_connectors__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select",
 				'fields' => array( "m_unique_id" ),
 				'table'  => "modules",
-				'where'  => "m_type = " . $this->API->Db->quote( "connector" ),
+				'where'  => "m_type = " . $this->Registry->Db->quote( "connector" ),
 			);
 
 		$_cache = array();
-		if ( count( $result = $this->API->Db->simple_exec_query() ) )
+		if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 		{
 			foreach ( $result as $row )
 			{
@@ -689,7 +689,7 @@ class Cache__Recache
 				$_m_data_definition     = array();
 				$_m_data_definition_bak = array();
 
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'      =>  "select",
 						'fields' => array(
 								"m_unique_id", "name", "label", "type", "subtype", "maxlength", "allowed_filetypes", "connector_length_cap",
@@ -697,10 +697,10 @@ class Cache__Recache
 								"is_required", "is_unique", "is_numeric", "is_backup"
 							),
 						'table'   =>  "modules_data_definition",
-						'where'   =>  "m_unique_id=" . $this->API->Db->quote( $row['m_unique_id'] ),
+						'where'   =>  "m_unique_id=" . $this->Registry->Db->quote( $row['m_unique_id'] ),
 						'order'   =>  array( "position ASC", "is_backup ASC" ),
 					);
-				if ( count( $result_ = $this->API->Db->simple_exec_query() ) )
+				if ( count( $result_ = $this->Registry->Db->simple_exec_query() ) )
 				{
 					foreach ( $result_ as $row_ )
 					{
@@ -747,7 +747,7 @@ class Cache__Recache
 				'join_type'   => 'LEFT'
 			);
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	    => "select",
 				'fields'    => "d.*",
 				'table'     => array( 'd' => 'members_pfields_data' ),
@@ -756,7 +756,7 @@ class Cache__Recache
 			);
 
 		$_cache = array();
-		if ( count( $result = $this->API->Db->simple_exec_query() ) )
+		if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 		{
 			foreach ( $result as $row )
 			{
@@ -778,7 +778,7 @@ class Cache__Recache
 	 */
 	private function settings__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select",
 				'fields' => array( "g.*" ),
 				'table'  => array( 'g' => "conf_settings_groups" ),
@@ -794,7 +794,7 @@ class Cache__Recache
 			);
 
 		$_cache = array();
-		if ( count( $result = $this->API->Db->simple_exec_query() ) )
+		if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 		{
 			foreach ( $result as $row )
 			{
@@ -845,16 +845,16 @@ class Cache__Recache
 	 */
 	private function skins__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select",
 				'fields' => array( "set_id", "set_name", "set_hide_from_list", "set_is_default", "set_author_email", "set_author_name", "set_author_url", "set_assets", "set_favicon", "set_css_updated", "set_enabled" ),
 				'table'  => "skin_sets",
 				// @todo    Skin permissions and useragent-tied-hidden-skins stuff
-				// 'where'  => array( array( "set_enabled=?", $this->API->Db->quote( 1, "INTEGER" ) ) )
+				// 'where'  => array( array( "set_enabled=?", $this->Registry->Db->quote( 1, "INTEGER" ) ) )
 			);
 
 		$_cache = array();
-		if ( count( $result = $this->API->Db->simple_exec_query() ) )
+		if ( count( $result = $this->Registry->Db->simple_exec_query() ) )
 		{
 			foreach ( $result as $row )
 			{
@@ -879,7 +879,7 @@ class Cache__Recache
 							(current: \"" . $_cache['_default_skin']['set_id'] . "\",
 							duplicate: \"" . $row['set_id'] . "\")! Overriding default with the last flagged skin!
 							Diagnostics recommended!";
-						$this->API->logger__do_log( __CLASS__ . "::skins__do_recache(): " . $_msg , "WARNING" );
+						$this->Registry->logger__do_log( __CLASS__ . "::skins__do_recache(): " . $_msg , "WARNING" );
 					}
 					$_cache['_default_skin'] =& $_cache[ $row['set_id'] ];
 				}
@@ -897,33 +897,33 @@ class Cache__Recache
 	 */
 	private function stats__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "select_row",
 				'fields' => array(
 						'member_count' => new Zend_Db_Expr( "COUNT(id)" ),
 					),
 				'table'  => "members",
-				'where'  => "mgroup != " . $this->API->Db->quote( $this->API->config['security']['auth_group'] , "INTEGER" ),
+				'where'  => "mgroup != " . $this->Registry->Db->quote( $this->Registry->config['security']['auth_group'] , "INTEGER" ),
 			);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		$_cache['mem_count'] = intval( $result['member_count'] );
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "select_row",
 				'fields' => array( "id" , "display_name" , "seo_name" ),
 				'table'  => "members",
 				'where'  => array(
-						array( "mgroup != " . $this->API->Db->quote( $this->API->config['security']['auth_group'] , "INTEGER" ) ),
+						array( "mgroup != " . $this->Registry->Db->quote( $this->Registry->config['security']['auth_group'] , "INTEGER" ) ),
 						/*
-						array( "display_name != " . $this->API->Db->quote( "" ) ),
-						array( "display_name " . $this->API->Db->build__is_null( FALSE ) ),
+						array( "display_name != " . $this->Registry->Db->quote( "" ) ),
+						array( "display_name " . $this->Registry->Db->build__is_null( FALSE ) ),
 						*/
 					),
 				'order'  => array( "id DESC" ),
 			);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 		$_cache['last_mem_name_seo']  = $result['seo_name'];
 		$_cache['last_mem_name']      = $result['display_name'] ? $result['display_name'] : $result['name'];
 		$_cache['last_mem_id']		  = $result['id'];
@@ -941,7 +941,7 @@ class Cache__Recache
 	{
 		$_cache = array();
 		$_cache['task_next_run'] = UNIX_TIME_NOW;
-		$_cache['load_limit']    = $this->API->config['performance']['load_limit'];
+		$_cache['load_limit']    = $this->Registry->config['performance']['load_limit'];
 		// $_cache['mail_queue']    = $_cache['mail_queue'];          @todo
 
 		return $_cache;
@@ -955,12 +955,12 @@ class Cache__Recache
 	 */
 	private function total_nr_of_attachments__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'     => "select_one",
 				'fields' => array( new Zend_Db_Expr("COUNT(*)") ),
 				'table'  => "media_library",
 			);
-		return $this->API->Db->simple_exec_query();
+		return $this->Registry->Db->simple_exec_query();
 	}
 
 
@@ -971,12 +971,12 @@ class Cache__Recache
 	 */
 	private function useragents__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "select",
 				"table"  => "user_agents",
 				"order"  => array( "uagent_position ASC", "uagent_key ASC" ),
 			);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $row )
@@ -995,12 +995,12 @@ class Cache__Recache
 	 */
 	private function useragentgroups__do_recache ( $params = array() )
 	{
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				"do"	 => "select",
 				"table"  => "user_agents_groups",
 				"order"  => array( "ugroup_id ASC" ),
 			);
-		$result = $this->API->Db->simple_exec_query();
+		$result = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $row )

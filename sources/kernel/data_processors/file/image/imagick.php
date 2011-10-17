@@ -16,10 +16,10 @@ if ( ! defined( "INIT_DONE" ) )
 final class Data_Processors__File__Image__Imagick
 {
 	/**
-	 * API Object reference
+	 * Registry reference
 	 * @var object
 	 */
-	public $API;
+	public $Registry;
 
 	/**
 	 * Ratio of original image's dimension in a given direction to that of the watermark image
@@ -30,12 +30,12 @@ final class Data_Processors__File__Image__Imagick
 
 	/**
 	 * Contructor
-	 * @param    API    API object reference
+	 * @param    Registry    Registry object reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
 	{
-		$this->API = $API;
-		$this->API->logger__do_log( "Loaded Imagick library!" , "INFO" );
+		$this->Registry = $Registry;
+		$this->Registry->logger__do_log( "Loaded Imagick library!" , "INFO" );
 	}
 
 
@@ -77,7 +77,7 @@ final class Data_Processors__File__Image__Imagick
 
 		# Small thumbs
 		# Dimensions from Config
-		$_dimensions = explode( "x" , strtolower( $this->API->config['medialibrary']['thumb_small_dimensions'] ) );
+		$_dimensions = explode( "x" , strtolower( $this->Registry->config['medialibrary']['thumb_small_dimensions'] ) );
 
 		# Resize to fit
 		$image->thumbnailImage( $width, $height );
@@ -86,7 +86,7 @@ final class Data_Processors__File__Image__Imagick
 		if
 		(
 			! $image->writeImage(
-					$this->API->Input->file__filename__attach_suffix( $file_resource['_f_location'] , $file_suffix )
+					$this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , $file_suffix )
 				)
 		)
 		{
@@ -141,24 +141,24 @@ final class Data_Processors__File__Image__Imagick
 		// Is it below watermark-able image dimension limit?
 		//-----------------------------------------------------
 
-		if ( strpos( $this->API->config['medialibrary']['watermark_threshold'], "x" ) !== FALSE )
+		if ( strpos( $this->Registry->config['medialibrary']['watermark_threshold'], "x" ) !== FALSE )
 		{
-			$this->API->config['medialibrary']['watermark_threshold'] = explode( "x" , $this->API->config['medialibrary']['watermark_threshold'] );
+			$this->Registry->config['medialibrary']['watermark_threshold'] = explode( "x" , $this->Registry->config['medialibrary']['watermark_threshold'] );
 		}
 		if
 		(
-			$_image_to_watermark__geometry['width'] <= $this->API->config['medialibrary']['watermark_threshold'][0]
+			$_image_to_watermark__geometry['width'] <= $this->Registry->config['medialibrary']['watermark_threshold'][0]
 			and
-			$_image_to_watermark__geometry['height'] <= $this->API->config['medialibrary']['watermark_threshold'][1]
+			$_image_to_watermark__geometry['height'] <= $this->Registry->config['medialibrary']['watermark_threshold'][1]
 		)
 		{
 			# Apparently it is - duplicate the original image without watermarking it, but mark it as if it is so.
 			if
 			(
-				! copy( $file_resource['_f_location'] , $this->API->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" ) )
+				! copy( $file_resource['_f_location'] , $this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" ) )
 			)
 			{
-				$this->API->logger__do_log(
+				$this->Registry->logger__do_log(
 						"Modules - Data_Processors - FILE - IMAGE - IMAGICK: "
 							. ( $_chdir === FALSE ? "Failed" : "Succeeded" )
 							. " to COPY image '" . $file_resource['_f_location'] . "'" ,
@@ -198,7 +198,7 @@ final class Data_Processors__File__Image__Imagick
 
 		$_watermark_position__x = 0;
 		$_watermark_position__y = 0;
-		switch ( $this->API->config['medialibrary']['watermark_position'] )
+		switch ( $this->Registry->config['medialibrary']['watermark_position'] )
 		{
 			case 'sw':
 				$_watermark_position__y = $_image_to_watermark__geometry['height'] - $_watermark__geometry['height'];
@@ -225,7 +225,7 @@ final class Data_Processors__File__Image__Imagick
 		if
 		(
 			! $image_to_watermark->writeImage(
-					$this->API->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" )
+					$this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" )
 				)
 		)
 		{

@@ -18,9 +18,9 @@ interface iCache_Drivers
 	/**
 	 * Constructor
 	 *
-	 * @param  object  API reference
+	 * @param  object  Registry reference
 	 */
-	public function __construct ( API $API, $identifier = "" );
+	public function __construct ( Registry $Registry, $identifier = "" );
 
 
 	/**

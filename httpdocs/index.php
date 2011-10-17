@@ -9,12 +9,12 @@ require_once( "./init.php" );
 // API Source
 //--------------
 
-require_once( PATH_SOURCES . "/kernel/api.php"                );
+require_once( PATH_SOURCES . "/kernel/registry.php"                );
 
 //-------------
 // API Init
 //-------------
 
-$API = API::init();
-$API->Display->do_display();
+$Registry = Registry::init();
+$Registry->Display->do_display();
 exit();

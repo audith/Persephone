@@ -17,10 +17,10 @@ if ( ! defined( "INIT_DONE" ) )
 class Module_Handler
 {
 	/**
-	 * API Object Reference
+	 * Registry Reference
 	 * @var Object
 	 */
-	private $API;
+	private $Registry;
 
 	/**
 	 * Flag :: Account unlocked
@@ -112,18 +112,18 @@ class Module_Handler
     /**
 	 * Constructor
 	 *
-	 * @param    API    API Object Reference
+	 * @param    Registry    Registry Object Reference
 	 */
-	public function __construct ( API $API )
+	public function __construct ( Registry $Registry )
     {
 		//----------
     	// Prelim
     	//----------
 
-    	$this->API = $API;
-    	$this->request = $this->API->Input->request();
+    	$this->Registry = $Registry;
+    	$this->request = $this->Registry->Input->request();
     	$this->request['referer'] = isset( $this->request['referer'] ) ? urldecode( $this->request['referer'] ) : "";
-    	$this->member =& $this->API->member;
+    	$this->member =& $this->Registry->member;
 
 		require_once( PATH_SOURCES . '/login_auth/login_core.php' );
 
@@ -135,7 +135,7 @@ class Module_Handler
     	// Do we have cache?
     	//----------------------
 
-    	$cache = $this->API->Cache->cache__do_get( "login_methods" );
+    	$cache = $this->Registry->Cache->cache__do_get( "login_methods" );
 
     	if ( is_array( $cache ) and count( $cache ) )
 		{
@@ -159,7 +159,7 @@ class Module_Handler
 						}
 
 						require_once( $classes[ $login_method['login_order'] ] );
-						$this->login_modules[ $login_method['login_order'] ]    = new Login_Method( $this->API, $login_method, $this->login_confs[ $login_method['login_order'] ] );
+						$this->login_modules[ $login_method['login_order'] ]    = new Login_Method( $this->Registry, $login_method, $this->login_confs[ $login_method['login_order'] ] );
 					}
 				}
 			}
@@ -171,13 +171,13 @@ class Module_Handler
 
     	else
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "select_row",
 					'table'  => "login_methods",
-					'where'  => "login_folder_name=" . $this->API->Db->db->quote( "internal" ),
+					'where'  => "login_folder_name=" . $this->Registry->Db->db->quote( "internal" ),
 				);
 
-			$login_method = $this->API->Db->simple_exec_query();
+			$login_method = $this->Registry->Db->simple_exec_query();
 
     		if ( $login_method['login_id'] )
 			{
@@ -197,7 +197,7 @@ class Module_Handler
 
     	if ( ! count( $this->login_modules ) )
 		{
-			$this->API->logger__do_log( __CLASS__ . ": No login methods available to process user login!" , "ERROR" );
+			$this->Registry->logger__do_log( __CLASS__ . ": No login methods available to process user login!" , "ERROR" );
 		}
 
 		//----------------------
@@ -355,7 +355,7 @@ class Module_Handler
 		// Is this a username or email address?
 		//-----------------------------------------
 
-		if ( $this->API->Input->check_email_address( $this->request['username'] ) )
+		if ( $this->Registry->Input->check_email_address( $this->request['username'] ) )
 		{
 			$email = $this->request['username'];
 		}
@@ -386,12 +386,12 @@ class Module_Handler
 			{
 				$extra = "<!-- -->";
 
-				if ( $this->API->config['security']['bruteforce_unlock'] )
+				if ( $this->Registry->config['security']['bruteforce_unlock'] )
 				{
 					if ( $this->account_unlock )
 					{
 						$time = UNIX_TIME_NOW - $this->account_unlock;
-						$time = ( $this->API->config['security']['bruteforce_period'] - ceil( $time / 60 ) > 0 ) ? $this->API->config['security']['bruteforce_period'] - ceil( $time / 60 ) : 1;
+						$time = ( $this->Registry->config['security']['bruteforce_period'] - ceil( $time / 60 ) > 0 ) ? $this->Registry->config['security']['bruteforce_period'] - ceil( $time / 60 ) : 1;
 					}
 				}
 
@@ -418,7 +418,7 @@ class Module_Handler
 
 		if ( $member['created_remote'] and isset( $member['full'] ) and !$member['full'] )
 		{
-			return array( 'responseCode' => 1 , 'responseMessage' => "Authentication successful!<br />Authorization in 2 seconds... Please standby!" , 'extra' => $this->API->Modules->cur_module['m_url_prefix'] . "/complete_login" );
+			return array( 'responseCode' => 1 , 'responseMessage' => "Authentication successful!<br />Authorization in 2 seconds... Please standby!" , 'extra' => $this->Registry->Modules->cur_module['m_url_prefix'] . "/complete_login" );
 		}
 
 		//-----------------------------------------
@@ -426,13 +426,13 @@ class Module_Handler
 		//-----------------------------------------
 
 		$_ok     = 1;
-		$_time   = ( $this->API->config['security']['login_key_expire'] ) ? ( time() + ( intval($this->API->config['security']['login_key_expire']) * 86400 ) ) : 0;
+		$_time   = ( $this->Registry->config['security']['login_key_expire'] ) ? ( time() + ( intval($this->Registry->config['security']['login_key_expire']) * 86400 ) ) : 0;
 		$_sticky = $_time ? 0 : 1;
-		$_days   = $_time ? $this->API->config['security']['login_key_expire'] : 365;
+		$_days   = $_time ? $this->Registry->config['security']['login_key_expire'] : 365;
 
-		if ( $this->API->config['security']['login_change_key'] or !$member['login_key'] or ( $this->API->config['security']['login_key_expire'] and ( time() > $member['login_key_expire'] ) ) )
+		if ( $this->Registry->config['security']['login_change_key'] or !$member['login_key'] or ( $this->Registry->config['security']['login_key_expire'] and ( time() > $member['login_key_expire'] ) ) )
 		{
-			$member['login_key'] = $this->API->Session->generate_autologin_key();
+			$member['login_key'] = $this->Registry->Session->generate_autologin_key();
 
 			$_save['login_key']         = $member['login_key'];
 			$_save['login_key_expire']  = $_time;
@@ -444,20 +444,20 @@ class Module_Handler
 
 		if ( isset( $this->request['remember_me'] ) and $this->request['remember_me'] )
 		{
-			$this->API->Input->my_setcookie( "member_id" , $member['id'] , 1 );
-			$this->API->Input->my_setcookie( "pass_hash" , $member['login_key'] , $_sticky, $_days );
+			$this->Registry->Input->my_setcookie( "member_id" , $member['id'] , 1 );
+			$this->Registry->Input->my_setcookie( "pass_hash" , $member['login_key'] , $_sticky, $_days );
 		}
 		else
 		{
-			$this->API->Input->my_setcookie( "member_id" , $member['id'], 0 );
-			$this->API->Input->my_setcookie( "pass_hash" , $member['login_key'], 0 );
+			$this->Registry->Input->my_setcookie( "member_id" , $member['id'], 0 );
+			$this->Registry->Input->my_setcookie( "pass_hash" , $member['login_key'], 0 );
 		}
 
 		//-----------------------------------------
 		// Remove any COPPA cookies previously set
 		//-----------------------------------------
 
-		$this->API->Input->my_setcookie( "coppa" , '0', 0);
+		$this->Registry->Input->my_setcookie( "coppa" , '0', 0);
 
 		//-----------------------------------------
 		// Update profile if IP addr missing
@@ -465,7 +465,7 @@ class Module_Handler
 
 		if ( $member['ip_address'] == "" or $member['ip_address'] == '127.0.0.1' )
 		{
-			$_save['ip_address'] = $this->API->Session->ip_address;
+			$_save['ip_address'] = $this->Registry->Session->ip_address;
 		}
 
 		//-----------------------------
@@ -479,7 +479,7 @@ class Module_Handler
 			$privacy = 1;
 		}
 
-		$session_id = $this->API->Session->convert_guest_to_member(
+		$session_id = $this->Registry->Session->convert_guest_to_member(
 				array(
 						'member_name'   => $member['display_name'],
 						'member_id'     => $member['id'],
@@ -497,7 +497,7 @@ class Module_Handler
 			else
 			{
 				$url = str_replace( '&amp;' , '&' , $this->request['referer'] );
-				$url = preg_replace( "#" . $this->API->Session->session_name . "=(\w){32}#", "" , $url );
+				$url = preg_replace( "#" . $this->Registry->Session->session_name . "=(\w){32}#", "" , $url );
 			}
 		}
 		else
@@ -513,18 +513,18 @@ class Module_Handler
 		$_save['failed_logins']        = "";
 		$_save['failed_login_count']   = 0;
 
-		$this->API->Session->save_member( $member['id'], array( 'members' => $_save ) );
+		$this->Registry->Session->save_member( $member['id'], array( 'members' => $_save ) );
 
 		//-----------------------------------------
 		// Clear out any passy change stuff
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "delete",
 				'table'  => "members_validating",
-				'where'  => "member_id=" . $this->API->Db->db->quote( $this->member['id'], "INTEGER" ) . " AND lost_pass=" . $this->API->Db->db->quote( 1, "INTEGER" ),
+				'where'  => "member_id=" . $this->Registry->Db->db->quote( $this->member['id'], "INTEGER" ) . " AND lost_pass=" . $this->Registry->Db->db->quote( 1, "INTEGER" ),
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//-----------------------------------------
 		// Redirect them to either the index
@@ -595,7 +595,7 @@ class Module_Handler
 
   		if ( $this->return_code != 'SUCCESS' and $redirect )
   		{
-  			$this->API->http_redirect( $redirect , null );
+  			$this->Registry->http_redirect( $redirect , null );
   		}
 
   		return ( $this->return_code == 'SUCCESS' ) ? TRUE : FALSE;
@@ -656,20 +656,20 @@ class Module_Handler
 
 		if ( $member['created_remote'] and ( isset( $member['full'] ) and !$member['full'] ) )
 		{
-			return array( 'responseCode' => 1 , 'responseMessage' => "Authentication successful!<br />Authorization in 2 seconds... Please standby!" , 'extra' => $this->API->Modules->cur_module['m_url_prefix'] . "/complete_login" );
+			return array( 'responseCode' => 1 , 'responseMessage' => "Authentication successful!<br />Authorization in 2 seconds... Please standby!" , 'extra' => $this->Registry->Modules->cur_module['m_url_prefix'] . "/complete_login" );
 		}
 
 		//---------------
 		// A login key
 		//---------------
 
-		$_time = ( $this->API->config['security']['login_key_expire'] ) ? ( time() + ( intval( $this->API->config['security']['login_key_expire'] ) * 86400 ) ) : 0;
+		$_time = ( $this->Registry->config['security']['login_key_expire'] ) ? ( time() + ( intval( $this->Registry->config['security']['login_key_expire'] ) * 86400 ) ) : 0;
 		$_sticky = $_time ? 0 : 1;
-		$_days = $_time ? intval( $this->API->config['security']['login_key_expire'] ) : 365;
+		$_days = $_time ? intval( $this->Registry->config['security']['login_key_expire'] ) : 365;
 
-		if ( $this->API->config['security']['login_change_key'] or !$member['login_key'] or ( $this->API->config['security']['login_key_expire'] and ( time() > $member['login_key_expire'] ) ) )
+		if ( $this->Registry->config['security']['login_change_key'] or !$member['login_key'] or ( $this->Registry->config['security']['login_key_expire'] and ( time() > $member['login_key_expire'] ) ) )
 		{
-			$member['login_key'] = $this->API->Session->generate_autologin_key();
+			$member['login_key'] = $this->Registry->Session->generate_autologin_key();
 			$_save['login_key']         = $member['login_key'];
 			$_save['login_key_expire']  = $_time;
 		}
@@ -680,20 +680,20 @@ class Module_Handler
 
 		if ( $do_set_cookies )
 		{
-			$this->API->Input->my_setcookie( "member_id" , $member['id'] , 1 );
-			$this->API->Input->my_setcookie( "pass_hash" , $member['login_key'] , $_sticky , $_days );
+			$this->Registry->Input->my_setcookie( "member_id" , $member['id'] , 1 );
+			$this->Registry->Input->my_setcookie( "pass_hash" , $member['login_key'] , $_sticky , $_days );
 		}
 		else
 		{
-			$this->API->Input->my_setcookie( "member_id" , $member['id'] , 0 );
-			$this->API->Input->my_setcookie( "pass_hash" , $member['login_key'] , 0 );
+			$this->Registry->Input->my_setcookie( "member_id" , $member['id'] , 0 );
+			$this->Registry->Input->my_setcookie( "pass_hash" , $member['login_key'] , 0 );
 		}
 
 		//--------------------------------------------
 		// Remove any COPPA cookies previously set
 		//--------------------------------------------
 
-		$this->API->Input->my_setcookie("coppa", '0', 0);
+		$this->Registry->Input->my_setcookie("coppa", '0', 0);
 
 		//--------------------------------------
 		// Update profile if IP addr missing
@@ -701,7 +701,7 @@ class Module_Handler
 
 		if ( $member['ip_address'] == "" OR $member['ip_address'] == '127.0.0.1' )
 		{
-			$_save['ip_address'] = $this->API->Session->ip_address;
+			$_save['ip_address'] = $this->Registry->Session->ip_address;
 		}
 
 		//---------------------------
@@ -715,7 +715,7 @@ class Module_Handler
 			$privacy = 1;
 		}
 
-		$session_id = $this->API->Session->convert_guest_to_member(
+		$session_id = $this->Registry->Session->convert_guest_to_member(
 				array(
 						'member_name'   => $member['display_name'],
 						'member_id'     => $member['id'],
@@ -733,7 +733,7 @@ class Module_Handler
 			else
 			{
 				$url = str_replace( '&amp;' , '&' , $this->request['referer'] );
-				$url = preg_replace( "#" . $this->API->Session->session_name . "=(\w){32}#", "" , $url );
+				$url = preg_replace( "#" . $this->Registry->Session->session_name . "=(\w){32}#", "" , $url );
 			}
 		}
 		else
@@ -749,18 +749,18 @@ class Module_Handler
 		$_save['failed_logins']        = "";
 		$_save['failed_login_count']   = 0;
 
-		$this->API->Session->save_member( $member['id'], array( 'members' => $_save ) );
+		$this->Registry->Session->save_member( $member['id'], array( 'members' => $_save ) );
 
 		//-----------------------------------------
 		// Clear out any passy change stuff
 		//-----------------------------------------
 
-		$this->API->Db->cur_query = array(
+		$this->Registry->Db->cur_query = array(
 				'do'	 => "delete",
 				'table'  => "members_validating",
-				'where'  => "member_id=" . $this->API->Db->db->quote( $this->member['id'], "INTEGER" ) . " AND lost_pass=" . $this->API->Db->db->quote( 1, "INTEGER" ),
+				'where'  => "member_id=" . $this->Registry->Db->db->quote( $this->member['id'], "INTEGER" ) . " AND lost_pass=" . $this->Registry->Db->db->quote( 1, "INTEGER" ),
 			);
-		$this->API->Db->simple_exec_query();
+		$this->Registry->Db->simple_exec_query();
 
 		//-----------------------------------------
 		// Redirect them to either the index
@@ -798,7 +798,7 @@ class Module_Handler
 		if ( $check_key and isset( $this->request['k'] ) )
 		{
 			# Check for funny business
-			if ( $this->request['k'] != $this->API->Session->form_hash )
+			if ( $this->request['k'] != $this->Registry->Session->form_hash )
 			{
 				// @todo $this->registry->getClass('output')->showError( 'bad_logout_key', 2012 );
 			}
@@ -808,16 +808,16 @@ class Module_Handler
 		// Set some cookies
 		//-----------------------------------------
 
-		$this->API->Input->my_setcookie( "member_id" , "0"  );
-		$this->API->Input->my_setcookie( "pass_hash" , "0"  );
-		$this->API->Input->my_setcookie( "anonlogin" , "-1" );
+		$this->Registry->Input->my_setcookie( "member_id" , "0"  );
+		$this->Registry->Input->my_setcookie( "pass_hash" , "0"  );
+		$this->Registry->Input->my_setcookie( "anonlogin" , "-1" );
 
 		if( is_array( $_COOKIE ) )
  		{
  			foreach( $_COOKIE as $cookie => $value)
  			{
- 				$cookie = str_replace( $this->API->config['cookies']['cookie_id'] , "" , $cookie );
- 				$this->API->Input->my_setcookie( $cookie, '-', -1 );
+ 				$cookie = str_replace( $this->Registry->config['cookies']['cookie_id'] , "" , $cookie );
+ 				$this->Registry->Input->my_setcookie( $cookie, '-', -1 );
  			}
  		}
 
@@ -831,11 +831,11 @@ class Module_Handler
 		// Do it..
 		//------------
 
-		$this->API->Session->convert_member_to_guest();
+		$this->Registry->Session->convert_member_to_guest();
 
 		list( $privacy, $loggedin ) = explode( '&', $this->member['login_anonymous'] );
 
-		$this->API->Session->save_member(
+		$this->Registry->Session->save_member(
 				$this->member['id'], array(
 						'members' => array(
 								'login_anonymous' => $privacy . "&0",
@@ -855,11 +855,11 @@ class Module_Handler
 		{
 			if ( stripos( $this->request['referer'], "http://" ) === 0 )
 			{
-				$this->API->http_redirect( $this->request['referer'] );
+				$this->Registry->http_redirect( $this->request['referer'] );
 			}
 		}
 
-		$this->API->http_redirect( SITE_URL );
+		$this->Registry->http_redirect( SITE_URL );
 	}
 
 
@@ -896,7 +896,7 @@ class Module_Handler
 
   		if ( $redirect )
   		{
-  			$this->API->http_redirect( $redirect, null );
+  			$this->Registry->http_redirect( $redirect, null );
   		}
 
   		return $returns;
@@ -911,16 +911,16 @@ class Module_Handler
 			// Deleting cookies
 			//------------------------
 
-  			$this->API->Input->my_setcookie( "member_id" , "0"  );
-  			$this->API->Input->my_setcookie( "pass_hash" , "0"  );
-  			$this->API->Input->my_setcookie( "anonlogin" , "-1" );
+  			$this->Registry->Input->my_setcookie( "member_id" , "0"  );
+  			$this->Registry->Input->my_setcookie( "pass_hash" , "0"  );
+  			$this->Registry->Input->my_setcookie( "anonlogin" , "-1" );
 
   			if ( is_array( $_COOKIE ) )
   			{
   				foreach ( $_COOKIE as $cookie => $value )
   				{
-  					$cookie = str_replace( $this->API->config['cookies']['cookie_id'], "", $cookie );
-  					$this->API->Input->my_setcookie( $cookie , "-" , -1 );
+  					$cookie = str_replace( $this->Registry->config['cookies']['cookie_id'], "", $cookie );
+  					$this->Registry->Input->my_setcookie( $cookie , "-" , -1 );
   				}
   			}
 
@@ -934,11 +934,11 @@ class Module_Handler
 			// Do it..
 			//------------
 
-			$this->API->Session->convert_member_to_guest();
+			$this->Registry->Session->convert_member_to_guest();
 
 			list( $privacy, $loggedin ) = explode( '&', $this->member['login_anonymous'] );
 
-			$this->API->Session->save_member(
+			$this->Registry->Session->save_member(
 					$this->member['id'], array(
 							'members' => array(
 									'login_anonymous' => $privacy . "&0",
@@ -952,7 +952,7 @@ class Module_Handler
 		// LOGIN-METHODS : Any other registration URL?
 		//-------------------------------------------------
 
-		$cache = $this->API->Cache->cache__do_get( "login_methods" );
+		$cache = $this->Registry->Cache->cache__do_get( "login_methods" );
 
     	if ( is_array( $cache ) and count( $cache ) )
 		{
@@ -960,7 +960,7 @@ class Module_Handler
 			{
 				if ( $login_method['login_register_url'] )
 				{
-					$this->API->http_redirect( $login_method['login_register_url'] );
+					$this->Registry->http_redirect( $login_method['login_register_url'] );
 					exit();
 				}
 			}
@@ -970,9 +970,9 @@ class Module_Handler
 		// Referer
 		//-----------
 
-		if ( !is_null( $this->API->Input->request("referer") ) )
+		if ( !is_null( $this->Registry->Input->request("referer") ) )
 		{
-			$return['referer'] = $this->API->Input->request("referer");
+			$return['referer'] = $this->Registry->Input->request("referer");
 		}
 
 
@@ -995,7 +995,7 @@ class Module_Handler
   		// Registrations disabled?
   		//----------------------------
 
-  		if ( $this->API->config['security']['no_reg'] )
+  		if ( $this->Registry->config['security']['no_reg'] )
   		{
   			$faults[] = array( 'faultCode' => 0 , 'faultMessage' => "New registrations has been disabled by site administrator!" );
   		}
@@ -1006,7 +1006,7 @@ class Module_Handler
 
   		$_uses_username = FALSE;
 
-  		$cache = $this->API->Cache->cache__do_get( "login_methods" );
+  		$cache = $this->Registry->Cache->cache__do_get( "login_methods" );
 
     	if ( is_array( $cache ) and count( $cache ) )
 		{
@@ -1028,8 +1028,8 @@ class Module_Handler
 		// Check names
 		//---------------
 
-		$_username_valid = $this->API->Session->names__do_clean_and_check( $this->request['username'] , array() , "name" );
-		$_display_name_valid = $this->API->Session->names__do_clean_and_check( $this->request['display_name'] ? $this->request['display_name'] : $this->request['username'] , array() , "display_name" );
+		$_username_valid = $this->Registry->Session->names__do_clean_and_check( $this->request['username'] , array() , "name" );
+		$_display_name_valid = $this->Registry->Session->names__do_clean_and_check( $this->request['display_name'] ? $this->request['display_name'] : $this->request['username'] , array() , "display_name" );
 
 		if ( is_array( $_username_valid['errors'] ) and count( $_username_valid['errors'] ) )
 		{
@@ -1043,7 +1043,7 @@ class Module_Handler
 		{
 			foreach ( $_display_name_valid['errors'] as $key => $error )
 			{
-				if ( ! $this->API->config['namesettings']['auth_allow_dnames'] and ! ( is_array( $_username_valid['errors'] ) and count( $_username_valid['errors'] ) ) )
+				if ( ! $this->Registry->config['namesettings']['auth_allow_dnames'] and ! ( is_array( $_username_valid['errors'] ) and count( $_username_valid['errors'] ) ) )
 				{
 					$faults[] = array( 'faultCode' => 701 , 'faultMessage' => $error );
 				}
@@ -1063,7 +1063,7 @@ class Module_Handler
   			$faults[] = array( 'faultCode' => 704 , 'faultMessage' => "E-mail addresses do not match! Make sure e-mail addresses you entered do match..." );
   		}
 
-  		if ( ! $_email or strlen( $_email ) < 6 or ! $this->API->Input->check_email_address( $_email ) )
+  		if ( ! $_email or strlen( $_email ) < 6 or ! $this->Registry->Input->check_email_address( $_email ) )
   		{
   			$faults[] = array( 'faultCode' => 703 , 'faultMessage' => "Invalid e-mail address provided!" );
   		}
@@ -1101,7 +1101,7 @@ class Module_Handler
 		// EMAIL : Is taken?
 		//---------------------
 
-		if ( $this->API->Session->email__do_check_if_exists( $_email ) )
+		if ( $this->Registry->Session->email__do_check_if_exists( $_email ) )
 		{
 			$faults[] = array( 'faultCode' => 703 , 'faultMessage' => "The email address is already in use by another member!" );
 		}
@@ -1117,7 +1117,7 @@ class Module_Handler
 		// EMAIL : Is Banned?
 		//----------------------
 
-		if ( $this->API->Session->is_banned( 'email' , $_email ) === TRUE )
+		if ( $this->Registry->Session->is_banned( 'email' , $_email ) === TRUE )
 		{
 			$faults[] = array( 'faultCode' => 703 , 'faultMessage' => "The email address you provided is not accepted by this web site! Give a different address..." );
 		}
@@ -1126,11 +1126,11 @@ class Module_Handler
 		// CAPTCHA
 		//-----------
 
-		if ( $this->API->config['security']['enable_captcha'] )
+		if ( $this->Registry->config['security']['enable_captcha'] )
 		{
-			$_recaptcha_obj = $this->API->loader("ReCaptcha");
-			$_recaptcha_obj->setPubKey( $this->API->config['security']['recaptcha_public_key'] );
-			$_recaptcha_obj->setPrivKey( $this->API->config['security']['recaptcha_private_key'] );
+			$_recaptcha_obj = $this->Registry->loader("ReCaptcha");
+			$_recaptcha_obj->setPubKey( $this->Registry->config['security']['recaptcha_public_key'] );
+			$_recaptcha_obj->setPrivKey( $this->Registry->config['security']['recaptcha_private_key'] );
 
 			if ( ! isset( $this->request["recaptcha_response_field"] ) or empty( $this->request["recaptcha_response_field"] ) )
 			{
@@ -1174,10 +1174,10 @@ class Module_Handler
 		// Member-group
 		//----------------
 
-		$_mgroup = $this->API->config['security']['member_group'];
-		if ( $this->API->config['security']['reg_auth_type'] != 'none' )
+		$_mgroup = $this->Registry->config['security']['member_group'];
+		if ( $this->Registry->config['security']['reg_auth_type'] != 'none' )
 		{
-			$_mgroup = $this->API->config['security']['auth_group'];
+			$_mgroup = $this->Registry->config['security']['auth_group'];
 		}
 
 		//-----------------------
@@ -1187,11 +1187,11 @@ class Module_Handler
 		$member = array(
 				'name'                => $this->request['username'],
 				'password'            => $_password,
-				'display_name'        => $this->API->config['namesettings']['auth_allow_dnames'] ? $this->request['display_name'] : $this->request['username'],
+				'display_name'        => $this->Registry->config['namesettings']['auth_allow_dnames'] ? $this->request['display_name'] : $this->request['username'],
 				'email'               => $_email,
 				'mgroup'              => $_mgroup,
 				'joined'              => UNIX_TIME_NOW,
-				'ip_address'          => $this->API->Session->ip_address,
+				'ip_address'          => $this->Registry->Session->ip_address,
 				// 'coppa_user'          => $coppa,
 				'allow_admin_mails'   => 1,
 				'hide_email'          => 1,
@@ -1201,7 +1201,7 @@ class Module_Handler
   		// Create the account
   		//----------------------
 
-		$member = $this->API->Session->create_member( array( 'members' => $member ) );
+		$member = $this->Registry->Session->create_member( array( 'members' => $member ) );
 
 		$this->create_account(
 				array(
@@ -1217,14 +1217,14 @@ class Module_Handler
 		// Validation
 		//-----------------
 
-		$validate_key = md5( $this->API->Session->create_password() . UNIX_TIME_NOW );
+		$validate_key = md5( $this->Registry->Session->create_password() . UNIX_TIME_NOW );
 
 		if (
-			( $this->API->config['security']['reg_auth_type'] == 'user' )
+			( $this->Registry->config['security']['reg_auth_type'] == 'user' )
 			or
-			( $this->API->config['security']['reg_auth_type'] == 'admin' )
+			( $this->Registry->config['security']['reg_auth_type'] == 'admin' )
 			or
-			( $this->API->config['security']['reg_auth_type'] == 'admin_user' )
+			( $this->Registry->config['security']['reg_auth_type'] == 'admin_user' )
 		)
 		{
 			//-------------------------------------------------------------------------------------------
@@ -1232,44 +1232,44 @@ class Module_Handler
 			// we restore their previous group and remove the validate_key
 			//-------------------------------------------------------------------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "insert",
 					'table'  => "members_validating",
 					'set'    => array(
 							'vid'             => $validate_key,
 							'member_id'       => $member['id'],
-						    'real_group'      => $this->API->config['security']['member_group'],
-						    'temp_group'      => $this->API->config['security']['auth_group'],
+						    'real_group'      => $this->Registry->config['security']['member_group'],
+						    'temp_group'      => $this->Registry->config['security']['auth_group'],
 						    'entry_date'      => UNIX_TIME_NOW,
 							// 'coppa_user'      => $coppa,  @todo
 						    'new_reg'         => 1,
 							'ip_address'      => $member['ip_address']
 						)
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
-			if ( $this->API->config['security']['reg_auth_type'] == 'user' or $this->API->config['security']['reg_auth_type'] == 'admin_user' )
+			if ( $this->Registry->config['security']['reg_auth_type'] == 'user' or $this->Registry->config['security']['reg_auth_type'] == 'admin_user' )
 			{
 				# EMAIL VALIDATION or EMAIL+ADMIN REVIEW
 				$_variables_to_assign_to_email_template = array(
 						'member'                    =>  $member,
 						'validation_link'           =>  SITE_URL . "/users/validate/mid-" . urlencode( $member['id'] ) . "/aid-" . urlencode( $validate_key ),
 					);
-				$this->API->Display->smarty->assign( "CONTENT" , $_variables_to_assign_to_email_template );
+				$this->Registry->Display->smarty->assign( "CONTENT" , $_variables_to_assign_to_email_template );
 
-				$_email_body = $this->API->Display->smarty->fetch( "bits:register__validation_instructions-email" , $this->API->Display->cache_id['request_based']['encoded'] );
+				$_email_body = $this->Registry->Display->smarty->fetch( "bits:register__validation_instructions-email" , $this->Registry->Display->cache_id['request_based']['encoded'] );
 
 				require_once( "Zend/Mail.php" );
 				$mail = new Zend_Mail();
 				$mail->setBodyText( $_email_body )
-				     ->setFrom( $this->API->config['email']['email_out'] )
+				     ->setFrom( $this->Registry->config['email']['email_out'] )
 				     ->addTo( $member['email'] )
-				     ->setSubject( $this->API->config['general']['site_name'] . ": Account Validation" )
+				     ->setSubject( $this->Registry->config['general']['site_name'] . ": Account Validation" )
 				     ->send();
 
 				return array( 'responseCode' => 1 , 'responseMessage' => "You have successfully completed your registration!<br /><br />Please be advised that, the administrator has requested e-mail address validation for all registering members! In a few moments (usually instantly) you will be receiving an email containing necessary instructions in order to complete your registration!<br /><br />Redirecting to login page in 15 seconds... <a href=\"/users/login/\">Click here if you don't wish to wait!</a>" , 'extra' => SITE_URL . "/users/login/" );
 			}
-			elseif( $this->API->config['security']['reg_auth_type'] == 'admin' )
+			elseif( $this->Registry->config['security']['reg_auth_type'] == 'admin' )
 			{
 				# ADMIN REVIEW
 				return array( 'responseCode' => 2 , 'responseMessage' => "You have successfully completed your registration!<br /><br />Please be advised that, the administrator has requested to review and approve all registering members personally! Until that happens, you are welcome to browse our website!<br /><br />Redirecting to login page in 15 seconds... <a href=\"/users/login/\">Click here if you don't wish to wait!</a>" , 'extra' => SITE_URL . "/users/login/" );
@@ -1282,13 +1282,13 @@ class Module_Handler
 			if ( $member['display_name'] and $member['id'] )
 			{
 				$stat_cache['last_mem_name']      = $member['display_name'];
-				$stat_cache['last_mem_name_seo']  = $this->API->Input->make_seo_title( $member['display_name'] );
+				$stat_cache['last_mem_name_seo']  = $this->Registry->Input->make_seo_title( $member['display_name'] );
 				$stat_cache['last_mem_id']        = $member['id'];
 			}
 
 			$stat_cache['mem_count'] += 1;
 
-			$this->API->Cache->setCache( 'stats', $stat_cache, array( 'array' => 1 ) );
+			$this->Registry->Cache->setCache( 'stats', $stat_cache, array( 'array' => 1 ) );
 			*/
 
 			# NO VALIDATION
@@ -1296,24 +1296,24 @@ class Module_Handler
 			$_variables_to_assign_to_email_template = array(
 					'member' =>  $member
 				);
-			$this->API->Display->smarty->assign( "CONTENT" , $_variables_to_assign_to_email_template );
+			$this->Registry->Display->smarty->assign( "CONTENT" , $_variables_to_assign_to_email_template );
 
-			$_email_body = $this->API->Display->smarty->fetch( "bits:register__welcome_message-email" , $this->API->Display->cache_id['request_based']['encoded'] );
+			$_email_body = $this->Registry->Display->smarty->fetch( "bits:register__welcome_message-email" , $this->Registry->Display->cache_id['request_based']['encoded'] );
 
 			require_once( "Zend/Mail.php" );
 			$mail = new Zend_Mail();
 			$mail->setBodyText( $_email_body )
-			     ->setFrom( $this->API->config['email']['email_out'] )
+			     ->setFrom( $this->Registry->config['email']['email_out'] )
 			     ->addTo( $member['email'] )
-			     ->setSubject( $this->API->config['general']['site_name'] . ": Welcome Aboard!" )
+			     ->setSubject( $this->Registry->config['general']['site_name'] . ": Welcome Aboard!" )
 			     ->send();
 
 			//---------------------
 			// Fix up session
 			//---------------------
 
-			$this->API->Input->my_setcookie( 'pass_hash' , $member['login_key'], 1 );
-			$this->API->Input->my_setcookie( 'member_id' , $member['id']       , 1 );
+			$this->Registry->Input->my_setcookie( 'pass_hash' , $member['login_key'], 1 );
+			$this->Registry->Input->my_setcookie( 'member_id' , $member['id']       , 1 );
 
 			$privacy = $this->request['privacy'] ? 1 : 0;
 
@@ -1322,7 +1322,7 @@ class Module_Handler
 				$privacy = 1;
 			}
 
-			$this->API->Session->convert_guest_to_member(
+			$this->Registry->Session->convert_guest_to_member(
 					array(
 							'member_name'   => $member['display_name'],
 							'member_id'     => $member['id'],
@@ -1346,7 +1346,7 @@ class Module_Handler
 		//----------
 
   		$_mid   = intval( urldecode( $this->running_subroutine['request']['mid'] ) );
-		$_aid   = substr( $this->API->Input->clean__md5_hash( urldecode( $this->running_subroutine['request']['aid'] ) ), 0, 32 );
+		$_aid   = substr( $this->Registry->Input->clean__md5_hash( urldecode( $this->running_subroutine['request']['aid'] ) ), 0, 32 );
 		$_type  = ( isset( $this->request['type'] ) and $this->request['type'] )
 			?
 			$this->request['type']
@@ -1357,7 +1357,7 @@ class Module_Handler
 		// Attempt to get the profile of the requesting user
 		//-----------------------------------------------------
 
-		$member = $this->API->Session->load_member( $_mid, 'members' );
+		$member = $this->Registry->Session->load_member( $_mid, 'members' );
 
 		if ( ! $member['id'] )
 		{
@@ -1370,44 +1370,44 @@ class Module_Handler
 
 		if ( $_type == 'lostpass' )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "select_row",
 					'table'  => "members_validating",
 					'where'  => array(
-							array( "member_id=" . $this->API->Db->db->quote( $_mid , "INTEGER" ) ),
-							array( "lost_pass=" . $this->API->Db->db->quote( 1 , "INTEGER" ) ),
+							array( "member_id=" . $this->Registry->Db->db->quote( $_mid , "INTEGER" ) ),
+							array( "lost_pass=" . $this->Registry->Db->db->quote( 1 , "INTEGER" ) ),
 						)
 				);
 		}
 		else if ( $_type == 'newemail' )
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "select_row",
 					'table'  => "members_validating",
 					'where'  => array(
-							array( "member_id=" . $this->API->Db->db->quote( $_mid , "INTEGER" ) ),
-							array( "email_chg=" . $this->API->Db->db->quote( 1 , "INTEGER" ) ),
+							array( "member_id=" . $this->Registry->Db->db->quote( $_mid , "INTEGER" ) ),
+							array( "email_chg=" . $this->Registry->Db->db->quote( 1 , "INTEGER" ) ),
 						)
 				);
 		}
 		else
 		{
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'     => "select_row",
 					'table'  => "members_validating",
 					'where'  => array(
-							array( "member_id=" . $this->API->Db->db->quote( $_mid , "INTEGER" ) ),
+							array( "member_id=" . $this->Registry->Db->db->quote( $_mid , "INTEGER" ) ),
 						)
 				);
 		}
 
-		$validate = $this->API->Db->simple_exec_query();
+		$validate = $this->Registry->Db->simple_exec_query();
 
 		//--------------
 		// Checks...
 		//--------------
 
-		if ( $validate['new_reg'] == 1 and $this->API->config['security']['reg_auth_type'] == "admin" )
+		if ( $validate['new_reg'] == 1 and $this->Registry->config['security']['reg_auth_type'] == "admin" )
 		{
 			return array( "faultCode" => 0 , "faultMessage" => "Activation Failed!<br /><br />Please be advised that, the administrator has requested to review and approve all registering members personally! Until that happens, you are welcome to browse our website!" );
 		}
@@ -1425,37 +1425,37 @@ class Module_Handler
 		{
 			if ( ! $validate['real_group'] )
 			{
-				$validate['real_group'] = $this->API->config['security']['member_group'];
+				$validate['real_group'] = $this->Registry->config['security']['member_group'];
 			}
 
 			//-------------------------
 			// SELF-VERIFICATION...
 			//-------------------------
 
-			if ( $this->API->config['security']['reg_auth_type'] != 'admin_user' )
+			if ( $this->Registry->config['security']['reg_auth_type'] != 'admin_user' )
 			{
-				$this->API->Session->save_member( $member['id'], array( 'members' => array( 'mgroup' => $validate['real_group'] ) ) );
+				$this->Registry->Session->save_member( $member['id'], array( 'members' => array( 'mgroup' => $validate['real_group'] ) ) );
 
 				# Reset newest member
 
-				$_stats_cache = $this->API->Cache->cache__do_get( "stats" );
+				$_stats_cache = $this->Registry->Cache->cache__do_get( "stats" );
 				if ( $member['display_name'] and $member['id'] )
 				{
 					$_stats_cache['last_mem_name']      = $member['display_name'];
-					$_stats_cache['last_mem_name_seo']  = $this->API->Input->make_seo_title( $member['display_name'] );
+					$_stats_cache['last_mem_name_seo']  = $this->Registry->Input->make_seo_title( $member['display_name'] );
 					$_stats_cache['last_mem_id']        = $member['id'];
 				}
 				$stat_cache['mem_count'] += 1;
-				$this->API->Cache->cache__do_update( array( 'name' => "stats", 'value' => $_stats_cache, 'array' => 1 ) );
+				$this->Registry->Cache->cache__do_update( array( 'name' => "stats", 'value' => $_stats_cache, 'array' => 1 ) );
 
 				# Remove "dead" validation
 
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'	 => "delete",
 						'table'  => "members_validating",
-						'where'  => "vid=" . $this->API->Db->db->quote( $validate['vid'] ),
+						'where'  => "vid=" . $this->Registry->Db->db->quote( $validate['vid'] ),
 					);
-				$this->API->Db->simple_exec_query();
+				$this->Registry->Db->simple_exec_query();
 
 				return array( "responseCode" => 1 , "responseMessage" => "Account Activation Successful!<br /><br />Please log-in to continue..." );
 			}
@@ -1470,15 +1470,15 @@ class Module_Handler
 				// Update DB row...
 				//---------------------
 
-				$this->API->Db->cur_query = array(
+				$this->Registry->Db->cur_query = array(
 						'do'	 => "update",
 						'tables' => "members_validating",
 						'set'    => array( 'user_verified' => 1 ),
-						'where'  => "vid=" . $this->API->Db->db->quote( $validate['vid'] ),
+						'where'  => "vid=" . $this->Registry->Db->db->quote( $validate['vid'] ),
 
 						'force_data_type' => array( 'member_name' => "string" )
 					);
-				$this->API->Db->simple_exec_query();
+				$this->Registry->Db->simple_exec_query();
 
 				return array( "responseCode" => 1 , "responseMessage" => "Activation Successful!<br /><br />Please be advised that, the administrator has requested to review and approve all registering members personally! Until that happens, you are welcome to browse our website!" );
 			}
@@ -1500,20 +1500,20 @@ class Module_Handler
 			// Generate a new random password
 			//-----------------------------------
 
-			$_new_pass = $this->API->Input->create_password();
+			$_new_pass = $this->Registry->Input->create_password();
 
 			//-------------------------
 			// Generate a new salt
 			//-------------------------
 
-			$_salt = $this->API->Session->generate_password_salt(5);
+			$_salt = $this->Registry->Session->generate_password_salt(5);
 			$_salt = str_replace( '\\', "\\\\", $_salt );
 
 			//--------------------
 			// New log in key
 			//--------------------
 
-			$_key = $this->API->Session->generate_autologin_key();
+			$_key = $this->Registry->Session->generate_autologin_key();
 
 			//--------------
 			// Update...
@@ -1522,7 +1522,7 @@ class Module_Handler
 			$save_array['pass_salt']        = $_salt;
 			$save_array['pass_hash']        = md5( md5( $_salt ) . md5( $_new_pass ) );
 			$save_array['login_key']        = $_key;
-			$save_array['login_key_expire'] = $this->API->config['security']['login_key_expire'] * 60 * 60 * 24;
+			$save_array['login_key_expire'] = $this->Registry->config['security']['login_key_expire'] * 60 * 60 * 24;
 
 			$this->change_pass( $member['email'], md5( $_new_pass ) );
 
@@ -1531,7 +1531,7 @@ class Module_Handler
 				return array( "faultCode" => 0 , "faultMessage" => "There was an error changing your password in one of our external systems! Please notify an administrator." );
 	    	}
 
-	    	$this->API->Session->save_member( $member['id'], array( 'members' => $save_array ) );
+	    	$this->Registry->Session->save_member( $member['id'], array( 'members' => $save_array ) );
 
 			//--------------------------
 			// Send out the email...
@@ -1543,29 +1543,29 @@ class Module_Handler
 					'usercp_passwd_change_link'   =>  SITE_URL . "/users/password",
 					'new_passwd'                  =>  $_new_pass,
 				);
-			$this->API->Display->smarty->assign( "CONTENT" , $_variables_to_assign_to_email_template );
+			$this->Registry->Display->smarty->assign( "CONTENT" , $_variables_to_assign_to_email_template );
 
-			$_email_body = $this->API->Display->smarty->fetch( "bits:usercp__generate_and_email_random_passwd-email" , $this->API->Display->cache_id['request_based']['encoded'] );
+			$_email_body = $this->Registry->Display->smarty->fetch( "bits:usercp__generate_and_email_random_passwd-email" , $this->Registry->Display->cache_id['request_based']['encoded'] );
 
 			require_once( "Zend/Mail.php" );
 			$mail = new Zend_Mail();
 			$mail->setBodyText( $_email_body )
-			     ->setFrom( $this->API->config['email']['email_out'] )
+			     ->setFrom( $this->Registry->config['email']['email_out'] )
 			     ->addTo( $member['email'] )
-			     ->setSubject( $this->API->config['general']['site_name'] . ": Your New Password" )
+			     ->setSubject( $this->Registry->config['general']['site_name'] . ": Your New Password" )
 			     ->send();
 
 			# Remove "dead" validation
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "delete",
 					'table'  => "members_validating",
 					'where'  => array(
-							array("vid=" . $this->API->Db->db->quote( $validate['vid'] ) ),
-							array("lost_pass=" . $this->API->Db->db->quote( 1 , "INTEGER" ) ),
+							array("vid=" . $this->Registry->Db->db->quote( $validate['vid'] ) ),
+							array("lost_pass=" . $this->Registry->Db->db->quote( 1 , "INTEGER" ) ),
 						),
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
 			return array( "responseCode" => 1 , "responseMessage" => "Password Generation Successful!<br /><br />Your new random password has been generated and emailed to you..." );
 		}
@@ -1578,27 +1578,27 @@ class Module_Handler
 		{
 			if ( ! $validate['real_group'] )
 			{
-				$validate['real_group'] = $this->API->config['security']['member_group'];
+				$validate['real_group'] = $this->Registry->config['security']['member_group'];
 			}
 
-			$this->API->Session->save_member( $member['id'], array( 'members' => array( 'mgroup' => intval( $validate['real_group'] ) ) ) );
+			$this->Registry->Session->save_member( $member['id'], array( 'members' => array( 'mgroup' => intval( $validate['real_group'] ) ) ) );
 
-			$this->API->Input->my_setcookie( "member_id", $member['id']        , 1 );
-			$this->API->Input->my_setcookie( "pass_hash", $member['login_key'] , 1 );
+			$this->Registry->Input->my_setcookie( "member_id", $member['id']        , 1 );
+			$this->Registry->Input->my_setcookie( "pass_hash", $member['login_key'] , 1 );
 
 			//------------------------------
 			// Remove "dead" validation
 			//------------------------------
 
-			$this->API->Db->cur_query = array(
+			$this->Registry->Db->cur_query = array(
 					'do'	 => "delete",
 					'table'  => "members_validating",
 					'where'  => array(
-							array("vid=" . $this->API->Db->db->quote( $validate['vid'] ) ),
-							array("email_chg=" . $this->API->Db->db->quote( 1 , "INTEGER" ) ),
+							array("vid=" . $this->Registry->Db->db->quote( $validate['vid'] ) ),
+							array("email_chg=" . $this->Registry->Db->db->quote( 1 , "INTEGER" ) ),
 						),
 				);
-			$this->API->Db->simple_exec_query();
+			$this->Registry->Db->simple_exec_query();
 
 			// @todo REDIRECT TO USERCP - EMAIL CHANGE page
 			exit;
@@ -1880,7 +1880,7 @@ class Module_Handler
 
   		if ( $redirect )
   		{
-  			$this->API->http_redirect( $redirect, null );
+  			$this->Registry->http_redirect( $redirect, null );
   		}
 
   		return FALSE;
@@ -1919,7 +1919,7 @@ class Module_Handler
 
   		if ( $redirect )
   		{
-  			$this->API->http_redirect( $redirect, null );
+  			$this->Registry->http_redirect( $redirect, null );
   		}
 
   		return FALSE;
