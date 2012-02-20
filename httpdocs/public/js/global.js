@@ -581,21 +581,25 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 	{
 		jQuery("#matte").click(Persephone.unDimLights);
 
-		jQuery("A.js__go_ajax").live("click", function ( event )
+		jQuery(document).on("click", "A.js__go_ajax", function ( event )
 		{
 			event.preventDefault();
 			var url = jQuery(this).attr("href");
 			var currentConsole = persephone.Form.scrollToConsole();
 
 			/* Find FORM container for this Anchor-element */
+			if ( 'function' == typeof jQuery().metadata )  // Is jQuery.metadata() installed?
+			{
+				var formToBeUpdated = jQuery(this).metadata().whoami;
+			}
 			var parentForm = jQuery(this).parent();
-			while ( parentForm.not("FORM") && parentForm != undefined )
+			while ( !parentForm.is("FORM, BODY") && parentForm != undefined )  // If we reached BODY, then stop loop.
 			{
 				parentForm = parentForm.parent();
 			}
 
 			/* No FORM's? Exit. */
-			if ( parentForm.not("FORM") )
+			if ( !parentForm.is("FORM") )
 			{
 				return false;
 			}
@@ -666,12 +670,12 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			return jQuery.parseJSON(jqXHR.responseText);
 		});
 
-		jQuery("INPUT.js__go_dialogue").live("click", function ( event )
+		jQuery(document).on("click", "INPUT.js__go_dialogue", function ( event )
 		{
 
 		});
 
-		jQuery("FORM.js__go_ajax").live("submit", function ( event )
+		jQuery(document).on("submit", "FORM.js__go_ajax", function ( event )
 		{
 			event.preventDefault();
 			var whoami = persephone.Form.self = jQuery(this);
@@ -802,6 +806,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 		}
 
 		// Do we have tablesorter() function defined? If so, apply it accordingly.
+		// Note: jQuery.tablesorter() already has jQuery.metadata() integrated, so we don't need to do that again!
 		if ( 'function' == typeof jQuery().tablesorter )
 		{
 			jQuery("TABLE.tablesorter").tablesorter({

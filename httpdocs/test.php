@@ -1,36 +1,30 @@
 <?php
-phpinfo();
+//$a = "_SERVER"; var_dump($$a); var_dump($_SERVER); exit;
+class A
+{
+	function __construct ()
+	{
+		$a = "_SERVER"; $x = $$a; var_dump($x); var_dump($_SERVER); exit;
+	}
+}
 
-$tmp = array(
-	// array( 'file' => "/highslide.css", 'params' => "" , 'type' => "css" , 'scope' => "global" ),
-	array( 'file' => "/jquery-ui.css", 'params' => "" , 'type' => "css"  , 'scope' => "global" ),
-	// array( 'file' => "/jquery-tablesorter-blue.css", 'params' => "" , 'type' => "css"  , 'scope' => "local" ),
-	array( 'file' => "/style.css", 'params' => "" , 'type' => "css"  , 'scope' => "local" ),
+new A();
 
-	array( 'file' => "/jquery.js", 'params' => "" , 'type' => "js" , 'scope' => "global" ),
-	array( 'file' => "/jquery-ui.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	// array( 'file' => "/jquery-ui-i18n.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	// array( 'file' => "/jquery.livequery.js", 'params' => "" , 'type' => "js" , 'scope' => "global" ),
-	// array( 'file' => "/jquery.metadata.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	array( 'file' => "/jquery.cookie.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	// array( 'file' => "/jquery.tablesorter.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	// array( 'file' => "/jquery.tablesorter.pager.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	// array( 'file' => "/tiny_mce/jquery.tinymce.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	// array( 'file' => "/highslide.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	array( 'file' => "/global.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-	array( 'file' => "/global.js", 'params' => "" , 'type' => "js"  , 'scope' => "local" ),
-);
-
-print serialize($tmp);
 
 /*
-$im = new Imagick();
-$im->newPseudoImage(1000, 1000, "magick:rose");
-$im->setImageFormat("png");
-$im->roundCorners(12,8);
-$type=$im->getFormat();
-header("Content-type: $type");
-echo $im->getimageblob();
+$a = 'a:6:{i:0;a:4:{s:4:"file";s:14:"/jquery-ui.css";s:6:"params";s:0:"";s:4:"type";s:3:"css";s:5:"scope";s:6:"global";}i:1;a:4:{s:4:"file";s:10:"/style.css";s:6:"params";s:0:"";s:4:"type";s:3:"css";s:5:"scope";s:5:"local";}i:2;a:4:{s:4:"file";s:10:"/jquery.js";s:6:"params";s:0:"";s:4:"type";s:2:"js";s:5:"scope";s:6:"global";}i:3;a:4:{s:4:"file";s:13:"/jquery-ui.js";s:6:"params";s:0:"";s:4:"type";s:2:"js";s:5:"scope";s:6:"global";}i:4;a:4:{s:4:"file";s:10:"/global.js";s:6:"params";s:0:"";s:4:"type";s:2:"js";s:5:"scope";s:6:"global";}i:5;a:4:{s:4:"file";s:10:"/global.js";s:6:"params";s:0:"";s:4:"type";s:2:"js";s:5:"scope";s:5:"local";}}';
+print_r(unserialize($a));
+
+echo serialize(
+	array(
+		array( 'file' => "/jquery-ui.css", 'params' => "" , 'type' => "css"  , 'scope' => "global" ),
+		array( 'file' => "/style.css", 'params' => "" , 'type' => "css"  , 'scope' => "local" ),
+		array( 'file' => "/jquery.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+		array( 'file' => "/jquery-ui.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+		array( 'file' => "/global.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+		array( 'file' => "/global.js", 'params' => "" , 'type' => "js"  , 'scope' => "local" ),
+	)
+);
 */
 
 ?>

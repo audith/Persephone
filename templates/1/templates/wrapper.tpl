@@ -14,8 +14,8 @@
 	{{$NAVIGATION}}
 	{{$HEADER}}
 	<div id="midbar">
-		<div id="search">{{$SEARCH_FORM}}</div>
-		<div id="user_navigation">{{$MEMBERBAR}}</div>
+		{{$SEARCH_FORM}}
+		{{$MEMBERBAR}}
 	</div>
 	{{$CONTENT}}
 	{{$COPYRIGHT}}

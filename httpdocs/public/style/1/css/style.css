@@ -2,7 +2,7 @@
 
 @media screen
 {
-	/* Reset
+	/* Reset & Globals
 	---------------------------------*/
 
 	HTML, BODY, DIV, SPAN, APPLET, OBJECT, IFRAME, H1, H2, H3, H4, H5, H6, P, BLOCKQUOTE, PRE,
@@ -19,17 +19,17 @@
 		font: inherit;
 		vertical-align: baseline;
 	}
-	
+
 	STRONG, B
 	{
 		font-weight: bold;
 	}
-	
+
 	EM, I
 	{
 		font-style: oblique;
 	}
-	
+
 	TEXTAREA
 	{
 		resize: none;
@@ -70,9 +70,6 @@
 	}
 
 
-	/* Main
-	---------------------------------*/
-
 	BODY
 	{
 		font-family: "trebuchet ms",arial,sans-serif;
@@ -84,7 +81,10 @@
 		color: #0085bf;
 		text-decoration: none;
 	}
-	
+
+	/* Matte
+	---------------------------------*/
+
 	DIV#matte
 	{
 		position: absolute;
@@ -97,18 +97,10 @@
 		cursor: pointer;
 	}
 
-	DIV#navigation
-	{
-		width: 910px;
-		height: 86px;
-		clear: both;
-		margin: 0px auto;
-		padding: 0 10px;
-		overflow: hidden;
-		background-color: white;
-	}
+	/* Header logo
+	---------------------------------*/
 
-	H1#logo
+	#logo
 	{
 		width: 437px;
 		height: 86px;
@@ -124,12 +116,12 @@
 		text-indent: -9999px;
 	}
 
-	H1#logo.acp
+	#logo.acp
 	{
 		background-image: url('../images/acp__logo.jpg');
 	}
 
-		H1#logo A
+		#logo A
 		{
 			float: left;
 			width: 100%;
@@ -138,7 +130,10 @@
 			text-indent: -99999px;
 		}
 
-	UL#navigation
+	/* Navigation Menu
+	---------------------------------*/
+
+	UL#nav
 	{
 		width: 473px;
 		list-style: none;
@@ -150,17 +145,73 @@
 		margin-right: -455px;
 	}
 
-	UL#navigation LI A
-	{
-		float: left;
-		width: 100%;
-		height: 100%;
+		UL#nav LI
+		{
+			float: left;
+			position: relative;
+			display: block;
+			min-width: 140px;
+		}
 
-		text-indent: -99999px;
-		/* color: transparent; */
-	}
+		UL#nav > LI
+		{
+			min-width: 0;
+			height: 86px;
+		}
 
-	DIV#header
+		UL#nav LI A
+		{
+			float: left;
+			min-width: 90%;
+			height: 100%;
+			padding: 5%;
+			background-image: -moz-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* FF3.6+ */
+			background-image: -webkit-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* Chrome10+,Safari5.1+ */
+			background-image: -o-linear-gradient(top, #e9eef2 0%, #ffffff 100%); /* Opera11.10+ */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9eef2', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+			background-image: linear-gradient(top, #e9eef2 0%, #ffffff 100%);
+			opacity: 0.85;
+			color: inherit;
+			font-weight: bold;
+        }
+
+		UL#nav > LI > A
+		{
+			text-indent: -99999px;
+			background-image: none;
+			filter: none;
+			opacity: 1.00;
+		}
+
+		UL#nav LI > UL
+		{
+			float: left;
+			width: auto;
+			display: none;
+			z-index: 99;
+			box-shadow: inherit;
+		}
+
+		UL#nav LI:hover > UL
+		{
+			position: absolute;
+			top: 0px;
+			left: 100%;
+			display: inline;
+		}
+
+			UL#nav > LI:hover > UL
+			{
+				position: absolute;
+				top: 86px;
+				left: 25px;
+				display: inline;
+			}
+
+	/* Header
+	---------------------------------*/
+
+	#header
 	{
 		width: 930px;
 		height: 258px;
@@ -169,12 +220,11 @@
 		overflow: hidden;
 	}
 
-		DIV#header.acp
+		#header.acp
 		{
 			background-image: url('../images/acp__header__bg_1.png'), url('../images/acp__header__bg_2.png'), url('../images/acp__header__bg_3.png'), url('../images/acp__header__bg_4.png');
 			background-position: 0 0, 670px -100px, 370px -120px, 0 0;
 			background-repeat: no-repeat;
-			/*background-image: url('../images/acp__header.jpg');*/
 			width: 925px;
 			height: 163px;
 			position: relative;
@@ -182,116 +232,144 @@
 			margin-left: -462px;
 		}
 
+	/* Middle Bar
+	---------------------------------*/
+
 	#midbar
 	{
-		background-image: url('../images/midbar_background.png');
-		background-repeat: no-repeat;
+		background-image: -moz-linear-gradient(bottom, #000000 0%, #7E7E80 100%); /* FF3.6+ */
+		background-image: -webkit-linear-gradient(bottom, #000000 0%, #7E7E80 100%); /* Chrome10+,Safari5.1+ */
+		background-image: -o-linear-gradient(bottom, #000000 0%, #7E7E80 100%); /* Opera11.10+ */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#7E7E80',GradientType=0 ); /* IE6-9 */
+		background-clip: content-box;
+		border-width: 1px;
+		border-color: #D0D0D0;
+		border-style: solid;
+		border-radius: 0 0 6px 6px;
+		padding: 1px;
+		margin: 2px auto 0;
+		width: 895px;
+		height: 32px;
 		clear: both;
-		width: 930px;
-		height: 43px;
-		margin: 0 auto;
 		overflow: hidden;
 	}
 
-	#midbar DIV#user_navigation
-	{
-		float: right;
-		clear: right;
-		width: 622px;
-		height: 43px;
-	}
+		/* User navigation
+		---------------------------------*/
 
-	#midbar DIV#user_navigation UL
-	{
-		float: right;
-		margin-right: 30px;
-		list-style: none;
-		list-style-type: none;
-	}
+		#user_navigation
+		{
+			float: right;
+			clear: right;
+			height: 32px;
+			margin-right: 1em;
+			list-style: none;
+			list-style-type: none;
+		}
 
-	#midbar DIV#user_navigation UL LI
-	{
-		float: left;
-		width: auto;
-		height: 15px;
-		clear: none;
-		margin: 15px 0 13px 20px;
-	}
+		#user_navigation LI
+		{
+			float: left;
+			width: auto;
+			clear: none;
 
-	#midbar DIV#user_navigation UL LI,
-	#midbar DIV#user_navigation UL LI *
-	{
-		font-family: tahoma, sans-serif;
-		font-size: 1em;
-		color: white;
-	}
+			line-height: 32px;
+		}
 
-	#midbar DIV#user_navigation UL LI A
-	{
-		font-weight: bolder;
-	}
+		#user_navigation LI,
+		#user_navigation LI *
+		{
+			font-family: sans-serif;
+			font-size: 1em;
+			color: white;
+		}
 
-	#midbar DIV#user_navigation UL LI A#links__memberbar__profile
-	{
-		font-style: oblique;
-	}
+		#user_navigation LI A
+		{
+			margin: 0 0 0 15px;
 
-	#midbar #search
-	{
-		float: left;
-		clear: left;
-		width: 308px;
-		height: 43px;
-	}
+			text-transform: lowercase;
+		}
 
-	#midbar #search LABEL
-	{
-		background-image: url('../images/search_title.png');
-		background-repeat: no-repeat;
-		background-position: 0 0;
-		float: left;
-		clear: left;
-		width: 82px;
-		height: 43px;
-		margin-left: 27px;
+		#user_navigation LI A#links__memberbar__profile
+		{
+			font-style: oblique;
+		}
 
-		text-indent: -99999px;
-	}
+		/* Search bar
+		---------------------------------*/
 
-	#midbar #search INPUT#search__keyword
-	{
-		background-image: url('../images/search_box.png');
-		background-repeat: no-repeat;
-		background-position: 4px 0;
-		background-color: transparent;
-		border: 0;
-		float: left;
-		clear: none;
-		width: 120px;
-		height: 15px;
-		line-height: 15px;
-		padding: 15px 10px 13px 7px; /* don't make it margin... padding goes better with transparent bg-color */
+		#forms__search FIELDSET
+		{
+			float: left;
+			clear: left;
+			height: 32px;
+			overflow: hidden;
+		}
 
-		font-size: 1em;
-		font-weight: bold;
-		font-family: tahoma, 'Trebuchet MS', arial, sans serif;
-		color: black;
-	}
+		#forms__search LABEL
+		{
+			float: left;
+			height: 100%;
+			padding: 0 0 0 1em;
 
-	#midbar #search INPUT#search__button
-	{
-		background-image: url('../images/search_button.png');
-		background-repeat: no-repeat;
-		background-position: 0 0;
-		background-color: transparent;
-		float: left;
-		clear: none;
-		width: 40px;
-		height: 43px;
-		padding: 0; /* don't make it margin... padding goes better with transparent bg-color */
+			color: #DEEDF1;
+			font-family: sans-serif;
+			font-weight: bold;
+			font-size: 1.2em;
+			line-height: 32px;
+			text-transform: lowercase;
+		}
 
-		text-indent: -99999px;
-	}
+		#search__input
+		{
+			float: left;
+			height: 16px;
+			width: 10em;
+			margin: 6px;
+			padding: 1px;
+			/*
+			-moz-box-shadow: inset 0 0 2px 2px #FFFFFF;
+			-webkit-box-shadow: inset 0 0 2px 2px #FFFFFF;
+			*/
+			box-shadow: inset 0 0 0.5px 0.5px #000000;
+			background-color: white;
+			background-clip: content-box;
+			border-color: gray;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 3px;
+
+			font-family: sans-serif;
+			font-weight: bold;
+			font-color: darkgray;
+			font-size: 0.9em;
+		}
+
+		#search__button
+		{
+			float: left;
+			width: 2.5em;
+			height: 2em;
+			background-color: white;
+			background-image:
+				-moz-radial-gradient(50% 35%, ellipse closest-side, #EEEEEE 0%, #CCCCCC 70%, #BBBBBB 75%, transparent 100%),
+				-moz-radial-gradient(50% 50%, ellipse, #FFFFFF 0%, #CCCCCC 70%, #999999 80%);
+			background-image:
+				-webkit-radial-gradient(50% 35%, ellipse closest-side, #EEEEEE 0%, #CCCCCC 70%, #BBBBBB 75%, transparent 100%),
+				-webkit-radial-gradient(50% 50%, ellipse, #FFFFFF 0%, #CCCCCC 70%, #999999 80%);
+			margin: 2px;
+			border-width: 0;
+			border-top-left-radius: 45% 50%;
+			border-top-right-radius: 45% 50%;
+			border-bottom-left-radius: 45% 50%;
+			border-bottom-right-radius: 45% 50%;
+			box-shadow: inset 0 0 1px 1px darkgray;
+
+			text-transform: uppercase;
+			color: black;
+			text-indent: -0.1em;
+		}
 
 	#content
 	{
@@ -716,17 +794,17 @@
 		float: left;
 		padding: 1.5%;
 	}
-	
+
 		/**
 		 * All FIELDSETs
 		 */
 		UL.section > LI > FORM FIELDSET,
 		.section > .article > FORM FIELDSET
 		{
-			width: 100%;
+			width: 99.9%;
 			float: left;
 		}
-		
+
 			/**
 			 * FIELDSET, a child of FORM
 			 */
@@ -735,13 +813,13 @@
 			{
 				margin: 0 0 1% 0;
 			}
-			
+
 				UL.section > LI > FORM > FIELDSET.ui-tabs,
 				.section > .article > FORM > FIELDSET.ui-tabs
 				{
 					width: auto;
 				}
-				
+
 					UL.section > LI > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel,
 					.section > .article > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel
 					{
@@ -749,14 +827,14 @@
 						padding: 0;
 						margin: 0;
 					}
-					
+
 						UL.section > LI > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel FIELDSET,
 						.section > .article > FORM > FIELDSET.ui-tabs > FIELDSET.ui-tabs-panel FIELDSET
 						{
 							width: 100%;
 							margin: 0;
 						}
-			
+
 			/**
 			 * FIELDSET.deco_1
 			 */
@@ -769,7 +847,7 @@
 				border-radius: 6px;
 				background-color: white;
 			}
-			
+
 			/**
 			 * Nested FIELDSETs, a descendant of FORM
 			 */
@@ -789,25 +867,25 @@
 			display: block;
 			margin: 1.5% 0 0 1.5%;
 		}
-		
+
 			UL.section > LI > FORM LABEL.full_size,
 			.section > .article > FORM LABEL.full_size
 			{
 				clear: both;
 			}
-		
+
 			UL.section > LI > FORM LABEL > STRONG,
 			.section > .article > FORM LABEL > STRONG
 			{
 				clear: both;
 				float: left;
-		
+
 				font-size: 1.1em;
 				line-height: 1.5em;
 				font-weight: bold;
 				color: #0085bf;
 			}
-			
+
 		UL.section > LI > FORM EM.ui-tooltip,
 		.section > .article > FORM EM.ui-tooltip
 		{
@@ -815,11 +893,11 @@
 			float: left;
 			width: 55%;
 			margin: 0.5% 0 0.5% 36.5%;
-			
+
 			font-size: 0.9em;
 			color: #666666;
 		}
-		
+
 		UL.section > LI > FORM INPUT.text,
 			UL.section > LI > FORM TEXTAREA,
 			UL.section > LI > FORM SELECT,
@@ -850,13 +928,13 @@
 		border: 1px #99CBDF solid;
 		overflow: hidden;
 	}
-	
+
 	UL.section > LI > FORM SELECT OPTION,
 	.section > .article > FORM SELECT OPTION
 	{
 		padding-left: 2px;
 	}
-	
+
 	UL.section > LI > FORM SELECT OPTGROUP,
 	.section > .article > FORM SELECT OPTGROUP
 	{
@@ -936,7 +1014,7 @@
 		color: #00639D;
 		line-height: 1.5em;
 	}
-	
+
 		UL.section > LI > FORM SPAN.input > *,
 		.section > .article > FORM SPAN.input > *
 		{
@@ -954,7 +1032,7 @@
 			padding: 0;
 			margin: 0 !important;
 		}
-		
+
 		UL.section > LI > FORM SPAN.input > LABEL,
 		.section > .article > FORM SPAN.input > LABEL
 		{
@@ -978,7 +1056,7 @@
 			/* font-size: 1em; */
 			color: #00639D;
 		}
-		
+
 	UL.section > LI > FORM SPAN.input.full_size,
 	.section > .article > FORM SPAN.input.full_size
 	{
@@ -986,7 +1064,7 @@
 		margin: 1% 0 2% 3%;
 		width: 97%;
 	}
-	
+
 		UL.section > LI > FORM EM.ui-tooltip.full_size,
 		.section > .article > FORM EM.ui-tooltip.full_size
 		{
@@ -995,11 +1073,11 @@
 			width: auto;
 			max-width: 85%;
 			margin: 0.5% 0 1.5% 3%;
-			
+
 			font-size: 0.9em;
 			color: #666666;
 		}
-	
+
 	UL.section > LI > FORM SPAN.mceEditor > TABLE,
 	.section > .article > FORM SPAN.mceEditor > TABLE
 	{
@@ -1110,10 +1188,10 @@
 	/* .section.half_size
 	---------------------------------*/
 
-	
-	
-	
-	
+
+
+
+
 
 	/* .section.full_size
 	---------------------------------*/
@@ -1132,8 +1210,8 @@
 		clear: both;
 	}
 
-	UL.section.full_size > LI.ui-tabs > FORM > FIELDSET.deco_1 > LEGEND,
-	.section.full_size > .article.ui-tabs > FORM > FIELDSET.deco_1 > LEGEND
+	UL.section.full_size > LI > FORM > FIELDSET.deco_1 > LEGEND,
+	.section.full_size > .article > FORM > FIELDSET.deco_1 > LEGEND
 	{
 		background-color: #001d2a;
 		background-image: -moz-linear-gradient(top, #546770 0%, #07222f 35%, #001d2a 100%); /* FF3.6+ */
@@ -1145,7 +1223,7 @@
 		border-width: 0;
 		border-radius: 6px 6px 0 0;
 		float: left;
-		width: 845px;
+		width: 98.6%;
 		height: 2em;
 		clear: both;
 		padding: 0.3% 0.7%;
@@ -1165,8 +1243,8 @@
 		margin: 10px 20px 15px 0;
 		border: 1px #99CBDF solid;
 		overflow: hidden;
-	}				
-				
+	}
+
 	/* UL.side_pane
 	---------------------------------*/
 

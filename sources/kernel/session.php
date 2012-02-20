@@ -2828,57 +2828,6 @@ class Session
 
 
 	/**
-	 * Format name based on group suffix/prefix
-	 *
-	 * @param   string      User's display name
-	 * @param   integer     User's group ID
-	 * @param   string      Optional prefix override (uses group setting if not provided)
-	 * @param   string      Optional suffix override (uses group setting if not provided)
-	 * @return  string      Formatted name
-	 */
-	public function names__do_format ( $name="", $group_id="", $prefix="", $suffix="" )
-	{
-		if ( $this->Registry->config['userprofiles']['disable_group_psformat'] )
-		{
-			return $name;
-		}
-
-		if ( ! $group_id )
-		{
-			$group_id = 0;
-		}
-
-		$group_cache = $this->Registry->Cache->cache__do_get( "member_groups" );
-
-		if ( ! $prefix )
-		{
-			if ( isset( $group_cache[ $group_id ]['prefix'] ) )
-			{
-				$prefix = $group_cache[ $group_id ]['prefix'];
-			}
-		}
-
-		if ( ! $suffix )
-		{
-			if ( isset( $group_cache[ $group_id ]['suffix'] ) )
-			{
-				$suffix = $group_cache[ $group_id ]['suffix'];
-			}
-		}
-
-		if ( ! $name )
-		{
-			if ( isset( $group_cache[ $group_id ]['g_title'] ) )
-			{
-				$name = $group_cache[ $group_id ]['g_title'];
-			}
-		}
-
-		return $prefix . $name . $suffix;
-	}
-
-
-	/**
 	 * Get unicode version of name
 	 *
 	 * @access	protected
@@ -3158,7 +3107,7 @@ class Session
 				'_cache'            => array( 'qr_open' => 0, 'friends' => array() ),
 				'ignored_users'     => null,
 				'editor_choice'     => "std",
-				'_group_formatted'  => $this->names__do_format( $cache[ $this->Registry->config['security']['guest_group'] ]['g_title'], $this->Registry->config['security']['guest_group'] ),
+				'_group_formatted'  => $cache[ $this->Registry->config['security']['guest_group'] ]['g_title'], $this->Registry->config['security']['guest_group'],
 			);
 
 		return is_array( $cache[ $this->Registry->config['security']['guest_group'] ] ) ? array_merge( $array, $cache[ $this->Registry->config['security']['guest_group'] ] ) : $array;

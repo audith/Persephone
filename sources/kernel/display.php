@@ -242,16 +242,16 @@ class Display
 				switch ( $_v['scope'] . "_" . $_v['type'] )
 				{
 					case 'global_css':
-						$_prefix = rtrim( $this->smarty->style_url['global_css'] , "/" );
+						$_prefix = rtrim( $this->style_url['global_css'] , "/" );
 						break;
 					case 'local_css':
-						$_prefix = rtrim( $this->smarty->style_url['local_css'] , "/" );
+						$_prefix = rtrim( $this->style_url['local_css'] , "/" );
 						break;
 					case 'global_js':
-						$_prefix = rtrim( $this->smarty->style_url['global_js'] , "/" );
+						$_prefix = rtrim( $this->style_url['global_js'] , "/" );
 						break;
 					case 'local_js':
-						$_prefix = rtrim( $this->smarty->style_url['local_js'] , "/" );
+						$_prefix = rtrim( $this->style_url['local_js'] , "/" );
 						break;
 				}
 				$_assets_parsed[ $_v['type'] ][] = $_prefix . $_v['file'];
@@ -698,13 +698,13 @@ if ( $this->Registry->Modules->cur_module['m_name'] == 'acp' )
 		$this->smarty->right_delimiter        = '}}';
 
 		# Smarty Dirs
-		$this->smarty->template_dir           = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates";
-		$this->smarty->compile_dir            = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates_c";
-		$this->smarty->config_dir             = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/config";
-		$this->smarty->cache_dir              = PATH_TEMPLATES . "/"  . $skin['set_id'] . "/cache";
+		$this->smarty->setTemplateDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates" );
+		$this->smarty->setCompileDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates_c" );
+		$this->smarty->setConfigDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/config" );
+		$this->smarty->setCacheDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/cache" );
 
 		# Skin URLs
-		$this->smarty->style_url              = array(
+		$this->style_url              = array(
 				'images'      => SITE_URL . "/public/style/" . $skin['set_id'] . "/images",
 				'global_css'  =>            "/public/css",
 				'global_js'   =>            "/public/js",
@@ -1024,11 +1024,11 @@ if ( $this->Registry->Modules->cur_module['m_name'] == 'acp' )
 
 		# Path to template file
 		$_fs__full_path = array(
-				'primary'    => $smarty_object->template_dir  // "Primary" (module-specific) template-bit
+				'primary'    => $smarty_object->getTemplateDir  // "Primary" (module-specific) template-bit
 					. "/" . $template_bit_information['m_unique_id_clean']
 					. "/" . $template_bit_information['t_bit_name']
 					. "." . $template_bit_information['t_type'],
-				'secondary'  => $smarty_object->template_dir  // "Secondary" (global) template-bit
+				'secondary'  => $smarty_object->getTemplateDir  // "Secondary" (global) template-bit
 					. "/" . $template_bit_information['t_bit_name']
 					. "." . $template_bit_information['t_type']
 			);
@@ -1088,7 +1088,7 @@ if ( $this->Registry->Modules->cur_module['m_name'] == 'acp' )
 				null;
 
 			# Write template-source to a new template-file
-			$template_bit_information['fs__full_path'] = $smarty_object->template_dir
+			$template_bit_information['fs__full_path'] = $smarty_object->getTemplateDir
 					. ( ( !is_null( $template_bit_information['m_unique_id_clean'] ) ) ? "/" . $template_bit_information['m_unique_id_clean'] : "" )
 					. "/" . $template_bit_information['t_bit_name']
 					. "." . $template_bit_information['t_type'];

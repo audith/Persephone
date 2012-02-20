@@ -73,150 +73,156 @@ class Module_Handler
 		//------------------
 
 		$this->structural_map = array(
-				'm_subroutines'                  =>
-					array(
-							'system_index'                      =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'system_index',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'tpl',
-										's_pathinfo_uri_schema'           => 'system(\/\?[a-z_]+)?',
-										's_pathinfo_uri_schema_parsed'    => 'system(\/\?[a-z_]+)?',
-										's_qstring_parameters'            => array(),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(
-												array( 'file' => "/jquery.cookie.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+				'm_subroutines'                  => array(
+						'configuration__system'             => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'configuration__system',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'configuration/system-(?P<config_group>[-a-z]+)',
+								's_pathinfo_uri_schema_parsed'    => 'configuration/system-(?P<config_group>[-a-z]+)',
+								's_qstring_parameters'            => array(
+										'config_group'                      => array(
+												'request_regex'                       => '[-a-z]+',
+												'_is_mandatory'                       => true,
 											),
 									),
-							'content_and_data__index'           =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'management_index',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'tpl',
-										's_pathinfo_uri_schema'           => 'content_and_data',
-										's_pathinfo_uri_schema_parsed'    => 'content_and_data',
-										's_qstring_parameters'            => array(),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(),
-									),
-							'content_and_data__content'         =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'content_and_data__content',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'rdbms',
-										's_pathinfo_uri_schema'           => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
-										's_pathinfo_uri_schema_parsed'    => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
-										's_qstring_parameters'            => array(
-												'm_unique_id_clean'                 => array(
-														'request_regex'                       => '[a-z0-9]{32}',
-														'_is_mandatory'                       => true,
-													),
-											),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(),
-									),
-							'content_and_data__media_library'   =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'content_and_data__media_library',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'rdbms',
-										's_pathinfo_uri_schema'           => 'content_and_data/media_library',
-										's_pathinfo_uri_schema_parsed'    => 'content_and_data/media_library',
-										's_qstring_parameters'            => array(),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(
-												array( 'file' => "/jumploader.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(),
+							),
+						'content_and_data__index'           => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'management_index',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'content_and_data',
+								's_pathinfo_uri_schema_parsed'    => 'content_and_data',
+								's_qstring_parameters'            => array(),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(),
+							),
+						'content_and_data__content'         => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'content_and_data__content',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'rdbms',
+								's_pathinfo_uri_schema'           => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
+								's_pathinfo_uri_schema_parsed'    => 'content_and_data/content-(?P<m_unique_id_clean>[a-z0-9]{32})',
+								's_qstring_parameters'            => array(
+										'm_unique_id_clean'                 => array(
+												'request_regex'                       => '[a-z0-9]{32}',
+												'_is_mandatory'                       => true,
 											),
 									),
-							'components_modules'                =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'components_modules',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'rdbms',
-										's_pathinfo_uri_schema'           => 'components',
-										's_pathinfo_uri_schema_parsed'    => 'components',
-										's_qstring_parameters'            => array(),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(
-												array( 'file' => "/jquery.tablesorter.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-												array( 'file' => "/jquery.tablesorter.pager.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-												array( 'file' => "/jquery.metadata.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(),
+							),
+						'content-and-data__media-library'   => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'content_and_data__media_library',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'content-and-data/media-library',
+								's_pathinfo_uri_schema_parsed'    => 'content-and-data/media-library',
+								's_qstring_parameters'            => array(),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(
+										array( 'file' => "/jumploader.js", 'params' => "", 'type' => "js", 'scope' => "global" ),
+									),
+							),
+						'components_modules'                => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'components_modules',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'components/modules',
+								's_pathinfo_uri_schema_parsed'    => 'components/modules',
+								's_qstring_parameters'            => array(),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(
+										array( 'file' => "/jquery.tablesorter.js", 'params' => "", 'type' => "js", 'scope' => "global" ),
+										array( 'file' => "/jquery.tablesorter.pager.js", 'params' => "", 'type' => "js", 'scope' => "global" ),
+										array( 'file' => "/jquery.metadata.js", 'params' => "", 'type' => "js", 'scope' => "global" ),
+									),
+							),
+						'components_viewmodule'             => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'components_viewmodule',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'components/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
+								's_pathinfo_uri_schema_parsed'    => 'components/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
+								's_qstring_parameters'            => array(
+										'm_unique_id_clean'                 => array(
+												'request_regex'                       => '[a-z0-9]{32}',
+												'_is_mandatory'                       => true,
 											),
 									),
-							'components_viewmodule'             =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'components_viewmodule',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'rdbms',
-										's_pathinfo_uri_schema'           => 'components/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
-										's_pathinfo_uri_schema_parsed'    => 'components/viewmodule-(?P<m_unique_id_clean>[a-z0-9]{32})',
-										's_qstring_parameters'            => array(
-												'm_unique_id_clean'                 => array(
-														'request_regex'                       => '[a-z0-9]{32}',
-														'_is_mandatory'                       => true,
-													),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(
+										array( 'file' => "/jquery.cookie.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+										array( 'file' => "/jquery.tablesorter.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+										array( 'file' => "/jquery.tablesorter.pager.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+										array( 'file' => "/jquery.metadata.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+									),
+							),
+						'components_viewconnector'          => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'components_viewconnector',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'components/viewconnector-(?P<m_unique_id_clean>[a-z0-9]{32})-(?P<c_name>[a-z][a-z0-9_]+)',
+								's_pathinfo_uri_schema_parsed'    => 'components/viewconnector-(?P<m_unique_id_clean>[a-z0-9]{32})-(?P<c_name>[a-z][a-z0-9_]+)',
+								's_qstring_parameters'            => array(
+										'm_unique_id_clean'                 => array(
+												'request_regex'                       => '[a-z0-9]{32}',
+												'_is_mandatory'                       => true,
 											),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(
-												array( 'file' => "/jquery.cookie.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-												array( 'file' => "/jquery.tablesorter.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-												array( 'file' => "/jquery.tablesorter.pager.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
-												array( 'file' => "/jquery.metadata.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
+										'c_name'                            => array(
+												'request_regex'                       => '[a-z][a-z0-9_]+',
+												'_is_mandatory'                       => true,
 											),
 									),
-							'components_viewconnector'          =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'components_viewconnector',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'rdbms',
-										's_pathinfo_uri_schema'           => 'components/viewconnector-(?P<m_unique_id_clean>[a-z0-9]{32})-(?P<c_name>[a-z][a-z0-9_]+)',
-										's_pathinfo_uri_schema_parsed'    => 'components/viewconnector-(?P<m_unique_id_clean>[a-z0-9]{32})-(?P<c_name>[a-z][a-z0-9_]+)',
-										's_qstring_parameters'            => array(
-												'm_unique_id_clean'                 => array(
-														'request_regex'                       => '[a-z0-9]{32}',
-														'_is_mandatory'                       => true,
-													),
-												'c_name'                            => array(
-														'request_regex'                       => '[a-z][a-z0-9_]+',
-														'_is_mandatory'                       => true,
-													),
-											),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(),
-									),
-							'test'                              =>
-								array(
-										'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-										's_name'                          => 'test',
-										's_data_source'                   => 'rdbms',
-										's_data_target'                   => 'rdbms',
-										's_pathinfo_uri_schema'           => 'test',
-										's_pathinfo_uri_schema_parsed'    => 'test',
-										's_qstring_parameters'            => array(
-												'm_unique_id_clean'                 => array(
-														'request_regex'                       => '[a-z0-9]{32}',
-														'_is_mandatory'                       => true,
-													),
-											),
-										's_fetch_criteria'                => array(),
-										's_data_definition'               => array(),
-										's_additional_skin_assets'        => array(),
-									),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(),
+							),
+						'components__mrp__uom'              => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'components__mrp__uom',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'components/mrp/uom',
+								's_pathinfo_uri_schema_parsed'    => 'components/mrp/uom',
+								's_qstring_parameters'            => array(),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(),
 						),
+						'test'                              => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'test',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'rdbms',
+								's_pathinfo_uri_schema'           => 'test',
+								's_pathinfo_uri_schema_parsed'    => 'test',
+								's_qstring_parameters'            => array(
+										'm_unique_id_clean'                 => array(
+												'request_regex'                       => '[a-z0-9]{32}',
+												'_is_mandatory'                       => true,
+											),
+									),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(),
+							),
+					),
 			);
     }
 
@@ -229,64 +235,59 @@ class Module_Handler
 		$this->running_subroutine = $running_subroutine;
 
 		$this->processor_map = array(
-				'system_index'                   =>
-					array(
-							'get'                                  => "settings__do_show",
-							'edit'                                 => "settings__do_edit",
-							'revert'                               => "settings__do_revert",
-						),
-				'management_index'               =>
-					array(
-							'get'                                  => "management__do_prepare"
-						),
-				'management_content'             =>
-					array(
-							'get'                                  => "content__do_fetch",
-							'edit'                                 => "content__do_edit",
-							'create'                               => "content__do_create",
-							'delete'                               => "content__do_remove",
-						),
-				'management_medialibrary'        =>
-					array(
-							'get'                                  => "management__media_library__do_list",
-						),
-				'components_modules'             =>
-					array(
-							'get'                                  => "modules__do_list",
-							'edit'                                 => "modules__do_edit",
-							'create'                               => "modules__do_create__master_unit",
-							'delete'                               => "modules__do_remove",
-						),
-				'components_viewmodule'          =>
-					array(
-							'get'                                  => "modules__do_view",
-							'sr_alter__add'                        => "modules__subroutines__do_create",
-							'sr_alter__drop'                       => "modules__subroutines__do_remove",
-							'ddl_alter__add'                       => "modules__ddl__do_create",
-							'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
-							'ddl_alter__pre_edit'                  => "modules__ddl__do_edit__pre_processing",
-							'ddl_alter__edit'                      => "modules__ddl__do_edit",
-							'ddl_alter__sort'                      => "modules__ddl__do_sort",
-							'ddl_alter__drop'                      => "modules__ddl__do_drop",
-							'ddl_alter__restore_backup'            => "modules__ddl__do_restore_backup",
-							'ddl_alter__purge_backup'              => "modules__ddl__do_drop_backup",
-							'ddl_alter__set_title_column'          => "modules__ddl__do_set_title_column",
-							'ddl_alter__link_to_connector_unit'    => "modules__do_create__connector_unit",
-						),
-				'components_viewconnector'   =>
-					array(
-							'get'                                  => "modules__connector_unit__do_view",
-							'ddl_alter__add'                       => "modules__connector_unit__ddl__do_create",
-							'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
-							'ddl_alter__sort'                      => "modules__connector_unit__ddl__do_sort",
-							'ddl_alter__drop'                      => "modules__connector_unit__ddl__do_drop",
-							'ddl_alter__restore_backup'            => "modules__connector_unit__ddl__do_restore_backup",
-							'ddl_alter__purge_backup'              => "modules__connector_unit__ddl__do_drop_backup",
-						),
-				'test'                           =>
-					array(
-							'get'                                  => "modules__do_view",
-						),
+				'configuration__system'               => array(
+						'get'                                  => "settings__do_show",
+						'edit'                                 => "settings__do_edit",
+						'revert'                               => "settings__do_revert",
+					),
+				'management_index'                    => array(
+						'get'                                  => "management__do_prepare"
+					),
+				'management_content'                  => array(
+						'get'                                  => "content__do_fetch",
+						'edit'                                 => "content__do_edit",
+						'create'                               => "content__do_create",
+						'delete'                               => "content__do_remove",
+					),
+				'content-and-data__media-library'     => array(
+						'get'                                  => "management__media_library__do_list",
+					),
+				'components_modules'                  => array(
+						'get'                                  => "modules__do_list",
+						'edit'                                 => "modules__do_edit",
+						'create'                               => "modules__do_create__master_unit",
+						'delete'                               => "modules__do_remove",
+					),
+				'components_viewmodule'               => array(
+						'get'                                  => "modules__do_view",
+						'sr_alter__add'                        => "modules__subroutines__do_create",
+						'sr_alter__drop'                       => "modules__subroutines__do_remove",
+						'ddl_alter__add'                       => "modules__ddl__do_create",
+						'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
+						'ddl_alter__pre_edit'                  => "modules__ddl__do_edit__pre_processing",
+						'ddl_alter__edit'                      => "modules__ddl__do_edit",
+						'ddl_alter__sort'                      => "modules__ddl__do_sort",
+						'ddl_alter__drop'                      => "modules__ddl__do_drop",
+						'ddl_alter__restore_backup'            => "modules__ddl__do_restore_backup",
+						'ddl_alter__purge_backup'              => "modules__ddl__do_drop_backup",
+						'ddl_alter__set_title_column'          => "modules__ddl__do_set_title_column",
+						'ddl_alter__link_to_connector_unit'    => "modules__do_create__connector_unit",
+					),
+				'components_viewconnector'            => array(
+						'get'                                  => "modules__connector_unit__do_view",
+						'ddl_alter__add'                       => "modules__connector_unit__ddl__do_create",
+						'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
+						'ddl_alter__sort'                      => "modules__connector_unit__ddl__do_sort",
+						'ddl_alter__drop'                      => "modules__connector_unit__ddl__do_drop",
+						'ddl_alter__restore_backup'            => "modules__connector_unit__ddl__do_restore_backup",
+						'ddl_alter__purge_backup'              => "modules__connector_unit__ddl__do_drop_backup",
+					),
+				'components__mrp__uom'     => array(
+						'get'                                  => "components__mrp__uom__do_List",
+				),
+				'test'                                => array(
+						'get'                                  => "modules__do_view",
+					),
 			);
 
 		if (
@@ -301,7 +302,6 @@ class Module_Handler
 		{
 			$_methods = $this->processor_map[ $this->running_subroutine['s_name'] ][ $action ];
 			$_methods = explode( "|" , $_methods );
-
 			foreach ( $_methods as $_method_name )
 			{
 				/* Each method alters the content, and the subsequent method uses
@@ -524,6 +524,17 @@ class Module_Handler
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * Fetches Units-of-Measure information
+	 *
+	 * @return   mixed     Array containing UOM-info on success; FALSE otherwise
+	 */
+	private function components__mrp__uom__do_list ()
+	{
+		return $this->Registry->Cache->cache__do_get_part("components__mrp__uom", "_by_id");
 	}
 
 
@@ -2911,117 +2922,113 @@ class Module_Handler
 	 */
 	private function settings__do_show ()
 	{
-	$data = array();
+		$data = array();
 		if ( isset( $this->Registry->Cache->cache['settings'] ) and count( $this->Registry->Cache->cache['settings'] ) )
 		{
-			foreach ( $this->Registry->Cache->cache['settings']['by_id'] as $_group_id=>$_group_data )
+			$_group_data = $this->Registry->Cache->cache['settings']['by_key'][ $this->running_subroutine['request']['config_group'] ];
+			if ( $_group_data['conf_group_noshow'] )
 			{
-				if ( $_group_data['conf_group_noshow'] )
+				continue;
+			}
+
+			$_group_data__items = $_group_data;
+			foreach ( $_group_data__items as $_k=>&$_v )
+			{
+				if ( !is_array( $_v ) or $_v['conf_show'] == 0 )
 				{
-					continue;
+					unset( $_group_data__items[ $_k ] );
+					continue;  // "continue" is a MUST here, otherwise after key deletion we will lose a character, due to pointer shifting ahead for 1-byte.
 				}
 
-				$_settings_by_group = $this->Registry->Cache->cache['settings']['by_id'][ $_group_id ];
-				foreach ( $_settings_by_group as $_k=>&$_v )
+				$_conf_extra = array();
+				if ( $_v['conf_type'] == 'dropdown' or $_v['conf_type'] == 'multi' )
 				{
-					if ( is_array( $_v ) )
+					if ( !empty( $_v['conf_extra'] ) )
 					{
-						if ( $_v['conf_show'] == 0 )
+						if ( $_v['conf_extra'] == '#show_groups#' )
 						{
-							unset( $_settings_by_group[ $_k ] );
-						}
-
-						$_conf_extra = array();
-
-						if ( $_v['conf_type'] == 'dropdown' or $_v['conf_type'] == 'multi' )
-						{
-							if ( !empty( $_v['conf_extra'] ) )
+							foreach ( $this->Registry->Cache->cache['member_groups'] as $__k=>$__v )
 							{
-								if ( $_v['conf_extra'] == '#show_groups#' )
-								{
-									foreach ( $this->Registry->Cache->cache['member_groups'] as $__k=>$__v )
-									{
-										$_conf_extra[ $__v['g_id'] ] = $__v['g_title'];
-									}
-								}
-								elseif ( $_v['conf_extra'] == '#show_skins#' )
-								{
-									foreach ( $this->Registry->Cache->cache['skins'] as $__k=>$__v )
-									{
-										$_conf_extra[ $__v['set_id'] ] = $__v['set_name'];
-									}
-								}
-								else
-								{
-									$_conf_extra_lines = explode( "\n", preg_replace( '#\r?\n#m', "\n", $_v['conf_extra'] ) );
-									foreach ( $_conf_extra_lines as $__v )
-									{
-										$_tmp_conf_extra = explode( "=", $__v );
-										$_conf_extra[ $_tmp_conf_extra[0] ] = $_tmp_conf_extra[1];
-									}
-								}
+								$_conf_extra[ $__v['g_id'] ] = $__v['g_title'];
 							}
-							$_v['conf_extra'] = $_conf_extra;
 						}
-
-						switch ( $_v['conf_type'] )
+						elseif ( $_v['conf_extra'] == '#show_skins#' )
 						{
-							case 'yes_no':
-								if ( $_v['conf_value'] == '1' )
-								{
-									(int) $_conf_real_value = 1;
-								}
-								elseif ( $_v['conf_value'] == '0' )
-								{
-									(int) $_conf_real_value = 0;
-								}
-								else
-								{
-									(int) $_conf_real_value = $_v['conf_default'];
-								}
-								break;
-
-							case 'input':
-							case 'textarea':
-							case 'dropdown':
-								if ( strval( $_v['conf_value'] ) == '' )
-								{
-									(string) $_conf_real_value = $_v['conf_default'];
-								}
-								else
-								{
-									(string) $_conf_real_value = $_v['conf_value'];
-								}
-								break;
-
-							case 'multi':
-								$_v['conf_default'] = $this->Registry->Input->clean__excessive_separators( $_v['conf_default'], "," );
-								$_v['conf_default'] = explode( "," , $_v['conf_default'] );
-								if ( strval( $_v['conf_value'] ) == '' )
-								{
-									$_conf_real_value = $_v['conf_default'];
-								}
-								else
-								{
-									$_v['conf_value'] = $this->Registry->Input->clean__excessive_separators( $_v['conf_value'], "," );
-									$_conf_real_value = explode( "," , $_v['conf_value'] );
-								}
-								break;
+							foreach ( $this->Registry->Cache->cache['skins'] as $__k=>$__v )
+							{
+								$_conf_extra[ $__v['set_id'] ] = $__v['set_name'];
+							}
 						}
-						$_v['conf_real_value'] = $_conf_real_value;
+						else
+						{
+							$_conf_extra_lines = explode( "\n", preg_replace( '#\r?\n#m', "\n", $_v['conf_extra'] ) );
+							foreach ( $_conf_extra_lines as $__v )
+							{
+								$_tmp_conf_extra = explode( "=", $__v );
+								$_conf_extra[ $_tmp_conf_extra[0] ] = $_tmp_conf_extra[1];
+							}
+						}
 					}
+					$_v['conf_extra'] = $_conf_extra;
 				}
 
-				$data[ $_group_id ] = array(
-						'conf_group_id'       =>  $_group_id,
-						'conf_group_title'    =>  $_group_data['conf_group_title'],
-						'conf_group_desc'     =>  $_group_data['conf_group_desc'],
-						'conf_group_count'    =>  $_group_data['conf_group_count'],
-						'conf_group_noshow'   =>  $_group_data['conf_group_noshow'],
-						'conf_group_keyword'  =>  $_group_data['conf_group_keyword'],
-						'_items'              =>  $_settings_by_group,
-					);
-		}
+				switch ( $_v['conf_type'] )
+				{
+					case 'yes_no':
+						if ( $_v['conf_value'] == '1' )
+						{
+							(int) $_conf_real_value = 1;
+						}
+						elseif ( $_v['conf_value'] == '0' )
+						{
+							(int) $_conf_real_value = 0;
+						}
+						else
+						{
+							(int) $_conf_real_value = $_v['conf_default'];
+						}
+						break;
+
+					case 'input':
+					case 'textarea':
+					case 'dropdown':
+						if ( strval( $_v['conf_value'] ) == '' )
+						{
+							(string) $_conf_real_value = $_v['conf_default'];
+						}
+						else
+						{
+							(string) $_conf_real_value = $_v['conf_value'];
+						}
+						break;
+
+					case 'multi':
+						$_v['conf_default'] = $this->Registry->Input->clean__excessive_separators( $_v['conf_default'], "," );
+						$_v['conf_default'] = explode( "," , $_v['conf_default'] );
+						if ( strval( $_v['conf_value'] ) == '' )
+						{
+							$_conf_real_value = $_v['conf_default'];
+						}
+						else
+						{
+							$_v['conf_value'] = $this->Registry->Input->clean__excessive_separators( $_v['conf_value'], "," );
+							$_conf_real_value = explode( "," , $_v['conf_value'] );
+						}
+						break;
+				}
+				$_v['conf_real_value'] = $_conf_real_value;
+			}
+
+			$data[ $_group_data['conf_group_id'] ] = array(
+					'conf_group_id'       =>  $_group_data['conf_group_id'],
+					'conf_group_title'    =>  $_group_data['conf_group_title'],
+					'conf_group_desc'     =>  $_group_data['conf_group_desc'],
+					'conf_group_count'    =>  $_group_data['conf_group_count'],
+					'conf_group_noshow'   =>  $_group_data['conf_group_noshow'],
+					'conf_group_keyword'  =>  $_group_data['conf_group_keyword'],
+					'_items'              =>  $_group_data__items,
+				);
+
 			return $data;
 		}
 		else

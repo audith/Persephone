@@ -188,7 +188,7 @@ jQuery(document).ready(function ()
 					/* do = edit */
 					jQuery("#forms__modules__alter_add [name='do']").val("edit");
 					jQuery("#forms__modules__alter_add [name='m_unique_id']").prop("disabled","").val(data.me.m_unique_id);
-acp__components.debug(jQuery("#forms__modules__alter_add [name='m_unique_id']"));
+
 					/* Finalize */
 					currentConsole.html("Form successfully loaded!").removeClass("error").addClass("success");
 					jQuery("#components__modules__alter_add").slideDown("medium");

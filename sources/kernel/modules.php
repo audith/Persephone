@@ -25,7 +25,7 @@ class Modules
 	 * Array of active modules
 	 * @var array
 	**/
-	public $active_modules  = array();
+	public $active_modules = array();
 
 	/**
 	 * Current working module
@@ -216,7 +216,7 @@ class Modules
 	}
 
 
-/**
+	/**
 	 * GET - Fetches all the content requested, according to the Subroutine fetch-criteria
 	 *
 	 * @param   array    Reference: Module info
