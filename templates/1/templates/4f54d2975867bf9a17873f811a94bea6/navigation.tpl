@@ -47,8 +47,13 @@
 			<li>
 				<a href="#">Material Resource Planning</a>
 				<ul style="color: #B94E2A; box-shadow: 0 0 3px 1px #B94E2A;">
-					<li><a href="{{$MODULE_URL}}/components/mrp/uom">Units of Measure</a></li>
-					<li><a href="{{$MODULE_URL}}/components/mrp/bom">Bill of Materials</a></li>
+					<li>
+						<a href="#">Warehouse Management</a>
+						<ul style="color: #B94E2A; box-shadow: 0 0 3px 1px #B94E2A;">
+							<li><a href="{{$MODULE_URL}}/components/mrp/uom">Units of Measure</a></li>
+							<li><a href="{{$MODULE_URL}}/components/mrp/bom">Bill of Materials</a></li>
+						</ul>
+					</li>
 				</ul>
 			</li>
 		</ul>

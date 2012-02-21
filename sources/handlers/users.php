@@ -973,10 +973,9 @@ class Module_Handler
 		if ( !is_null( $this->Registry->Input->request("referer") ) )
 		{
 			$return['referer'] = $this->Registry->Input->request("referer");
+
+			return $return;
 		}
-
-
-		return $return;
   	}
 
 

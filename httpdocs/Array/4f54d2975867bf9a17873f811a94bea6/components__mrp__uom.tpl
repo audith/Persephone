@@ -55,22 +55,21 @@
 		</form>
 	</li>
 
-	<li id="components__modules__list">
-		<h2>Components Management - Modules
+	<li id="components__mrp__uom__categories-list">
+		<h2>Units of Measure
 			<span class="description"></span>
 		</h2>
 
-		<form id="forms-components__mrp__uom__categories__list" class="js__go_ajax" method="post" action="">
+		<form id="forms-components__mrp__uom__categories-list" class="js__go_ajax" method="post" action="">
 		<table class="full_size tablesorter" id="tables__modules__list">
 			<thead>
 				<tr>
-					<th style="width:65%; white-space:nowrap">Module Info</th>
-					<th style="width:35%; white-space:nowrap; text-align:center;" class="{sorter: false}">Preliminary Diagnostics</th>
+					<th style="width:65%; white-space:nowrap">UOM Category</th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<td colspan="2">
+					<td>
 					<div class="system_console"></div>
 					<fieldset class="buttons">
 						<input type="hidden" value="" name="do" />
@@ -81,27 +80,22 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				{{foreach from=$CONTENT item=MODULE}}
-				{{if $MODULE.m_type neq 'built-in'}}
+				{{foreach from=$CONTENT item=UOM_CATEG}}
 				<tr>
 					<td>
 						<span class="name">
-							<a href="{{$MODULE_URL}}/components/viewmodule-{{$MODULE.m_unique_id|m_unique_id_clean}}"><strong>/{{$MODULE.m_name|truncate:16}}</strong></a> - {{$MODULE.m_description|truncate:48}}
-							<br />
-							{{$MODULE.m_unique_id}}
+							<a href="{{$MODULE_URL}}/components/mrp/uom/browse-{{$UOM_CATEG.category_id}}"><strong>{{$UOM_CATEG.category_name|truncate:16}}</strong></a>
 						</span>
 						<ul class="actions">
-							<li class="ui-icon ui-icon-pencil"><a class="edit" href="?{{$MODULE.m_unique_id}}" title="Edit">Edit</a></li>
-							<li class="ui-icon ui-icon-closethick"><a class="delete" href="?{{$MODULE.m_unique_id}}" title="Delete">Delete</a></li>
-							<li class="ui-icon ui-icon-seek-next"><a href="{{$MODULE_URL}}/components/viewmodule-{{$MODULE.m_unique_id|m_unique_id_clean}}" title="Manage">Manage</a></li>
+							<li class="ui-icon ui-icon-pencil"><a class="edit" href="?xxx" title="Edit">Edit</a></li>
+							<li class="ui-icon ui-icon-closethick"><a class="delete" href="?xxx" title="Delete">Delete</a></li>
+							<li class="ui-icon ui-icon-seek-next"><a href="{{$MODULE_URL}}/components/viewmodule-xxx" title="Manage">Manage</a></li>
 						</ul>
 					</td>
-					<td style="text-align:center;">COMING SOON!</td>
 				</tr>
-				{{/if}}
 				{{foreachelse}}
 				<tr>
-					<td colspan="2"><span class="system_message_error">NO MODULES FOUND!</span></td>
+					<td><span class="system_message_error">NO MODULES FOUND!</span></td>
 				</tr>
 				{{/foreach}}
 			</tbody>

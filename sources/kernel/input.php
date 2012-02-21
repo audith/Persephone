@@ -64,6 +64,7 @@ class Input
 	private $_is_cleanup_done_for = array(
 			'post'     => false,
 			'get'      => false,
+			'request'  => false,
 			'cookie'   => false,
 			'server'   => false,
 			'env'      => false

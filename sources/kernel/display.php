@@ -698,10 +698,11 @@ if ( $this->Registry->Modules->cur_module['m_name'] == 'acp' )
 		$this->smarty->right_delimiter        = '}}';
 
 		# Smarty Dirs
-		$this->smarty->setTemplateDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates" );
+		$this->smarty->setCacheDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/cache" );
 		$this->smarty->setCompileDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates_c" );
 		$this->smarty->setConfigDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/config" );
-		$this->smarty->setCacheDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/cache" );
+		// $this->smarty->setPluginsDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/plugins" );
+		$this->smarty->setTemplateDir( PATH_TEMPLATES . "/"  . $skin['set_id'] . "/templates" );
 
 		# Skin URLs
 		$this->style_url              = array(
@@ -1024,11 +1025,11 @@ if ( $this->Registry->Modules->cur_module['m_name'] == 'acp' )
 
 		# Path to template file
 		$_fs__full_path = array(
-				'primary'    => $smarty_object->getTemplateDir  // "Primary" (module-specific) template-bit
+				'primary'    => $smarty_object->getTemplateDir(0)  // "Primary" (module-specific) template-bit
 					. "/" . $template_bit_information['m_unique_id_clean']
 					. "/" . $template_bit_information['t_bit_name']
 					. "." . $template_bit_information['t_type'],
-				'secondary'  => $smarty_object->getTemplateDir  // "Secondary" (global) template-bit
+				'secondary'  => $smarty_object->getTemplateDir(0)  // "Secondary" (global) template-bit
 					. "/" . $template_bit_information['t_bit_name']
 					. "." . $template_bit_information['t_type']
 			);
@@ -1088,7 +1089,7 @@ if ( $this->Registry->Modules->cur_module['m_name'] == 'acp' )
 				null;
 
 			# Write template-source to a new template-file
-			$template_bit_information['fs__full_path'] = $smarty_object->getTemplateDir
+			$template_bit_information['fs__full_path'] = $smarty_object->getTemplateDir(0)
 					. ( ( !is_null( $template_bit_information['m_unique_id_clean'] ) ) ? "/" . $template_bit_information['m_unique_id_clean'] : "" )
 					. "/" . $template_bit_information['t_bit_name']
 					. "." . $template_bit_information['t_type'];
