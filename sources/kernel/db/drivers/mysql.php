@@ -18,21 +18,19 @@ class Db__Drivers__Mysql extends Database
 {
 	/**
 	 * Zend DB instance
-	 * @var object
+	 * @var Zend_Db
 	 */
 	public $db;
 
 	/**
 	 * Constructor
 	 *
-	 * @param    object    REFERENCE: Registry Object
+	 * @param    Registry    REFERENCE: Registry Object
 	 */
 	public function __construct ( Registry $Registry )
 	{
-		# Bring-in Registry Object
 		$this->Registry = $Registry;
 
-		# Zend Db
 		$this->Registry->loader( "Zend_Db", false );
 
 		# Db options
@@ -94,6 +92,72 @@ class Db__Drivers__Mysql extends Database
 	public function last_insert_id ()
 	{
 		return $this->db->lastInsertId();
+	}
+
+
+	/**
+	 * Determines the referenced tables, and the count of referenced rows (latter is on-demand)
+	 *
+	 * @param     string   Referenced table name
+	 * @param     array    Parameters containing information for querying referenced data statistics
+	 *                     array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
+	 *
+	 * @return    array    Reference and possibly, data statistics information (row-count)
+	 */
+	public function check_for_references ( $referenced_table_name , $_params = array() )
+	{
+		//----------------------------------
+		// Fetching reference information
+		//----------------------------------
+
+		$this->cur_query = array(
+				'do'      =>  "select",
+				'fields'  =>  array(
+						"table_name" , "column_name" , "referenced_column_name"	),
+				'table'   =>  array( "information_schema.KEY_COLUMN_USAGE" ),
+				'where'   =>  array(
+						array( 'table_schema = ' . $this->quote( $this->Registry->config['sql']['dbname'] ) ),
+						array( 'referenced_table_name = ' . $this->quote( $referenced_table_name ) ),
+					)
+			);
+		$reference_information = $this->simple_exec_query();
+
+		//----------------------------------------
+		// Fetching referenced data statistics
+		//----------------------------------------
+
+		if ( !empty( $_params ) and $_params['_do_count'] === true and !empty( $_params['referenced_column_name'] ) and !empty( $_params['value_to_check'] ) )
+		{
+			$_data_statistics = array();
+			foreach ( $reference_information as $_r )
+			{
+				if ( $_r['referenced_column_name'] != $_params['referenced_column_name'] )
+				{
+					continue;
+				}
+
+				$this->cur_query = array(
+						'do'      =>  "select_one",
+						'fields'  =>  array( new Zend_Db_Expr( "count(*)" ) ),
+						'table'   =>  $_r['table_name'],
+						'where'   =>  $_r['table_name'] . "." . $_r['column_name'] . "=" .
+							(
+								is_int( $_params['value_to_check'] )
+								?
+								$this->quote( $_params['value_to_check'], "INTEGER" )
+								:
+								$this->quote( $_params['value_to_check'] )
+							),
+					);
+				$_data_statistics[ $_r['table_name'] ] = $this->simple_exec_query();
+			}
+		}
+
+		//----------
+		// Return
+		//----------
+
+		return array( 'reference_information' => $reference_information, '_data_statistics' => $_data_statistics );
 	}
 
 

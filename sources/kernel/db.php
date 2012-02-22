@@ -159,6 +159,18 @@ abstract class Database
 
 
 	/**
+	 * Determines the referenced tables, and the count of referenced rows (latter is on-demand)
+	 *
+	 * @param     string   Referenced table name
+	 * @param     array    Parameters containing information for querying referenced data statistics
+	 *                     array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
+	 *
+	 * @return    array    Reference and possibly, data statistics information (row-count)
+	 */
+	abstract public function check_for_references ( $referenced_table_name , $_params = array() );
+
+
+	/**
 	 * Prepares column-data for ALTER query for a given module data-field-type
 	 *
 	 * @param   array      Data-field info
