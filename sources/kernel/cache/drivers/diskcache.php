@@ -21,7 +21,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 	/**
 	 * Registry Reference
 	 *
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -40,12 +40,10 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 	public $crashed = 0;
 
 
-	public function __construct ( Registry $Registry, $identifier = "" )
+	public function __construct ( Registry $Registry , $identifier = "" )
 	{
-		# Prelim
 		$this->Registry = $Registry;
 
-		# Cont.
 		if ( ! is_writeable( PATH_CACHE ) )
 		{
 			$this->crashed = 1;
@@ -98,7 +96,7 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 		$_cache_file_path = PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php";
 		if ( file_exists(  $_cache_file_path ) and is_file( $_cache_file_path ) and ! is_writable( $_cache_file_path ) )
 		{
-			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: Cache file for key '" . $key . "' is NOT WRITABLE!" , "ERROR" );
+			throw new Registry__Exception( "Cache Abstraction - Diskcache: Cache file for key '" . $key . "' is NOT WRITABLE!" );
 		}
 
 		# Open file for writing
@@ -137,48 +135,58 @@ class Cache__Drivers__Diskcache implements iCache_Drivers
 
 		# LOCK
 		$_flock = flock( $fh, LOCK_EX );
-		$this->Registry->logger__do_log(
-				"Cache Abstraction - Diskcache: FLOCK "
-					. ( $_flock === FALSE ? "failed" : "succeeded" )
-					. " for key '" . $key . "'" ,
-				$_flock === FALSE ? "ERROR" : "INFO"
-			);
+		if ( $_flock === false )
+		{
+			throw new Registry__Exception( "Cache Abstraction - Diskcache: FLOCK failed for key '" . $key . "'" );
+		}
+		else
+		{
+			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FLOCK succeeded for key '" . $key . "'" , "INFO" );
+		}
 
 		# Write
 		$_fwrite = fwrite( $fh, $file_content );
-		$this->Registry->logger__do_log(
-				"Cache Abstraction - Diskcache: FWRITE "
-					. ( $_fwrite === FALSE ? "failed" : "succeeded" )
-					. " for key '" . $key . "'" ,
-				$_fwrite === FALSE ? "ERROR" : "INFO"
-			);
+		if ( $_fwrite === false )
+		{
+			throw new Registry__Exception( "Cache Abstraction - Diskcache: FWRITE failed for key '" . $key . "'" );
+		}
+		else
+		{
+			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FWRITE succeeded for key '" . $key . "'" , "INFO" );
+		}
 
 		# Unlock
 		$_flock = flock( $fh, LOCK_UN );
-		$this->Registry->logger__do_log(
-				"Cache Abstraction - Diskcache: FUNLOCK "
-					. ( $_flock === FALSE ? "failed" : "succeeded" )
-					. " for key '" . $key . "'" ,
-				$_flock === FALSE ? "ERROR" : "INFO"
-			);
+		if ( $_flock === false )
+		{
+			throw new Registry__Exception( "Cache Abstraction - Diskcache: FUNLOCK failed for key '" . $key . "'" );
+		}
+		else
+		{
+			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FUNLOCK succeeded for key '" . $key . "'" , "INFO" );
+		}
 
 		# Close file handler
 		$_fclose = fclose( $fh );
-		$this->Registry->logger__do_log(
-				"Cache Abstraction - Diskcache: FCLOSE "
-					. ( $_fclose === FALSE ? "failed" : "succeeded" )
-					. " for key '" . $key . "'" ,
-				$_fclose === FALSE ? "ERROR" : "INFO"
-			);
+		if ( $_fclose === false )
+		{
+			throw new Registry__Exception( "Cache Abstraction - Diskcache: FCLOSE failed for key '" . $key . "'" );
+		}
+		else
+		{
+			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FCLOSE succeeded for key '" . $key . "'" , "INFO" );
+		}
 
 		# ChMod
 		$_chmod = chmod( $_cache_file_path , 0777 );
-		$this->Registry->logger__do_log(
-				"Cache Abstraction - Diskcache: CHMOD "
-					. ( $_chmod === FALSE ? "failed" : "succeeded" )
-					. " for key '" . $key . "'" ,
-				$_chmod === FALSE ? "ERROR" : "INFO"
-			);
+		if ( $_chmod === false )
+		{
+			throw new Registry__Exception( "Cache Abstraction - Diskcache: CHMOD failed for key '" . $key . "'" );
+		}
+		else
+		{
+			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: CHMOD succeeded for key '" . $key . "'" , "INFO" );
+		}
 	}
 
 

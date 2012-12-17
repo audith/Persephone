@@ -17,7 +17,7 @@ class Cache__Recache
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -157,12 +157,13 @@ class Cache__Recache
 	*
 	* @return   mixed    Retrieved data
 	*/
-	private function components__mrp__uom__do_recache ( $params = array() )
+	private function components__mrp__warehouse__uom__do_recache ( $params = array() )
 	{
 		$_join   = array();
 		$_join[] = array(
-					'fields'      => array( "units.*" ),
-			 		'table'       => array( 'units' => "components__mrp__uom__units" ),
+					'fields'      => array( "uom_id", "uom_name", "uom_category_id", "uom_type",
+						"uom_rounding_precision", "uom_is_enabled", "uom_ratio" ),
+			 		'table'       => array( 'units' => "components__mrp__warehouse__uom__units" ),
 					'conditions'  => 'units.uom_category_id=categories.uom_category_id',
 					'join_type'   => "LEFT"
 		);
@@ -170,7 +171,7 @@ class Cache__Recache
 		$this->Registry->Db->cur_query = array(
 						'do'	    => "select",
 						'fields'    => array( 'category_id' => "uom_category_id", 'category_name' => "uom_category_name" ),
-						'table'     => array( 'categories' => "components__mrp__uom__categories" ),
+						'table'     => array( 'categories' => "components__mrp__warehouse__uom__categories" ),
 						'add_join'  => $_join,
 						'order'     => array( "categories.uom_category_name ASC" )
 		);
@@ -179,26 +180,29 @@ class Cache__Recache
 		$_cache = array();
 		foreach ( $result as $_r )
 		{
-			//------------
-			// _by_name
-			//------------
+			//----------------------
+			// Category name list
+			//----------------------
 
-			$_cache['_by_name'][ $_r['category_name'] ]['category_name'] = $_r['category_name'];
-			$_cache['_by_name'][ $_r['category_name'] ]['category_id'] = $_r['category_id'];
-			$_cache['_by_name'][ $_r['category_name'] ]['_units_by_id'][ $_r['uom_id'] ] = $_r;
-
-			# Default unit for the category
-			if ( $_r['uom_type'] == '0' )
-			{
-				$_cache['_by_name'][ $_r['category_name'] ]['_default_unit'] =& $_cache['_by_name'][ $_r['category_name'] ]['_units_by_id'][ $_r['uom_id'] ];
-			}
-			$_cache['_by_name'][ $_r['category_name'] ]['_units_by_name'][ $_r['uom_name'] ] =& $_cache['_by_name'][ $_r['category_name'] ]['_units_by_id'][ $_r['uom_id'] ];
+			$_cache['_name_list'][] = $_r['category_name'];
 
 			//------------
 			// _by_id
 			//------------
 
-			$_cache['_by_id'][ $_r['category_id'] ] =& $_cache['_by_name'][ $_r['category_name'] ];
+			$_cache['_by_id'][ $_r['category_id'] ]['category_name'] = $_r['category_name'];
+			$_cache['_by_id'][ $_r['category_id'] ]['category_id'] = $_r['category_id'];
+			if ( $_r['uom_id'] )
+			{
+				$_cache['_by_id'][ $_r['category_id'] ]['_units_by_id'][ $_r['uom_id'] ] = $_r;
+
+				# Default unit for the category
+				if ( $_r['uom_type'] == '0' )
+				{
+					$_cache['_by_id'][ $_r['category_id'] ]['_default_unit'] =& $_cache['_by_id'][ $_r['category_id'] ]['_units_by_id'][ $_r['uom_id'] ];
+				}
+				$_cache['_by_id'][ $_r['category_id'] ]['_units_by_name'][ $_r['uom_name'] ] =& $_cache['_by_id'][ $_r['category_id'] ]['_units_by_id'][ $_r['uom_id'] ];
+			}
 		}
 
 		return $_cache;

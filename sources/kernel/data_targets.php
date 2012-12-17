@@ -17,7 +17,7 @@ abstract class Data_Targets
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	**/
 	public $Registry;
 

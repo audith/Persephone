@@ -21,7 +21,7 @@ class Cache__Drivers__Eaccelerator implements iCache_Drivers
 	/**
 	 * Registry reference
 	 *
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 

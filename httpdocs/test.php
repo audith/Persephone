@@ -1,4 +1,19 @@
 <?php
+phpinfo(); exit;
+
+$a = array(0=>"a" , 1=>"Tiny ing");
+var_dump(in_array("Tiny in", $a));
+exit;
+
+
+
+
+
+
+
+
+
+
 //$a = "_SERVER"; var_dump($$a); var_dump($_SERVER); exit;
 class A
 {
@@ -9,6 +24,7 @@ class A
 }
 
 new A();
+
 
 
 /*

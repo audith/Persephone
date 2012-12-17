@@ -17,7 +17,7 @@ class Input
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -53,10 +53,9 @@ class Input
 
 	/**
 	 * HTTP Headers
-	 * @var unknown_type
+	 * @var array
 	 */
-	public $headers = array();
-
+	public $headers = array( 'request' => array( '_is_ajax' => false ) );
 	/**
 	 * Whether or not, Input::clean_makesafe_recursively() was applied to the selected Superglobal.
 	 * @var array
@@ -118,7 +117,7 @@ class Input
 	 *
 	 * @param array  Registry object reference
 	 */
-	public function __construct ( & $Registry )
+	public function __construct ( Registry $Registry )
 	{
 		//----------
 		// Prelim
@@ -135,39 +134,39 @@ class Input
 	 * @param     array       Enumerated array containing the parameters passed to the $name'd method.
 	 * @throws    Exception   In case, if method is not one of the pre-defined Six.
 	 */
-	public function __call ( $name , $arguments )
-	{
-		if ( !in_array( $name, array( "post", "get", "cookie", "request", "server", "env" ) ) )
+		public function __call ( $name , $arguments )
 		{
-			throw new Exception( "Input::" . $name . "() not declared!" );
-			exit;
-		}
-
-		$_name_of_superglobal = "_" . strtoupper( $name );
-		$_max_iteration_level_for_cleanup = in_array( $name, array( "server", "env" ) ) ? 1 : 10;
-
-		if ( !empty( $arguments[0] ) and array_key_exists( $arguments[0], $this->$name ) )
-		{
-			return $this->$name[ $arguments[0] ];
-		}
-		elseif ( !empty( $arguments[0] ) and array_key_exists( $arguments[0], $GLOBALS[ $_name_of_superglobal ] ) )
-		{
-			return $this->$name[ $this->clean__makesafe_key( $arguments[0] ) ] = $this->clean__makesafe_value( $GLOBALS[ $_name_of_superglobal ][ $arguments[0] ], array(), true );
-		}
-		elseif ( !empty( $arguments[0] ) and !array_key_exists( $arguments[0], $GLOBALS[ $_name_of_superglobal ] ) )
-		{
-			return null;
-		}
-		else
-		{
-			if ( $this->_is_cleanup_done_for[ $name ] === true )
+			if ( !in_array( $name, array( "post", "get", "cookie", "request", "server", "env" ) ) )
 			{
-				return $this->$name;
+				throw new Exception( "Input::" . $name . "() not declared!" );
 			}
-			$this->_is_cleanup_done_for[ $name ] = true;
-			return $this->$name = $this->clean__makesafe_recursively( $GLOBALS[ $_name_of_superglobal ], $_max_iteration_level_for_cleanup );
+
+			$_name_of_superglobal = "_" . strtoupper( $name );
+			$_max_iteration_level_for_cleanup = in_array( $name, array( "server", "env" ) ) ? 1 : 10;
+
+			# $arguments[0] is the index of the value, to be fetched from within the array.
+			if ( !empty( $arguments[0] ) and array_key_exists( $arguments[0], $this->$name ) )
+			{
+				return $this->$name[ $arguments[0] ];
+			}
+			elseif ( !empty( $arguments[0] ) and array_key_exists( $arguments[0], $GLOBALS[ $_name_of_superglobal ] ) )
+			{
+				return $this->$name[ $this->clean__makesafe_key( $arguments[0] ) ] = $this->clean__makesafe_value( $GLOBALS[ $_name_of_superglobal ][ $arguments[0] ], array(), true );
+			}
+			elseif ( !empty( $arguments[0] ) and !array_key_exists( $arguments[0], $GLOBALS[ $_name_of_superglobal ] ) )
+			{
+				return null;
+			}
+			else
+			{
+				if ( $this->_is_cleanup_done_for[ $name ] === true )
+				{
+					return $this->$name;
+				}
+				$this->_is_cleanup_done_for[ $name ] = true;
+				return $this->$name = $this->clean__makesafe_recursively( $GLOBALS[ $_name_of_superglobal ], $_max_iteration_level_for_cleanup );
+			}
 		}
-	}
 
 
 	/**
@@ -190,7 +189,6 @@ class Input
 		// Request headers
 		//--------------------
 
-		$this->headers['request'] = array();
 		foreach ( $_SERVER as $_k=>$_v )
 		{
 			if ( strpos( $_k, 'HTTP_') === 0 )
@@ -201,7 +199,6 @@ class Input
 		}
 
 		# Is it an XMLHttpRequest?
-		$this->headers['request']['_is_ajax'] = false;
 		if ( isset( $this->headers['request']['X-REQUESTED-WITH'] ) and $this->headers['request']['X-REQUESTED-WITH'] == 'XMLHttpRequest' )
 		{
 			$this->headers['request']['_is_ajax'] = true;
@@ -509,9 +506,9 @@ class Input
 		# Continue with cleaning...
 
 		$val = str_replace( "&"	            , "&amp;"           , $val );
-		$val = str_replace( "<!--"          , "&#060;&#033;--"  , $val );
-		$val = str_replace( "-->"           , "--&#062;"        , $val );
-		$val = preg_replace( "/<script/i"   , "&#060;script"    , $val );
+		$val = str_replace( "<!--"          , "&#60;&#33;--"    , $val );
+		$val = str_replace( "-->"           , "--&#62;"         , $val );
+		$val = preg_replace( "/<script/i"   , "&#60;script"     , $val );
 		$val = str_replace( ">"	            , "&gt;"            , $val );
 		$val = str_replace( "<"	            , "&lt;"            , $val );
 		$val = str_replace( '"'	            , "&quot;"          , $val );
@@ -526,7 +523,8 @@ class Input
 		$val = str_replace( $_list_of_html_entities__from , $_list_of_html_entities__to , $val );
 
 		# Ensure unicode chars are OK
-		$val = preg_replace("/&amp;(#[0-9]+|[a-z]+);/s", "&\\1;", $val );
+		// @todo
+		// $val = preg_replace("/&amp;(#[0-9]+|[a-z]+);/s", "&\\1;", $val );
 
 		# Try and fix up HTML entities with missing ;
 		$val = preg_replace( "/&#(\d+?)([^\d;])/i", "&#\\1;\\2", $val );

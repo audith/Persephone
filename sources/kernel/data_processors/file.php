@@ -20,7 +20,7 @@ class Data_Processors__File extends Data_Processors
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	public $Registry;
 

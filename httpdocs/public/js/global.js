@@ -33,9 +33,10 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 
 		error : function ( jqXHR , textStatus , errorThrown )
 		{
-			if ( persephone.Form.currentConsole != undefined && persephone.Form.currentConsole )
+			var currentConsole = null;
+			if ( currentConsole = persephone.Form.scrollToConsole(true) )
 			{
-				persephone.Form.currentConsole.html("Unspecified error occured! Possible causes are <i>connection problems</i> or <i>invalid response from server</i>.").removeClass("success").addClass("error");
+				currentConsole.html("Unspecified error occured! Possible causes are <i>connection problems</i> or <i>invalid response from server</i>.").removeClass("success loading").addClass("error");
 			}
 			return 0;
 		}
@@ -616,14 +617,14 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 						/* ... with responseMessage */
 						if ( 'responseMessage' in data && data.responseMessage != '' )
 						{
-							currentConsole.html(data.responseMessage).removeClass("error").addClass("success");
+							currentConsole.html(data.responseMessage).removeClass("error loading").addClass("success");
 						}
 						/* ... without responseMessage */
 						else if ( 'responseMessage' in data && data.responseMessage == '' )
 						{
 							persephone.Form.closeConsoles();
 						}
-						currentConsole.removeClass("notice error").addClass("success");
+						currentConsole.removeClass("error loading").addClass("success");
 
 						/* ... with responseAction */
 						if ( 'responseAction' in data )
@@ -638,7 +639,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 
 							if ( data.responseMessage == '' )
 							{
-								currentConsole.html("Success! Refreshing...").removeClass("error").addClass("success");
+								currentConsole.html("Success! Refreshing...").removeClass("error loading").addClass("success");
 							}
 
 							setTimeout( "window.location = window.location.href", _refreshIn );
@@ -648,7 +649,11 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 					/* Single faultCode */
 					else if ( 'faultMessage' in data )
 					{
-						currentConsole.html(data.faultMessage).removeClass("success").addClass("error");
+						currentConsole.html(data.faultMessage).removeClass("success loading").addClass("error");
+						if ( data.faultCode )
+						{
+							whoami.find("._" + data.faultCode).addClass("error");
+						}
 						return 0;
 					}
 					/* Multiple faultCodes */
@@ -661,7 +666,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 							_faultMessages.push("<li>" + value['faultMessage'] + "</li>");
 						});
 						var _faultMessagesParsed = "One or more error(s) occured! Correct them and resubmit the form to continue:<ul>" + _faultMessages.join("") + "</ul>";
-						currentConsole.html(_faultMessagesParsed).removeClass("success").addClass("error");
+						currentConsole.html(_faultMessagesParsed).removeClass("success loading").addClass("error");
 						return 0;
 					}
 				}
@@ -682,7 +687,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			whoami.find(".error").removeClass("error");
 			persephone.Form.closeConsoles();
 			var currentConsole = persephone.Form.scrollToConsole();
-			currentConsole.html("Processing... Please wait!").removeClass("error success");
+			currentConsole.html("Processing... Please wait!").removeClass("error success").addClass("loading");
 			var jqXHR = jQuery.ajax({
 				url : whoami.attr("action") == '' ? window.location.href : whoami.attr("action"),
 				data : whoami.serialize(),
@@ -695,14 +700,14 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 						/* ... with responseMessage */
 						if ( 'responseMessage' in data && data.responseMessage != '' )
 						{
-							currentConsole.html(data.responseMessage).removeClass("error").addClass("success");
+							currentConsole.html(data.responseMessage).removeClass("error loading").addClass("success");
 						}
 						/* ... without responseMessage */
 						else if ( 'responseMessage' in data && data.responseMessage == '' )
 						{
 							persephone.Form.closeConsoles();
 						}
-						currentConsole.removeClass("notice error").addClass("success");
+						currentConsole.removeClass("notice error loading").addClass("success");
 
 						/* ... with responseAction */
 						if ( 'responseAction' in data )
@@ -717,7 +722,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 
 							if ( data.responseMessage == '' )
 							{
-								currentConsole.html("Success! Refreshing...").removeClass("error").addClass("success");
+								currentConsole.html("Success! Refreshing...").removeClass("error loading").addClass("success");
 							}
 
 							setTimeout( "window.location = window.location.href", _refreshIn );
@@ -727,7 +732,11 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 					/* Single faultCode */
 					else if ( typeof data == 'object' && 'faultMessage' in data )
 					{
-						currentConsole.html(data.faultMessage).removeClass("success").addClass("error");
+						currentConsole.html(data.faultMessage).removeClass("success loading").addClass("error");
+						if ( data.faultCode )
+						{
+							whoami.find("._" + data.faultCode).addClass("error");
+						}
 						return 0;
 					}
 					/* Multiple faultCodes */
@@ -740,7 +749,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 							_faultMessages.push("<li>" + value['faultMessage'] + "</li>");
 						});
 						var _faultMessagesParsed = "One or more error(s) occured! Correct them and resubmit the form to continue:<ul>" + _faultMessages.join("") + "</ul>";
-						currentConsole.html(_faultMessagesParsed).removeClass("success").addClass("error");
+						currentConsole.html(_faultMessagesParsed).removeClass("success loading").addClass("error");
 						return 0;
 					}
 				}
@@ -766,7 +775,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			});
 		}
 
-		// Do we have accordion() function defined? If so, apply it accordingly.
+		// Do we have button() function defined? If so, apply it accordingly.
 		if ( 'function' == typeof jQuery().button )
 		{
 			jQuery(".buttons").find("INPUT[type='submit'],INPUT[type='button'],INPUT[type='reset'],BUTTON").button();

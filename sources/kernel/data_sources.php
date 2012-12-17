@@ -17,7 +17,7 @@ abstract class Data_Sources
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	**/
 	public $Registry;
 

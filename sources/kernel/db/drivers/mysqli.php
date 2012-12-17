@@ -111,8 +111,7 @@ class Db__Drivers__Mysqli extends Database
 
 		$this->cur_query = array(
 				'do'      =>  "select",
-				'fields'  =>  array(
-						"table_name" , "column_name" , "referenced_column_name"	),
+				'fields'  =>  array( "table_name" , "column_name" , "referenced_column_name" ),
 				'table'   =>  array( "information_schema.KEY_COLUMN_USAGE" ),
 				'where'   =>  array(
 						array( 'table_schema = ' . $this->quote( $this->Registry->config['sql']['dbname'] ) ),

@@ -24,7 +24,7 @@ class Cache__Drivers__Apc implements iCache_Drivers
 	/**
 	 * Registry reference
 	 *
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 

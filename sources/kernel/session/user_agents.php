@@ -26,7 +26,7 @@ class Session__User_Agents
 	/**
 	 * Registry reference
 	 *
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -50,12 +50,8 @@ class Session__User_Agents
 	 * @param    object    REFERENCE: Registry Object Reference
 	 * @return   void
 	 */
-	public function __construct ( & $Registry )
+	public function __construct ( Registry $Registry )
 	{
-		//---------
-		// Init
-		//---------
-
 		$this->Registry = $Registry;
 	}
 

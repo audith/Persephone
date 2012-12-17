@@ -18,7 +18,7 @@ class Session
 	/**
 	 * Registry reference
 	 *
-	 * @var Object
+	 * @var Registry
 	 */
 	private $Registry;
 

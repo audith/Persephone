@@ -17,7 +17,7 @@ final class Registry
 {
 	/**
 	 * Self-Instance [Singleton implementation]
-	 * @var object
+	 * @var Registry
 	 */
 	private static $_instance;
 
@@ -41,31 +41,31 @@ final class Registry
 
 	/**
 	 * Instance of DB class
-	 * @var object
+	 * @var Database
 	 */
 	public $Db;
 
 	/**
 	 * Instance of Display class
-	 * @var object
+	 * @var Display
 	 */
 	public $Display;
 
 	/**
 	 * Instance of Input class
-	 * @var object
+	 * @var Input
 	 */
 	public $Input;
 
 	/**
 	 * Instance of IPS Converge
-	 * @var object
+	 * @var IPS_Converge
 	 */
 	public $IPS_Converge;
 
 	/**
 	 * Zend_Log object
-	 * @var object
+	 * @var Zend_Log
 	 */
 	public $logger;
 
@@ -77,7 +77,7 @@ final class Registry
 
 	/**
 	 * Instance of Modules class
-	 * @var object
+	 * @var Modules
 	 */
 	public $Modules;
 
@@ -101,7 +101,7 @@ final class Registry
 
 	/**
 	 * Instance of Session class
-	 * @var object
+	 * @var Session
 	 */
 	public $Session;
 
@@ -121,11 +121,16 @@ final class Registry
 	**/
 	private function __construct ( $disabled_classes )
 	{
-		//----------------
-		// Start Debug
-		//----------------
+		//------------------------------------
+		// Start Exception handlers & Debug
+		//------------------------------------
 
-		# Set Exception handler
+		# Load Registry__Exception class
+		if ( ! class_exists( "Registry__Exception" ) )
+		{
+			$this->loader( "Registry__Exception", false );
+		}
+		//set_exception_handler( array( new Registry__Exception(null, 0, null, $this), "logException" ) );
 		set_exception_handler( array( $this, "exception_handler" ) );
 
 		# Start timer
@@ -578,14 +583,25 @@ final class Registry
 	 */
 	public function exception_handler ( $e )
 	{
+
+		//-----------
+		// Logging
+		//-----------
+
 		$message = "EXCEPTION: " . ( $_exception_class = get_class( $e ) )
-			. "\nMESSAGE: " . $e->getMessage()
-			. "\nFILE: " . $e->getFile()
-			. "\nLINE: " . $e->getLine()
-			. "\nCLASS: " . __CLASS__
-			. "\nTRACE:\n" . $e->getTraceAsString()
-			. ( ( strpos( $_exception_class, "Zend_Db_" ) === 0 ) ? "\nSQL-QUERY:\n" . var_export( $this->Db->cur_query, true ) : "" )
-			. "\n\n";
+		. "\nMESSAGE: " . $e->getMessage()
+		. "\nFILE: " . $e->getFile()
+		. "\nLINE: " . $e->getLine()
+		. "\nCLASS: " . __CLASS__
+		. "\nTRACE:\n" . $e->getTraceAsString()
+		. (
+			( strpos( $_exception_class, "Zend_Db_" ) === 0 and isset( $this->Db ) and is_object( $this->Db ) )
+				?
+				"\nSQL-QUERY:\n" . var_export( $this->Db->cur_query, true )
+				:
+				""
+			)
+		. "\n\n";
 
 		$this->logger__do_log( $message, "ERROR" );
 	}
@@ -646,10 +662,10 @@ final class Registry
 	/**
 	 * Local Logger [facilitates Zend_Log]
 	 *
-	 * @param  string  Message to log
-	 * @param  string  Priority level [ERROR|WARNING|NOTICE|INFO|DEBUG]
+	 * @param     string    Message to log
+	 * @param     string    Priority level [ERROR|WARNING|NOTICE|INFO|DEBUG]
 	 *
-	 * @return void
+	 * @return    boolean   TRUE on success, FALSE otherwise
 	 */
 	public function logger__do_log ( $message, $priority = "INFO" )
 	{
@@ -676,11 +692,21 @@ final class Registry
 
 		if ( ! is_object( $this->logger ) )
 		{
+			if ( ! class_exists( "Zend_log" ) )
+			{
+				$this->loader( "Zend_Log", false );
+			}
+
 			$this->logger = new Zend_Log();
 
 			//-----------------
 			// Set "Writers"
 			//-----------------
+
+			if ( ! class_exists( "Zend_Log_Writer_Stream" ) )
+			{
+				$this->loader( "Zend_Log_Writer_Stream", false );
+			}
 
 			# stdout
 			if ( ini_get( "display_errors" ) != '0' )
@@ -690,28 +716,39 @@ final class Registry
 
 			# error_log
 			$log_file = ini_get( "error_log" );
-			if ( file_exists( $log_file ) and is_writable( $log_file ) )
+			if ( file_exists( $log_file ) and is_file( $log_file ) and is_writable( $log_file ) )
 			{
 				$this->logger->addWriter( new Zend_Log_Writer_Stream( $log_file ) );
 			}
 
-			# FIREPHP
+			# Fire-PHP
 			if ( IN_DEV )
 			{
-				require_once( "Zend/Log/Writer/Firebug.php" );
+				if ( ! class_exists( "Zend_Log_Writer_Firebug" ) )
+				{
+					$this->loader( "Zend_Log_Writer_Firebug", false );
+				}
 				$this->logger->addWriter( new Zend_Log_Writer_Firebug() );
 
-				require_once( "Zend/Controller/Request/Http.php" );
+				if ( ! class_exists( "Zend_Controller_Request_Http" ) )
+				{
+					$this->loader( "Zend_Controller_Request_Http", false );
+				}
 				$request = new Zend_Controller_Request_Http();
-				require_once( "Zend/Controller/Response/Http.php" );
+
+				if ( ! class_exists( "Zend_Controller_Response_Http" ) )
+				{
+					$this->loader( "Zend_Controller_Response_Http", false );
+				}
 				$response = new Zend_Controller_Response_Http();
-				require_once( "Zend/Wildfire/Channel/HttpHeaders.php" );
+
+				if ( ! class_exists( "Zend_Wildfire_Channel_HttpHeaders" ) )
+				{
+					$this->loader( "Zend_Wildfire_Channel_HttpHeaders", false );
+				}
 				$channel = Zend_Wildfire_Channel_HttpHeaders::getInstance();
 				$channel->setRequest($request);
 				$channel->setResponse($response);
-
-				# Start output buffering
-				//ob_start();
 			}
 		}
 
@@ -719,7 +756,8 @@ final class Registry
 		// Continue...
 		//---------------
 
-		try {
+		try
+		{
 			# IN_DEV flag required for non-ERROR logging
 			if ( $_method_map[ $priority ] != 3 and ! IN_DEV )
 			{
@@ -737,17 +775,20 @@ final class Registry
 		}
 		catch ( Zend_Log_Exception $e )
 		{
-			# Logging failed... "Log" the failure itself :-d
+			# Logging failed... "Log" the failure itself :D
 			$message = "<pre>EXCEPTION: " . get_class( $e )
-				. "\nMESSAGE: " . $e->getMessage()
-				. "\nFILE: " . __FILE__
-				. "\nLINE: " . __LINE__
-				. "\nCLASS: " . __CLASS__
-				. ( IN_DEV ? "\nTRACE:\n" . $e->getTraceAsString() : "" )
-				. "\n</pre>";
+			. "\nMESSAGE: " . $e->getMessage()
+			. "\nFILE: " . $e->getFile()
+			. "\nLINE: " . $e->getLine()
+			. "\nCLASS: " . __CLASS__
+			. ( IN_DEV ? "\nTRACE:\n" . $e->getTraceAsString() : "" )
+			. "\n</pre>";
+
 			trigger_error( $message, E_USER_WARNING );
+
 			return false;
 		}
+
 		return true;
 	}
 

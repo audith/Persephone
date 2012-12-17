@@ -6,11 +6,12 @@ if ( ! defined( "INIT_DONE" ) )
 	exit();
 }
 
+/** @noinspection PhpVoidFunctionResultUsedInspection */
 class Display
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -64,7 +65,7 @@ class Display
 
 	/**
 	 * Smarty instance
-	 * @var object
+	 * @var Smarty
 	 */
 	public $smarty;
 

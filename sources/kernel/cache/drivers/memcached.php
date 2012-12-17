@@ -23,7 +23,7 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 	/**
 	 * Registry reference
 	 *
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -44,7 +44,7 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 	/**
 	 * Memcached class object
 	 *
-	 * @var object
+	 * @var Memcached
 	 */
 	public $link;
 
@@ -168,13 +168,13 @@ class Cache__Drivers__Memcached implements iCache_Drivers
 		{
 			if ( ! count( $server_info ) )
 			{
-				throw new Exception( "No servers to connect!" );
+				throw new Registry__Exception( "No servers to connect!" );
 			}
 
 			if ( ( $return = $this->link->addServers( $server_info ) ) === false )
 			{
 				$_log_message = $this->_result_codes__do_log( "Cache - Memcached - _connect(): Failed to ADD servers to the server pool." );
-				throw new Exception( $_log_message );
+				throw new Registry__Exception( $_log_message );
 			}
 		}
 		catch ( Exception $e )

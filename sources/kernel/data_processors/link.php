@@ -20,7 +20,7 @@ class Data_Processors__Link extends Data_Processors
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	public $Registry;
 

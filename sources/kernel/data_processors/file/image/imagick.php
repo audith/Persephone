@@ -17,7 +17,7 @@ final class Data_Processors__File__Image__Imagick
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	public $Registry;
 

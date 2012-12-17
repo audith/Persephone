@@ -20,7 +20,7 @@ class Data_Processors__Alphanumeric extends Data_Processors
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	**/
 	public $Registry;
 

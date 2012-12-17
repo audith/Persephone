@@ -18,7 +18,7 @@ interface iCache_Drivers
 	/**
 	 * Constructor
 	 *
-	 * @param  object  Registry reference
+	 * @param  Registry  Registry reference
 	 */
 	public function __construct ( Registry $Registry, $identifier = "" );
 

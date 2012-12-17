@@ -17,7 +17,7 @@ class Cache
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -93,7 +93,7 @@ class Cache
 					$this->cachelib = $this->Registry->loader("Cache__Drivers__Memcached");
 					if ( $this->cachelib->crashed )
 					{
-						throw new Exception( "Cache: Memcached failed to connect!" );
+						throw new Registry__Exception( "Cache: Memcached failed to connect!" );
 					}
 				}
 				else
@@ -114,7 +114,7 @@ class Cache
 					$this->cachelib = $this->Registry->loader("Cache__Drivers__Memcache");
 					if ( $this->cachelib->crashed )
 					{
-						throw new Exception( "Cache: Memcache failed to connect!" );
+						throw new Registry__Exception( "Cache: Memcache failed to connect!" );
 					}
 				}
 				else

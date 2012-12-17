@@ -17,7 +17,7 @@ class Module_Handler
 {
 	/**
 	 * Registry Reference
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -74,7 +74,7 @@ class Module_Handler
 
 		$this->structural_map = array(
 				'm_subroutines'                  => array(
-						'configuration__system'             => array(
+						'configuration__system'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'configuration__system',
 								's_data_source'                   => 'rdbms',
@@ -91,7 +91,7 @@ class Module_Handler
 								's_data_definition'               => array(),
 								's_additional_skin_assets'        => array(),
 							),
-						'content_and_data__index'           => array(
+						'content_and_data__index'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'management_index',
 								's_data_source'                   => 'rdbms',
@@ -103,7 +103,7 @@ class Module_Handler
 								's_data_definition'               => array(),
 								's_additional_skin_assets'        => array(),
 							),
-						'content_and_data__content'         => array(
+						'content_and_data__content'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'content_and_data__content',
 								's_data_source'                   => 'rdbms',
@@ -120,7 +120,7 @@ class Module_Handler
 								's_data_definition'               => array(),
 								's_additional_skin_assets'        => array(),
 							),
-						'content-and-data__media-library'   => array(
+						'content-and-data__media-library'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'content_and_data__media_library',
 								's_data_source'                   => 'rdbms',
@@ -134,7 +134,7 @@ class Module_Handler
 										array( 'file' => "/jumploader.js", 'params' => "", 'type' => "js", 'scope' => "global" ),
 									),
 							),
-						'components_modules'                => array(
+						'components_modules'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'components_modules',
 								's_data_source'                   => 'rdbms',
@@ -150,7 +150,7 @@ class Module_Handler
 										array( 'file' => "/jquery.metadata.js", 'params' => "", 'type' => "js", 'scope' => "global" ),
 									),
 							),
-						'components_viewmodule'             => array(
+						'components_viewmodule'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'components_viewmodule',
 								's_data_source'                   => 'rdbms',
@@ -172,7 +172,7 @@ class Module_Handler
 										array( 'file' => "/jquery.metadata.js", 'params' => "" , 'type' => "js"  , 'scope' => "global" ),
 									),
 							),
-						'components_viewconnector'          => array(
+						'components_viewconnector'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'components_viewconnector',
 								's_data_source'                   => 'rdbms',
@@ -193,19 +193,36 @@ class Module_Handler
 								's_data_definition'               => array(),
 								's_additional_skin_assets'        => array(),
 							),
-						'components__mrp__uom'              => array(
+						'components__mrp__warehouse__uom__category_listing'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
-								's_name'                          => 'components__mrp__uom',
+								's_name'                          => 'components__mrp__warehouse__uom__category_listing',
 								's_data_source'                   => 'rdbms',
 								's_data_target'                   => 'tpl',
-								's_pathinfo_uri_schema'           => 'components/mrp/uom',
-								's_pathinfo_uri_schema_parsed'    => 'components/mrp/uom',
+								's_pathinfo_uri_schema'           => 'components/mrp/warehouse/uom',
+								's_pathinfo_uri_schema_parsed'    => 'components/mrp/warehouse/uom',
 								's_qstring_parameters'            => array(),
 								's_fetch_criteria'                => array(),
 								's_data_definition'               => array(),
 								's_additional_skin_assets'        => array(),
+							),
+						'components__mrp__warehouse__uom__category_view'  => array(
+								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
+								's_name'                          => 'components__mrp__warehouse__uom__category_view',
+								's_data_source'                   => 'rdbms',
+								's_data_target'                   => 'tpl',
+								's_pathinfo_uri_schema'           => 'components/mrp/warehouse/uom/view-(?P<category_id>\d+)',
+								's_pathinfo_uri_schema_parsed'    => 'components/mrp/warehouse/uom/view-(?P<category_id>\d+)',
+								's_qstring_parameters'            => array(
+									'category_id'                           => array(
+											'request_regex'                           => '\d+',
+											'_is_mandatory'                           => true,
+										),
+									),
+								's_fetch_criteria'                => array(),
+								's_data_definition'               => array(),
+								's_additional_skin_assets'        => array(),
 						),
-						'test'                              => array(
+						'test'  => array(
 								'm_unique_id'                     => "{4F54D297-5867BF9A-17873F81-1A94BEA6}",
 								's_name'                          => 'test',
 								's_data_source'                   => 'rdbms',
@@ -235,30 +252,30 @@ class Module_Handler
 		$this->running_subroutine = $running_subroutine;
 
 		$this->processor_map = array(
-				'configuration__system'               => array(
+				'configuration__system'  => array(
 						'get'                                  => "settings__do_show",
 						'edit'                                 => "settings__do_edit",
 						'revert'                               => "settings__do_revert",
 					),
-				'management_index'                    => array(
+				'management_index'  => array(
 						'get'                                  => "management__do_prepare"
 					),
-				'management_content'                  => array(
+				'management_content'  => array(
 						'get'                                  => "content__do_fetch",
 						'edit'                                 => "content__do_edit",
 						'create'                               => "content__do_create",
 						'delete'                               => "content__do_remove",
 					),
-				'content-and-data__media-library'     => array(
+				'content-and-data__media-library'  => array(
 						'get'                                  => "management__media_library__do_list",
 					),
-				'components_modules'                  => array(
+				'components_modules'  => array(
 						'get'                                  => "modules__do_list",
 						'edit'                                 => "modules__do_edit",
 						'create'                               => "modules__do_create__master_unit",
 						'delete'                               => "modules__do_remove",
 					),
-				'components_viewmodule'               => array(
+				'components_viewmodule'  => array(
 						'get'                                  => "modules__do_view",
 						'sr_alter__add'                        => "modules__subroutines__do_create",
 						'sr_alter__drop'                       => "modules__subroutines__do_remove",
@@ -273,7 +290,7 @@ class Module_Handler
 						'ddl_alter__set_title_column'          => "modules__ddl__do_set_title_column",
 						'ddl_alter__link_to_connector_unit'    => "modules__do_create__connector_unit",
 					),
-				'components_viewconnector'            => array(
+				'components_viewconnector'  => array(
 						'get'                                  => "modules__connector_unit__do_view",
 						'ddl_alter__add'                       => "modules__connector_unit__ddl__do_create",
 						'ddl_alter__add__mimelist__do_fetch'   => "modules__ddl__mimelist__do_fetch",
@@ -282,10 +299,18 @@ class Module_Handler
 						'ddl_alter__restore_backup'            => "modules__connector_unit__ddl__do_restore_backup",
 						'ddl_alter__purge_backup'              => "modules__connector_unit__ddl__do_drop_backup",
 					),
-				'components__mrp__uom'     => array(
-						'get'                                  => "components__mrp__uom__do_List",
+				'components__mrp__warehouse__uom__category_listing'  => array(
+						'get'                                  => "components__mrp__warehouse__uom_category__do_List",
+						'create'                               => "components__mrp__warehouse__uom_category__do_create",
+						'edit'                                 => "components__mrp__warehouse__uom_category__do_edit",
+						'delete'                               => "components__mrp__warehouse__uom_category__do_remove",
 				),
-				'test'                                => array(
+				'components__mrp__warehouse__uom__category_view'  => array(
+						'get'                                  => "components__mrp__warehouse__uom_category__do_view",
+						'create'                               => "components__mrp__warehouse__uom__do_create",
+						'delete'                               => "components__mrp__warehouse__uom__do_remove",
+				),
+				'test'  => array(
 						'get'                                  => "modules__do_view",
 					),
 			);
@@ -528,13 +553,416 @@ class Module_Handler
 
 
 	/**
-	 * Fetches Units-of-Measure information
+	 * Fetches Units-of-Measure information for UoM category listing
 	 *
-	 * @return   mixed     Array containing UOM-info on success; FALSE otherwise
+	 * @return   mixed     Array containing UoM-info on success; FALSE otherwise
 	 */
-	private function components__mrp__uom__do_list ()
+	private function components__mrp__warehouse__uom_category__do_list ()
 	{
-		return $this->Registry->Cache->cache__do_get_part("components__mrp__uom", "_by_id");
+		return $this->Registry->Cache->cache__do_get_part("components__mrp__warehouse__uom", "_by_id");
+	}
+
+
+	/**
+	 * Creates UoM Category
+	 *
+	 * @return   mixed     Array containing UoM-info on success; FALSE otherwise
+	 */
+	private function components__mrp__warehouse__uom_category__do_create ()
+	{
+		$uom_categories_name_list = $this->Registry->Cache->cache__do_get_part("components__mrp__warehouse__uom", "_name_list");
+		$category_name = $this->Registry->Input->post("category_name");
+
+		if ( empty( $category_name ) )
+		{
+			return array( array( 'faultCode' => 701, 'faultMessage' => "UoM category name cannot be empty!" ) );
+		}
+
+		if ( ! in_array( $category_name, $uom_categories_name_list ) )
+		{
+			# Insert
+			$this->Registry->Db->cur_query = array(
+				"do"	 => "insert",
+				"table"  => "components__mrp__warehouse__uom__categories",
+				"set"    => array(
+						'uom_category_name' => $category_name,
+					)
+			);
+
+			if ( $this->Registry->Db->simple_exec_query() )
+			{
+				# On SUCCESS, update cache and respond
+				$this->Registry->loader("Cache__Recache")->main( "components__mrp__warehouse__uom" );
+
+				return array( 'responseCode' => 1, 'responseMessage' => "UoM category successfully created!", 'responseAction' => "refresh" );
+			}
+			else
+			{
+				return array( array( 'faultCode' => 0, 'faultMessage' => "Unexpected problem occured! Possible DB-connection problems?!" ) );
+			}
+		}
+		else
+		{
+			return array( array( 'faultCode' => 701, 'faultMessage' => "UoM category with the same name already exists!" ) );
+		}
+	}
+
+
+	/**
+	 * Renames UoM Category
+	 *
+	 * @return   mixed     Array containing UoM-info on success; FALSE otherwise
+	 */
+	private function components__mrp__warehouse__uom_category__do_edit ()
+	{
+		$uom_categories_name_list = $this->Registry->Cache->cache__do_get("components__mrp__warehouse__uom");
+		$category_name = $this->Registry->Input->post("category_name");
+		$category_id = intval( $this->Registry->Input->post("category_id") );
+
+		if ( empty( $category_name ) )
+		{
+			return array( array( 'faultCode' => 701, 'faultMessage' => "UoM category name cannot be empty!" ) );
+		}
+
+		if ( !in_array( $category_id, $uom_categories_name_list ) )
+		{
+			# Update
+			$this->Registry->Db->cur_query = array(
+					'do'	 => "update",
+					'tables'  => "components__mrp__warehouse__uom__categories",
+					'set'    => array(
+							'uom_category_name' => $category_name,
+						),
+					'where'  => "uom_category_id=" . $this->Registry->Db->quote( $category_id, "INTEGER" )
+				);
+
+			if ( $this->Registry->Db->simple_exec_query() !== false )
+			{
+				# On SUCCESS, update cache and respond
+				$this->Registry->loader("Cache__Recache")->main( "components__mrp__warehouse__uom" );
+				return array( 'responseCode' => 1, 'responseMessage' => "UoM category successfully updated!", 'responseAction' => "refresh" );
+			}
+			else
+			{
+				return array( array( 'faultCode' => 0, 'faultMessage' => "Unexpected problem occured! Possible DB-connection problems?!" ) );
+			}
+		}
+		else
+		{
+			return array( 'faultCode' => 701, 'faultMessage' => "No such UoM category exists!" );
+		}
+	}
+
+
+	/**
+	 * Fetches Units-of-Measure information for UoM category viewing
+	 *
+	 * @return   mixed     Array containing UoM-info on success; FALSE otherwise
+	 */
+	private function components__mrp__warehouse__uom_category__do_view ()
+	{
+		$uom_cache = $this->Registry->Cache->cache__do_get_part("components__mrp__warehouse__uom", "_by_id");
+		$category_id = intval( $this->running_subroutine['request']['category_id'] );
+
+		if ( !array_key_exists( $category_id, $uom_cache ) )
+		{
+			return array( 'faultCode' => 0, 'faultMessage' => "No such UoM category exists!" );
+		}
+
+		return $uom_cache[ $category_id ];
+	}
+
+
+	/**
+	 * Creates UoM
+	 *
+	 * @return   mixed     Array containing UoM-info on success; FALSE otherwise
+	 */
+	private function components__mrp__warehouse__uom__do_create ()
+	{
+		//---------------------------------------------------
+		// Requirement check: Is BC Math extension loaded?
+		//---------------------------------------------------
+
+		if ( extension_loaded("bcmath") )
+		{
+			throw new Exception( "PHP BC-Math extension not loaded!" );
+			return array( 'faultCode' => 0, 'faultMessage' => "PHP BC-Math extension not loaded! Please contact your system administrator for support!" );
+		}
+
+		$faults = array();
+		$uom_cache = $this->Registry->Cache->cache__do_get_part("components__mrp__warehouse__uom", "_by_id");
+		$uom_category_id = intval( $this->running_subroutine['request']['category_id'] );
+
+		//-----------------------------
+		// Is the category id valid?
+		//-----------------------------
+
+		if ( !array_key_exists( $uom_category_id, $uom_cache ) )
+		{
+			return array( 'faultCode' => 0, 'faultMessage' => "No such UoM category exists!" );
+		}
+
+		//----------------------------
+		// Validation & Sanitation
+		//----------------------------
+
+		# UoM name
+		$uom_name = $this->Registry->Input->post("uom_name");
+		if ( empty( $uom_name ) )
+		{
+			return array( 'faultCode' => 701, 'faultMessage' => "Empty UoM name! Please enter a UoM name..." );
+		}
+		if ( array_key_exists( $uom_name, $uom_cache[ $uom_category_id ]['_units_by_name'] ) )
+		{
+			return array( 'faultCode' => 701, 'faultMessage' => "Duplicate UoM entry! UoM with the same name already exists within this category..." );
+		}
+		$uom_name = preg_replace( '/[^a-z0-9-]/i', "", $uom_name );
+
+		# UoM type and ratio
+		$uom_type = $this->Registry->Input->post("uom_type");
+		$uom_ratio = $this->Registry->Input->post("uom_ratio");
+		if ( !in_array( $uom_type, array( "-1", "0", "1" ) ) )
+		{
+			$faults[] = array( 'faultCode' => 702, 'faultMessage' => "Invalid UoM-type." );
+		}
+		elseif ( $uom_type == '1' and bccomp( $uom_ratio, "1") == 1 )
+		{
+			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "For a UoM which is bigger than the reference one, ratio needs to be less than 1 (e.g. 0.001)." );
+		}
+		elseif ( $uom_type == '-1' and bccomp( $uom_ratio, "1") == -1 )
+		{
+			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "For a UoM which is smaller than the reference one, ratio needs to be bigger than 1 (e.g. 100.0)." );
+		}
+
+		# UoM rounding precision
+		$uom_rounding_precision = $this->Registry->Input->post("uom_rounding_precision");
+		if ( !is_int( $uom_rounding_precision ) and $uom_rounding_precision > 16 )
+		{
+			$faults[] = array( 'faultCode' => 704, 'faultMessage' => "Invalid value for '<i>UoM Rounding Precision</i>': only a positive integer value which is equal to or less than 16 is allowed." );
+		}
+
+		# Faults
+		if ( count( $faults ) )
+		{
+			return $faults;
+		}
+
+		# Insert
+		$this->Registry->Db->cur_query = array(
+				"do"	 => "insert",
+				"table"  => "components__mrp__warehouse__uom__units",
+				"set"    => array(
+						'uom_name'               => $uom_name,
+						'uom_category_id'        => $uom_category_id,
+						'uom_type'               => $uom_type,
+						'uom_rounding_precision' => $uom_rounding_precision,
+						'uom_is_enabled'         => intval( $this->Registry->Input->post("uom_is_enabled") ) == 1 ? 1 : 0,
+						'uom_ratio'              => $uom_ratio,
+					)
+			);
+
+		if ( $this->Registry->Db->simple_exec_query() )
+		{
+			# On SUCCESS, update cache and respond
+			$this->Registry->loader("Cache__Recache")->main( "components__mrp__warehouse__uom" );
+
+			return array( 'responseCode' => 1, 'responseMessage' => "UoM successfully created!", 'responseAction' => "refresh" );
+		}
+
+		return array( array( 'faultCode' => 0, 'faultMessage' => "Unexpected problem occured! Possible DB-connection problems?!" ) );
+	}
+
+
+	/**
+	 * Creates UoM
+	 *
+	 * @return   mixed     Array containing UoM-info on success; FALSE otherwise
+	 */
+	private function components__mrp__warehouse__uom__do_edit ()
+	{
+		//---------------------------------------------------
+		// Requirement check: Is BC Math extension loaded?
+		//---------------------------------------------------
+
+		if ( !extension_loaded("bcmath") )
+		{
+			return array( 'faultCode' => 0, 'faultMessage' => "PHP BC-Math extension not loaded! Please contact your system administrator for support!" );
+		}
+
+		$faults = array();
+		$uom_cache = $this->Registry->Cache->cache__do_get_part("components__mrp__warehouse__uom", "_by_id");
+		$uom_category_id = intval( $this->running_subroutine['request']['category_id'] );
+
+		//-----------------------------
+		// Is the category id valid?
+		//-----------------------------
+
+		if ( !array_key_exists( $uom_category_id, $uom_cache ) )
+		{
+			return array( 'faultCode' => 0, 'faultMessage' => "No such UoM category exists!" );
+		}
+
+		//----------------------------
+		// Validation & Sanitation
+		//----------------------------
+
+		# UoM name
+		$uom_name = $this->Registry->Input->post("uom_name");
+		if ( empty( $uom_name ) )
+		{
+			return array( 'faultCode' => 701, 'faultMessage' => "Empty UoM name! Please enter a UoM name..." );
+		}
+		if ( array_key_exists( $uom_name, $uom_cache[ $uom_category_id ]['_units_by_name'] ) )
+		{
+			return array( 'faultCode' => 701, 'faultMessage' => "Duplicate UoM entry! UoM with the same name already exists within this category..." );
+		}
+		$uom_name = preg_replace( '/[^a-z0-9-]/i', "", $uom_name );
+
+		# UoM type and ratio
+		$uom_type = $this->Registry->Input->post("uom_type");
+		$uom_ratio = $this->Registry->Input->post("uom_ratio");
+		if ( !in_array( $uom_type, array( "-1", "0", "1" ) ) )
+		{
+			$faults[] = array( 'faultCode' => 702, 'faultMessage' => "Invalid UoM-type." );
+		}
+		elseif ( $uom_type == '1' and bccomp( $uom_ratio, "1") == 1 )
+		{
+			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "For a UoM which is bigger than the reference one, ratio needs to be less than 1 (e.g. 0.001)." );
+		}
+		elseif ( $uom_type == '-1' and bccomp( $uom_ratio, "1") == -1 )
+		{
+			$faults[] = array( 'faultCode' => 703, 'faultMessage' => "For a UoM which is smaller than the reference one, ratio needs to be bigger than 1 (e.g. 100.0)." );
+		}
+
+		# UoM rounding precision
+		$uom_rounding_precision = $this->Registry->Input->post("uom_rounding_precision");
+		if ( !is_int( $uom_rounding_precision ) and $uom_rounding_precision > 16 )
+		{
+			$faults[] = array( 'faultCode' => 704, 'faultMessage' => "Invalid value for '<i>UoM Rounding Precision</i>': only a positive integer value which is equal to or less than 16 is allowed." );
+		}
+
+		# Faults
+		if ( count( $faults ) )
+		{
+			return $faults;
+		}
+
+		# Insert
+		$this->Registry->Db->cur_query = array(
+				"do"	 => "insert",
+				"table"  => "components__mrp__warehouse__uom__units",
+				"set"    => array(
+						'uom_name'               => $uom_name,
+						'uom_category_id'        => $uom_category_id,
+						'uom_type'               => $uom_type,
+						'uom_rounding_precision' => $uom_rounding_precision,
+						'uom_is_enabled'         => intval( $this->Registry->Input->post("uom_is_enabled") ) == 1 ? 1 : 0,
+						'uom_ratio'              => $uom_ratio,
+					)
+			);
+
+		if ( $this->Registry->Db->simple_exec_query() )
+		{
+			# On SUCCESS, update cache and respond
+			$this->Registry->loader("Cache__Recache")->main( "components__mrp__warehouse__uom" );
+
+			return array( 'responseCode' => 1, 'responseMessage' => "UoM successfully created!", 'responseAction' => "refresh" );
+		}
+
+		return array( array( 'faultCode' => 0, 'faultMessage' => "Unexpected problem occured! Possible DB-connection problems?!" ) );
+	}
+
+
+	/**
+	 * Deletes UoM
+	 *
+	 * @return    array     Array containing Response-status on success; Fault-status on failure
+	 */
+	private function components__mrp__warehouse__uom__do_remove ()
+	{
+		$uom_cache =& $this->Registry->Cache->cache__do_get_part("components__mrp__warehouse__uom", "_by_id");
+		$category_id = intval( $this->Registry->Input->post("category_id") );
+
+		if ( $category_id and array_key_exists( $category_id, $uom_cache ) )
+		{
+			//-----------------------------------------------
+			// Is category empty? If not, we cannot delete
+			//-----------------------------------------------
+
+			if ( empty( $uom_cache[ $category_id ]['_units_by_id'] ) )
+			{
+				$this->Registry->Db->cur_query = array(
+						'do'	  =>  "delete",
+						'table'   =>  "components__mrp__warehouse__uom__categories",
+						'where'   =>  "uom_category_id=" . $this->Registry->Db->quote( $category_id, "INTEGER" ),
+					);
+				if ( $this->Registry->Db->simple_exec_query() )
+				{
+					# Success: Update cache and return
+					$this->Registry->loader("Cache__Recache")->main( "components__mrp__warehouse__uom" );
+					return array( 'responseCode' => 1, 'responseMessage' => "UoM category successfully removed!", 'responseAction' => "refresh" );
+				}
+				else
+				{
+					return array( 'faultCode' => 0, 'faultMessage' => "Failed to delete UoM category! Check logs for possible errors..." );
+				}
+			}
+			else
+			{
+				return array( 'faultCode' => 0, 'faultMessage' => "Cannot delete non-empty UoM category!" );
+			}
+		}
+		else
+		{
+			return array( 'faultCode' => 0, 'faultMessage' => "No such UoM category exists!" );
+		}
+	}
+
+
+	/**
+	 * Deletes UoM category
+	 *
+	 * @return    array     Array containing Response-status on success; Fault-status on failure
+	 */
+	private function components__mrp__warehouse__uom_category__do_remove ()
+	{
+		$uom_cache =& $this->Registry->Cache->cache__do_get_part("components__mrp__warehouse__uom", "_by_id");
+		$category_id = intval( $this->Registry->Input->post("category_id") );
+
+		if ( $category_id and array_key_exists( $category_id, $uom_cache ) )
+		{
+			//-----------------------------------------------
+			// Is category empty? If not, we cannot delete
+			//-----------------------------------------------
+
+			if ( empty( $uom_cache[ $category_id ]['_units_by_id'] ) )
+			{
+				$this->Registry->Db->cur_query = array(
+						'do'	  =>  "delete",
+						'table'   =>  "components__mrp__warehouse__uom__categories",
+						'where'   =>  "uom_category_id=" . $this->Registry->Db->quote( $category_id, "INTEGER" ),
+					);
+				if ( $this->Registry->Db->simple_exec_query() )
+				{
+					# Success: Update cache and return
+					$this->Registry->loader("Cache__Recache")->main( "components__mrp__warehouse__uom" );
+					return array( 'responseCode' => 1, 'responseMessage' => "UoM category successfully removed!", 'responseAction' => "refresh" );
+				}
+				else
+				{
+					return array( 'faultCode' => 0, 'faultMessage' => "Failed to delete UoM category! Check logs for possible errors..." );
+				}
+			}
+			else
+			{
+				return array( 'faultCode' => 0, 'faultMessage' => "Cannot delete non-empty UoM category!" );
+			}
+		}
+		else
+		{
+			return array( 'faultCode' => 0, 'faultMessage' => "No such UoM category exists!" );
+		}
 	}
 
 

@@ -17,7 +17,7 @@ abstract class Login_Core
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	**/
 	protected $Registry;
 

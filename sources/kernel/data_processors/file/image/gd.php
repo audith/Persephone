@@ -18,7 +18,7 @@ final class Data_Processors__File__Image__Gd
 {
 	/**
 	 * Registry reference
-	 * @var object
+	 * @var Registry
 	 */
 	public $Registry;
 
@@ -58,7 +58,7 @@ final class Data_Processors__File__Image__Gd
 		if ( ! $file_resource['_diagnostics']['file_exists'] )
 		{
 			$this->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] not exists or inaccessible!" , "ERROR" );
-			return FALSE;
+			return false;
 		}
 
 		//----------------------
@@ -69,27 +69,27 @@ final class Data_Processors__File__Image__Gd
 		{
 			case 'jpeg':
 				$image_to_resize = ( imagetypes() and IMG_JPEG ) ?
-					imagecreatefromjpeg( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefromjpeg( $file_resource['_f_location'] ) : false;
 				break;
 			case 'gif':
 				$image_to_resize = ( imagetypes() and IMG_GIF ) ?
-					imagecreatefromgif( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefromgif( $file_resource['_f_location'] ) : false;
 				break;
 			case 'png':
 				$image_to_resize = ( imagetypes() and IMG_PNG ) ?
-					imagecreatefrompng( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefrompng( $file_resource['_f_location'] ) : false;
 				break;
 			case 'vnd.wap.wbmp':
 				$image_to_resize = ( imagetypes() and IMG_WBMP ) ?
-					imagecreatefromwbmp( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefromwbmp( $file_resource['_f_location'] ) : false;
 				break;
 			default:
-				$image_to_resize = FALSE;
+				$image_to_resize = false;
 				break;
 		}
-		if ( $image_to_resize === FALSE )
+		if ( $image_to_resize === false )
 		{
-			return FALSE;
+			return false;
 		}
 
 		$_image_to_resize__geometry = array(
@@ -140,7 +140,7 @@ final class Data_Processors__File__Image__Gd
 		//------------------
 
 		$_file_save_as = $this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , $file_suffix );
-		$return        = FALSE;
+		$return        = false;
 		switch ( $file_resource['_f_subtype'] )
 		{
 			case 'jpeg':
@@ -180,7 +180,7 @@ final class Data_Processors__File__Image__Gd
 		if ( ! $file_resource['_diagnostics']['file_exists'] )
 		{
 			$this->logger__do_log( "Media ['" . $file_resource['f_hash'] . "'] not exists or inaccessible!" , "ERROR" );
-			return FALSE;
+			return false;
 		}
 
 		//----------------------
@@ -191,27 +191,27 @@ final class Data_Processors__File__Image__Gd
 		{
 			case 'jpeg':
 				$image_to_watermark = ( imagetypes() and IMG_JPEG ) ?
-					imagecreatefromjpeg( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefromjpeg( $file_resource['_f_location'] ) : false;
 				break;
 			case 'gif':
 				$image_to_watermark = ( imagetypes() and IMG_GIF ) ?
-					imagecreatefromgif( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefromgif( $file_resource['_f_location'] ) : false;
 				break;
 			case 'png':
 				$image_to_watermark = ( imagetypes() and IMG_PNG ) ?
-					imagecreatefrompng( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefrompng( $file_resource['_f_location'] ) : false;
 				break;
 			case 'vnd.wap.wbmp':
 				$image_to_watermark = ( imagetypes() and IMG_WBMP ) ?
-					imagecreatefromwbmp( $file_resource['_f_location'] ) : FALSE;
+					imagecreatefromwbmp( $file_resource['_f_location'] ) : false;
 				break;
 			default:
-				$image_to_watermark = FALSE;
+				$image_to_watermark = false;
 				break;
 		}
-		if ( $image_to_watermark === FALSE )
+		if ( $image_to_watermark === false )
 		{
-			return FALSE;
+			return false;
 		}
 
 		$_image_to_watermark__geometry = array(
@@ -223,7 +223,7 @@ final class Data_Processors__File__Image__Gd
 		// Is it below watermark-able image dimension limit?
 		//-----------------------------------------------------
 
-		if ( is_string( $this->Registry->config['medialibrary']['watermark_threshold'] ) and strpos( $this->Registry->config['medialibrary']['watermark_threshold'], "x" ) !== FALSE )
+		if ( is_string( $this->Registry->config['medialibrary']['watermark_threshold'] ) and strpos( $this->Registry->config['medialibrary']['watermark_threshold'], "x" ) !== false )
 		{
 			$this->Registry->config['medialibrary']['watermark_threshold'] = explode( "x" , $this->Registry->config['medialibrary']['watermark_threshold'] );
 		}
@@ -242,11 +242,11 @@ final class Data_Processors__File__Image__Gd
 			{
 				$this->Registry->logger__do_log(
 						"Modules - Data_Processors - FILE - IMAGE - GD: "
-							. ( $_chdir === FALSE ? "Failed" : "Succeeded" )
+							. ( $_chdir === false ? "Failed" : "Succeeded" )
 							. " to COPY image '" . $file_resource['_f_location'] . "'" ,
-						$_chdir === FALSE ? "ERROR" : "INFO"
+						$_chdir === false ? "ERROR" : "INFO"
 					);
-				return FALSE;
+				return false;
 			}
 			return TRUE;
 		}
@@ -316,7 +316,7 @@ final class Data_Processors__File__Image__Gd
 		//------------------
 
 		$_file_save_as = $this->Registry->Input->file__filename__attach_suffix( $file_resource['_f_location'] , "_W" );
-		$return        = FALSE;
+		$return        = false;
 		switch ( $file_resource['_f_subtype'] )
 		{
 			case 'jpeg':

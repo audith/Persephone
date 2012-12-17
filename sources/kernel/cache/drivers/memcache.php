@@ -20,7 +20,7 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 	/**
 	 * Registry reference
 	 *
-	 * @var object
+	 * @var Registry
 	 */
 	private $Registry;
 
@@ -39,9 +39,9 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 	public $crashed = 0;
 
 	/**
-	 * Memcache connection link - TRUE on success, FALSE otherwise
+	 * Memcache connection link
 	 *
-	 * @var boolean
+	 * @var Memcache
 	 */
 	public $link;
 
@@ -90,24 +90,24 @@ class Cache__Drivers__Memcache implements iCache_Drivers
 		{
 			if ( ! count( $server_info ) )
 			{
-				throw new Exception( "No servers to connect!" );
+				throw new Registry__Exception( "No servers to connect!" );
 			}
 
 			foreach ( $server_info as $_server )
 			{
 				if ( count( $_server ) != 2 or ( ! isset( $_server[0] ) or empty( $_server[0] ) ) or ( ! isset( $_server[1] ) or empty( $_server[1] ) ) )
 				{
-					throw new Exception( "Invalid server information!" );
+					throw new Registry__Exception( "Invalid server information!" );
 				}
 
-				if ( !is_object( $this->link ) )
+				if ( ! is_object( $this->link ) )
 				{
-					throw new Exception( "Link not instantiated?!" );
+					throw new Registry__Exception( "Link not instantiated?!" );
 				}
 
-				if ( !$this->link->addServer( $_server[0], $_server[1] ) )
+				if ( ! $this->link->addServer( $_server[0], $_server[1] ) )
 				{
-					throw new Exception( "Connection to " . $_server[0] . ":" . $_server[1] . " failed!" );
+					throw new Registry__Exception( "Connection to " . $_server[0] . ":" . $_server[1] . " failed!" );
 				}
 			}
 		}

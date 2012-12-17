@@ -21,7 +21,7 @@ class Ips_Converge
 	/**
 	 * Registry reference
 	 *
-	 * @var Object
+	 * @var Registry
 	**/
 	private $Registry;
 
@@ -38,7 +38,7 @@ class Ips_Converge
 	 *
 	 * @param	object Database object
 	**/
-	public function __construct ( & $Registry )
+	public function __construct ( Registry $Registry )
 	{
 		# Bring-in Registry object reference
 		$this->Registry = $Registry;

@@ -103,22 +103,22 @@ ignore_user_abort( true );
  */
 error_reporting( E_ALL );
 /*
- if ( IN_DEV )
- {
- if ( version_compare( PHP_VERSION, "5.2.4", "<" ) )
- {
- ini_set( "display_errors" , "1" );
- }
- else
- {
- ini_set( "display_errors" , "stdout" );
- }
- }
- else
- {
- ini_set( "display_errors" , "0"      );
- }
- */
+if ( IN_DEV )
+{
+	if ( version_compare( PHP_VERSION, "5.2.4", "<" ) )
+	{
+		ini_set( "display_errors" , "1" );
+	}
+	else
+	{
+		ini_set( "display_errors" , "stdout" );
+	}
+}
+else
+{
+	ini_set( "display_errors" , "0"      );
+}
+*/
 ini_set( "display_errors"        , "0"                              );
 ini_set( "error_log"             , PATH_LOGS . "/php_errors.log"    );
 ini_set( "log_errors"            , "1"                              );

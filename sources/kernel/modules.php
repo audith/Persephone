@@ -17,7 +17,7 @@ class Modules
 {
 	/**
 	 * Registry reference
-	 * @var Object
+	 * @var Registry
 	**/
 	private $Registry;
 
@@ -60,7 +60,6 @@ class Modules
 	 */
 	public function __construct ( Registry $Registry, $params = "" )
 	{
-		# Bring-in Registry object reference
 		$this->Registry = $Registry;
 
 		# Get active modules from DB
