@@ -1,41 +1,24 @@
 /* jQuery Setup */
-if ( jQuery != undefined && typeof jQuery == 'function' )
-{
+if ( jQuery != undefined && typeof jQuery == 'function' ) {
 	/* jQuery::noConflict() */
 	jQuery.noConflict();
 
-	/* HTML-5 support for IE8 and earlier */
-	/*
-	if ( jQuery.support.leadingWhitespace == false ) // This =false in IE 6-8
-	{
-		document.createElement("header");
-		document.createElement("footer");
-		document.createElement("section");
-		document.createElement("aside");
-		document.createElement("nav");
-		document.createElement("article");
-		document.createElement("hgroup");
-		document.createElement("time");
-	}
-	*/
-
 	/* AJAX setup */
 	jQuery.ajaxSetup({
-		async : true,
-		cache : true,
-		data : "",
-		dataType : "json",
-		global : true,
+		async      : true,
+		cache      : true,
+		data       : "",
+		dataType   : "json",
+		global     : true,
 		ifModified : true,
-		timeout : 15000,
-		type : "POST",
-		url : window.location.href,
+		timeout    : 15000,
+		type       : "POST",
+		url        : window.location.href,
 
-		error : function ( jqXHR , textStatus , errorThrown )
+		error : function ( jqXHR, textStatus, errorThrown )
 		{
 			var currentConsole = null;
-			if ( currentConsole = persephone.Form.scrollToConsole(true) )
-			{
+			if ( currentConsole = persephone.Form.scrollToConsole(true) ) {
 				currentConsole.html("Unspecified error occured! Possible causes are <i>connection problems</i> or <i>invalid response from server</i>.").removeClass("success loading").addClass("error");
 			}
 			return 0;
@@ -46,10 +29,12 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 /**
  * Basic extend function.
  */
-function extend ( B , A )
+function extend ( B, A )
 {
 	// Intermediate function
-	function I () {};
+	function I ()
+	{
+	}
 
 	// The rest...
 	I.prototype = A.prototype;
@@ -63,10 +48,11 @@ function extend ( B , A )
  */
 Function.prototype.singleton = function ()
 {
-	if ( this._singleton === undefined )
-	{
+	if ( this._singleton === undefined ) {
 		// Create an Intermediate constructor to avoid problems during initialization of the generic construct itself
-		function I () {};
+		function I ()
+		{
+		};
 
 		// Assign the same prototype to extend itself
 		I.prototype = this.prototype;
@@ -84,69 +70,58 @@ Function.prototype.singleton = function ()
 /**
  * Checks whether given arrays are the same.
  *
- * @param {Array} First array.
- * @param {Array} Second array.
+ * @param {Array} a1 First array.
+ * @param {Array} a2 Second array.
  * @returns {Boolean} TRUE if both arrays are the same, FALSE otherwise.
  *
  * @see http://stackoverflow.com/questions/784012/javascript-equivalent-of-phps-in-array
  */
-Persephone.prototype.arrayCompare = function ( a1 , a2 )
+Persephone.prototype.arrayCompare = function ( a1, a2 )
 {
-	if ( a1.length != a2.length )
-	{
+	if ( a1.length != a2.length ) {
 		return false;
 	}
 	var length = a2.length;
-	for ( var i = 0; i < length; i++ )
-	{
-		if ( a1[i] !== a2[i] )
-		{
+	for ( var i = 0; i < length; i++ ) {
+		if ( a1[i] !== a2[i] ) {
 			return false;
 		}
 	}
-    return true;
+	return true;
 };
 
 /**
  * Checks if a value exists in an array.
+ * {function(needle=, haystack=, ?strict=)}
  *
- * @param {Mixed} The searched value.
- * @param {Array} The haystack-array.
- * @param {Boolean} Optional: If TRUE then the types of the needle will also be checked. Defaults to FALSE.
+ * @param {*} needle The searched value.
+ * @param {Array} haystack The haystack-array.
+ * @param {Boolean} strict Optional: If TRUE then the types of the needle will also be checked. Defaults to FALSE.
  * @returns {Boolean} TRUE if needle is found in the array, FALSE otherwise.
  *
  * @see http://stackoverflow.com/questions/784012/javascript-equivalent-of-phps-in-array
  */
-Persephone.prototype.inArray = function ( needle , haystack /* , strict */ )
+Persephone.prototype.inArray = function ( needle, haystack /* , strict */ )
 {
 	var length = haystack.length;
 	var strict = false;
-	if ( arguments[2] != undefined && arguments[2] == true )
-	{
+	if ( arguments[2] != undefined && arguments[2] == true ) {
 		strict = true;
 	}
-	for ( var i = 0; i < length; i++ )
-	{
-		if ( typeof haystack[i] == 'object' )
-		{
-			if ( persephone.arrayCompare(haystack[i], needle) )
-			{
+	for ( var i = 0; i < length; i++ ) {
+		if ( typeof haystack[i] == 'object' ) {
+			if ( persephone.arrayCompare(haystack[i], needle) ) {
 				return true;
 			}
 		}
-		else
-		{
-			if ( strict )
-			{
-				if ( haystack[i] === needle )
-				{
+		else {
+			if ( strict ) {
+				if ( haystack[i] === needle ) {
 					return true;
 				}
 			}
-			else
-			{
-				if ( haystack[i] == needle )
-				{
+			else {
+				if ( haystack[i] == needle ) {
 					return true;
 				}
 			}
@@ -157,21 +132,18 @@ Persephone.prototype.inArray = function ( needle , haystack /* , strict */ )
 
 /**
  * Creates a copy/clone of an object.
- * @param    {Object}  Object to copy/clone
- * @returns  {Object}  New object
+ * @param    {Object} objectToClone
+ * @returns  {Object}
  * @usage    var newObj = persephone.cloneObject( objectToClone );
  */
 Persephone.prototype.cloneObject = function ( objectToClone )
 {
 	var newObj = (objectToClone instanceof Array) ? [] : {};
-	for ( i in objectToClone )
-	{
-		if ( objectToClone[i] && typeof objectToClone[i] == "object" )
-		{
+	for ( i in objectToClone ) {
+		if ( objectToClone[i] && typeof objectToClone[i] == "object" ) {
 			newObj[i] = persephone.cloneObject(objectToClone[i]);
 		}
-		else
-		{
+		else {
 			newObj[i] = objectToClone[i];
 		}
 	}
@@ -182,38 +154,33 @@ Persephone.prototype.cloneObject = function ( objectToClone )
 /**
  * Checks whether the given object is empty or not.
  *
- * @returns {Mixed} TRUE if the object is empty, FALSE if not; undefined if error occurs.
+ * @returns {*} TRUE if the object is empty, FALSE if not; undefined if error occurs.
  */
 Persephone.prototype.isEmptyObject = function ( object )
 {
 	/* Return undefined if we are dealing with non-object. */
-	if ( typeof object != 'object' )
-	{
+	if ( typeof object != 'object' ) {
 		return undefined;
 	}
 
 	/**
 	 * jQuery Objects
 	 */
-	if ( object instanceof jQuery )
-	{
-		return object.length === 0 ? true : false;
+	if ( object instanceof jQuery ) {
+		return !!(object.length === 0);
 	}
 
 	/**
 	 * @deprecated Since Javascript 1.8.5
 	 * @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object
 	 */
-	if ( object.__count__ !== undefined )
-	{
-		return object.__count__ === 0 ? true : false;
+	if ( object.__count__ !== undefined ) {
+		return !!(object.__count__ === 0);
 	}
 
 	/* Less-aesthetic method, if above method fails */
-	for ( var property in object )
-	{
-		if ( object.hasOwnProperty(property) )
-		{
+	for ( var property in object ) {
+		if ( object.hasOwnProperty(property) ) {
 			return false;
 		}
 	}
@@ -240,13 +207,11 @@ var persephone = Persephone.singleton();
 /**
  * Tries to output a debug message/object to Window-console.
  *
- * @param mixed Message/object to output.
- * @returns void
+ * @param {*} item Message/object to output.
  */
 Persephone.prototype.debug = function ( item )
 {
-	if ( window.console && typeof window.console.log == 'function' )
-	{
+	if ( window.console && typeof window.console.log == 'function' ) {
 		window.console.log(item);
 	}
 };
@@ -254,13 +219,13 @@ Persephone.prototype.debug = function ( item )
 Persephone.prototype.Form = {
 	/**
 	 * Working form object.
-	 * @var {Mixed}
+	 * @var {*}
 	 */
 	self : null,
 
 	/**
 	 * jQuery-UI Dialog instance
-	 * @var {Mixed}
+	 * @var {*}
 	 */
 	dialogInstance : null,
 
@@ -272,10 +237,10 @@ Persephone.prototype.Form = {
 	{
 		/* Options */
 		var options = {
-			autoOpen : false,
-			buttons : [
+			autoOpen      : false,
+			buttons       : [
 				{
-					text : "Ok",
+					text  : "Ok",
 					click : function ( event )
 					{
 						jQuery(this).dialog("close");
@@ -283,28 +248,25 @@ Persephone.prototype.Form = {
 				}
 			],
 			closeOnEscape : true,
-			maxHeight : (2 * jQuery(window).height() / 3),
-			maxWidth : (2 * jQuery(window).width() / 3),
-			modal : true,
-			stack : true,
-			zIndex : 1000,
+			maxHeight     : (2 * jQuery(window).height() / 3),
+			maxWidth      : (2 * jQuery(window).width() / 3),
+			modal         : true,
+			stack         : true,
+			zIndex        : 1000,
 
 			title : "Please confirm...",
-			body : "Are you sure?"
+			body  : "Are you sure?"
 		};
-		if ( typeof newOptions == 'object' && !persephone.isEmptyObject(newOptions) )
-		{
+		if ( typeof newOptions == 'object' && !persephone.isEmptyObject(newOptions) ) {
 			jQuery.extend(true, options, newOptions);  // 'true' means we merge two arrays and assign the resulting value to the first variable
 		}
 
 		/* Do we have a valid instance? If so, return it; otherwise, create new one. */
-		if ( this.dialogInstance === null )
-		{
+		if ( this.dialogInstance === null ) {
 			/* Instantiate */
 			this.dialogInstance = jQuery("<div></div>").dialog(options).html(newOptions['body']);
 		}
-		else
-		{
+		else {
 			/* Set title and body */
 			this.dialogInstance.dialog("option", options).html(newOptions['body']);
 		}
@@ -315,24 +277,21 @@ Persephone.prototype.Form = {
 	/**
 	 * Scrolls the page to the to the "top" of Console
 	 *
-	 * @returns {Mixed} [jQuery] jQuery object (current canvas) on success, [Boolean] FALSE otherwise
+	 * @returns {*} [jQuery] jQuery object (current canvas) on success, [Boolean] FALSE otherwise
 	 * @uses jQuery
 	 */
 	scrollToConsole : function ( enforceGlobalConsole )
 	{
-		if ( jQuery === undefined || typeof jQuery != 'function' )
-		{
+		if ( jQuery === undefined || typeof jQuery != 'function' ) {
 			return false;
 		}
 
 		var currentConsole = {};
 
 		/* Is "self" set? */
-		if ( !enforceGlobalConsole && this.self !== null )
-		{
+		if ( !enforceGlobalConsole && this.self !== null ) {
 			/* We need to convert our object to jQuery object, if it's not already so. */
-			if ( !(this.self instanceof jQuery) )
-			{
+			if ( !(this.self instanceof jQuery) ) {
 				this.self = jQuery(this.self);
 			}
 
@@ -341,8 +300,7 @@ Persephone.prototype.Form = {
 		}
 
 		/* Revert to the "global" console if no "local" one was found */
-		if ( enforceGlobalConsole || persephone.isEmptyObject( currentConsole ) )
-		{
+		if ( enforceGlobalConsole || persephone.isEmptyObject(currentConsole) ) {
 			currentConsole = jQuery("#system_console");
 		}
 
@@ -355,14 +313,12 @@ Persephone.prototype.Form = {
 		var consoleBottom = parseInt(currentConsole.offset().top + currentConsole.height());
 		var canvasTop = parseInt(jQuery("html,body").scrollTop());
 		var canvasBottom = parseInt(jQuery("html,body").scrollTop() + jQuery(window).height());
-		if ( enforceGlobalConsole || consoleTop < canvasTop )
-		{
+		if ( enforceGlobalConsole || consoleTop < canvasTop ) {
 			jQuery("html,body").animate({
 				scrollTop : consoleTop
 			}, 500);
 		}
-		else if ( consoleBottom > canvasBottom )
-		{
+		else if ( consoleBottom > canvasBottom ) {
 			jQuery("html,body").animate({
 				scrollTop : consoleBottom
 			}, 500);
@@ -374,42 +330,39 @@ Persephone.prototype.Form = {
 	/**
 	 * Closes all Consoles
 	 *
-	 * @returns {Void}
+	 * @params {Boolean}
+	 * @returns {Boolean} TRUE if function completes successfully, FALSE if jQuery not found
 	 * @uses jQuery
 	 */
 	closeConsoles : function ( excludeGlobalConsole )
 	{
-		if ( jQuery === undefined || typeof jQuery != 'function' )
-		{
+		if ( jQuery === undefined || typeof jQuery != 'function' ) {
 			return false;
 		}
 		excludeGlobalConsole ? jQuery(".system_console").hide() : jQuery("#system_console, .system_console").hide();
-		return;
+		return true;
 	},
 
 	/**
 	 * Hides all .ondemand elements
 	 *
-	 * @param {String} Optional: What to exclude (DOM elements)
+	 * @param {String} exceptions Optional: What to exclude (DOM elements)
 	 * @return {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
 	 * @uses jQuery
 	 */
 	resetOnDemandObjects : function ( exceptions )
 	{
-		if ( jQuery === undefined || typeof jQuery != 'function' )
-		{
+		if ( jQuery === undefined || typeof jQuery != 'function' ) {
 			return false;
 		}
 
 		/* Is "self" set? */
-		if ( this.self === null )
-		{
+		if ( this.self === null ) {
 			return false;
 		}
 
 		/* We need to convert our object to jQuery object, if it's not already so. */
-		if ( !(this.self instanceof jQuery) )
-		{
+		if ( !(this.self instanceof jQuery) ) {
 			this.self = jQuery(this.self);
 		}
 
@@ -417,18 +370,16 @@ Persephone.prototype.Form = {
 		var _obj = this.self.find(".ondemand");
 
 		/* No matching elements? */
-		if ( _obj.length == 0 )
-		{
+		if ( _obj.length == 0 ) {
 			return false;
 		}
 
-		if ( exceptions )
-		{
+		if ( exceptions ) {
 			_obj = _obj.not(exceptions);
 		}
 
 		/* Disable form elements within those containers */
-		_obj.find("INPUT,TEXTAREA,BUTTON,SELECT").prop("disabled","disabled");
+		_obj.find("INPUT,TEXTAREA,BUTTON,SELECT").prop("disabled", "disabled");
 
 		/* Hide the container(s) [fieldsets] */
 		_obj.hide();
@@ -439,26 +390,23 @@ Persephone.prototype.Form = {
 	/**
 	 * Enables/reveals/shows requested .ondemand element
 	 *
-	 * @param {Mixed} Requested object: of type {jQuery} or otherwise
+	 * @param {*} obj Requested object: of type {jQuery} or otherwise
 	 * @return {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
 	 * @uses jQuery
 	 */
 	enableOnDemandElement : function ( obj /* , enableImmediateChildrenOnly = false */ )
 	{
-		if ( jQuery === undefined || typeof jQuery != 'function' )
-		{
+		if ( jQuery === undefined || typeof jQuery != 'function' ) {
 			return false;
 		}
 
 		/* We need to convert our object to jQuery object, if it's not already so. */
-		if ( !(obj instanceof jQuery) )
-		{
+		if ( !(obj instanceof jQuery) ) {
 			obj = jQuery(obj);
 		}
 
 		/* No matching elements? */
-		if ( obj.length == 0 )
-		{
+		if ( obj.length == 0 ) {
 			return false;
 		}
 
@@ -466,13 +414,11 @@ Persephone.prototype.Form = {
 		obj.show();
 
 		/* Then enable the disabled form elements within the container(s) [fieldsets] */
-		if ( arguments[1] !== undefined && arguments[1] === true )
-		{
+		if ( arguments[1] !== undefined && arguments[1] === true ) {
 			obj.children(":input").removeAttr("disabled");
 			obj.children("SPAN.input").children(":input").removeAttr("disabled");
 		}
-		else
-		{
+		else {
 			obj.find(":input").removeAttr("disabled");
 		}
 
@@ -482,31 +428,28 @@ Persephone.prototype.Form = {
 	/**
 	 * Resets/hides/disables requested .ondemand element
 	 *
-	 * @param {Mixed} Requested object: of type {jQuery} or otherwise
-	 * @return {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
+	 * @params {*} obj Requested object - of type {jQuery} or otherwise
+	 * @returns {Boolean} TRUE on success, FALSE otherwise (working form not defined or no matching DOM objects found)
 	 * @uses jQuery
 	 */
 	resetOnDemandElement : function ( obj )
 	{
-		if ( jQuery === undefined || typeof jQuery != 'function' )
-		{
+		if ( jQuery === undefined || typeof jQuery != 'function' ) {
 			return false;
 		}
 
 		/* We need to convert our object to jQuery object, if it's not already so. */
-		if ( !(obj instanceof jQuery) )
-		{
+		if ( !(obj instanceof jQuery) ) {
 			obj = jQuery(obj);
 		}
 
 		/* No matching elements? */
-		if ( obj.length == 0 )
-		{
+		if ( obj.length == 0 ) {
 			return false;
 		}
 
 		/* First disable the form elements within those containers */
-		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").prop("disabled","disabled");
+		obj.find("INPUT,TEXTAREA,BUTTON,SELECT").prop("disabled", "disabled");
 
 		/* Then hide the container(s) [fieldsets] */
 		obj.hide();
@@ -516,15 +459,12 @@ Persephone.prototype.Form = {
 
 	decodeHtmlEntities : function ( obj )
 	{
-		if ( obj instanceof Array )
-		{
-			for ( i in obj )
-			{
+		if ( obj instanceof Array ) {
+			for ( i in obj ) {
 				obj[i] = this.decodeHtmlEntities(obj[i]);
 			}
 		}
-		else
-		{
+		else {
 			obj = obj.replace("&#38;", "&");
 			obj = obj.replace("&#60;", "<");
 			obj = obj.replace("&#62;", ">");
@@ -544,17 +484,16 @@ Persephone.prototype.Form = {
 /**
  * Modal windows : Masking the Window/Document
  *
- * @returns {Mixed} [Number] Mask z-index value on success, [Boolean] FALSE otherwise
+ * @returns {*} [Number] Mask z-index value on success, [Boolean] FALSE otherwise
  * @uses jQuery
  */
 Persephone.prototype.dimLights = function ()
 {
-	if ( jQuery === undefined || typeof jQuery != 'function' )
-	{
+	if ( jQuery === undefined || typeof jQuery != 'function' ) {
 		return false;
 	}
 	jQuery("#matte").css({
-		"width" : jQuery(window).width(),
+		"width"  : jQuery(window).width(),
 		"height" : jQuery(document).height()
 	}).attr("title", "Click to close...").fadeIn("medium").fadeTo("medium", 0.8);
 	return jQuery("#matte").css("z-index");
@@ -568,16 +507,14 @@ Persephone.prototype.dimLights = function ()
  */
 Persephone.prototype.unDimLights = function ()
 {
-	if ( jQuery === undefined || typeof jQuery != 'function' )
-	{
+	if ( jQuery === undefined || typeof jQuery != 'function' ) {
 		return false;
 	}
 	jQuery(".modal, #matte").hide();
 	return true;
 };
 
-if ( jQuery != undefined && typeof jQuery == 'function' )
-{
+if ( jQuery != undefined && typeof jQuery == 'function' ) {
 	jQuery(document).ready(function ( event )
 	{
 		jQuery("#matte").click(Persephone.unDimLights);
@@ -600,67 +537,57 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			}
 
 			/* No FORM's? Exit. */
-			if ( !parentForm.is("FORM") )
-			{
+			if ( !parentForm.is("FORM") ) {
 				return false;
 			}
 
 			var jqXHR = jQuery.ajax({
-				url : url,
-				data : parentForm.serialize(),
-				cache : false,
+				url     : url,
+				data    : parentForm.serialize(),
+				cache   : false,
 				success : function ( data )
 				{
 					/* responseCode ... */
-					if ( 'responseCode' in data && data.responseCode == '1' )
-					{
+					if ( 'responseCode' in data && data.responseCode == '1' ) {
 						/* ... with responseMessage */
-						if ( 'responseMessage' in data && data.responseMessage != '' )
-						{
+						if ( 'responseMessage' in data && data.responseMessage != '' ) {
 							currentConsole.html(data.responseMessage).removeClass("error loading").addClass("success");
 						}
 						/* ... without responseMessage */
-						else if ( 'responseMessage' in data && data.responseMessage == '' )
-						{
+						else if ( 'responseMessage' in data && data.responseMessage == '' ) {
 							persephone.Form.closeConsoles();
 						}
 						currentConsole.removeClass("error loading").addClass("success");
 
 						/* ... with responseAction */
-						if ( 'responseAction' in data )
-						{
+						if ( 'responseAction' in data ) {
 							var _responseActionMatch = data.responseAction.match(/refresh(?::(\d+))?/);
 
 							var _refreshIn = 2000;
-							if ( _responseActionMatch[1] )
-							{
+							if ( _responseActionMatch[1] ) {
 								_refreshIn = parseInt(_responseActionMatch[1]);
 							}
 
-							if ( data.responseMessage == '' )
-							{
+							if ( data.responseMessage == '' ) {
 								currentConsole.html("Success! Refreshing...").removeClass("error loading").addClass("success");
 							}
 
-							setTimeout( "window.location = window.location.href", _refreshIn );
+							setTimeout("window.location = window.location.href", _refreshIn);
 						}
 						return 1;
 					}
 					/* Single faultCode */
-					else if ( 'faultMessage' in data )
-					{
+					else if ( 'faultMessage' in data ) {
 						currentConsole.html(data.faultMessage).removeClass("success loading").addClass("error");
-						if ( data.faultCode )
-						{
+						if ( data.faultCode ) {
 							whoami.find("._" + data.faultCode).addClass("error");
 						}
 						return 0;
 					}
 					/* Multiple faultCodes */
-					else if ( data.length )
-					{
+					else if ( data.length ) {
 						var _faultMessages = [];
-						jQuery.each(data, function ( key , value )
+						jQuery.each(data, function ( key, value )
 						{
 							whoami.find("._" + value['faultCode']).addClass("error");
 							_faultMessages.push("<li>" + value['faultMessage'] + "</li>");
@@ -689,61 +616,52 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 			var currentConsole = persephone.Form.scrollToConsole();
 			currentConsole.html("Processing... Please wait!").removeClass("error success").addClass("loading");
 			var jqXHR = jQuery.ajax({
-				url : whoami.attr("action") == '' ? window.location.href : whoami.attr("action"),
-				data : whoami.serialize(),
-				cache : false,
+				url     : whoami.attr("action") == '' ? window.location.href : whoami.attr("action"),
+				data    : whoami.serialize(),
+				cache   : false,
 				success : function ( data )
 				{
 					/* responseCode ... */
-					if ( typeof data == 'object' && 'responseCode' in data && data.responseCode == '1' )
-					{
+					if ( typeof data == 'object' && 'responseCode' in data && data.responseCode == '1' ) {
 						/* ... with responseMessage */
-						if ( 'responseMessage' in data && data.responseMessage != '' )
-						{
+						if ( 'responseMessage' in data && data.responseMessage != '' ) {
 							currentConsole.html(data.responseMessage).removeClass("error loading").addClass("success");
 						}
 						/* ... without responseMessage */
-						else if ( 'responseMessage' in data && data.responseMessage == '' )
-						{
+						else if ( 'responseMessage' in data && data.responseMessage == '' ) {
 							persephone.Form.closeConsoles();
 						}
 						currentConsole.removeClass("notice error loading").addClass("success");
 
 						/* ... with responseAction */
-						if ( 'responseAction' in data )
-						{
+						if ( 'responseAction' in data ) {
 							var _responseActionMatch = data.responseAction.match(/refresh(?:\:(\d+))?/);
 
 							var _refreshIn = 2000;
-							if ( _responseActionMatch[1] )
-							{
+							if ( _responseActionMatch[1] ) {
 								_refreshIn = parseInt(_responseActionMatch[1]);
 							}
 
-							if ( data.responseMessage == '' )
-							{
+							if ( data.responseMessage == '' ) {
 								currentConsole.html("Success! Refreshing...").removeClass("error loading").addClass("success");
 							}
 
-							setTimeout( "window.location = window.location.href", _refreshIn );
+							setTimeout("window.location = window.location.href", _refreshIn);
 						}
 						return 1;
 					}
 					/* Single faultCode */
-					else if ( typeof data == 'object' && 'faultMessage' in data )
-					{
+					else if ( typeof data == 'object' && 'faultMessage' in data ) {
 						currentConsole.html(data.faultMessage).removeClass("success loading").addClass("error");
-						if ( data.faultCode )
-						{
+						if ( data.faultCode ) {
 							whoami.find("._" + data.faultCode).addClass("error");
 						}
 						return 0;
 					}
 					/* Multiple faultCodes */
-					else if ( typeof data == 'object' && data.length )
-					{
+					else if ( typeof data == 'object' && data.length ) {
 						var _faultMessages = [];
-						jQuery.each(data, function ( key , value )
+						jQuery.each(data, function ( key, value )
 						{
 							whoami.find("._" + value['faultCode']).addClass("error");
 							_faultMessages.push("<li>" + value['faultMessage'] + "</li>");
@@ -759,43 +677,39 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 		});
 
 		// Do we have accordion() function defined? If so, apply it accordingly.
-		if ( 'function' == typeof jQuery().accordion )
-		{
+		if ( 'function' == typeof jQuery().accordion ) {
 			jQuery(".ui-accordion").accordion({
-				active : false,
-				animated : 'easeslide',
-				autoHeight : false,
-				clearStyle : false,
+				active      : false,
+				animated    : 'easeslide',
+				autoHeight  : false,
+				clearStyle  : false,
 				collapsible : true,
-				icons : {
-					'header' : "",
+				icons       : {
+					'header'         : "",
 					'headerSelected' : ""
 				},
-				navigation : true
+				navigation  : true
 			});
 		}
 
 		// Do we have button() function defined? If so, apply it accordingly.
-		if ( 'function' == typeof jQuery().button )
-		{
-			jQuery(".buttons").find("INPUT[type='submit'],INPUT[type='button'],INPUT[type='reset'],BUTTON").button();
+		if ( 'function' == typeof jQuery().button ) {
+			jQuery(".buttons").find("[type='submit'],[type='button'],[type='reset'],BUTTON").button();
 		}
 
 		// Do we have buttonset() function defined? If so, apply it accordingly.
-		if ( 'function' == typeof jQuery().buttonset )
-		{
+		if ( 'function' == typeof jQuery().buttonset ) {
 			jQuery(".ui-buttonset").buttonset();
 		}
 
 		// Do we have sortable() function defined? If so, apply it accordingly.
-		if ( 'function' == typeof jQuery().sortable )
-		{
+		if ( 'function' == typeof jQuery().sortable ) {
 			jQuery("TABLE TBODY.js__sortable").sortable({
-				axis : 'y',
+				axis   : 'y',
 				// containment: 'parent',
 				cursor : 'move',
-				delay : 300,
-				helper : function ( e , tr )
+				delay  : 300,
+				helper : function ( e, tr )
 				{
 					var _originals = tr.children();
 					var _helper = tr.clone();
@@ -816,10 +730,9 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 
 		// Do we have tablesorter() function defined? If so, apply it accordingly.
 		// Note: jQuery.tablesorter() already has jQuery.metadata() integrated, so we don't need to do that again!
-		if ( 'function' == typeof jQuery().tablesorter )
-		{
+		if ( 'function' == typeof jQuery().tablesorter ) {
 			jQuery("TABLE.tablesorter").tablesorter({
-				widgets : [
+				widgets    : [
 					'zebra'
 				],
 				widthFixed : true
@@ -827,18 +740,17 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 		}
 
 		// Do we have tabs() function defined? If so, apply it accordingly.
-		if ( 'function' == typeof jQuery().tabs )
-		{
+		if ( 'function' == typeof jQuery().tabs ) {
 			/* Options */
 			var options = {
 				collapsible : false,
-				cookie : {
+				cookie      : {
 					expires : 365
 				},
-				event : "click"
+				event       : "click"
 			};
 
-			jQuery(".ui-tabs").each(function ( index , element )
+			jQuery(".ui-tabs").each(function ( index, element )
 			{
 				/**
 				 * Checks for custom options
@@ -847,8 +759,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 				if ( 'function' == typeof jQuery().metadata )  // Is jQuery.metadata() installed?
 				{
 					var newOptions = jQuery(this).metadata().tabs;
-					if ( typeof newOptions == 'object' && !persephone.isEmptyObject(newOptions) )
-					{
+					if ( typeof newOptions == 'object' && !persephone.isEmptyObject(newOptions) ) {
 						jQuery.extend(true, options, newOptions);  // 'true' means we merge two arrays and assign the resulting value to the first variable
 					}
 				}
@@ -873,8 +784,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 	 */
 	jQuery(window).scroll(function ( event )
 	{
-		if ( jQuery("#jumpLoaderApplet") && jQuery("#jumpLoaderApplet").is(":visible") )
-		{
+		if ( jQuery("#jumpLoaderApplet") && jQuery("#jumpLoaderApplet").is(":visible") ) {
 			jQuery("#jumpLoaderApplet")
 				.css("top", (jQuery(window).height() - jQuery("#jumpLoaderApplet").height()) / 2 + jQuery(document).scrollTop())
 				.css("left", (jQuery(window).width() - jQuery("#jumpLoaderApplet").width()) / 2);
@@ -886,8 +796,7 @@ if ( jQuery != undefined && typeof jQuery == 'function' )
 	 */
 	jQuery(window).resize(function ()
 	{
-		if ( jQuery("#jumpLoaderApplet") && jQuery("#jumpLoaderApplet").is(":visible") )
-		{
+		if ( jQuery("#jumpLoaderApplet") && jQuery("#jumpLoaderApplet").is(":visible") ) {
 			jQuery("#jumpLoaderApplet")
 				.css("top", (jQuery(window).height() - jQuery("#jumpLoaderApplet").height()) / 2 + jQuery(document).scrollTop())
 				.css("left", (jQuery(window).width() - jQuery("#jumpLoaderApplet").width()) / 2);
