@@ -825,7 +825,7 @@ final class Registry
 	{
 		if ( ! $this->config['serverenvironment']['disable_gzip'] and in_array( "zlib", $this->config['runtime']['loaded_extensions'] ) )
 		{
-			ini_set( "zlib.output_handler"     , "1" );
+			ini_set( "zlib.output_handler"     , "" );
 			ini_set( "zlib.output_compression" , "1" );
 			$this->ob_compression = true;
 			if ( ob_start( /* "ob_gzhandler" */ ) )
@@ -836,7 +836,7 @@ final class Registry
 		}
 		else
 		{
-			ini_set( "zlib.output_handler" , "0" );
+			ini_set( "zlib.output_handler" , "" );
 			$this->ob_compression = false;
 			if ( ob_start() )
 			{

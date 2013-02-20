@@ -1,136 +1,320 @@
-2012-12-16T23:59:57+00:00 INFO (6): 
+2013-02-20T10:23:11+00:00 INFO (6): 
 	Memory Usage - Zend_Log Init: 524288 bytes
-	Timedelta - Zend_Log Init: 0.00681 secs
-2012-12-16T23:59:58+00:00 INFO (6): Database: Connection successful!
-2012-12-16T23:59:58+00:00 INFO (6): 
+	Timedelta - Zend_Log Init: 0.00267 secs
+2013-02-20T10:23:12+00:00 INFO (6): Database: Connection successful!
+2013-02-20T10:23:12+00:00 INFO (6): 
 	Memory Usage - Db::__construct(): 1835008 bytes
-	Timedelta - Db::__construct(): 1.06588 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
+	Timedelta - Db::__construct(): 1.04644 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
 	Memory Usage - Input::__construct(): 2097152 bytes
-	Timedelta - Input::__construct(): 1.07042 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
+	Timedelta - Input::__construct(): 1.04894 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
 	Memory Usage - Cache::__construct(): 2097152 bytes
-	Timedelta - Cache::__construct(): 1.07197 secs
-2012-12-16T23:59:58+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
-[16-Dec-2012 23:59:58 UTC] PHP Warning:  Illegal string offset 'SERVER_NAME' in S:\Server\var\www\vhosts\Persephone\sources\kernel\input.php on line 159
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Timedelta - Cache-Abstraction - Diskcache Identifier: shehi.dyndns.org: 1.07474 secs
-2012-12-16T23:59:58+00:00 INFO (6): Cache: SUCCEEDED loading initial cache for keys: 'member_groups','settings','modules','skins'
-2012-12-16T23:59:58+00:00 INFO (6): 
+	Timedelta - Cache::__construct(): 1.04979 secs
+2013-02-20T10:23:12+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Timedelta - Cache-Abstraction - Diskcache Identifier: persephone: 1.05104 secs
+2013-02-20T10:23:12+00:00 INFO (6): Cache: SUCCEEDED loading initial cache for keys: 'member_groups','settings','modules','skins'
+2013-02-20T10:23:12+00:00 INFO (6): 
 	Memory Usage - Cache::init(): 2359296 bytes
-	Timedelta - Cache::init(): 1.07777 secs
-2012-12-16T23:59:58+00:00 INFO (6): Session: Successfully reverted ini-directive 'session.save_path' = 'files'
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Session::__construct(): 2621440 bytes
-	Timedelta - Session::__construct(): 1.08433 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Registry::config [final]: 2621440 bytes
-	Timedelta - Registry::config [final]: 1.08485 secs
-2012-12-16T23:59:58+00:00 INFO (6): Input::init() : Request-path = '/acp/components/modules'
-[16-Dec-2012 23:59:58 UTC] PHP Strict Standards:  Only variables should be passed by reference in S:\Server\var\www\vhosts\Persephone\sources\kernel\input.php on line 246
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Input::init(): 2621440 bytes
-	Timedelta - Input::init(): 1.08543 secs
-[16-Dec-2012 23:59:58 UTC] PHP Warning:  ini_set(): function '1' not found or invalid function name in S:\Server\var\www\vhosts\Persephone\sources\kernel\registry.php on line 829
-2012-12-16T23:59:58+00:00 INFO (6): 
+	Timedelta - Cache::init(): 1.05261 secs
+2013-02-20T10:23:12+00:00 INFO (6): Session: Successfully reverted ini-directive 'session.save_path' = 'files'
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Session::__construct(): 2883584 bytes
+	Timedelta - Session::__construct(): 1.0563 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Registry::config [final]: 2883584 bytes
+	Timedelta - Registry::config [final]: 1.05656 secs
+2013-02-20T10:23:12+00:00 INFO (6): Input::init() : Request-path = '/acp/components/viewmodule-da00411bc15ca9ae98ca2db1f3df7a7a'
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Input::init(): 2883584 bytes
+	Timedelta - Input::init(): 1.05678 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
 	Memory Usage - OB Start: 2883584 bytes
-	Timedelta - OB Start: 1.08581 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Modules::__construct(): 2883584 bytes
-	Timedelta - Modules::__construct(): 1.08879 secs
-[16-Dec-2012 23:59:58 UTC] PHP Strict Standards:  Only variables should be passed by reference in S:\Server\var\www\vhosts\Persephone\sources\kernel\session.php on line 263
-2012-12-16T23:59:58+00:00 INFO (6): Session::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = 5ecb6812f8f6a6d4603cbd120304f90d, Member ID = 0
-2012-12-16T23:59:58+00:00 INFO (6): Session::update_guest_session: Updating GUEST session: 5ecb6812f8f6a6d4603cbd120304f90d
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Session::init(): 2883584 bytes
-	Timedelta - Session::init(): 1.09666 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Display::__construct(): 3670016 bytes
-	Timedelta - Display::__construct(): 1.11214 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Modules::init(): 4194304 bytes
-	Timedelta - Modules::init(): 1.12012 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Converge::__construct(): 4194304 bytes
-	Timedelta - Converge::__construct(): 1.12112 secs
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage - Registry::__construct(): 4194304 bytes
-	Timedelta - Registry::__construct(): 1.12129 secs
-2012-12-16T23:59:58+00:00 INFO (6): Display::__destruct: Destroying class
-2012-12-16T23:59:58+00:00 INFO (6): Modules::__destruct: Destroying class
-2012-12-16T23:59:58+00:00 INFO (6): Session: 1 sessions updated, 0 sessions deleted
-2012-12-16T23:59:58+00:00 INFO (6): Session::__destruct: Destroying class
-2012-12-16T23:59:58+00:00 INFO (6): Input::__destruct: Destroying class
-2012-12-16T23:59:58+00:00 INFO (6): Cache::__destruct: Destroying class
-2012-12-16T23:59:58+00:00 INFO (6): Database::__destruct: Destroying class
-2012-12-16T23:59:58+00:00 INFO (6): 
-	Memory Usage: 4456448 bytes
-	Timedelta: 1.13926 secs
-2012-12-17T00:02:18+00:00 INFO (6): 
+	Timedelta - OB Start: 1.05685 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Modules::__construct(): 3145728 bytes
+	Timedelta - Modules::__construct(): 1.05852 secs
+2013-02-20T10:23:12+00:00 INFO (6): Session::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = 724e546ce3c7866d5a34df9d27c9bec2, Member ID = 0
+2013-02-20T10:23:12+00:00 INFO (6): Session::update_guest_session: Updating GUEST session: 724e546ce3c7866d5a34df9d27c9bec2
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Session::init(): 3145728 bytes
+	Timedelta - Session::init(): 1.06098 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Display::__construct(): 3932160 bytes
+	Timedelta - Display::__construct(): 1.06879 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Modules::init(): 4456448 bytes
+	Timedelta - Modules::init(): 1.07302 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Converge::__construct(): 4456448 bytes
+	Timedelta - Converge::__construct(): 1.07357 secs
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage - Registry::__construct(): 4456448 bytes
+	Timedelta - Registry::__construct(): 1.07365 secs
+2013-02-20T10:23:12+00:00 INFO (6): Display::__destruct: Destroying class
+2013-02-20T10:23:12+00:00 INFO (6): Modules::__destruct: Destroying class
+2013-02-20T10:23:12+00:00 INFO (6): Session: 1 sessions updated, 0 sessions deleted
+2013-02-20T10:23:12+00:00 INFO (6): Session::__destruct: Destroying class
+2013-02-20T10:23:12+00:00 INFO (6): Input::__destruct: Destroying class
+2013-02-20T10:23:12+00:00 INFO (6): Cache::__destruct: Destroying class
+2013-02-20T10:23:12+00:00 INFO (6): Database::__destruct: Destroying class
+2013-02-20T10:23:12+00:00 INFO (6): 
+	Memory Usage: 4980736 bytes
+	Timedelta: 1.08556 secs
+2013-02-20T10:23:13+00:00 INFO (6): 
 	Memory Usage - Zend_Log Init: 524288 bytes
-	Timedelta - Zend_Log Init: 0.00718 secs
-2012-12-17T00:02:19+00:00 INFO (6): Database: Connection successful!
-2012-12-17T00:02:19+00:00 INFO (6): 
+	Timedelta - Zend_Log Init: 0.00278 secs
+2013-02-20T10:23:14+00:00 INFO (6): Database: Connection successful!
+2013-02-20T10:23:14+00:00 INFO (6): 
 	Memory Usage - Db::__construct(): 1835008 bytes
-	Timedelta - Db::__construct(): 1.05859 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
+	Timedelta - Db::__construct(): 1.03845 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
 	Memory Usage - Input::__construct(): 2097152 bytes
-	Timedelta - Input::__construct(): 1.06329 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
+	Timedelta - Input::__construct(): 1.04097 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
 	Memory Usage - Cache::__construct(): 2097152 bytes
-	Timedelta - Cache::__construct(): 1.06495 secs
-2012-12-17T00:02:19+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
-[17-Dec-2012 00:02:19 UTC] PHP Warning:  Illegal string offset 'SERVER_NAME' in S:\Server\var\www\vhosts\Persephone\sources\kernel\input.php on line 154
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Timedelta - Cache-Abstraction - Diskcache Identifier: shehi.dyndns.org: 1.06784 secs
-2012-12-17T00:02:19+00:00 INFO (6): Cache: SUCCEEDED loading initial cache for keys: 'member_groups','settings','modules','skins'
-2012-12-17T00:02:19+00:00 INFO (6): 
+	Timedelta - Cache::__construct(): 1.04178 secs
+2013-02-20T10:23:14+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Timedelta - Cache-Abstraction - Diskcache Identifier: persephone: 1.04299 secs
+2013-02-20T10:23:14+00:00 INFO (6): Cache: SUCCEEDED loading initial cache for keys: 'member_groups','settings','modules','skins'
+2013-02-20T10:23:14+00:00 INFO (6): 
 	Memory Usage - Cache::init(): 2359296 bytes
-	Timedelta - Cache::init(): 1.07113 secs
-2012-12-17T00:02:19+00:00 INFO (6): Session: Successfully reverted ini-directive 'session.save_path' = 'files'
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Session::__construct(): 2621440 bytes
-	Timedelta - Session::__construct(): 1.07737 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Registry::config [final]: 2621440 bytes
-	Timedelta - Registry::config [final]: 1.07786 secs
-2012-12-17T00:02:19+00:00 INFO (6): Input::init() : Request-path = '/acp/components/modules'
-[17-Dec-2012 00:02:19 UTC] PHP Strict Standards:  Only variables should be passed by reference in S:\Server\var\www\vhosts\Persephone\sources\kernel\input.php on line 241
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Input::init(): 2621440 bytes
-	Timedelta - Input::init(): 1.07853 secs
-[17-Dec-2012 00:02:19 UTC] PHP Warning:  ini_set(): function '1' not found or invalid function name in S:\Server\var\www\vhosts\Persephone\sources\kernel\registry.php on line 829
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - OB Start: 2883584 bytes
-	Timedelta - OB Start: 1.07892 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Modules::__construct(): 2883584 bytes
-	Timedelta - Modules::__construct(): 1.08188 secs
-[17-Dec-2012 00:02:19 UTC] PHP Strict Standards:  Only variables should be passed by reference in S:\Server\var\www\vhosts\Persephone\sources\kernel\session.php on line 263
-2012-12-17T00:02:19+00:00 INFO (6): Session::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = 5ecb6812f8f6a6d4603cbd120304f90d, Member ID = 0
-2012-12-17T00:02:19+00:00 INFO (6): Session::update_guest_session: Updating GUEST session: 5ecb6812f8f6a6d4603cbd120304f90d
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Session::init(): 2883584 bytes
-	Timedelta - Session::init(): 1.08741 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Display::__construct(): 3670016 bytes
-	Timedelta - Display::__construct(): 1.10397 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Modules::init(): 4194304 bytes
-	Timedelta - Modules::init(): 1.11217 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Converge::__construct(): 4194304 bytes
-	Timedelta - Converge::__construct(): 1.1132 secs
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage - Registry::__construct(): 4194304 bytes
-	Timedelta - Registry::__construct(): 1.11335 secs
-2012-12-17T00:02:19+00:00 INFO (6): Display::__destruct: Destroying class
-2012-12-17T00:02:19+00:00 INFO (6): Modules::__destruct: Destroying class
-2012-12-17T00:02:19+00:00 INFO (6): Session: 1 sessions updated, 0 sessions deleted
-2012-12-17T00:02:19+00:00 INFO (6): Session::__destruct: Destroying class
-2012-12-17T00:02:19+00:00 INFO (6): Input::__destruct: Destroying class
-2012-12-17T00:02:19+00:00 INFO (6): Cache::__destruct: Destroying class
-2012-12-17T00:02:19+00:00 INFO (6): Database::__destruct: Destroying class
-2012-12-17T00:02:19+00:00 INFO (6): 
-	Memory Usage: 4456448 bytes
-	Timedelta: 1.13302 secs
+	Timedelta - Cache::init(): 1.04453 secs
+2013-02-20T10:23:14+00:00 INFO (6): Session: Successfully reverted ini-directive 'session.save_path' = 'files'
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Session::__construct(): 2883584 bytes
+	Timedelta - Session::__construct(): 1.04794 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Registry::config [final]: 2883584 bytes
+	Timedelta - Registry::config [final]: 1.04822 secs
+2013-02-20T10:23:14+00:00 INFO (6): Input::init() : Request-path = '/acp/components/viewmodule-da00411bc15ca9ae98ca2db1f3df7a7a'
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Input::init(): 3145728 bytes
+	Timedelta - Input::init(): 1.04863 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - OB Start: 3145728 bytes
+	Timedelta - OB Start: 1.0487 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Modules::__construct(): 3145728 bytes
+	Timedelta - Modules::__construct(): 1.05032 secs
+2013-02-20T10:23:14+00:00 INFO (6): Session::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = 724e546ce3c7866d5a34df9d27c9bec2, Member ID = 0
+2013-02-20T10:23:14+00:00 INFO (6): Session::update_guest_session: Updating GUEST session: 724e546ce3c7866d5a34df9d27c9bec2
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Session::init(): 3145728 bytes
+	Timedelta - Session::init(): 1.05288 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Display::__construct(): 3932160 bytes
+	Timedelta - Display::__construct(): 1.06109 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Modules::init(): 4456448 bytes
+	Timedelta - Modules::init(): 1.06525 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Converge::__construct(): 4456448 bytes
+	Timedelta - Converge::__construct(): 1.06581 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Registry::__construct(): 4456448 bytes
+	Timedelta - Registry::__construct(): 1.0659 secs
+2013-02-20T10:23:14+00:00 INFO (6): Display::__destruct: Destroying class
+2013-02-20T10:23:14+00:00 INFO (6): Modules::__destruct: Destroying class
+2013-02-20T10:23:14+00:00 INFO (6): Session: 1 sessions updated, 0 sessions deleted
+2013-02-20T10:23:14+00:00 INFO (6): Session::__destruct: Destroying class
+2013-02-20T10:23:14+00:00 INFO (6): Input::__destruct: Destroying class
+2013-02-20T10:23:14+00:00 INFO (6): Cache::__destruct: Destroying class
+2013-02-20T10:23:14+00:00 INFO (6): Database::__destruct: Destroying class
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage: 4718592 bytes
+	Timedelta: 1.0683 secs
+2013-02-20T10:23:14+00:00 INFO (6): 
+	Memory Usage - Zend_Log Init: 524288 bytes
+	Timedelta - Zend_Log Init: 0.00242 secs
+2013-02-20T10:23:15+00:00 INFO (6): Database: Connection successful!
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Db::__construct(): 1835008 bytes
+	Timedelta - Db::__construct(): 1.03162 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Input::__construct(): 2097152 bytes
+	Timedelta - Input::__construct(): 1.03402 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Cache::__construct(): 2097152 bytes
+	Timedelta - Cache::__construct(): 1.03479 secs
+2013-02-20T10:23:15+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Timedelta - Cache-Abstraction - Diskcache Identifier: persephone: 1.0359 secs
+2013-02-20T10:23:15+00:00 INFO (6): Cache: SUCCEEDED loading initial cache for keys: 'member_groups','settings','modules','skins'
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Cache::init(): 2359296 bytes
+	Timedelta - Cache::init(): 1.03743 secs
+2013-02-20T10:23:15+00:00 INFO (6): Session: Successfully reverted ini-directive 'session.save_path' = 'files'
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Session::__construct(): 2883584 bytes
+	Timedelta - Session::__construct(): 1.04128 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Registry::config [final]: 2883584 bytes
+	Timedelta - Registry::config [final]: 1.04155 secs
+2013-02-20T10:23:15+00:00 INFO (6): Input::init() : Request-path = '/acp/components/viewmodule-da00411bc15ca9ae98ca2db1f3df7a7a'
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Input::init(): 3145728 bytes
+	Timedelta - Input::init(): 1.04195 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - OB Start: 3145728 bytes
+	Timedelta - OB Start: 1.04203 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Modules::__construct(): 3145728 bytes
+	Timedelta - Modules::__construct(): 1.04365 secs
+2013-02-20T10:23:15+00:00 INFO (6): Session::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = 724e546ce3c7866d5a34df9d27c9bec2, Member ID = 0
+2013-02-20T10:23:15+00:00 INFO (6): Session::update_guest_session: Updating GUEST session: 724e546ce3c7866d5a34df9d27c9bec2
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Session::init(): 3145728 bytes
+	Timedelta - Session::init(): 1.04619 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Display::__construct(): 3932160 bytes
+	Timedelta - Display::__construct(): 1.05428 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Modules::init(): 4456448 bytes
+	Timedelta - Modules::init(): 1.0586 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Converge::__construct(): 4456448 bytes
+	Timedelta - Converge::__construct(): 1.05926 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Registry::__construct(): 4456448 bytes
+	Timedelta - Registry::__construct(): 1.05934 secs
+2013-02-20T10:23:15+00:00 INFO (6): Display::__destruct: Destroying class
+2013-02-20T10:23:15+00:00 INFO (6): Modules::__destruct: Destroying class
+2013-02-20T10:23:15+00:00 INFO (6): Session: 1 sessions updated, 0 sessions deleted
+2013-02-20T10:23:15+00:00 INFO (6): Session::__destruct: Destroying class
+2013-02-20T10:23:15+00:00 INFO (6): Input::__destruct: Destroying class
+2013-02-20T10:23:15+00:00 INFO (6): Cache::__destruct: Destroying class
+2013-02-20T10:23:15+00:00 INFO (6): Database::__destruct: Destroying class
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage: 4718592 bytes
+	Timedelta: 1.06188 secs
+2013-02-20T10:23:15+00:00 INFO (6): 
+	Memory Usage - Zend_Log Init: 524288 bytes
+	Timedelta - Zend_Log Init: 0.00253 secs
+2013-02-20T10:23:16+00:00 INFO (6): Database: Connection successful!
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Db::__construct(): 1835008 bytes
+	Timedelta - Db::__construct(): 1.03542 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Input::__construct(): 2097152 bytes
+	Timedelta - Input::__construct(): 1.03815 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Cache::__construct(): 2097152 bytes
+	Timedelta - Cache::__construct(): 1.03898 secs
+2013-02-20T10:23:16+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Timedelta - Cache-Abstraction - Diskcache Identifier: persephone: 1.04011 secs
+2013-02-20T10:23:16+00:00 INFO (6): Cache: SUCCEEDED loading initial cache for keys: 'member_groups','settings','modules','skins'
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Cache::init(): 2359296 bytes
+	Timedelta - Cache::init(): 1.04168 secs
+2013-02-20T10:23:16+00:00 INFO (6): Session: Successfully reverted ini-directive 'session.save_path' = 'files'
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Session::__construct(): 2883584 bytes
+	Timedelta - Session::__construct(): 1.04555 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Registry::config [final]: 2883584 bytes
+	Timedelta - Registry::config [final]: 1.0458 secs
+2013-02-20T10:23:16+00:00 INFO (6): Input::init() : Request-path = '/acp/components/viewmodule-da00411bc15ca9ae98ca2db1f3df7a7a'
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Input::init(): 3145728 bytes
+	Timedelta - Input::init(): 1.04621 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - OB Start: 3145728 bytes
+	Timedelta - OB Start: 1.04629 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Modules::__construct(): 3145728 bytes
+	Timedelta - Modules::__construct(): 1.04784 secs
+2013-02-20T10:23:16+00:00 INFO (6): Session::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = 724e546ce3c7866d5a34df9d27c9bec2, Member ID = 0
+2013-02-20T10:23:16+00:00 INFO (6): Session::update_guest_session: Updating GUEST session: 724e546ce3c7866d5a34df9d27c9bec2
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Session::init(): 3145728 bytes
+	Timedelta - Session::init(): 1.05074 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Display::__construct(): 3932160 bytes
+	Timedelta - Display::__construct(): 1.05902 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Modules::init(): 4456448 bytes
+	Timedelta - Modules::init(): 1.06313 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Converge::__construct(): 4456448 bytes
+	Timedelta - Converge::__construct(): 1.06359 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Registry::__construct(): 4456448 bytes
+	Timedelta - Registry::__construct(): 1.06367 secs
+2013-02-20T10:23:16+00:00 INFO (6): Display::__destruct: Destroying class
+2013-02-20T10:23:16+00:00 INFO (6): Modules::__destruct: Destroying class
+2013-02-20T10:23:16+00:00 INFO (6): Session: 1 sessions updated, 0 sessions deleted
+2013-02-20T10:23:16+00:00 INFO (6): Session::__destruct: Destroying class
+2013-02-20T10:23:16+00:00 INFO (6): Input::__destruct: Destroying class
+2013-02-20T10:23:16+00:00 INFO (6): Cache::__destruct: Destroying class
+2013-02-20T10:23:16+00:00 INFO (6): Database::__destruct: Destroying class
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage: 4718592 bytes
+	Timedelta: 1.06599 secs
+2013-02-20T10:23:16+00:00 INFO (6): 
+	Memory Usage - Zend_Log Init: 524288 bytes
+	Timedelta - Zend_Log Init: 0.00242 secs
+2013-02-20T10:23:17+00:00 INFO (6): Database: Connection successful!
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Db::__construct(): 1835008 bytes
+	Timedelta - Db::__construct(): 1.03868 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Input::__construct(): 2097152 bytes
+	Timedelta - Input::__construct(): 1.04116 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Cache::__construct(): 2097152 bytes
+	Timedelta - Cache::__construct(): 1.04195 secs
+2013-02-20T10:23:17+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Timedelta - Cache-Abstraction - Diskcache Identifier: persephone: 1.04306 secs
+2013-02-20T10:23:17+00:00 INFO (6): Cache: SUCCEEDED loading initial cache for keys: 'member_groups','settings','modules','skins'
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Cache::init(): 2359296 bytes
+	Timedelta - Cache::init(): 1.0447 secs
+2013-02-20T10:23:17+00:00 INFO (6): Session: Successfully reverted ini-directive 'session.save_path' = 'files'
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Session::__construct(): 2883584 bytes
+	Timedelta - Session::__construct(): 1.04814 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Registry::config [final]: 2883584 bytes
+	Timedelta - Registry::config [final]: 1.04838 secs
+2013-02-20T10:23:17+00:00 INFO (6): Input::init() : Request-path = '/acp/components/viewmodule-da00411bc15ca9ae98ca2db1f3df7a7a'
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Input::init(): 3145728 bytes
+	Timedelta - Input::init(): 1.04875 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - OB Start: 3145728 bytes
+	Timedelta - OB Start: 1.04882 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Modules::__construct(): 3145728 bytes
+	Timedelta - Modules::__construct(): 1.05033 secs
+2013-02-20T10:23:17+00:00 INFO (6): Session::kill_authorize_attempt: Authorization attempt SUCCESSFUL: Session ID = 724e546ce3c7866d5a34df9d27c9bec2, Member ID = 0
+2013-02-20T10:23:17+00:00 INFO (6): Session::update_guest_session: Updating GUEST session: 724e546ce3c7866d5a34df9d27c9bec2
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Session::init(): 3145728 bytes
+	Timedelta - Session::init(): 1.05279 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Display::__construct(): 3932160 bytes
+	Timedelta - Display::__construct(): 1.06081 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Modules::init(): 4456448 bytes
+	Timedelta - Modules::init(): 1.06492 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Converge::__construct(): 4456448 bytes
+	Timedelta - Converge::__construct(): 1.06541 secs
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage - Registry::__construct(): 4456448 bytes
+	Timedelta - Registry::__construct(): 1.06548 secs
+2013-02-20T10:23:17+00:00 INFO (6): Display::__destruct: Destroying class
+2013-02-20T10:23:17+00:00 INFO (6): Modules::__destruct: Destroying class
+2013-02-20T10:23:17+00:00 INFO (6): Session: 1 sessions updated, 0 sessions deleted
+2013-02-20T10:23:17+00:00 INFO (6): Session::__destruct: Destroying class
+2013-02-20T10:23:17+00:00 INFO (6): Input::__destruct: Destroying class
+2013-02-20T10:23:17+00:00 INFO (6): Cache::__destruct: Destroying class
+2013-02-20T10:23:17+00:00 INFO (6): Database::__destruct: Destroying class
+2013-02-20T10:23:17+00:00 INFO (6): 
+	Memory Usage: 4718592 bytes
+	Timedelta: 1.06792 secs

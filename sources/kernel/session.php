@@ -260,7 +260,9 @@ class Session
 		// Client information
 		//----------------------
 
-		$this->user_agent = substr( $this->Registry->Input->clean__makesafe_value( $this->Registry->Input->my_getenv( 'HTTP_USER_AGENT' ), array(), true ) , 0 , 200 );
+		$this->user_agent = $this->Registry->Input->my_getenv( 'HTTP_USER_AGENT' );
+		$this->Registry->Input->clean__makesafe_value( $this->user_agent );
+		$this->user_agent = substr( $this->user_agent , 0 , 200 );
 		$this->operating_system = $this->fetch_os();
 		$this->fetch_ip_address();
 
@@ -599,7 +601,7 @@ class Session
 							'do'	 => "update",
 							'tables' => "sessions",
 							'set'    => $data,
-							'where'  => "id=" . $this->Registry->Db->db->quote( $sid ),
+							'where'  => "id=" . $this->Registry->Db->quote( $sid ),
 
 							'force_data_type' => array( 'member_name' => "string" )
 						);
@@ -888,7 +890,7 @@ class Session
 									'max' => new Zend_Db_Expr( "MAX(id)" ),
 								),
 							'table'  => "members",
-							'where'  => "l_display_name LIKE " . $this->Registry->Db->db->quote( strtolower( $_final_tables['members']['display_name'] ) . "%" ),
+							'where'  => "l_display_name LIKE " . $this->Registry->Db->quote( strtolower( $_final_tables['members']['display_name'] ) . "%" ),
 						);
 					$max = $this->Registry->Db->simple_exec_query();
 
@@ -918,7 +920,7 @@ class Session
 									'max' => new Zend_Db_Expr( "MAX(id)" ),
 								),
 							'table'  => "members",
-							'where'  => "l_username LIKE " . $this->Registry->Db->db->quote( strtolower( $_final_tables['members']['name'] ) . "%" ),
+							'where'  => "l_username LIKE " . $this->Registry->Db->quote( strtolower( $_final_tables['members']['name'] ) . "%" ),
 						);
 
 					$max = $this->Registry->Db->simple_exec_query();
@@ -1100,7 +1102,7 @@ class Session
 			{
 				if ( strstr( $member_key, '@' ) )
 				{
-					$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
+					$_member_value = $this->Registry->Db->quote( strtolower( $member_key ) );
 					$_member_field = 'email';
 				}
 				else
@@ -1142,36 +1144,36 @@ class Session
 				case 'email':
 					if ( is_array( $member_key ) )
 					{
-						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->db->quote( strtolower( $v ) );' ) );
+						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->quote( strtolower( $v ) );' ) );
 						$_multiple_ids = $member_key;
 					}
 					else
 					{
-						$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
+						$_member_value = $this->Registry->Db->quote( strtolower( $member_key ) );
 					}
 					$_member_field = 'email';
 					break;
 				case 'username':
 					if ( is_array( $member_key ) )
 					{
-						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->db->quote( strtolower( $v ) );' ) );
+						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->quote( strtolower( $v ) );' ) );
 						$_multiple_ids = $member_key;
 					}
 					else
 					{
-						$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
+						$_member_value = $this->Registry->Db->quote( strtolower( $member_key ) );
 					}
 					$_member_field = 'l_username';
 					break;
 				case 'displayname':
 					if ( is_array( $member_key ) )
 					{
-						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->db->quote( strtolower( $v ) );' ) );
+						array_walk( $member_key, create_function( '&$v,$k', '$v=$this->Registry->Db->quote( strtolower( $v ) );' ) );
 						$_multiple_ids = $member_key;
 					}
 					else
 					{
-						$_member_value = $this->Registry->Db->db->quote( strtolower( $member_key ) );
+						$_member_value = $this->Registry->Db->quote( strtolower( $member_key ) );
 					}
 					$_member_field = 'l_display_name';
 					break;
@@ -1349,7 +1351,7 @@ class Session
 			if ( strstr( $member_key, '@' ) )
 			{
 				$member_k_array['members'] = array( 'field' => "email",
-				 									'value' => $this->Registry->Db->db->quote( strtolower( $member_key ) ) );
+				 									'value' => $this->Registry->Db->quote( strtolower( $member_key ) ) );
 
 				/* Check to see if we've got more than the 'members' table to save on. */
 
@@ -1423,7 +1425,7 @@ class Session
 						'do'     => "select_row",
 						'fields' => array( "member_id" ),
 						'table'  => array( "members_pfields_content" ),
-						'where'  => 'member_id=' . $this->Registry->Db->db->quote( $data['id'] , "INTEGER" )
+						'where'  => 'member_id=' . $this->Registry->Db->quote( $data['id'] , "INTEGER" )
 					);
 				$check = $this->Registry->Db->simple_exec_query();
 
@@ -1441,7 +1443,7 @@ class Session
 							'do'	 => "update",
 							'tables' => $table,
 							'set'    => $data,
-							'where'  => 'member_id=' . $this->Registry->Db->db->quote( $data['id'] , "INTEGER" )
+							'where'  => 'member_id=' . $this->Registry->Db->quote( $data['id'] , "INTEGER" )
 						);
 				}
 				$_updated += $this->Registry->Db->simple_exec_query();
@@ -1507,12 +1509,12 @@ class Session
 
 		if ( $this->session_dead_id )
 		{
-			$query[] = "id=" . $this->Registry->Db->db->quote( $this->session_dead_id );
+			$query[] = "id=" . $this->Registry->Db->quote( $this->session_dead_id );
 		}
 
 		if ( $this->Registry->config['security']['match_ipaddress'] == 1 )
 		{
-			$query[] = "ip_address=" . $this->Registry->Db->db->quote( $this->ip_address );
+			$query[] = "ip_address=" . $this->Registry->Db->quote( $this->ip_address );
 		}
 
 		$this->session_id = md5( uniqid( microtime(), true ) . $this->ip_address . $this->user_agent );
@@ -1544,7 +1546,7 @@ class Session
 				$this->Registry->logger__do_log( __CLASS__ . "::create_guest_session: Creating SEARCH ENGINE session: " . $this->session_id , "INFO" );
 			}
 
-			$query[] = "id=" . $this->Registry->Db->db->quote( $this->session_id );
+			$query[] = "id=" . $this->Registry->Db->quote( $this->session_id );
 		}
 		else
 		{
@@ -1826,7 +1828,7 @@ class Session
 						'member_group'			=> $data['member_group'],
 						'login_type'			=> $data['login_type'],
 					),
-				'where'  => "id=" . $this->Registry->Db->db->quote( $this->session_id )
+				'where'  => "id=" . $this->Registry->Db->quote( $this->session_id )
 			);
 		$this->Registry->Db->simple_exec_query_shutdown();
 
@@ -1871,7 +1873,7 @@ class Session
 	public function convert_member_to_guest ()
 	{
 		/* Delete old sessions */
-		$this->destroy_sessions( "ip_address=" . $this->Registry->Db->db->quote( $this->ip_address ) . " AND id != " . $this->Registry->Db->db->quote( $this->session_id ) );
+		$this->destroy_sessions( "ip_address=" . $this->Registry->Db->quote( $this->ip_address ) . " AND id != " . $this->Registry->Db->quote( $this->session_id ) );
 
 		/* Update this session directly */
 		$this->Registry->Db->cur_query = array(
@@ -1884,7 +1886,7 @@ class Session
 						'running_time'			=> UNIX_TIME_NOW,
 						'member_group'			=> $this->Registry->config['security']['guest_group'],
 					),
-				'where'  => "id=" . $this->Registry->Db->db->quote( $this->session_id )
+				'where'  => "id=" . $this->Registry->Db->quote( $this->session_id )
 			);
 		$this->Registry->Db->simple_exec_query_shutdown();
 
@@ -2074,7 +2076,7 @@ class Session
 					'set'    => array(
 							'seo_name' => $_seo_name,
 						),
-					'where'  => "id=" . $this->Registry->Db->db->quote( $m_data['id'], "INTEGER" ),
+					'where'  => "id=" . $this->Registry->Db->quote( $m_data['id'], "INTEGER" ),
 				);
 			$this->Registry->Db->simple_exec_query();
 
@@ -2156,7 +2158,7 @@ class Session
 			$this->Registry->Db->cur_query = array(
 					'do'	 => "select_row",
 					'table'  => "sessions",
-					'where'  => "id=" . $this->Registry->Db->db->quote( $session_id ),
+					'where'  => "id=" . $this->Registry->Db->quote( $session_id ),
 				);
 			$_session = $this->Registry->Db->simple_exec_query();
 
@@ -2523,7 +2525,7 @@ class Session
 							),
 						'table'  => "members_dname_changes",
 						'where'  => array(
-								"dname_member_id = " . $this->Registry->Db->db->quote( $member['id'] , "INTEGER" ),
+								"dname_member_id = " . $this->Registry->Db->quote( $member['id'] , "INTEGER" ),
 								"dname_date > " . $_time_check,
 							),
 					);
@@ -2577,8 +2579,8 @@ class Session
 				'fields' => array( $field, "id" ),
 				'table'  => "members",
 				'where'  => array(
-						array( $_check_field . " = ?"  , $this->Registry->Db->db->quote( strtolower( $name ) )        ),
-						array( "id != ?"               , $this->Registry->Db->db->quote( $member['id'], "INTEGER" )   ),
+						array( $_check_field . " = ?"  , $this->Registry->Db->quote( strtolower( $name ) )        ),
+						array( "id != ?"               , $this->Registry->Db->quote( $member['id'], "INTEGER" )   ),
 					),
 			);
 		$result = $this->Registry->Db->simple_exec_query();
@@ -2597,7 +2599,7 @@ class Session
 					'do'     => "select_row",
 					'fields' => array( $field, "id" ),
 					'table'  => "members",
-					'where'  => $_check_field . "=" . $this->Registry->Db->db->quote( strtolower( $name ) ),
+					'where'  => $_check_field . "=" . $this->Registry->Db->quote( strtolower( $name ) ),
 				);
 			$check_name = $this->Registry->Db->simple_exec_query();
 			if ( ! empty( $check_name ) )
@@ -2624,8 +2626,8 @@ class Session
 					'do'     => "select_row",
 					'fields' => array( "id" , "display_name" , "email" ),
 					'table'  => "members",
-					'where'  => $_check_field . "=" . $this->Registry->Db->db->quote( strtolower( $_unicode_name ) )
-						. " AND id != " . $this->Registry->Db->db->quote( $member['id'] , "INTEGER" ),
+					'where'  => $_check_field . "=" . $this->Registry->Db->quote( strtolower( $_unicode_name ) )
+						. " AND id != " . $this->Registry->Db->quote( $member['id'] , "INTEGER" ),
 				);
 			$result = $this->Registry->Db->simple_exec_query();
 			if ( ! empty( $result ) )
@@ -3195,7 +3197,7 @@ class Session
 							'last_visit'    => $this->member['last_activity'],
 							'last_activity' => UNIX_TIME_NOW,
 						),
-					'where'  => "id=" . $this->Registry->Db->db->quote( $this->member['id'], "INTEGER" ),
+					'where'  => "id=" . $this->Registry->Db->quote( $this->member['id'], "INTEGER" ),
 				);
 			$this->Registry->Db->simple_exec_query_shutdown();
 			$this->member['last_visit'] = $this->member['last_activity'];
@@ -3216,7 +3218,7 @@ class Session
 							'login_anonymous'  => $be_anon . "&1",
 							'last_activity'    => UNIX_TIME_NOW,
 						),
-					'where'  => "id=" . $this->Registry->Db->db->quote( $this->member['id'], "INTEGER" ),
+					'where'  => "id=" . $this->Registry->Db->quote( $this->member['id'], "INTEGER" ),
 				);
 			$this->Registry->Db->simple_exec_query_shutdown();
 		}

@@ -1,7 +1,3 @@
-### AUDITH CMS ###
-
-# Internal Clock: <-MD5->
-
 <FilesMatch "^\.ht">
 	Order Deny,Allow
 	Deny from all
