@@ -1,162 +1,162 @@
 UL.actions
 {
-	float: right;
-	clear: right;
-	margin-left: 6px;
-	height: inherit;
-	width: auto;
-	max-width: 64px;
-	display: none;
+	float       : right;
+	clear       : right;
+	margin-left : 6px;
+	height      : inherit;
+	width       : auto;
+	max-width   : 64px;
+	display     : none;
 }
 
 TD:hover > UL.actions
 {
-	display: block;
+	display : block;
 }
 
-	UL.actions > LI
-	{
-		float: left;
-		clear: none;
-	}
-	
-		UL.actions > LI > A
-		{
-			float: left;
-			clear: both;
-			width: 100%;
-			height: 100%;
-			
-			text-indent: -99999px;
-		}
+UL.actions > LI
+{
+	float : left;
+	clear : none;
+}
+
+UL.actions > LI > A
+{
+	float       : left;
+	clear       : both;
+	width       : 100%;
+	height      : 100%;
+
+	text-indent : -99999px;
+}
 
 SPAN.name
 {
-	height: inherit;
-	width: 201px;
-	float: left;
-	clear: left;
-	overflow: hidden;
-	white-space: nowrap;
-	vertical-align: middle;
+	height         : inherit;
+	width          : 201px;
+	float          : left;
+	clear          : left;
+	overflow       : hidden;
+	white-space    : nowrap;
+	vertical-align : middle;
 
-	color: #0085BF;
-	line-height: 18px;
+	color          : #0085BF;
+	line-height    : 18px;
 }
 
 TD:hover > SPAN.name
 {
-	width: 130px;
+	width : 130px;
 }
 
-	SPAN.name.is_title
-	{
-		
-		color: #6F1414;
-	}
-	
-	SPAN.name.is_backup
-	{
-		color: #CF8733;
-	}
+SPAN.name.is_title
+{
+
+	color : #6F1414;
+}
+
+SPAN.name.is_backup
+{
+	color : #CF8733;
+}
 
 #forms__components__sr__create BUTTON
 {
-	min-width: 16px;
-	height: 22px;
-	float: right;
-	clear: right;
-	border-width: 0;
-	background-position: 100% 50%;
-	background-repeat: no-repeat;
-	background-color: transparent;
-	
-	text-indent: -99999px;
+	min-width           : 16px;
+	height              : 22px;
+	float               : right;
+	clear               : right;
+	border-width        : 0;
+	background-position : 100% 50%;
+	background-repeat   : no-repeat;
+	background-color    : transparent;
+
+	text-indent         : -99999px;
 }
 
-	#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_policy
-	{
-		
-		background-image: url('{{$STYLE_IMAGES_URL}}/plus_green_16.png');
-		
-		font-family:inherit;
-		font-style:oblique;
-		color:#006600;
-		line-height: 22px;
-	}
-	
-	#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_policy
-	{
-		
-		background-image: url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
-	}
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_policy
+{
+
+	background-image : url('{{$STYLE_IMAGES_URL}}/plus_green_16.png');
+
+	font-family      : inherit;
+	font-style       : oblique;
+	color            : #006600;
+	line-height      : 22px;
+}
+
+#forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_policy
+{
+
+	background-image : url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
+}
 
 #forms__components__sr__create SPAN.s_fetch_criteria__policies
 {
-	float: left;
-	width: 100% !important;
-	background-image: url('{{$STYLE_IMAGES_URL}}/arrow_turn_left.png');
-	background-repeat: no-repeat;
-	background-position: 80% 100%;
+	float               : left;
+	width               : 100% !important;
+	background-image    : url('{{$STYLE_IMAGES_URL}}/arrow_turn_left.png');
+	background-repeat   : no-repeat;
+	background-position : 80% 100%;
 }
 
-	#forms__components__sr__create SPAN.s_fetch_criteria__policies LABEL
-	{
-		height: 20px;
-		width: 98px;
-		float: right;
-		clear: right;
-		margin: 2px 0 0 1px;
-		padding: 5px 2px 0 3px;
-		
-		font-style: oblique;
-		font-size: 1.2em;
-		text-align: right;
-		color: #33aa33;
-	}
+#forms__components__sr__create SPAN.s_fetch_criteria__policies LABEL
+{
+	height     : 20px;
+	width      : 98px;
+	float      : right;
+	clear      : right;
+	margin     : 2px 0 0 1px;
+	padding    : 5px 2px 0 3px;
+
+	font-style : oblique;
+	font-size  : 1.2em;
+	text-align : right;
+	color      : #33aa33;
+}
 
 #forms__components__sr__create SPAN.s_fetch_criteria__policy_shortcut
 {
-	float: left;
-	margin: 2px 0 0 3px;
-	padding: 0 4px 0 4px;
-	border-width: 1px;
-	border-style: solid;
-	border-color: #0085BF;
-	border-radius: 3px;
-	background-color: white;
-	
-	font-weight: bold;
+	float            : left;
+	margin           : 2px 0 0 3px;
+	padding          : 0 4px 0 4px;
+	border-width     : 1px;
+	border-style     : solid;
+	border-color     : #0085BF;
+	border-radius    : 3px;
+	background-color : white;
+
+	font-weight      : bold;
 }
 
 #forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_query,
 #forms__components__sr__create BUTTON.buttons__s_fetch_criteria__add_sorting
 {
-	background-image:url('{{$STYLE_IMAGES_URL}}/plus_blue_16.png');
-	height: 20px;
+	background-image : url('{{$STYLE_IMAGES_URL}}/plus_blue_16.png');
+	height           : 20px;
 }
 
 #forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_query,
 #forms__components__sr__create BUTTON.buttons__s_fetch_criteria__remove_sorting
 {
-	background-image:url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
-	height: 20px;
+	background-image : url('{{$STYLE_IMAGES_URL}}/minus_red_16.png');
+	height           : 20px;
 }
 
 #forms__components__sr__create SPAN.s_fetch_criteria__query,
 #forms__components__sr__create SPAN.sr__sort_by
 {
-	width: 100% !important;
-	float: left;
+	width : 100% !important;
+	float : left;
 }
 
-	#forms__components__sr__create SPAN.s_fetch_criteria__query INPUT,
-	#forms__components__sr__create SPAN.s_fetch_criteria__query SELECT,
-	#forms__components__sr__create SPAN.s_fetch_criteria__do_perform_sorting SELECT
-	{
-		min-width: 0;
-		width: auto;
-	}
+#forms__components__sr__create SPAN.s_fetch_criteria__query INPUT,
+#forms__components__sr__create SPAN.s_fetch_criteria__query SELECT,
+#forms__components__sr__create SPAN.s_fetch_criteria__do_perform_sorting SELECT
+{
+	min-width : 0;
+	width     : auto;
+}
 
 SPAN.s_fetch_criteria__policies SELECT,
 SPAN.s_fetch_criteria__policies TEXTAREA,
@@ -168,22 +168,22 @@ SPAN.sr__sort_by SELECT,
 SPAN.sr__sort_by TEXTAREA,
 SPAN.sr__sort_by INPUT
 {
-	margin: 2px 2px 0 0 !important;
+	margin : 2px 2px 0 0 !important;
 }
 
 .dependency_list
 {
-	list-style-position:inside;
-	list-style-type:none;
+	list-style-position : inside;
+	list-style-type     : none;
 }
 
 .dependency_list LI
 {
-	background-image:url('{{$STYLE_IMAGES_URL}}/arrow_next_blue_10.png');
-	background-position:left 66%;
-	background-repeat:no-repeat;
-	float:left;
-	clear:none;
-	margin-right:5px;
-	padding-left:12px;
+	background-image    : url('{{$STYLE_IMAGES_URL}}/arrow_next_blue_10.png');
+	background-position : left 66%;
+	background-repeat   : no-repeat;
+	float               : left;
+	clear               : none;
+	margin-right        : 5px;
+	padding-left        : 12px;
 }

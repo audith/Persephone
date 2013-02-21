@@ -50,9 +50,7 @@ Function.prototype.singleton = function ()
 {
 	if ( this._singleton === undefined ) {
 		// Create an Intermediate constructor to avoid problems during initialization of the generic construct itself
-		function I ()
-		{
-		};
+		function I () {}
 
 		// Assign the same prototype to extend itself
 		I.prototype = this.prototype;
@@ -251,8 +249,6 @@ Persephone.prototype.Form = {
 			maxHeight     : (2 * jQuery(window).height() / 3),
 			maxWidth      : (2 * jQuery(window).width() / 3),
 			modal         : true,
-			stack         : true,
-			zIndex        : 1000,
 
 			title : "Please confirm...",
 			body  : "Are you sure?"

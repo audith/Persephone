@@ -1,102 +1,61 @@
-SPAN#dft_default_options TEXTAREA,
-SPAN#dft_default_value INPUT,
-SPAN#dft_subtype_options_for__file SELECT,
-SPAN#dft_maxlength_options_for__alphanumeric__string SELECT,
-SPAN#dft_maxlength_options_for__alphanumeric__integer SELECT,
-SPAN#dft_maxlength_options_for__alphanumeric__decimal SELECT
+UL.actions
 {
-	display:inherit;
-	padding:0;
-	margin:0;
+	float       : right;
+	clear       : right;
+	margin-left : 6px;
+	height      : inherit;
+	width       : auto;
+	max-width   : 64px;
+	display     : none;
 }
 
-SPAN#dft_max_nr_of_items,
-SPAN#dft_captions_enabled
+TD:hover > UL.actions
 {
-	display:none;
+	display : block;
 }
 
-DIV#content UL.data_container LI TABLE TBODY TD SPAN.name
+UL.actions > LI
 {
-	height:18px;
-	line-height:18px;
-	float:left;
-	vertical-align:middle;
-
-	color:#0085BF;
+	float : left;
+	clear : none;
 }
 
-	DIV#content UL.data_container LI TABLE TBODY TD SPAN.name.is_title
-	{
-		
-		color:#6F1414;
-	}
-	
-	DIV#content UL.data_container LI TABLE TBODY TD SPAN.name.is_backup
-	{
-		color:#CF8733;
-	}
-	
-	DIV#content UL.data_container LI TABLE TBODY TD SPAN.name.is_ro
-	{
-		min-height:18px;
-		background-image:url('{{$STYLE_IMAGES_URL}}/acp/s_mode_ro.png');
-		background-position:left center;
-		background-repeat:no-repeat;
-		padding-left:25px;
-	}
-	
-		DIV#content UL.data_container LI TABLE TBODY TD SPAN.name.is_wo
-		{
-			min-height:18px;
-			background-image:url('{{$STYLE_IMAGES_URL}}/acp/s_mode_wo.png');
-			background-position:left center;
-			background-repeat:no-repeat;
-			padding-left:25px;
-		}
-		
-		DIV#content UL.data_container LI TABLE TBODY TD SPAN.name.is_rw
-		{
-			min-height:18px;
-			background-image:url('{{$STYLE_IMAGES_URL}}/acp/s_mode_rw.png');
-			background-position:left center;
-			background-repeat:no-repeat;
-			padding-left:25px;
-		}
-
-DIV#content UL.full_size LI FORM SPAN.pre_extra,
-DIV#content UL.full_size LI FORM SPAN.extra
+UL.actions > LI > A
 {
-	width:100%;
-	float:left;
-	clear:both;
-	margin:2px 0 0 0;
-	display:none;
+	float       : left;
+	clear       : both;
+	width       : 100%;
+	height      : 100%;
+
+	text-indent : -99999px;
 }
 
-SPAN.pre_extra SELECT,
-SPAN.pre_extra TEXTAREA,
-SPAN.pre_extra INPUT,
-SPAN.extra SELECT,
-SPAN.extra TEXTAREA,
-SPAN.extra INPUT
+SPAN.name
 {
-	margin:2px 2px 0 0 !important;
+	height         : inherit;
+	width          : 201px;
+	float          : left;
+	clear          : left;
+	overflow       : hidden;
+	white-space    : nowrap;
+	vertical-align : middle;
+
+	color          : #0085BF;
+	line-height    : 18px;
 }
 
-.dependency_list
+TD:hover > SPAN.name
 {
-	list-style-position:inside;
-	list-style-type:none;
+	width : 130px;
 }
 
-.dependency_list LI
+SPAN.name.is_title
 {
-	background-image:url('{{$STYLE_IMAGES_URL}}/arrow_next_blue_10.png');
-	background-position:left 66%;
-	background-repeat:no-repeat;
-	float:left;
-	clear:none;
-	margin-right:5px;
-	padding-left:12px;
+
+	color : #6F1414;
+}
+
+SPAN.name.is_backup
+{
+	color : #CF8733;
 }

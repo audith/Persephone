@@ -7,9 +7,9 @@ function /* Class */ Acp_Components ()
 {
 	return {
 		constructor : Acp_Components,
-		obj : null
+		obj         : null
 	};
-};
+}
 
 /* Extending with Persephone */
 extend(Acp_Components, Persephone);
@@ -22,12 +22,11 @@ jQuery(document).ready(function ()
 	/**
 	 * Opens "Create-Module" Form.
 	 */
-	jQuery("#forms__modules__list INPUT[type='button']:eq(0)").click(function ( event )
+	jQuery("#forms__modules__list").find("[type='button']:eq(0)").click(function ( event )
 	{
-		if ( jQuery("#components__modules__alter_add").is(":hidden") )
-		{
+		if ( jQuery("#components__modules__alter_add").is(":hidden") ) {
 			/* Close all .ondemand panes */
-			jQuery("#content UL.data_container > .ondemand").hide();
+			jQuery("#content").find("UL.data_container > .ondemand").hide();
 		}
 
 		/* Open "DDL-Create" form */
@@ -38,10 +37,10 @@ jQuery(document).ready(function ()
 		});
 
 		/* do = create */
-		jQuery("#forms__modules__alter_add [name='do']").val("create");
+		jQuery("#forms__modules__alter_add").find("[name='do']").val("create");
 
 		/* Make-up */
-		jQuery("#components__modules__alter_add H2").html( "Register a Module" ); // Form title
+		jQuery("#components__modules__alter_add").find("H2").html("Register a Module"); // Form title
 	});
 
 	/**
@@ -65,7 +64,7 @@ jQuery(document).ready(function ()
 			jQuery(this).get(0).checked = false;
 			return;
 		});
-		jQuery("#forms__modules__alter_add [name='m_unique_id']").val("").prop("disabled","disabled");
+		whoami.find("[name='m_unique_id']").val("").prop("disabled", "disabled");
 
 		/* Scroll to global Console */
 		var currentConsole = acp__components.Form.scrollToConsole(true);
@@ -78,7 +77,7 @@ jQuery(document).ready(function ()
 	/**
 	 * Submits "Create-Module" and "Edit-Module" Forms.
 	 */
-	jQuery("#forms__modules__alter_add INPUT[type='button']:eq(0)").click(function ( event )
+	jQuery("#forms__modules__alter_add").find("[type='button']:eq(0)").click(function ( event )
 	{
 		event.preventDefault();
 		var whoami = acp__components.Form.self = jQuery("#forms__modules__alter_add");
@@ -88,10 +87,9 @@ jQuery(document).ready(function ()
 	/**
 	 * Close "Module-Create" Form.
 	 */
-	jQuery("#forms__modules__alter_add INPUT[type='button']:eq(1)").click(function ( event )
+	jQuery("#forms__modules__alter_add").find("INPUT[type='button']:eq(1)").click(function ( event )
 	{
-		if ( jQuery("#components__modules__alter_add").is(":visible") )
-		{
+		if ( jQuery("#components__modules__alter_add").is(":visible") ) {
 			acp__components.Form.closeConsoles();
 			jQuery("#components__modules__alter_add").slideUp("medium");
 		}
@@ -100,12 +98,12 @@ jQuery(document).ready(function ()
 	/**
 	 * Prepares "Edit-Module" form.
 	 */
-	jQuery("FORM#forms__modules__list A.edit").click(function ( event )
+	jQuery("#forms__modules__list").find("A.edit").click(function ( event )
 	{
 		event.preventDefault();
 
 		/* Close all .ondemand panes */
-		jQuery("#content UL.data_container > .ondemand").hide();
+		jQuery("#content").find("UL.data_container > .ondemand").hide();
 
 		/* The usual... */
 		var whoami = acp__components.Form.self = jQuery("#components__modules__alter_add"); // Working form
@@ -114,69 +112,59 @@ jQuery(document).ready(function ()
 		currentConsole.html("Resetting forms and fetching module information! Please stand-by...").removeClass("error success");
 
 		/* Few minor things... */
-		var m_unique_id_clean = jQuery(this).attr("href").replace(/^\?/,"").replace( /[^a-z0-9]/gi , "" ).toLowerCase();
+		var m_unique_id_clean = jQuery(this).attr("href").replace(/^\?/, "").replace(/[^a-z0-9]/gi, "").toLowerCase();
 		var url = "{{$MODULE_URL}}/components/viewmodule-" + m_unique_id_clean;
 
 		/* Execute */
 		jQuery.ajax({
-			type : "GET",
-			url : url,
-			data : null,
-			cache : false,
+			type    : "GET",
+			url     : url,
+			data    : null,
+			cache   : false,
 			success : function ( data )
 			{
-				if ( data.me == undefined )
-				{
+				if ( data.me == undefined ) {
 					var faultMessage = "One or more error(s) occured! Correct them and resubmit the form to continue:<ul><li>No such module (id: " + m_unique_id + ") found!</li></ul>";
 					currentConsole.html(faultMessage).removeClass("success").addClass("error");
 					return 0;
 				}
-				else
-				{
+				else {
 					/* Make-up */
-					jQuery("#components__modules__alter_add H2").html( "Editing Module <em>/" + data.me.m_name + "</em>" ); // Form title
+					jQuery("#components__modules__alter_add").find("H2").html("Editing Module <em>/" + data.me.m_name + "</em>"); // Form title
 
 					/* Values */
 					var dataset_to_apply = {
-						'm_name' : data.me.m_name,
-						'm_description' : data.me.m_description,
-						'm_extras' : data.me.m_extras,
-						'm_enforce_ssl' : data.me.m_enforce_ssl,
+						'm_name'           : data.me.m_name,
+						'm_description'    : data.me.m_description,
+						'm_extras'         : data.me.m_extras,
+						'm_enforce_ssl'    : data.me.m_enforce_ssl,
 						'm_enable_caching' : data.me.m_enable_caching
 					};
-					jQuery.each(dataset_to_apply, function ( key , value )
+					jQuery.each(dataset_to_apply, function ( key, value )
 					{
 						var input_field = jQuery("#forms__modules__alter_add ." + key + " [name^='" + key + "']");
-						if ( input_field.length == 1 )
-						{
-							if ( value != null )
-							{
+						if ( input_field.length == 1 ) {
+							if ( value != null ) {
 								/* SELECTs... */
-								if ( input_field.is("SELECT") )
-								{
-									if ( !( value instanceof Array ) )
-									{
+								if ( input_field.is("SELECT") ) {
+									if ( !( value instanceof Array ) ) {
 										value = value.split(",");
 									}
 									input_field.val(value);
 								}
 								/* Everything else... */
-								else if ( input_field.is("INPUT[type='text']") )
-								{
+								else if ( input_field.is("INPUT[type='text']") ) {
 									input_field.val(acp__components.Form.decodeHtmlEntities(value));
 								}
 							}
 						}
-						else if ( input_field.length > 1 )
-						{
+						else if ( input_field.length > 1 ) {
 							input_field.each(function ( index )
 							{
-								if ( jQuery(this).is(":radio") )
-								{
+								if ( jQuery(this).is(":radio") ) {
 									/* We have RADIO buttons here */
 									jQuery(this).get(0).checked = false; // jQuery-UI: Although this doesn't work, I will leave it here...
-									if ( jQuery(this).attr("value") == value )
-									{
+									if ( jQuery(this).attr("value") == value ) {
 										jQuery(this).get(0).checked = true; // jQuery-UI: Although this doesn't work, I will leave it here...
 										jQuery("LABEL[for='" + jQuery(this).attr("id") + "']").click();
 									}
@@ -186,8 +174,8 @@ jQuery(document).ready(function ()
 					});
 
 					/* do = edit */
-					jQuery("#forms__modules__alter_add [name='do']").val("edit");
-					jQuery("#forms__modules__alter_add [name='m_unique_id']").prop("disabled","").val(data.me.m_unique_id);
+					jQuery("#forms__modules__alter_add").find("[name='do']").val("edit");
+					jQuery("#forms__modules__alter_add").find("[name='m_unique_id']").prop("disabled", "").val(data.me.m_unique_id);
 
 					/* Finalize */
 					currentConsole.html("Form successfully loaded!").removeClass("error").addClass("success");
@@ -202,36 +190,36 @@ jQuery(document).ready(function ()
 	/**
 	 * Executes "Delete-Module" Request
 	 */
-	jQuery("#forms__modules__list A.delete").click(function ( event )
+	jQuery("#forms__modules__list").find("A.delete").click(function ( event )
 	{
 		event.preventDefault();
-		var m_unique_id = jQuery(this).attr("href").replace(/^\?/,"");
+		var m_unique_id = jQuery(this).attr("href").replace(/^\?/, "");
 
 		/* "Are you sure?" */
 		acp__components.Form.getDialogObject({
-			body : "You are about to <b>delete</b> a module, alongside with its <i>subroutines</i> and all associated data!<br /><b>THIS ACTION IS IRREVERSIBLE!!!</b><br /><br />Shall I proceed?",
+			body    : "You are about to <b>delete</b> a module, alongside with its <i>subroutines</i> and all associated data!<br /><b>THIS ACTION IS IRREVERSIBLE!!!</b><br /><br />Shall I proceed?",
 			buttons : [
 				{
-					text : "Yes, *delete* the module, including its *content-base*!",
+					text  : "Yes, *delete* the module, including its *content-base*!",
 					click : function ( event )
 					{
 						jQuery(this).unbind("dialogclose").dialog("close");
-						jQuery("#forms__modules__list [name='do']").val("delete");
-						jQuery("#forms__modules__list [name='m_unique_id']").val(m_unique_id);
+						jQuery("#forms__modules__list").find("[name='do']").val("delete");
+						jQuery("#forms__modules__list").find("[name='m_unique_id']").val(m_unique_id);
 						var whoami = acp__components.Form.self = jQuery("#forms__modules__list");
 						whoami.trigger("submit"); // Submit the form via AJAX (.js__go_ajax), it will handle itself...
 					}
 				},
 				{
-					text : "No, stop!",
+					text  : "No, stop!",
 					click : function ( event )
 					{
 						jQuery(this).dialog("close");
 						acp__components.Form.getDialogObject({
-							body : "Request aborted by user! No actions performed!",
+							body    : "Request aborted by user! No actions performed!",
 							buttons : [
 								{
-									text : "Thanks!",
+									text  : "Thanks!",
 									click : function ( event )
 									{
 										jQuery(this).dialog("close");
@@ -242,7 +230,7 @@ jQuery(document).ready(function ()
 					}
 				}
 			],
-			width : 500
+			width   : 500
 		}).dialog("open");
 	});
 });
