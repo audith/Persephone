@@ -13,7 +13,7 @@ $CONFIG['url']['hostname'] = array(
 $CONFIG['sql']['debug'] = 2;
 $CONFIG['sql']['pconnect'] = true;
 $CONFIG['sql']['protocol'] = "tcp";
-$CONFIG['sql']['driver'] = "mysqli";
+$CONFIG['sql']['driver'] = "Pdo_Mysql";
 $CONFIG['sql']['ssl'] = false;
 $CONFIG['sql']['table_prefix'] = "";
 $CONFIG['sql']['host'] = "localhost";
@@ -21,6 +21,7 @@ $CONFIG['sql']['port'] = 3306;
 $CONFIG['sql']['dbname'] = "audith";
 $CONFIG['sql']['user'] = "root";
 $CONFIG['sql']['passwd'] = "";
+$CONFIG['sql']['charset'] = "utf8";
 
 
 # TEMPLATE ENGINE

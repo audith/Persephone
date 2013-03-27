@@ -135,19 +135,17 @@
 		<table class="full_size tablesorter {sortlist: [[0,0]]}" id="tables__connectors__ddl__list">
 			<thead>
 				<tr>
-					<th style="width: 5%; white-space: nowrap;">Pos.</th>
-					<th style="width: 50%; white-space: nowrap;">Field Name</th>
+					<th style="width: 5%; white-space: nowrap; text-align: center;">#</th>
+					<th style="white-space: nowrap;">Field Name</th>
 					<th style="width: 40%; white-space: nowrap;" class="{sorter: false}">Data Type</th>
-					<th style="width: 5%;" class="{sorter: false}">&nbsp;</th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<td colspan="4">
+					<td colspan="3">
 					<div class="system_console"></div>
 					<fieldset class="buttons">
 						<input type="button" value="Create New" />
-						<input type="button" value="Drop Selected" />
 						<input type="hidden" name="do" value="" />
 						<input type="hidden" name="connectors_linked" value="{{$CONTENT.c_data.m_unique_id}}" />
 						<input type="hidden" name="connected_field" value="{{$CONTENT._request.c_name}}" />
@@ -160,13 +158,18 @@
 				{{foreach from=$CONTENT.c_data.m_data_definition item=FIELD}}
 				<tr id="position_{{$FIELD.name}}">
 					<td align="center">{{$FIELD.position}}</td>
-					<td><span class="name">{{$FIELD.name|truncate:45:"...":TRUE}}</span></td>
+					<td>
+						<span class="name">{{$FIELD.name|truncate:45:"...":TRUE}}</span>
+						<ul class="actions">
+							<li class="ui-icon ui-icon-pencil"><a class="ddl_alter__edit" href="?{{$FIELD.name}}" title="Edit">Edit</a></li>
+							<li class="ui-icon ui-icon-closethick"><a class="ddl_alter__drop" href="?{{$FIELD.name}}" title="Drop">Drop</a></li>
+						</ul>
+					</td>
 					<td>{{$FIELD.type}}{{if $FIELD.subtype neq ''}}/{{$FIELD.subtype}}{{/if}}{{if $FIELD.maxlength neq ''}} [{{$FIELD.maxlength|truncate:60:"...":TRUE}}]{{/if}}</td>
-					<td align="center"><input type="radio" name="ddl_checklist[]" value="{{$FIELD.name}}" /></td>
 				</tr>
 				{{foreachelse}}
 				<tr>
-					<td colspan="4"><span class="system_message_error">No such connector-enabled data-field found! Or maybe you haven't linked it yet. <a href="javascript: history.back(-1);">Click to go back and fix it</a>.</span></td>
+					<td colspan="3"><span class="system_message_error">No such connector-enabled data-field found! Or maybe you haven't linked it yet. <a href="javascript: history.back(-1);">Click to go back and fix it</a>.</span></td>
 				</tr>
 				{{/foreach}}
 			</tbody>

@@ -222,7 +222,7 @@ class Module_Handler
 			$_file_processor_obj = $this->Registry->loader( "Data_Processors__File" );
 			if ( ( $_file_info = $_file_processor_obj->file__info__do_get( $this->running_subroutine['request']['f_id'] ) ) == FALSE )
 			{
-				throw new Exception( "Delete failed! File does not exist..." );
+				throw new \Persephone\Exception( "Delete failed! File does not exist..." );
 			}
 
 			# Original file
@@ -237,7 +237,7 @@ class Module_Handler
 				)
 			)
 			{
-				throw new Exception( "Delete failed! Check file permissions for: <i>" . $_file_info['_f_location'] . "</i> and/or its variations!" );
+				throw new \Persephone\Exception( "Delete failed! Check file permissions for: <i>" . $_file_info['_f_location'] . "</i> and/or its variations!" );
 			}
 
 			# IMAGES - Variations
@@ -248,7 +248,7 @@ class Module_Handler
 				{
 					if ( ! is_writable( $_path_to_delete = $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_M" ) ) )
 					{
-						throw new Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
+						throw new \Persephone\Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
 					}
 				}
 
@@ -257,7 +257,7 @@ class Module_Handler
 				{
 					if ( ! is_writable( $_path_to_delete = $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_S" ) ) )
 					{
-						throw new Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
+						throw new \Persephone\Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
 					}
 				}
 
@@ -266,7 +266,7 @@ class Module_Handler
 				{
 					if ( ! is_writable( $_path_to_delete = $this->Registry->Input->file__filename__attach_suffix( $_file_info['_f_location'] , "_W" ) ) )
 					{
-						throw new Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
+						throw new \Persephone\Exception( "Delete failed! Check file permissions for: <i>" . $_path_to_delete . "</i>!" );
 					}
 				}
 			}
@@ -293,7 +293,7 @@ class Module_Handler
 				);
 			if ( ! $this->Registry->Db->simple_exec_query() )
 			{
-				throw new Exception( "Delete failed! Couldn't remove Db-record..." );
+				throw new \Persephone\Exception( "Delete failed! Couldn't remove Db-record..." );
 			}
 
 			//-----------------
@@ -343,27 +343,27 @@ class Module_Handler
 		{
 			if ( ! isset( $input['fileLength'] ) )
 			{
-				throw new Exception( "fileLength parameter is missing!" );
+				throw new \Persephone\Exception( "fileLength parameter is missing!" );
 			}
 			if ( ! isset( $input['fileName'] ) )
 			{
-				throw new Exception( "fileName parameter is missing!" );
+				throw new \Persephone\Exception( "fileName parameter is missing!" );
 			}
 			if ( ! isset( $input['md5'] ) )
 			{
-				throw new Exception( "md5 parameter is missing!" );
+				throw new \Persephone\Exception( "md5 parameter is missing!" );
 			}
 			if ( ! isset( $input['partitionMd5'] ) )
 			{
-				throw new Exception( "partitionMd5 parameter is missing!" );
+				throw new \Persephone\Exception( "partitionMd5 parameter is missing!" );
 			}
 			if ( ! isset( $input['partitionIndex'] ) )
 			{
-				throw new Exception( "partitionIndex parameter is missing!" );
+				throw new \Persephone\Exception( "partitionIndex parameter is missing!" );
 			}
 			if ( ! isset( $input['partitionCount'] ) )
 			{
-				throw new Exception( "partitionCount parameter is missing!" );
+				throw new \Persephone\Exception( "partitionCount parameter is missing!" );
 			}
 
 			$_file_length              = $input['fileLength'];
@@ -389,7 +389,7 @@ class Module_Handler
 			{
 				if ( in_array( $_file_name, $_existing_file_record['f_name'] ) )
 				{
-					throw new Exception( "Duplicate upload attempt! File already exists in our systems..." );
+					throw new \Persephone\Exception( "Duplicate upload attempt! File already exists in our systems..." );
 				}
 				else
 				{
@@ -408,7 +408,7 @@ class Module_Handler
 						);
 					if ( ! $this->Registry->Db->simple_exec_query() )
 					{
-						throw new Exception( "Failed to update Db-record!" );
+						throw new \Persephone\Exception( "Failed to update Db-record!" );
 					}
 
 					$this->Registry->Cache->cache__do_remove( "fileinfo_" . $_existing_file_record['f_hash'] );
@@ -427,7 +427,7 @@ class Module_Handler
 
 			if ( $_file_mime === FALSE )
 			{
-				throw new Exception( "MIME is invalid or not allowed!" );
+				throw new \Persephone\Exception( "MIME is invalid or not allowed!" );
 			}
 
 			//--------------------------------
@@ -443,7 +443,7 @@ class Module_Handler
 			$_partition_md5_checksum__calculated = hash_file( "md5" , $_partition_file_name );
 			if ( $_partition_md5_checksum__calculated != $_partition_md5_checksum )
 			{
-				throw new Exception( "Checksum mismatch - provided checksum value (for the current partition) does not match to the calculated one!" );
+				throw new \Persephone\Exception( "Checksum mismatch - provided checksum value (for the current partition) does not match to the calculated one!" );
 			}
 
 			//------------------------
@@ -452,7 +452,7 @@ class Module_Handler
 
 			if ( ! $_source_file_handle = fopen( $_partition_file_name , "rb" ) )
 			{
-				throw new Exception( "Failed to access the partition source file (" . $_partition_file_name . ")!" );
+				throw new \Persephone\Exception( "Failed to access the partition source file (" . $_partition_file_name . ")!" );
 			}
 
 			$mode = "r+b";
@@ -463,7 +463,7 @@ class Module_Handler
 			# 'w' (and 'w+') will truncate the file, but 'a' will always append, even if we seek; so r+ is correct, unless the file doesn't exist.
 			if ( ! $_target_file_handle = fopen( $_target_file , $mode ) )
 			{
-				throw new Exception( "Failed to access the staging file (" . $_target_file .")!" );
+				throw new \Persephone\Exception( "Failed to access the staging file (" . $_target_file .")!" );
 			}
 
 			# Note: do not just use mode 'a' and always append to end of file. Due to corruption or other resume behavior, we might
@@ -471,18 +471,18 @@ class Module_Handler
 			$where = bcmul( $_partition_index , $_partition_size );
 			if ( $this->Registry->Input->file__fseek_safe( $_target_file_handle , $where ) != 0 )
 			{
-				throw new Exception( "Failed to find resume position!" );
+				throw new \Persephone\Exception( "Failed to find resume position!" );
 			}
 
 			$_partition_file_size = filesize( $_partition_file_name );    // Input::file__filesize__do_get() not needed here: 1) it is slower, 2) partitions are always small enough
 			if ( ! $_is_this_last_partition_being_uploaded and $_partition_file_size != $_partition_size )
 			{
-				throw new Exception( "Transfered partition is of the wrong size!" );
+				throw new \Persephone\Exception( "Transfered partition is of the wrong size!" );
 			}
 
 			if ( stream_copy_to_stream( $_source_file_handle , $_target_file_handle ) != $_partition_file_size )
 			{
-				throw new Exception( "Failed to append data to destination file!" );
+				throw new \Persephone\Exception( "Failed to append data to destination file!" );
 			}
 
 			fclose( $_target_file_handle );
@@ -499,7 +499,7 @@ class Module_Handler
 				{
 					# The final staging file is broken, delete it so no resume is tried!
 					@unlink( $_target_file );
-					throw new Exception( "Checksum mismatch - provided checksum value (for final file) does not match to the calculated one!" );
+					throw new \Persephone\Exception( "Checksum mismatch - provided checksum value (for final file) does not match to the calculated one!" );
 				}
 
 				//--------------------------------
@@ -526,7 +526,7 @@ class Module_Handler
 					if ( ! $this->Registry->Db->simple_exec_query() )
 					{
 						@unlink( $_target_file );
-						throw new Exception( "Failed to insert Db-record!" );
+						throw new \Persephone\Exception( "Failed to insert Db-record!" );
 					}
 					else
 					{
@@ -536,7 +536,7 @@ class Module_Handler
 						}
 						if ( ! rename( $_target_file , $_dir_to_move_into . "/" . $_file_md5_checksum . "." . $_file_extension ) )
 						{
-							throw new Exception( "Failed to move the staging file to its final location!" );
+							throw new \Persephone\Exception( "Failed to move the staging file to its final location!" );
 						}
 					}
 
@@ -547,7 +547,7 @@ class Module_Handler
 				}
 				else
 				{
-					throw new Exception( "Failed to validate file-mime!" );
+					throw new \Persephone\Exception( "Failed to validate file-mime!" );
 				}
 			}
 			else
@@ -596,11 +596,11 @@ class Module_Handler
 		{
 			if ( ! isset( $input['fileLength'] ) )
 			{
-				throw new Exception( "fileLength parameter is missing!" );
+				throw new \Persephone\Exception( "fileLength parameter is missing!" );
 			}
 			if ( ! isset( $input['fileName'] ) )
 			{
-				throw new Exception( "fileName parameter is missing!" );
+				throw new \Persephone\Exception( "fileName parameter is missing!" );
 			}
 
 			$_file_id                  = UNIX_TIME_NOW;
@@ -621,7 +621,7 @@ class Module_Handler
 			{
 				if ( ! is_readable( $_target_file ) )
 				{
-					throw new Exception( "Can't read the file! Access denied!" );
+					throw new \Persephone\Exception( "Can't read the file! Access denied!" );
 				}
 
 				# Get file size

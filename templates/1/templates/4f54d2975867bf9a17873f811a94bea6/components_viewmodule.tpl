@@ -200,7 +200,7 @@
 									{{/if}}
 								{{/foreach}}
 							</optgroup>
-							<optgroup label="Also automatically are selected:">
+							<optgroup label="Following are automatically selected:">
 								<option value="id" disabled="disabled">Id [id]</option>
 								<option value="tags" disabled="disabled">Tags [tags]</option>
 								<option value="timestamp" disabled="disabled">Timestamp [timestamp]</option>
@@ -354,17 +354,13 @@
 	</li>
 
 	<li id="components__ddl__list">
-		<h2>Data Definition Management (for Master-unit) - Actual for: <em>/{{$CONTENT.me.m_name}}</em>
-			<span class="description">
-			... create and manage data-fields of your module
-			</span>
-		</h2>
+		<h2>Data Definition Management (for Master-unit) - Actual for: <em>/{{$CONTENT.me.m_name}}</em></h2>
 
 		<form id="forms__components__ddl__list" class="js__go_ajax" method="post" action="">
 		<table class="full_size{{if count($CONTENT.me.m_data_definition)}} tablesorter {sortlist: [[0,0]]}{{/if}}" id="tables__components__ddl__list">
 			<thead>
 				<tr>
-					<th style="width:7%; white-space:nowrap;">Pos.</th>
+					<th style="width: 7%; white-space: nowrap; text-align: center;">#</th>
 					<th style="width:25%; white-space:nowrap;">Field Name</th>
 					<th style="width:25%; white-space:nowrap;">Data Type</th>
 					<th style="width:43%; white-space:nowrap;"{{if count($CONTENT.me.m_data_definition)}} class="{sorter: false}"{{/if}}>Used In ...</th>
@@ -466,12 +462,10 @@
 	{{/if}}
 
 	<li id="components__sr__list">
-		<h2>Subroutine Management for: <em>/{{$CONTENT.me.m_name}}</em>
-			<span class="description"></span>
-		</h2>
+		<h2>Subroutine Management for: <em>/{{$CONTENT.me.m_name}}</em></h2>
 
 		<form id="forms__components__sr__list" class="js__go_ajax" method="post" action="">
-		<table class="full_size tablesorter {sortlist: [[0,0]]}" id="tables__components__sr__list">
+		<table class="full_size{{if count($CONTENT.me.m_subroutines)}} tablesorter {sortlist: [[0,0]]}{{/if}}" id="tables__components__sr__list">
 			<thead>
 				<tr>
 					<th style="width: 35%; white-space: nowrap;">Subroutine Name</th>
@@ -510,8 +504,8 @@
 				</tr>
 				{{foreachelse}}
 				<tr>
-					<td colspan="2"><span class="system_message_error">No Subroutines Found!<br />
-					{{if count($CONTENT.me.m_data_definition) eq 0}}You cannot create new one, until you create at least one data-field!{{/if}}</span></td>
+					<td colspan="2" class="no_data">No Subroutines Found!
+					{{if !count($CONTENT.me.m_data_definition)}}You cannot create new one, until you create at least one data-field!{{/if}}</td>
 				</tr>
 				{{/foreach}}
 			</tbody>

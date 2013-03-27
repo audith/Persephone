@@ -1,20 +1,17 @@
 <?php
-//----------
-// Init
-//----------
+
+namespace Persephone;
+
+//-------------
+// Prelim
+//-------------
 
 require_once( "./init.php" );
-
-//--------------
-// API Source
-//--------------
-
-require_once( PATH_SOURCES . "/kernel/registry.php"                );
 
 //-------------
 // API Init
 //-------------
 
-$Registry = Registry::init();
-$Registry->Display->do_display();
+$Registry = \Persephone\Registry::init();
+#$Registry->Display->do_display();
 exit();

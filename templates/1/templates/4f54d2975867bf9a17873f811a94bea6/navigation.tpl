@@ -44,18 +44,6 @@
 					<li><a href="{{$MODULE_URL}}/components/modules">Module Management</a></li>
 				</ul>
 			</li>
-			<li>
-				<a href="#">Material Resource Planning</a>
-				<ul style="color: #B94E2A; box-shadow: 0 0 3px 1px #B94E2A;">
-					<li>
-						<a href="#">Warehouse Management</a>
-						<ul style="color: #B94E2A; box-shadow: 0 0 3px 1px #B94E2A;">
-							<li><a href="{{$MODULE_URL}}/components/mrp/warehouse/uom">Units of Measure</a></li>
-							<li><a href="{{$MODULE_URL}}/components/mrp/warehouse/bom">Bill of Materials</a></li>
-						</ul>
-					</li>
-				</ul>
-			</li>
 		</ul>
 	</li>
 	<li style="width:106px; background-image:url('{{$STYLE_IMAGES_URL}}/acp__navigation__content_and_data.jpg'); background-repeat:no-repeat;">
