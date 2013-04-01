@@ -103,26 +103,29 @@ abstract class Database
 	/**
 	 * Magic method __toString()
 	 *
-	 * @return   string   Working SQL query as a string
+	 * @param     $query_object      \Zend\Db\Sql\Sql
+	 *
+	 * @return                       string|null                 String-ifyed query
+	 * @throws                       \Persephone\Exception
 	 */
 	public function __toString ( $query_object = null )
 	{
-		if ( IN_DEV )
+		if ( !IN_DEV )
 		{
-			if ( is_object( $query_object ) )
-			{
-				return $this->sql->getSqlStringForSqlObject( $query_object );
-			}
-
-			if ( is_object( $this->cur_query ) )
-			{
-				return $this->sql->getSqlStringForSqlObject( $this->cur_query );
-			}
-
-			return "";
+			throw new Exception ("Can't dump SQL queries outside Development mode! Please activate Development mode [/init.php - IN_DEV setting]...");
 		}
 
-		throw new Exception ("Can't dump SQL queries outside Development mode! Please activate Development mode [/init.php - IN_DEV setting]...");
+		if ( is_object( $query_object ) )
+		{
+			return $this->sql->getSqlStringForSqlObject( $query_object );
+		}
+
+		if ( is_object( $this->cur_query ) )
+		{
+			return $this->sql->getSqlStringForSqlObject( $this->cur_query );
+		}
+
+		return "";
 	}
 
 
@@ -166,49 +169,41 @@ abstract class Database
 	/**
 	 * Initiates a transaction
 	 *
-	 * @return    object   Zend_Db_Adapter_Abstract object instance
+	 * @return      \Zend\Db\Adapter\Driver\ConnectionInterface
 	 */
 	public function begin_transaction ()
 	{
-		return $this->adapter->beginTransaction();
+		return $this->adapter->getDriver()->getConnection()->beginTransaction();
 	}
 
 
 	/**
 	 * Marks changes made during the transaction as committed
 	 *
-	 * @return    object   Zend_Db_Adapter_Abstract object instance
+	 * @return      \Zend\Db\Adapter\Driver\ConnectionInterface
 	 */
 	public function commit ()
 	{
-		return $this->adapter->commit();
+		return $this->adapter->getDriver()->getConnection()->commit();
 	}
 
 
 	/**
 	 * Discards (rolls-back) the changes made during the transaction
 	 *
-	 * @return    object   Zend_Db_Adapter_Abstract object instance
+	 * @return      \Zend\Db\Adapter\Driver\ConnectionInterface
 	 */
 	public function rollback ()
 	{
-		return $this->adapter->rollback();
+		return $this->adapter->getDriver()->getConnection()->rollback();
 	}
-
-
-	/**
-	 * Build "is null" and "is not null" string
-	 *
-	 * @param     boolean     is null flag
-	 * @return    string      [Optional] SQL-formatted "is null" or "is not null" string
-	 */
-	abstract public function build__is_null( $is_null = true );
 
 
 	/**
 	 * The last value generated in the scope of the current database connection
 	 *
-	 * @return   integer   LAST_INSERT_ID
+	 * @return      integer   LAST_INSERT_ID
+	 * @throws      \Persephone\Exception
 	 */
 	public function last_insert_id ()
 	{
@@ -224,11 +219,11 @@ abstract class Database
 	/**
 	 * Determines the referenced tables, and the count of referenced rows (latter is on-demand)
 	 *
-	 * @param     string   Referenced table name
-	 * @param     array    Parameters containing information for querying referenced data statistics
-	 *                     array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
+	 * @param       $referenced_table_name      string      Referenced table name
+	 * @param       $_params                    array       Parameters containing information for querying referenced data statistics
 	 *
-	 * @return    array    Reference and possibly, data statistics information (row-count)
+	 * @usage       array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
+	 * @return                                  array       Reference and possibly, data statistics information (row-count)
 	 */
 	abstract public function check_for_references ( $referenced_table_name , $_params = array() );
 
@@ -236,9 +231,10 @@ abstract class Database
 	/**
 	 * Prepares column-data for ALTER query for a given module data-field-type
 	 *
-	 * @param   array      Data-field info
-	 * @param   boolean    Whether translated info will be applied to "_master_repo" tables or not (related to Connector-enabled fields only!)
-	 * @return  array      Column info
+	 * @param       $df_data                            array       Data-field info
+	 * @param       $we_need_this_for_master_table      boolean     Whether translated info will be applied to "_master_repo" tables or not (related to Connector-enabled fields only!)
+	 *
+	 * @return                                          array       Column info
 	 */
 	abstract public function modules__ddl_column_type_translation ( $df_data , $we_need_this_for_master_table = false );
 
@@ -246,40 +242,75 @@ abstract class Database
 	/**
 	 * Returns the table structure for any of the module tables
 	 *
-	 * @param   array   Table suffix, determining specific table
-	 * @return  array   Table structure
+	 * @param       $suffix     array       Table suffix, determining specific table
+	 *
+	 * @return                  array       Table structure
 	 */
 	abstract public function modules__default_table_structure ( $suffix );
 
 
 	/**
-	 * Quotes values before passing them into SQL query.
+	 * Quotes SQL identifiers before passing them into SQL query.
 	 *
-	 * @param    string|string[]
-	 * @param    string
-	 * @return   mixed
-	 * @throws   Exception
+	 * @param       $identifier     string|string[]
+	 * @return                      string
+	 * @throws                      Exception
 	 */
-	public function quote ( $value )
+	public function quoteIdentifier ( $identifier )
 	{
 		if ( !is_object( $this->adapter ) or !( $this->adapter instanceof Adapter ) )
 		{
-			throw new Exception( "Database - quote(): Database adapter not initialized!" );
+			throw new Exception( "Database - quoteIdentifier(): Database adapter not initialized!" );
 		}
 
-		/**
-		 * @var $platform \Zend\Db\Adapter\Platform\Sql92
-		 */
-		$platform = $this->adapter->getPlatform();
-
-		if ( is_array( $value ) )
+		if ( is_array( $identifier ) )
 		{
-			return $platform->quoteValueList( $value );
+			return $this->platform->quoteIdentifierChain( $identifier );
 		}
 		else
 		{
-			return $platform->quoteValue( $value );
+			return $this->platform->quoteIdentifier( $identifier );
 		}
+	}
+
+
+	/**
+	 * Quotes values before passing them into SQL query.
+	 *
+	 * @param       $value      string|string[]
+	 * @return                  string
+	 * @throws                  Exception
+	 */
+	public function quoteValue ( $value )
+	{
+		if ( !is_object( $this->adapter ) or !( $this->adapter instanceof Adapter ) )
+		{
+			throw new Exception( "Database - quoteValue(): Database adapter not initialized!" );
+		}
+
+		if ( is_array( $value ) )
+		{
+			return $this->platform->quoteValueList( $value );
+		}
+		else
+		{
+			return $this->platform->quoteValue( $value );
+		}
+	}
+
+
+	/**
+	 * ALIAS to Database::quoteValue()
+	 *
+	 * @param       $value      string|string[]
+	 *
+	 * @return                  string
+	 * @throws                  Exception
+	 * @deprecated
+	 */
+	public function quote ( $value )
+	{
+		return $this->quoteValue( $value );
 	}
 
 
@@ -519,8 +550,9 @@ abstract class Database
 	/**
 	 * Drops table(s)
 	 *
-	 * @param    array     List of tables to be dropped
-	 * @return   mixed     # of affected rows on success, FALSE otherwise
+	 * @param       $tables     string[]            List of tables to be dropped
+	 *
+	 * @return                  integer|boolean     # of affected rows on success, FALSE otherwise
 	 */
 	abstract public function simple_exec_drop_table ( $tables );
 
@@ -528,8 +560,9 @@ abstract class Database
 	/**
 	 * Builds "CREATE TABLE ..." query from Table-Structure Array and executes it
 	 *
-	 * @param    array     Struct array
-	 * @return   integer   # of queries executed
+	 * @param       $struct     array       Struct array
+	 *
+	 * @return                  integer     # of queries executed
 	 */
 	abstract public function simple_exec_create_table_struct ( $struct );
 }

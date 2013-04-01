@@ -47,28 +47,13 @@ class Pdo_Mysql extends \Persephone\Database
 
 
 	/**
-	 * Build "IS NULL" and "IS NOT NULL" string
-	 *
-	 * @param     boolean     IS NULL flag
-	 *
-	 * @return    string      [Optional] SQL-formatted "IS NULL" or "IS NOT NULL" string
-	 */
-	public function build__is_null ( $is_null = true )
-	{
-		return $is_null
-			? " IS NULL "
-			: " IS NOT NULL ";
-	}
-
-
-	/**
 	 * Determines the referenced tables, and the count of referenced rows (latter is on-demand)
 	 *
-	 * @param     string   Referenced table name
-	 * @param     array    Parameters containing information for querying referenced data statistics
-	 *                     array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
+	 * @param       $referenced_table_name      string      Referenced table name
+	 * @param       $_params                    array       Parameters containing information for querying referenced data statistics
 	 *
-	 * @return    array    Reference and possibly, data statistics information (row-count)
+	 * @usage       array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
+	 * @return                                  array       Reference and possibly, data statistics information (row-count)
 	 */
 	public function check_for_references ( $referenced_table_name, $_params = array() )
 	{
@@ -125,10 +110,10 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Prepares column-data for ALTER query for a given module data-field-type
 	 *
-	 * @param   array      Data-field info
-	 * @param   boolean    Whether translated info will be applied to "_master_repo" tables or not (related to Connector-enabled fields only!)
+	 * @param       $df_data                            array       Data-field info
+	 * @param       $we_need_this_for_master_table      boolean     Whether translated info will be applied to "_master_repo" tables or not (related to Connector-enabled fields only!)
 	 *
-	 * @return  array      Column info
+	 * @return                                          array       Column info
 	 */
 	public function modules__ddl_column_type_translation ( $df_data, $we_need_this_for_master_table = false )
 	{
@@ -400,9 +385,9 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Returns the table structure for any of the module tables
 	 *
-	 * @param   array   Table suffix, determining specific table
+	 * @param       $suffix     array       Table suffix, determining specific table
 	 *
-	 * @return  array   Table structure
+	 * @return                  array       Table structure
 	 */
 	public final function modules__default_table_structure ( $suffix )
 	{
@@ -927,11 +912,11 @@ class Pdo_Mysql extends \Persephone\Database
 	 *
 	 * @return  integer|boolean    # of affected rows on success, FALSE otherwise
 	 * @usage   array(
-	"do"        => "update",
-	"tables"    => array|string [elements can be key=>value pairs ("table aliases") or strings],
-	"set"       => assoc array of column_name-value pairs
-	"where"     => array|string
-	)
+			"do"        => "update",
+			"tables"    => string|string[] [elements can be key=>value pairs ("table aliases") or strings],
+			"set"       => assoc array of column_name-value pairs
+			"where"     => string|string[]
+		)
 	 */
 	protected final function simple_update_query ( $sql )
 	{
@@ -1309,9 +1294,9 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Drops table(s)
 	 *
-	 * @param    array     List of tables to be dropped
+	 * @param       $tables     string[]            List of tables to be dropped
 	 *
-	 * @return   mixed     # of affected rows on success, FALSE otherwise
+	 * @return                  integer|boolean     # of affected rows on success, FALSE otherwise
 	 */
 	public function simple_exec_drop_table ( $tables )
 	{
@@ -1359,9 +1344,9 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Builds "CREATE TABLE ..." query from Table-Structure Array and executes it
 	 *
-	 * @param    array     Struct array
+	 * @param       $struct     array       Struct array
 	 *
-	 * @return   integer   # of queries executed
+	 * @return                  integer     # of queries executed
 	 */
 	public function simple_exec_create_table_struct ( $struct )
 	{
