@@ -2,6 +2,7 @@
 
 namespace Persephone\Database\Drivers;
 use \Persephone\Database;
+use Zend\Db\Adapter\Adapter;
 use \Zend\Db\Sql\Sql;
 use \Zend\Db\Sql\Expression;
 
@@ -21,6 +22,16 @@ if ( !defined( "INIT_DONE" ) )
 class Pdo_Mysql extends \Persephone\Database
 {
 	/**
+	 * Options specific to this driver
+	 *
+	 * @var array
+	 */
+	public $driver_options = array(
+		\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+		\PDO::MYSQL_ATTR_INIT_COMMAND       => "SET NAMES UTF8;"
+	);
+
+	/**
 	 * Zend-Db Adapter object
 	 *
 	 * @var \Zend\Db\Adapter\Platform\Mysql
@@ -33,37 +44,6 @@ class Pdo_Mysql extends \Persephone\Database
 	 * @var \Zend\Db\Sql\Sql
 	 */
 	public $sql;
-
-
-	/**
-	 * Constructor
-	 *
-	 * @param    \Persephone\Registry REFERENCE: Registry Object
-	 */
-	public function __construct ( \Persephone\Registry $Registry )
-	{
-		$this->Registry = $Registry;
-
-		# Db options
-		$driver_options = array(
-			\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-			\PDO::MYSQL_ATTR_INIT_COMMAND       => "SET NAMES UTF8;"
-		);
-
-		# Preparing DSN and Options for PEAR DB::connect
-		$params = array(
-			'driver'   => "Pdo_Mysql",
-			'host'     => &$this->Registry->config[ 'sql' ][ 'host' ],
-			'username' => &$this->Registry->config[ 'sql' ][ 'user' ],
-			'password' => &$this->Registry->config[ 'sql' ][ 'passwd' ],
-			'dbname'   => &$this->Registry->config[ 'sql' ][ 'dbname' ],
-			'platform' => $driver_options,
-		);
-
-		$this->adapter  = new \Zend\Db\Adapter\Adapter( $params );
-		$this->platform = $this->adapter->getPlatform();
-		$this->sql      = new Sql( $this->adapter );
-	}
 
 
 	/**
@@ -696,29 +676,30 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Simple SELECT query
 	 *
-	 * @param    array    array(
-	"do"          => "select",
-	"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
-	"fields"      => array(),
-	"table"       => array() [when correlation names are used] | string,
-	"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
-	"add_join"    => array(
-	0 => array (
-	"fields"      => array(),
-	"table"       => array(),    - where count = 1
-	"conditions"  => "",
-	"join_type"   => "INNER|LEFT|RIGHT"
-	),
-	1 => array()
-	),
-	"group"       => array(),
-	"having"      => array(),
-	"order"       => array(),
-	"limit"       => array(offset, count),
-	"limit_page"  => array(page, count)
-	)
+	 * @param       array
 	 *
-	 * @return    mixed     Result set
+	 * @usage       array(
+						"do"          => "select",
+						"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
+						"fields"      => array(),
+						"table"       => array() [when correlation names are used] | string,
+						"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
+						"add_join"    => array(
+							0 => array (
+								"fields"      => array(),
+								"table"       => array(),    - where count = 1
+								"conditions"  => "",
+								"join_type"   => "INNER|LEFT|RIGHT"
+							),
+							1 => array()
+						),
+						"group"       => array(),
+						"having"      => array(),
+						"order"       => array(),
+						"limit"       => array(offset, count)
+					)
+	 * @throws      \Persephone\Exception
+	 * @return      \Zend\Db\ResultSet\ResultSet|boolean
 	 */
 	protected final function simple_select_query ( $sql )
 	{
@@ -726,61 +707,55 @@ class Pdo_Mysql extends \Persephone\Database
 
 		# Columns
 		$fields = array();
-		if ( isset( $sql[ 'fields' ] ) and is_array( $sql[ 'fields' ] ) and count( $sql[ 'fields' ] ) )
+		if ( isset( $sql[ 'fields' ] ) and !empty( $sql[ 'fields' ] ) )
 		{
-			$fields = $sql[ 'fields' ];
+			if ( is_array( $sql[ 'fields' ] ) )
+			{
+				$fields = $sql[ 'fields' ];
+			}
+			elseif ( is_string( $sql[ 'fields' ] ) )
+			{
+				$fields = array( $sql[ 'fields' ] );
+			}
 		}
 		else
 		{
 			$fields = "*";
 		}
+		$select = $select->columns( $fields );
 
 		# "From"
-		$tables = array();
 		if ( isset( $sql[ 'table' ] ) and ( is_array( $sql[ 'table' ] ) and count( $sql[ 'table' ] ) ) or ( !is_array( $sql[ 'table' ] ) and !empty( $sql[ 'table' ] ) ) )
 		{
-			$table = $this->attach_prefix( $sql[ 'table' ] );
+			$tables = $this->attach_prefix( $sql[ 'table' ] );
 		}
 		else
 		{
-			throw new \Persephone\Exception( "No or bad table references specified for SELECT query" );
+			throw new \Persephone\Exception( "None or bad table references specified for SELECT query" );
 		}
 		if ( isset( $sql[ 'distinct' ] ) and $sql[ 'distinct' ] === true )
 		{
 			$select = $select->quantifier( "DISTINCT" );
 		}
-		$select = $select->from( $table, $fields );
+		$select = $select->from( $tables );
 
 		# "Where"
 		$where = array();
-		if ( isset( $sql[ 'where' ] ) )
+		if ( isset( $sql[ 'where' ] ) and !empty( $sql[ 'where' ] ) )
 		{
 			# Backward compatibility
 			if ( !is_array( $sql[ 'where' ] ) )
 			{
-				$where = array_merge( $where, array( array( $sql[ 'where' ] ) ) );
+				$where = array( $sql[ 'where' ] );
 			}
 			else
 			{
-				if ( count( $sql[ 'where' ] ) )
-				{
-					$where = array_merge( $where, $sql[ 'where' ] ); // $where_clauses can consist of clause alone, or clause-parameter pairs
-				}
+				$where = $sql[ 'where' ];
 			}
 		}
 		if ( count( $where ) ) // Apply only if there is a need
 		{
-			foreach ( $where as $_w )
-			{
-				if ( isset( $_w[ 1 ] ) )
-				{
-					$select = $select->where( $_w[ 0 ], $_w[ 1 ] );
-				}
-				else
-				{
-					$select = $select->where( $_w[ 0 ] );
-				}
-			}
+			$select = $select->where( $where );
 		}
 
 		# "Join"
@@ -870,27 +845,27 @@ class Pdo_Mysql extends \Persephone\Database
 		# "Group By"
 		$group  = array();
 		$having = array();
-		if ( isset( $sql[ 'group' ] ) )
+		if ( isset( $sql[ 'group' ] ) and !empty( $sql[ 'group' ] ) )
 		{
-			if ( is_array( $sql[ 'group' ] ) and count( $sql[ 'group' ] ) )
+			if ( is_array( $sql[ 'group' ] ) )
 			{
 				$group = $sql[ 'group' ];
 			}
 			else
 			{
-				$group = array( $group );
+				$group = array( $sql[ 'group' ] );
 			}
 
 			# "Having"
-			if ( isset( $sql[ 'having' ] ) )
+			if ( isset( $sql[ 'having' ] ) and !empty( $sql[ 'having' ] ) )
 			{
-				if ( is_array( $sql[ 'having' ] ) and count( $sql[ 'having' ] ) )
+				if ( is_array( $sql[ 'having' ] ) )
 				{
 					$having = $sql[ 'having' ];
 				}
 				else
 				{
-					$having = array( $having );
+					$having = array( $sql[ 'having' ] );
 				}
 			}
 		}
@@ -900,24 +875,21 @@ class Pdo_Mysql extends \Persephone\Database
 		}
 		if ( count( $having ) ) // Apply only if there is a need
 		{
-			foreach ( $having as $_h )
-			{
-				if ( isset( $_h[ 1 ] ) and !empty( $_h[ 1 ] ) )
-				{
-					$select = $select->having( $_h[ 0 ], $_h[ 1 ] );
-				}
-				else
-				{
-					$select = $select->having( $_h[ 0 ] );
-				}
-			}
+			$select = $select->having( $having );
 		}
 
 		# "Order By"
 		$order = array();
-		if ( isset( $sql[ 'order' ] ) and is_array( $sql[ 'order' ] ) and count( $sql[ 'order' ] ) )
+		if ( isset( $sql[ 'order' ] ) and !empty( $sql[ 'order' ] ) )
 		{
-			$order = $sql[ 'order' ];
+			if ( is_array( $sql[ 'order' ] ) )
+			{
+				$order = $sql[ 'order' ];
+			}
+			else
+			{
+				$order = array( $sql[ 'order' ] );
+			}
 		}
 		if ( count( $order ) ) // Apply only if there is a need
 		{
@@ -927,67 +899,23 @@ class Pdo_Mysql extends \Persephone\Database
 		# "Limit"
 		if ( $sql[ 'do' ] == 'select_row' )
 		{
-			$select = $select->limit( 1, 0 );
+			$select = $select->limit( 1 )->offset( 0 );
 		}
 		elseif ( isset( $sql[ 'limit' ] ) and is_array( $sql[ 'limit' ] ) and count( $sql[ 'limit' ] ) == 2 )
 		{
-			$select = $select->limit( $sql[ 'limit' ][ 1 ], $sql[ 'limit' ][ 0 ] );
+			$select = $select->limit( intval( $sql[ 'limit' ][ 1 ] ) )->offset( intval( $sql[ 'limit' ][ 0 ] ) );
 		}
 
 		# EXEC
-		$this->adapter->setFetchMode( Zend_Db::FETCH_ASSOC );
-		$statement = $this->adapter->query( $select );
-
-		switch ( $sql[ 'do' ] )
+		$this->cur_query = $select;
+		try
 		{
-			case 'select':
-				try
-				{
-					$return = $statement->fetchAll();
-				}
-				catch ( \Persephone\Exception $e )
-				{
-					$this->Registry->exception_handler( $e );
-
-					return false;
-				}
-
-				return $return;
-				break;
-
-			case 'select_row':
-				try
-				{
-					$return = $statement->fetch();
-				}
-				catch ( \Persephone\Exception $e )
-				{
-					$this->Registry->exception_handler( $e );
-
-					return false;
-				}
-
-				return $return;
-				break;
-
-			case 'select_one':
-				try
-				{
-					$return = $statement->fetchColumn();
-				}
-				catch ( \Persephone\Exception $e )
-				{
-					$this->Registry->exception_handler( $e );
-
-					return false;
-				}
-
-				return $return;
-				break;
-
-			default:
-				throw new \Persephone\Exception( "Invalid mode provided for SELECT query operation" );
-				break;
+			$statement = $this->sql->prepareStatementForSqlObject( $select );
+			return $statement->execute();
+		}
+		catch ( \Persephone\Exception $e )
+		{
+			return false;
 		}
 	}
 

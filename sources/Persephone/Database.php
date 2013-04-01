@@ -2,6 +2,8 @@
 
 namespace Persephone;
 use \Zend\Db\Adapter\Adapter;
+use \Zend\Db\Sql\Sql;
+use Zend\Db\Sql\Expression;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -34,6 +36,13 @@ abstract class Database
 	 * @var array
 	 */
 	public $cur_query = array();
+
+	/**
+	 * Options specific to this driver
+	 *
+	 * @var array
+	 */
+	public $driver_options = array();
 
 	/**
 	 * Toggle telling to execute shutdown queries during shutdown
@@ -71,7 +80,50 @@ abstract class Database
 	 *
 	 * @param    \Persephone\Registry    Registry Object Reference
 	 */
-	abstract public function __construct ( Registry $Registry );
+	public function __construct ( Registry $Registry )
+	{
+		$this->Registry = $Registry;
+
+		# Preparing DSN and Options for PEAR DB::connect
+		$params = array(
+			'driver'   => ucwords( $this->Registry->config['sql']['driver'] ),
+			'host'     => &$this->Registry->config[ 'sql' ][ 'host' ],
+			'username' => &$this->Registry->config[ 'sql' ][ 'user' ],
+			'password' => &$this->Registry->config[ 'sql' ][ 'passwd' ],
+			'dbname'   => &$this->Registry->config[ 'sql' ][ 'dbname' ],
+			'platform' => $this->driver_options,
+		);
+
+		$this->adapter  = new \Zend\Db\Adapter\Adapter( $params );
+		$this->platform = $this->adapter->getPlatform();
+		$this->sql      = new Sql( $this->adapter );
+	}
+
+
+	/**
+	 * Magic method __toString()
+	 *
+	 * @return   string   Working SQL query as a string
+	 */
+	public function __toString ( $query_object = null )
+	{
+		if ( IN_DEV )
+		{
+			if ( is_object( $query_object ) )
+			{
+				return $this->sql->getSqlStringForSqlObject( $query_object );
+			}
+
+			if ( is_object( $this->cur_query ) )
+			{
+				return $this->sql->getSqlStringForSqlObject( $this->cur_query );
+			}
+
+			return "";
+		}
+
+		throw new Exception ("Can't dump SQL queries outside Development mode! Please activate Development mode [/init.php - IN_DEV setting]...");
+	}
 
 
 	/**
@@ -282,6 +334,7 @@ abstract class Database
 					switch ( $this->cur_query['force_data_type'][ $_k ] )
 					{
 						case 'int':
+						case 'integer':
 							$_v = intval( $_v );
 							break;
 						case 'float':
@@ -291,13 +344,15 @@ abstract class Database
 							$_v = strval( $_v );
 							break;
 						case 'null':
-							$_v = new Zend_Db_Expr("NULL");
+						case null:
+							$_v = null;
 							break;
 					}
 				}
 			}
 		}
 
+		$result = false;
 		switch ( $this->cur_query["do"] )
 		{
 			case 'select':
@@ -403,29 +458,30 @@ abstract class Database
 	/**
 	 * Simple SELECT query
 	 *
-	 * @param    array    array(
-	 							"do"          => "select",
-								"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
+	 * @param       array
+	 *
+	 * @usage       array(
+						"do"          => "select",
+						"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
+						"fields"      => array(),
+						"table"       => array() [when correlation names are used] | string,
+						"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
+						"add_join"    => array(
+							0 => array (
 								"fields"      => array(),
-								"table"       => array() [when correlation names are used] | string,
-								"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
-								"add_join"    => array(
-										0 => array (
-											"fields"      => array(),
-											"table"       => array(),    - where count = 1
-											"conditions"  => "",
-											"join_type"   => "INNER|CROSS|LEFT|RIGHT|NATURAL"
-												"
-										),
-										1 => array()
-									),
-								"group"       => array(),
-								"having"      => array(),
-								"order"       => array(),
-								"limit"       => array(offset, count),
-								"limit_page"  => array(page, count)
-							)
-	 * @return    mixed     Result set
+								"table"       => array(),    - where count = 1
+								"conditions"  => "",
+								"join_type"   => "INNER|LEFT|RIGHT"
+							),
+							1 => array()
+						),
+						"group"       => array(),
+						"having"      => array(),
+						"order"       => array(),
+						"limit"       => array(offset, count)
+					)
+	 * @throws      \Persephone\Exception
+	 * @return      \Zend\Db\ResultSet\ResultSet|boolean
 	 */
 	abstract protected function simple_select_query ( $sql );
 
