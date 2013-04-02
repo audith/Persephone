@@ -920,22 +920,31 @@ class Pdo_Mysql extends \Persephone\Database
 	 */
 	protected final function simple_update_query ( $sql )
 	{
+		//----------------
+		// Asset-check
+		//----------------
+
+		if ( !isset( $sql[ 'tables' ] ) )
+		{
+			return false;
+		}
+		if ( !count( $sql[ 'tables' ] ) )
+		{
+			return false;
+		}
+		if ( !count( $sql[ 'set' ] ) )
+		{
+			return false;
+		}
+
 		//----------
 		// Tables
 		//----------
 
 		$_tables = array();
-		if ( !isset( $sql[ 'tables' ] ) )
-		{
-			return false;
-		}
 		if ( !is_array( $sql[ 'tables' ] ) )
 		{
 			$sql[ 'tables' ] = array( $sql[ 'tables' ] );
-		}
-		if ( !count( $sql[ 'tables' ] ) )
-		{
-			return false;
 		}
 		foreach ( $sql[ 'tables' ] as $_table )
 		{
@@ -946,18 +955,18 @@ class Pdo_Mysql extends \Persephone\Database
 				{
 					if ( is_numeric( $_alias ) )
 					{
-						$_tables[ ] = $this->adapter->quoteIdentifier( $this->attach_prefix( $_table_name ), true );
+						$_tables[ ] = $this->platform->quoteIdentifier( $this->attach_prefix( $_table_name ) );
 					}
 					else
 					{
-						$_tables[ ] = $this->adapter->quoteIdentifier( $this->attach_prefix( $_table_name ), true ) . " AS " . $this->adapter->quoteIdentifier( $_alias, true );
+						$_tables[ ] = $this->platform->quoteIdentifierInFragment( $this->attach_prefix( $_table_name ) . " AS " . $_alias );
 					}
 				}
 			}
 			# If its just an array of strings - i.e. no "table name aliases"
 			else
 			{
-				$_tables[ ] = $this->adapter->quoteIdentifier( $this->attach_prefix( $_table ), true );
+				$_tables[ ] = $this->platform->quoteIdentifier( $this->attach_prefix( $_table ) );
 			}
 		}
 
@@ -965,23 +974,19 @@ class Pdo_Mysql extends \Persephone\Database
 		// "SET"
 		//---------
 
-		if ( !count( $sql[ 'set' ] ) )
-		{
-			return false;
-		}
 		$_set = array();
 		foreach ( $sql[ 'set' ] as $_col => $_val )
 		{
 			if ( $_val instanceof Expression )
 			{
-				$_val = $_val->__toString();
+				$_val = $_val->getExpression();
 				unset( $sql[ 'set' ][ $_col ] );
 			}
 			else
 			{
 				$_val = "?";
 			}
-			$_set[ ] = $this->adapter->quoteIdentifier( $_col, true ) . ' = ' . $_val;
+			$_set[ ] = $this->platform->quoteIdentifier( $_col ) . ' = ' . $this->adapter->driver->formatParameterName( $_val );
 		}
 
 		//-----------
@@ -994,20 +999,28 @@ class Pdo_Mysql extends \Persephone\Database
 
 		foreach ( $_where as $_cond => &$_term )
 		{
-			# is $_cond an int? (i.e. Not a condition)
+			# is $_cond an int? (i.e. not a condition, rather a numeric index)
 			if ( is_int( $_cond ) )
 			{
 				# $_term is the full condition
 				if ( $_term instanceof Expression )
 				{
-					$_term = $_term->__toString();
+					$_term = $_term->getExpression();
 				}
 			}
 			else
 			{
 				# $_cond is the condition with placeholder,
 				# and $_term is quoted into the condition
-				$_term = $this->adapter->quoteInto( $_cond, $_term );
+				if ( strpos( $_cond, "?" ) !== false )
+				{
+					# We always have one placeholder and its corresponding value, that's why we don't str_replace() all question marks, but just one.
+					$_term = substr_replace( $_cond, $this->quoteValue( $_term ), strpos( $_cond, "?" ), 1 );
+				}
+				else
+				{
+					throw new \Persephone\Exception("Database::simple_update_query() - Invalid condition struct in WHERE clause, couldn't parse the query!... ");
+				}
 			}
 			$_term = '(' . $_term . ')';
 		}
@@ -1029,15 +1042,14 @@ class Pdo_Mysql extends \Persephone\Database
 
 		try
 		{
-			$stmt   = $this->adapter->query( $this->cur_query, array_values( $sql[ 'set' ] ) );
-			$result = $stmt->rowCount();
-
-			return $result;
+			/**
+			 * @var $statement \Zend\Db\Adapter\Driver\StatementInterface
+			 */
+			$statement = $this->adapter->query( $this->cur_query );
+			return $statement->execute( $sql['set'] )->count();
 		}
-		catch ( Zend_Db_Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
-			$this->Registry->exception_handler( $e );
-
 			return false;
 		}
 	}
