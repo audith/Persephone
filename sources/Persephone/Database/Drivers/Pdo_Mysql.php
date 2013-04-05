@@ -1,8 +1,9 @@
 <?php
 
 namespace Persephone\Database\Drivers;
+
 use \Persephone\Database;
-use Zend\Db\Adapter\Adapter;
+use \Zend\Db\Adapter\Adapter;
 use \Zend\Db\Sql\Sql;
 use \Zend\Db\Sql\Expression;
 
@@ -19,7 +20,7 @@ if ( !defined( "INIT_DONE" ) )
  * @version  1.0
  **/
 #require_once( PATH_SOURCES . "/Database.php" );
-class Pdo_Mysql extends \Persephone\Database
+class Pdo_mysql extends \Persephone\Database
 {
 	/**
 	 * Options specific to this driver
@@ -32,18 +33,35 @@ class Pdo_Mysql extends \Persephone\Database
 	);
 
 	/**
-	 * Zend-Db Adapter object
-	 *
-	 * @var \Zend\Db\Adapter\Platform\Mysql
-	 */
-	public $platform;
-
-	/**
 	 * SQL abstraction layer
 	 *
 	 * @var \Zend\Db\Sql\Sql
 	 */
 	public $sql;
+
+
+	/**
+	 * Constructor
+	 *
+	 * @param    \Persephone\Registry Registry Object Reference
+	 */
+	public function __construct ( \Persephone\Registry $Registry )
+	{
+		$this->Registry = $Registry;
+
+		$_driver = array(
+			'driver'   => "Pdo_mysql",
+			'host'     => &$this->Registry->config[ 'sql' ][ 'host' ],
+			'username' => &$this->Registry->config[ 'sql' ][ 'user' ],
+			'password' => &$this->Registry->config[ 'sql' ][ 'passwd' ],
+			'dbname'   => &$this->Registry->config[ 'sql' ][ 'dbname' ],
+			'options'  => $this->driver_options,
+		);
+
+		$this->platform = new \Zend\Db\Adapter\Platform\Mysql();
+		$this->adapter  = new \Zend\Db\Adapter\Adapter( $_driver, $this->platform );
+		$this->sql      = new Sql( $this->adapter );
+	}
 
 
 	/**
@@ -61,13 +79,13 @@ class Pdo_Mysql extends \Persephone\Database
 		// Fetching reference information
 		//----------------------------------
 
-		$this->cur_query       = array(
+		$this->cur_query = array(
 			'do'     => "select",
 			'fields' => array( "table_name", "column_name", "referenced_column_name" ),
 			'table'  => array( "information_schema.KEY_COLUMN_USAGE" ),
 			'where'  => array(
-				array( 'table_schema = ' . $this->quote( $this->Registry->config[ 'sql' ][ 'dbname' ] ) ),
-				array( 'referenced_table_name = ' . $this->quote( $referenced_table_name ) ),
+				array( 'table_schema = ' . $this->platform->quoteValue( $this->Registry->config[ 'sql' ][ 'dbname' ] ) ),
+				array( 'referenced_table_name = ' . $this->platform->quoteValue( $referenced_table_name ) ),
 			)
 		);
 		$reference_information = $this->simple_exec_query();
@@ -76,9 +94,9 @@ class Pdo_Mysql extends \Persephone\Database
 		// Fetching referenced data statistics
 		//----------------------------------------
 
+		$_data_statistics = array();
 		if ( !empty( $_params ) and $_params[ '_do_count' ] === true and !empty( $_params[ 'referenced_column_name' ] ) and !empty( $_params[ 'value_to_check' ] ) )
 		{
-			$_data_statistics = array();
 			foreach ( $reference_information as $_r )
 			{
 				if ( $_r[ 'referenced_column_name' ] != $_params[ 'referenced_column_name' ] )
@@ -86,14 +104,14 @@ class Pdo_Mysql extends \Persephone\Database
 					continue;
 				}
 
-				$this->cur_query                         = array(
+				$this->cur_query = array(
 					'do'     => "select_one",
 					'fields' => array( new Expression( "count(*)" ) ),
 					'table'  => $_r[ 'table_name' ],
 					'where'  => $_r[ 'table_name' ] . "." . $_r[ 'column_name' ] . "=" .
 					            ( is_int( $_params[ 'value_to_check' ] )
-						            ? $this->quote( $_params[ 'value_to_check' ], "INTEGER" )
-						            : $this->quote( $_params[ 'value_to_check' ] ) ),
+						            ? $this->platform->quoteValue( $_params[ 'value_to_check' ] )
+						            : $this->platform->quoteValue( $_params[ 'value_to_check' ] ) ),
 				);
 				$_data_statistics[ $_r[ 'table_name' ] ] = $this->simple_exec_query();
 			}
@@ -194,7 +212,7 @@ class Pdo_Mysql extends \Persephone\Database
 					}
 					else
 					{
-						# Anything larger than 16 megabytes is not accepted through a regular input-form-fields
+						# Anything larger than 16 Megabytes is not accepted through a regular input-form-fields
 					}
 				}
 
@@ -385,7 +403,7 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Returns the table structure for any of the module tables
 	 *
-	 * @param       $suffix     array       Table suffix, determining specific table
+	 * @param       $suffix     string      Table suffix, determining specific table
 	 *
 	 * @return                  array       Table structure
 	 */
@@ -540,31 +558,23 @@ class Pdo_Mysql extends \Persephone\Database
 		{
 			try
 			{
-				$return = $this->adapter->delete( $table, $where );
+				return $this->sql->delete( $table, $where );
 			}
 			catch ( \Persephone\Exception $e )
 			{
-				$this->Registry->exception_handler( $e );
-
 				return false;
 			}
-
-			return $return;
 		}
 		else
 		{
 			try
 			{
-				$return = $this->adapter->query( "TRUNCATE TABLE " . $table )->rowCount();
+				return $this->adapter->query( "TRUNCATE TABLE " . $table )->count();
 			}
 			catch ( \Persephone\Exception $e )
 			{
-				$this->Registry->exception_handler( $e );
-
 				return false;
 			}
-
-			return $return;
 		}
 	}
 
@@ -599,16 +609,19 @@ class Pdo_Mysql extends \Persephone\Database
 		}
 
 		# EXEC
-		return $this->sql->insert( $table, $data );
+		$this->sql->insert( $table, $data );
+
+		return $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
 	}
 
 
 	/**
 	 * Simple REPLACE query
 	 *
-	 * @param   array              array( "do"=>"replace", "table"=>"", "set"=>array( associative array of column_name => value pairs , ... , ... ) )
+	 * @param       array                       array( "do"=>"replace", "table"=>"", "set"=>array( associative array of column_name => value pairs , ... , ... ) )
 	 *
-	 * @return  integer|boolean    # of affected rows on success, FALSE otherwise
+	 * @return      integer|boolean             # of affected rows on success, FALSE otherwise
+	 * @throws      \Persephone\Exception
 	 */
 	protected final function simple_replace_query ( $sql )
 	{
@@ -705,12 +718,15 @@ class Pdo_Mysql extends \Persephone\Database
 		}
 		else
 		{
-			$fields = "*";
+			$fields = array();
 		}
-		$select = $select->columns( $fields );
+		if ( count( $fields ) )
+		{
+			$select = $select->columns( $fields );
+		}
 
 		# "From"
-		if ( isset( $sql[ 'table' ] ) and ( is_array( $sql[ 'table' ] ) and count( $sql[ 'table' ] ) ) or ( !is_array( $sql[ 'table' ] ) and !empty( $sql[ 'table' ] ) ) )
+		if ( isset( $sql[ 'table' ] ) and !empty( $sql[ 'table' ] ) )
 		{
 			$tables = $this->attach_prefix( $sql[ 'table' ] );
 		}
@@ -892,10 +908,11 @@ class Pdo_Mysql extends \Persephone\Database
 		}
 
 		# EXEC
-		$this->cur_query = $select;
+		$this->cur_query = $this->sql->getSqlStringForSqlObject( $select );
 		try
 		{
 			$statement = $this->sql->prepareStatementForSqlObject( $select );
+
 			return $statement->execute();
 		}
 		catch ( \Persephone\Exception $e )
@@ -908,15 +925,16 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Simple UPDATE query [w/ MULTITABLE UPDATE support]
 	 *
-	 * @param   array
+	 * @param   $sql               array
+	 * @usage   array(
+					"do"        => "update",
+					"tables"    => string|string[] [elements can be key=>value pairs ("table aliases") or strings],
+					"set"       => assoc array of column_name-value pairs
+					"where"     => string|string[]
+				)
 	 *
 	 * @return  integer|boolean    # of affected rows on success, FALSE otherwise
-	 * @usage   array(
-			"do"        => "update",
-			"tables"    => string|string[] [elements can be key=>value pairs ("table aliases") or strings],
-			"set"       => assoc array of column_name-value pairs
-			"where"     => string|string[]
-		)
+	 * @throws  \Persephone\Exception
 	 */
 	protected final function simple_update_query ( $sql )
 	{
@@ -1058,14 +1076,17 @@ class Pdo_Mysql extends \Persephone\Database
 	/**
 	 * Simple ALTER TABLE query
 	 *
-	 * @param    array      array(
-	"do"          => "alter",
-	"table"       => string,
-	"action"      => "add_column"|"drop_column"|"change_column"|"add_key"
-	"col_info"    => column info to parse
-	)
+	 * @param   $sql        array
+	 * @usage   array(
+					"do"          => "alter",
+					"table"       => string,
+					"action"      => "add_column"|"drop_column"|"change_column"|"add_key"
+					"col_info"    => column info to parse
+				)
 	 *
-	 * @return   mixed      # of affected rows on success, FALSE otherwise
+	 *
+	 * @return              mixed      # of affected rows on success, FALSE otherwise
+	 *
 	 */
 	protected function simple_alter_table ( $sql )
 	{
@@ -1090,7 +1111,7 @@ class Pdo_Mysql extends \Persephone\Database
 			$sql[ 'comment' ] = "";
 		}
 
-		$this->cur_query = "ALTER TABLE " . $this->adapter->quoteIdentifier( $this->attach_prefix( $sql[ 'table' ] ) ) . " ";
+		$this->cur_query = "ALTER TABLE " . $this->platform->quoteIdentifier( $this->attach_prefix( $sql[ 'table' ] ) ) . " ";
 
 		switch ( $sql[ 'action' ] )
 		{
@@ -1181,7 +1202,7 @@ class Pdo_Mysql extends \Persephone\Database
 
 			case 'drop_column':
 				$i = 0;
-				foreach ( $sql[ 'col_info' ] as $col_name => $col_info )
+				foreach ( $sql[ 'col_info' ] as $col_info )
 				{
 					$this->cur_query .= ( ( $i == 0 )
 						? "DROP `"
@@ -1192,7 +1213,7 @@ class Pdo_Mysql extends \Persephone\Database
 
 			case 'change_column':
 				$i = 0;
-				foreach ( $sql[ 'col_info' ] as $col_name => $col_info )
+				foreach ( $sql[ 'col_info' ] as $col_info )
 				{
 					$this->cur_query .= ( ( $i == 0 )
 						? "CHANGE `"
@@ -1290,14 +1311,17 @@ class Pdo_Mysql extends \Persephone\Database
 
 		try
 		{
-			$stmt = new Zend_Db_Statement_Pdo( $this->adapter, $this->cur_query );
+			if ( IN_DEV )
+			{
+				$this->query_count++;
+			}
 
-			return $stmt->execute();
+			$statement = $this->adapter->query( $this->cur_query );
+
+			return $statement->execute();
 		}
-		catch ( Zend_Db_Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
-			$this->Registry->exception_handler( $e );
-
 			return false;
 		}
 	}
@@ -1331,7 +1355,7 @@ class Pdo_Mysql extends \Persephone\Database
 				$tables = $this->attach_prefix( $tables );
 				foreach ( $tables as &$table )
 				{
-					$table = $this->adapter->quoteIdentifier( $table, true );
+					$table = $this->platform->quoteIdentifier( $table );
 				}
 				$this->cur_query = "DROP TABLE IF EXISTS " . implode( ", ", $tables );
 			}
@@ -1339,15 +1363,17 @@ class Pdo_Mysql extends \Persephone\Database
 
 		try
 		{
-			$stmt = new Zend_Db_Statement_Pdo( $this->adapter, $this->cur_query );
-			$this->query_count++;
+			if ( IN_DEV )
+			{
+				$this->query_count++;
+			}
 
-			return $stmt->execute();
+			$statement = $this->adapter->query( $this->cur_query );
+
+			return $statement->execute();
 		}
-		catch ( Zend_Db_Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
-			$this->Registry->exception_handler( $e );
-
 			return false;
 		}
 	}
@@ -1371,9 +1397,7 @@ class Pdo_Mysql extends \Persephone\Database
 		// Build and exec
 		//-----------------
 
-		$i       = 0;
-		$q_count = 0;
-		$return  = 0;
+		$return = 0;
 		foreach ( $struct[ 'tables' ] as $table => $data )
 		{
 			//------------------------
@@ -1386,7 +1410,7 @@ class Pdo_Mysql extends \Persephone\Database
 			// Build CREATE TABLE statement
 			//--------------------------------
 
-			$this->cur_query = "CREATE TABLE IF NOT EXISTS " . $this->adapter->quoteIdentifier( $this->attach_prefix( $table ), true ) . " (\n";
+			$this->cur_query = "CREATE TABLE IF NOT EXISTS " . $this->platform->quoteIdentifier( $this->attach_prefix( $table ), true ) . " (\n";
 
 			# CREATE TABLE...
 			# Reset KEY data
@@ -1405,7 +1429,7 @@ class Pdo_Mysql extends \Persephone\Database
 					case 'float':
 					case 'double':
 					case 'decimal':
-						$this->cur_query .= $this->adapter->quoteIdentifier( $_column_name, true ) . " " . $_column_struct[ 'type' ] .
+						$this->cur_query .= $this->platform->quoteIdentifier( $_column_name, true ) . " " . $_column_struct[ 'type' ] .
 						                    ( $_column_struct[ 'length' ]
 							                    ? "(" . $_column_struct[ 'length' ] . ")"
 							                    : "" ) . " " . $_column_struct[ 'attribs' ] .
@@ -1426,7 +1450,7 @@ class Pdo_Mysql extends \Persephone\Database
 					case 'mediumtext':
 					case 'text':
 					case 'longtext':
-						$this->cur_query .= $this->adapter->quoteIdentifier( $_column_name, true ) . " " . $_column_struct[ 'type' ] .
+						$this->cur_query .= $this->platform->quoteIdentifier( $_column_name ) . " " . $_column_struct[ 'type' ] .
 						                    ( $_column_struct[ 'length' ]
 							                    ? "(" . $_column_struct[ 'length' ] . ")"
 							                    : "" ) . " collate utf8_unicode_ci" . " " . $_column_struct[ 'attribs' ] .
@@ -1449,12 +1473,12 @@ class Pdo_Mysql extends \Persephone\Database
 					{
 						if ( $v === true )
 						{
-							$key[ ] = $k . " KEY " . $this->adapter->quoteIdentifier( $_column_name, true ) . "(" . $this->adapter->quoteIdentifier( $_column_name, true ) . ")";
+							$key[ ] = $k . " KEY " . $this->platform->quoteIdentifier( $_column_name ) . "(" . $this->platform->quoteIdentifier( $_column_name ) . ")";
 						}
 						# $v is index_type, e.g. "USING {BTREE | HASH}"
 						else
 						{
-							$key[ ] = $k . " KEY " . $v . " " . $this->adapter->quoteIdentifier( $_column_name, true ) . "(" . $this->adapter->quoteIdentifier( $_column_name, true ) . ")";
+							$key[ ] = $k . " KEY " . $v . " " . $this->platform->quoteIdentifier( $_column_name ) . "(" . $this->platform->quoteIdentifier( $_column_name ) . ")";
 						}
 					}
 				}
@@ -1483,7 +1507,7 @@ class Pdo_Mysql extends \Persephone\Database
 				{
 					$data[ 'comment' ] = mb_substr( $data[ 'comment' ], 0, 60 );
 				}
-				$data[ 'comment' ] = str_replace( "'", "''", $data[ 'comment' ] ); // Single quotes are doubled in number. This is MySQL syntax!
+				$data[ 'comment' ] = str_replace( "'", "''", $data[ 'comment' ] ); // Escaping single quotes within comments...
 			}
 			else
 			{
@@ -1496,15 +1520,17 @@ class Pdo_Mysql extends \Persephone\Database
 			# Execute
 			try
 			{
-				$stmt = new Zend_Db_Statement_Pdo( $this->adapter, $this->cur_query );
-				$this->query_count++;
+				if ( IN_DEV )
+				{
+					$this->query_count++;
+				}
 
-				return $stmt->execute();
+				$statement = $this->adapter->query( $this->cur_query );
+
+				return $statement->execute();
 			}
-			catch ( Zend_Db_Exception $e )
+			catch ( \Persephone\Exception $e )
 			{
-				$this->Registry->exception_handler( $e );
-
 				return false;
 			}
 		}
@@ -1512,5 +1538,3 @@ class Pdo_Mysql extends \Persephone\Database
 		return $return;
 	}
 }
-
-?>

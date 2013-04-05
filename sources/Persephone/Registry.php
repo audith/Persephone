@@ -60,16 +60,9 @@ final class Registry
 	public $Input;
 
 	/**
-	 * Instance of IPS Converge
-	 * @var IPS_Converge
+	 * @var \Zend\Log\Logger
 	 */
-	public $IPS_Converge;
-
-	/**
-	 * Zend_Log object
-	 * @var Zend_Log
-	 */
-	public $logger;
+	public static $logger;
 
 	/**
 	 * Current member data
@@ -129,15 +122,6 @@ final class Registry
 
 		# Start timer
 		self::$starttime = self::debug__timer_start();
-
-		//------------
-		// Logger
-		//------------
-
-		$this->logger = new \Zend\Log\Logger;
-		//$this->logger->addWriter( new \Zend\Log\Writer\Stream( 'php://output' ) );
-		$this->logger->addWriter( new \Zend\Log\Writer\Stream( PATH_LOGS . '/php_errors.log' ) );
-		\Zend\Log\Logger::registerErrorHandler( $this->logger );
 
 		//--------------------
 		// Read config file
@@ -456,10 +440,10 @@ final class Registry
 	/**
 	 * Local Logger [facilitates Zend_Log]
 	 *
-	 * @param     string    Message to log
-	 * @param     string    Priority level [ERROR|WARNING|NOTICE|INFO|DEBUG]
+	 * @param     $message      string    Message to log
+	 * @param     $priority     string    Priority level [ERROR|WARNING|NOTICE|INFO|DEBUG]
 	 *
-	 * @return    boolean   TRUE on success, FALSE otherwise
+	 * @return                  boolean   TRUE on success, FALSE otherwise
 	 */
 	static public function logger__do_log ( $message, $priority = "INFO" )
 	{
@@ -468,77 +452,63 @@ final class Registry
 		//-----------------------
 
 		$_method_map = array(
-			'ERROR' => 3, 'WARNING' => 4, 'NOTICE' => 5, 'INFO' => 6, 'DEBUG' => 7
+			'EMERG'   => \Zend\Log\Logger::EMERG,
+			'ALERT'   => \Zend\Log\Logger::ALERT,
+			'CRIT'    => \Zend\Log\Logger::CRIT,
+			'ERROR'   => \Zend\Log\Logger::ERR,
+			'WARNING' => \Zend\Log\Logger::WARN,
+			'NOTICE'  => \Zend\Log\Logger::NOTICE,
+			'INFO'    => \Zend\Log\Logger::INFO,
+			'DEBUG'   => \Zend\Log\Logger::DEBUG
 		);
 
 		if ( !array_key_exists( $priority, $_method_map ) )
 		{
 			return false;
 		}
-/*
+
 		//------------------------------------------------------
 		// Instantiate Zend_Log object if not done so already
 		//------------------------------------------------------
 
-		if ( ! is_object( $this->logger ) )
+		if ( ! is_object( self::$logger ) )
 		{
-			if ( ! class_exists( "Zend_log" ) )
-			{
-				self::$loader( "Zend_Log", false );
-			}
-
-			self::$logger = new Zend_Log();
+			self::$logger = new \Zend\Log\Logger();
 
 			//-----------------
 			// Set "Writers"
 			//-----------------
 
-			if ( ! class_exists( "Zend_Log_Writer_Stream" ) )
-			{
-				$this->loader( "Zend_Log_Writer_Stream", false );
-			}
-
 			# stdout
 			if ( ini_get( "display_errors" ) != '0' )
 			{
-				$this->logger->addWriter( new Zend_Log_Writer_Stream('php://output') );
+				self::$logger->addWriter( $_writer__stdout = new \Zend\Log\Writer\Stream('php://output') );
+				if ( !IN_DEV )
+				{
+					$_filter__stdout = new \Zend\Log\Filter\Priority( \Zend\Log\Logger::ERR );
+					$_writer__stdout->addFilter( $_filter__stdout );
+				}
 			}
 
 			# error_log
-			$log_file = ini_get( "error_log" );
-			if ( file_exists( $log_file ) and is_file( $log_file ) and is_writable( $log_file ) )
+			if ( file_exists( $log_file = ini_get( "error_log" ) ) and is_file( $log_file ) and is_writable( $log_file ) )
 			{
-				$this->logger->addWriter( new Zend_Log_Writer_Stream( $log_file ) );
+				self::$logger->addWriter( $_writer__logfile = new \Zend\Log\Writer\Stream( $log_file ) );
+				if ( !IN_DEV )
+				{
+					$_filter__logfile = new \Zend\Log\Filter\Priority( \Zend\Log\Logger::ERR );
+					$_writer__logfile->addFilter( $_filter__logfile );
+				}
 			}
+
+			# Registering logger object as our main PHP error-logger
+			\Zend\Log\Logger::registerErrorHandler( self::$logger );
 
 			# Fire-PHP
 			if ( IN_DEV )
 			{
-				if ( ! class_exists( "Zend_Log_Writer_Firebug" ) )
-				{
-					$this->loader( "Zend_Log_Writer_Firebug", false );
-				}
-				$this->logger->addWriter( new Zend_Log_Writer_Firebug() );
-
-				if ( ! class_exists( "Zend_Controller_Request_Http" ) )
-				{
-					$this->loader( "Zend_Controller_Request_Http", false );
-				}
-				$request = new Zend_Controller_Request_Http();
-
-				if ( ! class_exists( "Zend_Controller_Response_Http" ) )
-				{
-					$this->loader( "Zend_Controller_Response_Http", false );
-				}
-				$response = new Zend_Controller_Response_Http();
-
-				if ( ! class_exists( "Zend_Wildfire_Channel_HttpHeaders" ) )
-				{
-					$this->loader( "Zend_Wildfire_Channel_HttpHeaders", false );
-				}
-				$channel = Zend_Wildfire_Channel_HttpHeaders::getInstance();
-				$channel->setRequest($request);
-				$channel->setResponse($response);
+				require_once PATH_LIBS . "/FirePHPCore/fb.php";
+				self::$logger->addWriter( $_writer__firephp = new \Zend\Log\Writer\FirePhp );
 			}
 		}
 
@@ -549,38 +519,19 @@ final class Registry
 		try
 		{
 			# IN_DEV flag required for non-ERROR logging
-			if ( $_method_map[ $priority ] != 3 and ! IN_DEV )
+			if ( $_method_map[ $priority ] != \Zend\Log\Logger::ERR and !IN_DEV )
 			{
 				return true;
 			}
 
 			# Log event
-			$this->logger->log( $message, ( intval( $_method_map[ $priority ] ) ? $_method_map[ $priority ] : 7 ) );
-			if ( isset( $channel ) and is_object( $channel ) )
-			{
-				# FIREPHP - Flush log data to browser
-				$channel->flush();
-				$response->sendHeaders();
-			}
+			self::$logger->log( ( $_method_map[ $priority ] ? $_method_map[ $priority ] : \Zend\Log\Logger::DEBUG ), $message );
 		}
-		catch ( Zend_Log_Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
-			# Logging failed... "Log" the failure itself :D
-			$message = "<pre>EXCEPTION: " . get_class( $e )
-			. "\nMESSAGE: " . $e->getMessage()
-			. "\nFILE: " . $e->getFile()
-			. "\nLINE: " . $e->getLine()
-			. "\nCLASS: " . __CLASS__
-			. ( IN_DEV ? "\nTRACE:\n" . $e->getTraceAsString() : "" )
-			. "\n</pre>";
-
-			trigger_error( $message, E_USER_WARNING );
-
 			return false;
 		}
 
-		return true;
-*/
 		return true;
 	}
 
@@ -588,10 +539,10 @@ final class Registry
 	/**
 	 * Debug : Logs the memory usage and timedelta
 	 *
-	 * @param    string     Marker
-	 * @param    boolean    Whether to log timedelta ONLY, or not - defaults to FALSE
+	 * @param    $location      string     Marker
+	 * @param    $time_only     boolean    Whether to log timedelta ONLY, or not - defaults to FALSE
 	 *
-	 * @return   void
+	 * @return                  void
 	 */
 	static public function logger__do_performance_log ( $location = "" , $time_only = false )
 	{
@@ -601,7 +552,7 @@ final class Registry
 			$location = ( $location ) ? " - " . $location : "";
 			if ( ! $time_only )
 			{
-				$_log_message .= "\n\tMemory Usage" . $location . ": " . memory_get_usage( true ) . " bytes";
+				$_log_message .= "\n\tMemory Usage" . $location . ": " . ( memory_get_usage( true ) - MEMORY_START ) . " bytes";
 			}
 			$_timer = self::debug__timer_stop();
 			$_log_message .= "\n\tTimedelta" . $location . ": " . $_timer['delta'] . " secs";

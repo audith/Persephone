@@ -97,6 +97,7 @@ class Exception extends \Exception
 		. "\nLINE: " . self::getLine()
 		. "\nCLASS: " . __CLASS__
 		. "\nTRACE:\n" . self::getTraceAsString()
+		. "\nLAST SQL QUERY:\n" . ( !empty( $this->Registry->Db->cur_query ) ? strval( $this->Registry->Db ) : "--none--" )
 		. "\n\n";
 
 		\Persephone\Registry::logger__do_log( $message_to_log, "ERROR" );

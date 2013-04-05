@@ -1,4 +1,6 @@
 <?php
+phpinfo();
+
 $a = <<<TEST
 a:1:{i:1;a:4:{s:8:"question";s:174:"Which evenings are you available to raid, as Raid Core member? Choose 4-days minimum, vote if you want to join Raid Core, not Reserve. Please consider upcoming Winter season.";s:5:"multi";i:1;s:6:"choice";a:7:{i:1;s:39:"Monday Evening - after 7pm Server time.";i:2;s:40:"Tuesday Evening - after 7pm Server time.";i:3;s:42:"Wednesday Evening - after 7pm Server time.";i:4;s:41:"Thursday Evening - after 7pm Server time.";i:5;s:39:"Friday Evening - after 7pm Server time.";i:6;s:41:"Saturday Evening - after 7pm Server time.";i:7;s:39:"Sunday Evening - after 7pm Server time.";}s:5:"votes";a:7:{i:1;i:12;i:2;i:13;i:3;i:12;i:4;i:18;i:5;i:10;i:6;i:15;i:7;i:15;}}}
 TEST;

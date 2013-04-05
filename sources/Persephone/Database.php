@@ -1,9 +1,11 @@
 <?php
 
 namespace Persephone;
+
 use \Zend\Db\Adapter\Adapter;
-use \Zend\Db\Sql\Sql;
-use Zend\Db\Sql\Expression;
+use \Zend\Db\Adapter\Driver\ConnectionInterface;
+use \Zend\Db\Sql\Expression;
+use Zend\Db\Sql\SqlInterface;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -21,18 +23,21 @@ abstract class Database
 {
 	/**
 	 * Registry reference
+	 *
 	 * @var \Persephone\Registry
 	 */
 	protected $Registry;
 
 	/**
 	 * \Zend\Db\Adapter\Adapter object
+	 *
 	 * @var \Zend\Db\Adapter\Adapter
 	 */
 	public $adapter;
 
 	/**
 	 * Current query
+	 *
 	 * @var array
 	 */
 	public $cur_query = array();
@@ -46,83 +51,74 @@ abstract class Database
 
 	/**
 	 * Toggle telling to execute shutdown queries during shutdown
+	 *
 	 * @var boolean
 	 */
 	protected $is_shutdown = false;
 
 	/**
+	 * Zend-Db Adapter object
+	 *
+	 * @var \Zend\Db\Adapter\Platform\Mysql
+	 */
+	public $platform;
+
+	/**
 	 * SQL query count (for Debug purposes)
+	 *
 	 * @var integer
 	 */
 	public $query_count = 0;
 
 	/**
 	 * List of all SQL queries executed (for Debug purposes)
+	 *
 	 * @var integer
 	 */
 	public $query_list = array();
 
 	/**
 	 * Queries to be run during shutdown
+	 *
 	 * @var array
 	 */
 	protected $shutdown_queries = array();
 
 	/**
+	 * SQL abstraction layer
+	 *
+	 * @var \Zend\Db\Sql\Sql
+	 */
+	public $sql;
+
+	/**
 	 * Usage of shutdown queries allowed
+	 *
 	 * @var boolean
 	 */
 	public $use_shutdown = true;
 
 
 	/**
-	 * Constructor
-	 *
-	 * @param    \Persephone\Registry    Registry Object Reference
-	 */
-	public function __construct ( Registry $Registry )
-	{
-		$this->Registry = $Registry;
-
-		# Preparing DSN and Options for PEAR DB::connect
-		$params = array(
-			'driver'   => ucwords( $this->Registry->config['sql']['driver'] ),
-			'host'     => &$this->Registry->config[ 'sql' ][ 'host' ],
-			'username' => &$this->Registry->config[ 'sql' ][ 'user' ],
-			'password' => &$this->Registry->config[ 'sql' ][ 'passwd' ],
-			'dbname'   => &$this->Registry->config[ 'sql' ][ 'dbname' ],
-			'platform' => $this->driver_options,
-		);
-
-		$this->adapter  = new \Zend\Db\Adapter\Adapter( $params );
-		$this->platform = $this->adapter->getPlatform();
-		$this->sql      = new Sql( $this->adapter );
-	}
-
-
-	/**
 	 * Magic method __toString()
-	 *
-	 * @param     $query_object      \Zend\Db\Sql\Sql
 	 *
 	 * @return                       string|null                 String-ifyed query
 	 * @throws                       \Persephone\Exception
 	 */
-	public function __toString ( $query_object = null )
+	public function __toString ()
 	{
 		if ( !IN_DEV )
 		{
-			throw new Exception ("Can't dump SQL queries outside Development mode! Please activate Development mode [/init.php - IN_DEV setting]...");
+			throw new Exception ( "Can't dump SQL queries outside Development mode! Please activate Development mode [/init.php - IN_DEV setting]..." );
 		}
 
-		if ( is_object( $query_object ) )
-		{
-			return $this->sql->getSqlStringForSqlObject( $query_object );
-		}
-
-		if ( is_object( $this->cur_query ) )
+		if ( $this->cur_query instanceof SqlInterface )
 		{
 			return $this->sql->getSqlStringForSqlObject( $this->cur_query );
+		}
+		elseif ( is_string( $this->cur_query ) and !empty( $this->cur_query ) )
+		{
+			return $this->cur_query;
 		}
 
 		return "";
@@ -135,32 +131,31 @@ abstract class Database
 	public function _my_destruct ()
 	{
 		# Run shutdown queries
-		$this->use_shutdown = false;
+		$this->use_shutdown                                     = false;
 		$_problematic_queries_during_simple_exec_query_shutdown = $this->simple_exec_query_shutdown();
 		if ( count( $_problematic_queries_during_simple_exec_query_shutdown ) )
 		{
-			$message  = "MESSAGE: Problems occured during Database::simple_exec_query_shutdown().";
+			$message = "MESSAGE: Problems occured during Database::simple_exec_query_shutdown().";
 			$message .= "\nDUMP: " . var_export( $_problematic_queries_during_simple_exec_query_shutdown, true ) . "\n\n";
 			$this->Registry->logger__do_log( $message, "ERROR" );
 		}
 
-		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class" , "INFO" );
+		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class", "INFO" );
 	}
 
 
 	/**
 	 * Attaches DB table name prefix to the default table name
 	 *
-	 * @param     string|array    Table name(s) as string (array)
+	 * @param     string|array Table name(s) as string (array)
+	 *
 	 * @return    string|array    New names with an attached prefix
 	 */
 	public function attach_prefix ( &$t )
 	{
 		is_array( $t )
-			?
-			array_walk( $t, array( $this, "attach_prefix" ) )
-			:
-			$t = $this->Registry->config['sql']['table_prefix'] . $t;
+			? array_walk( $t, array( $this, "attach_prefix" ) )
+			: $t = $this->Registry->config[ 'sql' ][ 'table_prefix' ] . $t;
 
 		return $t;
 	}
@@ -212,7 +207,7 @@ abstract class Database
 			throw new Exception( "Database - last_insert_id(): Database adapter not initialized!" );
 		}
 
-		return $this->adapter->getLastGeneratedValue();
+		return $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
 	}
 
 
@@ -225,7 +220,7 @@ abstract class Database
 	 * @usage       array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
 	 * @return                                  array       Reference and possibly, data statistics information (row-count)
 	 */
-	abstract public function check_for_references ( $referenced_table_name , $_params = array() );
+	abstract public function check_for_references ( $referenced_table_name, $_params = array() );
 
 
 	/**
@@ -236,13 +231,13 @@ abstract class Database
 	 *
 	 * @return                                          array       Column info
 	 */
-	abstract public function modules__ddl_column_type_translation ( $df_data , $we_need_this_for_master_table = false );
+	abstract public function modules__ddl_column_type_translation ( $df_data, $we_need_this_for_master_table = false );
 
 
 	/**
 	 * Returns the table structure for any of the module tables
 	 *
-	 * @param       $suffix     array       Table suffix, determining specific table
+	 * @param       $suffix     string      Table suffix, determining specific table
 	 *
 	 * @return                  array       Table structure
 	 */
@@ -253,6 +248,7 @@ abstract class Database
 	 * Quotes SQL identifiers before passing them into SQL query.
 	 *
 	 * @param       $identifier     string|string[]
+	 *
 	 * @return                      string
 	 * @throws                      Exception
 	 */
@@ -278,6 +274,7 @@ abstract class Database
 	 * Quotes values before passing them into SQL query.
 	 *
 	 * @param       $value      string|string[]
+	 *
 	 * @return                  string
 	 * @throws                  Exception
 	 */
@@ -318,6 +315,7 @@ abstract class Database
 	 * Simple DELETE query
 	 *
 	 * @param      array       array( "do"=>"delete", "table"=>"" , "where"=>array() )
+	 *
 	 * @return     integer     # of affected [deleted] rows
 	 */
 	abstract protected function simple_delete_query ( $sql );
@@ -326,18 +324,19 @@ abstract class Database
 	/**
 	 * Simple query
 	 *
-	 * @param   mixed    $params   Scalar or vectoral data parameter for PEAR query prepare() and exec()
+	 * @param   mixed $params   Scalar or vectoral data parameter for PEAR query prepare() and exec()
+	 *
 	 * @return  mixed    $result   Result set for data retrieval queries; # of affected rows for data manipulation queries
 	 */
 	public function simple_exec_query ()
 	{
 		# Query counter
-		if ( ! $this->is_shutdown )
+		if ( !$this->is_shutdown )
 		{
 			$this->query_count++;
 			if ( IN_DEV )
 			{
-				$this->query_list[] = $this->cur_query;
+				$this->query_list[ ] = $this->cur_query;
 			}
 		}
 
@@ -345,24 +344,23 @@ abstract class Database
 		// Force data-type: Only works with INSERTs, UPDATEs and REPLACEs (since they are the ones with $this->cur_query['set'] being availabie
 		//-----------------------------------------------------------------------------------------------------------------------------------------
 
-		if (
-			isset( $this->cur_query['set'] )
-			and
-			count( $this->cur_query['set'] )
-			and
-			isset( $this->cur_query['force_data_type'] )
-			and
-			is_array( $this->cur_query['force_data_type'] )
-			and
-			count( $this->cur_query['force_data_type'] )
+		if ( isset( $this->cur_query[ 'set' ] )
+		     and
+		     count( $this->cur_query[ 'set' ] )
+		     and
+		     isset( $this->cur_query[ 'force_data_type' ] )
+		     and
+		     is_array( $this->cur_query[ 'force_data_type' ] )
+		     and
+		     count( $this->cur_query[ 'force_data_type' ] )
 		)
 		{
-			$_forced_cols = array_keys( $this->cur_query['force_data_type'] );
-			foreach ( $this->cur_query['set'] as $_k=>&$_v )
+			$_forced_cols = array_keys( $this->cur_query[ 'force_data_type' ] );
+			foreach ( $this->cur_query[ 'set' ] as $_k => &$_v )
 			{
 				if ( in_array( $_k, $_forced_cols ) )
 				{
-					switch ( $this->cur_query['force_data_type'][ $_k ] )
+					switch ( $this->cur_query[ 'force_data_type' ][ $_k ] )
 					{
 						case 'int':
 						case 'integer':
@@ -384,7 +382,7 @@ abstract class Database
 		}
 
 		$result = false;
-		switch ( $this->cur_query["do"] )
+		switch ( $this->cur_query[ "do" ] )
 		{
 			case 'select':
 			case 'select_one':
@@ -411,7 +409,6 @@ abstract class Database
 			case 'alter':
 				$result = $this->simple_alter_table( $this->cur_query );
 				break;
-
 		}
 
 		# Clear the current query container
@@ -430,11 +427,11 @@ abstract class Database
 	 */
 	public function simple_exec_query_shutdown ()
 	{
-		if ( ! $this->use_shutdown )
+		if ( !$this->use_shutdown )
 		{
 			# Use shutdown mode
 			$this->is_shutdown = true;
-			$_any_problems = array();
+			$_any_problems     = array();
 			if ( is_array( $this->shutdown_queries ) and count( $this->shutdown_queries ) )
 			{
 				foreach ( $this->shutdown_queries as $query )
@@ -443,7 +440,7 @@ abstract class Database
 					$this->cur_query = $query;
 					if ( false === $this->simple_exec_query() )
 					{
-						$_any_problems[] = $query;
+						$_any_problems[ ] = $query;
 					}
 				}
 			}
@@ -456,12 +453,12 @@ abstract class Database
 			$this->query_count++;
 			if ( IN_DEV )
 			{
-				$this->query_list[] = $this->cur_query;
+				$this->query_list[ ] = $this->cur_query;
 			}
 
 			# Not a shutdown yet, cache queries
-			$this->shutdown_queries[] = $this->cur_query;
-			$this->cur_query = array();
+			$this->shutdown_queries[ ] = $this->cur_query;
+			$this->cur_query           = array();
 
 			return true;
 		}
@@ -472,6 +469,7 @@ abstract class Database
 	 * Simple INSERT query
 	 *
 	 * @param     array      array( "do"=>"insert", "table"=>"", "set"=>array() )
+	 *
 	 * @return    integer    # of affected rows
 	 */
 	abstract protected function simple_insert_query ( $sql );
@@ -481,6 +479,7 @@ abstract class Database
 	 * Simple REPLACE query
 	 *
 	 * @param   array              array( "do"=>"replace", "table"=>"", "set"=>array( associative array of column_name => value pairs , ... , ... ) )
+	 *
 	 * @return  integer|boolean    # of affected rows on success, FALSE otherwise
 	 */
 	abstract protected function simple_replace_query ( $sql );
@@ -492,25 +491,25 @@ abstract class Database
 	 * @param       array
 	 *
 	 * @usage       array(
-						"do"          => "select",
-						"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
-						"fields"      => array(),
-						"table"       => array() [when correlation names are used] | string,
-						"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
-						"add_join"    => array(
-							0 => array (
-								"fields"      => array(),
-								"table"       => array(),    - where count = 1
-								"conditions"  => "",
-								"join_type"   => "INNER|LEFT|RIGHT"
-							),
-							1 => array()
-						),
-						"group"       => array(),
-						"having"      => array(),
-						"order"       => array(),
-						"limit"       => array(offset, count)
-					)
+	"do"          => "select",
+	"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
+	"fields"      => array(),
+	"table"       => array() [when correlation names are used] | string,
+	"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
+	"add_join"    => array(
+	0 => array (
+	"fields"      => array(),
+	"table"       => array(),    - where count = 1
+	"conditions"  => "",
+	"join_type"   => "INNER|LEFT|RIGHT"
+	),
+	1 => array()
+	),
+	"group"       => array(),
+	"having"      => array(),
+	"order"       => array(),
+	"limit"       => array(offset, count)
+	)
 	 * @throws      \Persephone\Exception
 	 * @return      \Zend\Db\ResultSet\ResultSet|boolean
 	 */
@@ -521,14 +520,14 @@ abstract class Database
 	 * Simple UPDATE query [w/ MULTITABLE UPDATE support]
 	 *
 	 * @param   array
-	 * @return  integer|boolean    # of affected rows on success, FALSE otherwise
 	 *
+	 * @return  integer|boolean    # of affected rows on success, FALSE otherwise
 	 * @usage   array(
-	                "do"        => "update",
-	                "tables"    => array|string [elements can be key=>value pairs ("table aliases") or strings],
-	                "set"       => assoc array of column_name-value pairs
-	                "where"     => array|string
-	            )
+	"do"        => "update",
+	"tables"    => array|string [elements can be key=>value pairs ("table aliases") or strings],
+	"set"       => assoc array of column_name-value pairs
+	"where"     => array|string
+	)
 	 */
 	abstract protected function simple_update_query ( $sql );
 
@@ -537,11 +536,12 @@ abstract class Database
 	 * Simple ALTER TABLE query
 	 *
 	 * @param    array      array(
-	 							"do"          => "alter",
-								"table"       => string,
-								"action"      => "add_column"|"drop_column"|"change_column"|"add_key"
-								"col_info"    => column info to parse
-							)
+	"do"          => "alter",
+	"table"       => string,
+	"action"      => "add_column"|"drop_column"|"change_column"|"add_key"
+	"col_info"    => column info to parse
+	)
+	 *
 	 * @return   mixed      # of affected rows on success, FALSE otherwise
 	 */
 	abstract protected function simple_alter_table ( $sql );
