@@ -663,7 +663,8 @@ class Mysqli extends \Persephone\Database
 		// Execute the statement and return the number of affected rows
 		//----------------------------------------------------------------
 
-		$result = $this->adapter->query( $this->cur_query, array_values( $sql[ 'set' ] ) );
+		$statement = $this->adapter->query( $this->cur_query );
+		$result = $statement->execute( array_values( $sql[ 'set' ] ) );
 
 		return $result->count();
 	}
@@ -695,7 +696,7 @@ class Mysqli extends \Persephone\Database
 						"limit"       => array(offset, count)
 					)
 	 * @throws      \Persephone\Exception
-	 * @return      \Zend\Db\ResultSet\ResultSet|boolean
+	 * @return      array|boolean
 	 */
 	protected final function simple_select_query ( $sql )
 	{
@@ -909,9 +910,21 @@ class Mysqli extends \Persephone\Database
 		$this->cur_query = $this->sql->getSqlStringForSqlObject( $select );
 		try
 		{
-			$statement = $this->sql->prepareStatementForSqlObject( $select );
+			$result = $this->adapter->query( $this->cur_query );
 
-			return $statement->execute();
+			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface && $result->isQueryResult() )
+			{
+				$resultSet = new \Zend\Db\ResultSet\ResultSet();
+				return $resultSet->initialize( $result )->toArray();
+
+				/*
+				foreach ( $resultSet as $row )
+				{
+					echo $row->my_column . PHP_EOL;
+				}
+				*/
+			}
+
 		}
 		catch ( \Persephone\Exception $e )
 		{

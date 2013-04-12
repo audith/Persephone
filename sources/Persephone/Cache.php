@@ -48,7 +48,7 @@ class Cache
 	/**
 	 * Constructor - Loads and instantiates necessary libraries
 	 *
-	 * @param    object    Registry Object Reference
+	 * @param    \Persephone\Registry    Registry Object Reference
 	 **/
 	public function __construct ( Registry $Registry )
 	{
@@ -86,7 +86,6 @@ class Cache
 
 		try
 		{
-
 			//-----------------
 			// php-memcached
 			//-----------------
@@ -205,7 +204,7 @@ class Cache
 			"Cache: " .
 			( $return === true
 				? "SUCCEEDED"
-				: "FAILED" ) . " loading initial cache for keys: " . implode( ",", array_map( array( $this->Registry->Db->adapter, "quote" ), $_cache_list ) ),
+				: "FAILED" ) . " loading initial cache for keys: " . implode( ",", array_map( array( $this->Registry->Db->platform, "quoteValue" ), $_cache_list ) ),
 			$return === true
 				? "INFO"
 				: "ERROR"
@@ -359,8 +358,8 @@ class Cache
 	/**
 	 * Fetches only part of cache-data (i.e., one element of cache-data-array)
 	 *
-	 * @param   string   Cache to fetch
-	 * @param   string   Part to fetch
+	 * @param   string   $key   Cache to fetch
+	 * @param   string   $part  Part to fetch
 	 *
 	 * @return  mixed    FALSE if part does not exist, cache-data otherwise
 	 */
@@ -401,9 +400,9 @@ class Cache
 	/**
 	 * Loads cache-data from cache sources to $this->cache container for global use
 	 *
-	 * @param   array   Cacheable items/elements
+	 * @param   array   $_cache_array   Cacheable items/elements
 	 *
-	 * @return  mixed   NULL if data not avail, TRUE if data is avail. (implicitly: FALSE on error - db_error etc).
+	 * @return  mixed                   NULL if data not avail, TRUE if data is avail. (implicitly: FALSE on error - db_error etc).
 	 */
 	public function cache__do_load ( $_cache_array = array() )
 	{
@@ -572,9 +571,9 @@ class Cache
 			}
 
 			$this->Registry->Db->cur_query = array(
-				'do'              => "replace",
-				'table'           => "cache_store",
-				'set'             => array(
+				'do'       => "replace",
+				'table'    => "cache_store",
+				'set'      => array(
 					'cs_array' => ( isset( $v[ 'array' ] )
 						? $v[ 'array' ]
 						: 0 ),

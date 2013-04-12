@@ -665,7 +665,8 @@ class Pdo_mysql extends \Persephone\Database
 		// Execute the statement and return the number of affected rows
 		//----------------------------------------------------------------
 
-		$result = $this->adapter->query( $this->cur_query, array_values( $sql[ 'set' ] ) );
+		$statement = $this->adapter->query( $this->cur_query );
+		$result = $statement->execute( array_values( $sql[ 'set' ] ) );
 
 		return $result->count();
 	}

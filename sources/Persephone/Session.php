@@ -2159,7 +2159,7 @@ class Session
 			$this->Registry->Db->cur_query = array(
 					'do'	 => "select_row",
 					'table'  => "sessions",
-					'where'  => "id=" . $this->Registry->Db->quote( $session_id ),
+					'where'  => "id=" . $this->Registry->Db->platform->quoteValue( $session_id ),
 				);
 			$_session = $this->Registry->Db->simple_exec_query();
 
@@ -2306,7 +2306,7 @@ class Session
 	 * @param    boolean    TRUE (default, check secondary groups also), FALSE (check primary only)
 	 * @return   boolean    TRUE (is in group) - FALSE (not in group)
 	 */
-	static public function mgroup__is_in_group ( $member, $group, $_check_secondary = true )
+	public function mgroup__is_in_group ( $member, $group, $_check_secondary = true )
 	{
 		$member_data  = ( is_array( $member ) ) ? $member : $this->load_member( $member, 'members' );
 		$group        = ( is_array( $group ) )  ? $group  : array( $group );
@@ -2388,7 +2388,7 @@ class Session
 								{
 									$m_data[ $k ] = 0;
 								}
-								elseif ( $v > $data[ $k ] )
+								elseif ( $v > $m_data[ $k ] )
 								{
 									$m_data[ $k ] = $v;
 								}
@@ -2882,7 +2882,8 @@ class Session
 			// Get useragent stuff
 			//-----------------------------------------
 
-			$user_agent = $this->Registry->loader( "Session__User_Agents" )->find_user_agent_id( $this->user_agent );
+			$user_agent = new \Persephone\Session\User_agents( $this->Registry );
+			$user_agent = $user_agent->find_user_agent_id( $this->user_agent );
 
 			if ( $user_agent['uagent_key'] === null )
 			{

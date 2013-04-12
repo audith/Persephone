@@ -111,14 +111,15 @@ final class Registry
 
 	/**
 	 * Constructor - [Singleton implementation - cannot be accessed directly]
-	 *
-	 * @param    array    List of disabled classes, which don't need to be initialized (NOTE: Db and Input classes are mandatory, meaning, they cannot be disabled).
 	**/
 	private function __construct ( )
 	{
 		//------------------------------------
 		// Start Exception handlers & Debug
 		//------------------------------------
+
+		# First log
+		self::logger__do_log( "Script start-up." );
 
 		# Start timer
 		self::$starttime = self::debug__timer_start();
@@ -388,16 +389,16 @@ final class Registry
 	/**
 	 * HTTP redirect
 	 *
-	 * @param   string   URL to load
-	 * @param   string   Status code to deploy with, defaults to 302
+	 * @param   string     $url                     URL to load
+	 * @param   int        $http_status_code        Status code to deploy with, defaults to 302
 	 *
 	 * @return  void
-	**/
+	 */
 	public function http_redirect ( $url, $http_status_code = 302 )
 	{
 		# Ensure &amp;s are taken care of
 
-		$url = str_replace( "&", "&", $url );
+		$url = str_replace( "&amp;", "&", $url );
 
 		if ( $this->config['serverenvironment']['header_redirect'] == 'refresh' )
 		{
@@ -501,15 +502,16 @@ final class Registry
 				}
 			}
 
-			# Registering logger object as our main PHP error-logger
-			\Zend\Log\Logger::registerErrorHandler( self::$logger );
-
 			# Fire-PHP
 			if ( IN_DEV )
 			{
 				require_once PATH_LIBS . "/FirePHPCore/fb.php";
-				self::$logger->addWriter( $_writer__firephp = new \Zend\Log\Writer\FirePhp );
+				self::$logger->addWriter( new \Zend\Log\Writer\FirePhp );
 			}
+
+			# Registering logger object as our main PHP error-logger
+			#\Zend\Log\Logger::registerErrorHandler( self::$logger );
+			#\Zend\Log\Logger::registerExceptionHandler( self::$logger );
 		}
 
 		//---------------
