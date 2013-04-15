@@ -142,7 +142,7 @@ class Recache
 	{
 		$_join    = array();
 		$_join[ ] = array(
-			'fields'     => array( "d.*" ),
+			'fields'     => array( "*" ),
 			'table'      => array( 'd' => "components_ddl_skel_definitions" ),
 			'conditions' => 't.type_name=d.type_name',
 		);
@@ -348,7 +348,7 @@ class Recache
 				'table'  => "data_processors__signatures",
 				'where'  => "type_extension=" . $this->Registry->Db->platform->quoteValue( $r[ 'type_extension' ] ),
 			);
-			$result_ = $this->Registry->Db->simple_exec_query();
+			$result_                       = $this->Registry->Db->simple_exec_query();
 
 			$_signatures = array();
 			foreach ( $result_ as $r_ )
@@ -624,7 +624,7 @@ class Recache
 							"s_additional_skin_assets",
 							"s_can_remove"
 						),
-						'where'  => array( array( "m_unique_id=?", $row[ 'm_unique_id' ] ) )
+						'where'  => array( "m_unique_id=" . $this->Registry->Db->platform->quoteValue( $row[ 'm_unique_id' ] ) )
 					);
 
 					if ( count( $_result = $this->Registry->Db->simple_exec_query() ) )
@@ -832,11 +832,11 @@ class Recache
 	{
 		$this->Registry->Db->cur_query = array(
 			'do'       => "select",
-			'fields'   => array( "g.*" ),
+			'fields'   => array( "*" ),
 			'table'    => array( 'g' => "conf_settings_groups" ),
 			'add_join' => array(
 				array(
-					'fields'     => array( "c.*" ),
+					'fields'     => array( "*" ),
 					'table'      => array( 'c' => "conf_settings" ),
 					'conditions' => "g.conf_group_id = c.conf_group",
 					'join_type'  => "INNER"
@@ -965,7 +965,7 @@ class Recache
 			'table'  => "members",
 			'where'  => "mgroup != " . $this->Registry->Db->platform->quoteValue( $this->Registry->config[ 'security' ][ 'auth_group' ] ),
 		);
-		$result = $this->Registry->Db->simple_exec_query();
+		$result                        = $this->Registry->Db->simple_exec_query();
 
 		$_cache                = array();
 		$_cache[ 'mem_count' ] = intval( $result[ 'member_count' ] );
@@ -983,7 +983,7 @@ class Recache
 			),
 			'order'  => array( "id DESC" ),
 		);
-		$result = $this->Registry->Db->simple_exec_query();
+		$result                        = $this->Registry->Db->simple_exec_query();
 
 		$_cache[ 'last_mem_name_seo' ] = $result[ 'seo_name' ];
 		$_cache[ 'last_mem_name' ]     = $result[ 'display_name' ]
@@ -1037,7 +1037,7 @@ class Recache
 			"table" => "user_agents",
 			"order" => array( "uagent_position ASC", "uagent_key ASC" ),
 		);
-		$result = $this->Registry->Db->simple_exec_query();
+		$result                        = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $row )
@@ -1059,7 +1059,7 @@ class Recache
 			"table" => "user_agents_groups",
 			"order" => array( "ugroup_id ASC" ),
 		);
-		$result = $this->Registry->Db->simple_exec_query();
+		$result                        = $this->Registry->Db->simple_exec_query();
 
 		$_cache = array();
 		foreach ( $result as $row )

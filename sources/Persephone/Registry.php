@@ -247,7 +247,7 @@ final class Registry
 		// Instantiate Display class
 		//------------------------------
 
-		$this->Display = \Persephone\Display( $this );
+		$this->Display = new \Persephone\Display( $this );
 
 		//------------------
 		// Module::init()
@@ -439,7 +439,7 @@ final class Registry
 
 
 	/**
-	 * Local Logger [facilitates Zend_Log]
+	 * Local Logger
 	 *
 	 * @param     $message      string    Message to log
 	 * @param     $priority     string    Priority level [ERROR|WARNING|NOTICE|INFO|DEBUG]

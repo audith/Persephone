@@ -2163,7 +2163,7 @@ class Session
 				);
 			$_session = $this->Registry->Db->simple_exec_query();
 
-			if ( $_session['id'] )
+			if ( !empty( $_session ) and $_session['id'] )
 			{
 				# Kill any long running search thread...
 				/* @todo

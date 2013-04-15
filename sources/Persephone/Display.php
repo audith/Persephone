@@ -75,7 +75,7 @@ class Display
 	/**
 	 * Smarty instance
 	 *
-	 * @var Smarty
+	 * @var \Smarty
 	 */
 	public $smarty;
 
@@ -688,7 +688,7 @@ class Display
 		require_once( PATH_LIBS . "/Smarty/Smarty.class.php" );
 
 		# Initiating Smarty Object
-		if ( !$this->smarty = new Smarty() )
+		if ( !$this->smarty = new \Smarty() )
 		{
 			throw new \Persephone\Exception( "Display: Couldn't instantiate Smarty template-engine!" );
 		}
@@ -696,8 +696,8 @@ class Display
 		# Some SMARTY settings
 		$this->smarty->cache_lifetime       = $this->Registry->config[ 'display' ][ 'cache_lifetime' ];
 		$this->smarty->caching              = $this->Registry->Modules->cur_module[ 'm_enable_caching' ]
-			? Smarty::CACHING_LIFETIME_CURRENT
-			: Smarty::CACHING_OFF;
+			? \Smarty::CACHING_LIFETIME_CURRENT
+			: \Smarty::CACHING_OFF;
 		$this->smarty->cache_modified_check = true;
 		$this->smarty->compile_check        = true;
 		$this->smarty->auto_literal         = false;

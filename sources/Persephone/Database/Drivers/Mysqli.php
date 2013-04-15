@@ -908,21 +908,17 @@ class Mysqli extends \Persephone\Database
 
 		# EXEC
 		$this->cur_query = $this->sql->getSqlStringForSqlObject( $select );
+		\Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" );
+
 		try
 		{
-			$result = $this->adapter->query( $this->cur_query );
+			$statement = $this->sql->prepareStatementForSqlObject( $select );
+			$result = $statement->execute();
 
 			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface && $result->isQueryResult() )
 			{
 				$resultSet = new \Zend\Db\ResultSet\ResultSet();
 				return $resultSet->initialize( $result )->toArray();
-
-				/*
-				foreach ( $resultSet as $row )
-				{
-					echo $row->my_column . PHP_EOL;
-				}
-				*/
 			}
 
 		}
