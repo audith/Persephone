@@ -13,10 +13,7 @@ if ( !defined( "INIT_DONE" ) )
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
-**/
-
-#require_once( dirname( __FILE__ ) . "/_interface.php" );
-
+ */
 class Diskcache implements Iface
 {
 	/**

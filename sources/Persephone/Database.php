@@ -151,7 +151,7 @@ abstract class Database
 	 *
 	 * @return    string|array    New names with an attached prefix
 	 */
-	public function attach_prefix ( &$t )
+	public function attach_prefix ( $t )
 	{
 		is_array( $t )
 			? array_walk( $t, array( $this, "attach_prefix" ) )
@@ -314,9 +314,10 @@ abstract class Database
 	/**
 	 * Simple DELETE query
 	 *
-	 * @param      array       array( "do"=>"delete", "table"=>"" , "where"=>array() )
+	 * @param      array                    array( "do"=>"delete", "table"=>"" , "where"=>array() )
 	 *
-	 * @return     integer     # of affected [deleted] rows
+	 * @return     boolean|int              # of affected [deleted] rows on success, FALSE otherwise
+	 * @throws     \Persephone\Exception
 	 */
 	abstract protected function simple_delete_query ( $sql );
 

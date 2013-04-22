@@ -395,7 +395,6 @@ class Recache
 				"m_title_column",
 				"m_extras",
 				"m_cache_array",
-				"m_handler_class",
 				"m_enable_caching",
 				"m_can_disable",
 				"m_can_remove",
@@ -440,9 +439,6 @@ class Recache
 
 				$_cache[ 'by_unique_id' ][ $row[ 'm_unique_id' ] ][ 'm_cache_array' ] = unserialize( $row[ 'm_cache_array' ] );
 				$_cache[ 'by_name' ][ $row[ 'm_name' ] ][ 'm_cache_array' ]           =& $_cache[ 'by_unique_id' ][ $row[ 'm_unique_id' ] ][ 'm_cache_array' ];
-
-				$_cache[ 'by_unique_id' ][ $row[ 'm_unique_id' ] ][ 'm_handler_class' ] = $row[ 'm_handler_class' ];
-				$_cache[ 'by_name' ][ $row[ 'm_name' ] ][ 'm_handler_class' ]           =& $_cache[ 'by_unique_id' ][ $row[ 'm_unique_id' ] ][ 'm_handler_class' ];
 
 				$_cache[ 'by_unique_id' ][ $row[ 'm_unique_id' ] ][ 'm_enable_caching' ] = $row[ 'm_enable_caching' ];
 				$_cache[ 'by_name' ][ $row[ 'm_name' ] ][ 'm_enable_caching' ]           =& $_cache[ 'by_unique_id' ][ $row[ 'm_unique_id' ] ][ 'm_enable_caching' ];

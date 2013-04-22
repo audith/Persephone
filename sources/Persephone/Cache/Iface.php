@@ -13,7 +13,7 @@ if ( !defined( "INIT_DONE" ) )
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
- **/
+ */
 interface Iface
 {
 	/**

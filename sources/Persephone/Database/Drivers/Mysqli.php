@@ -17,8 +17,7 @@ if ( !defined( "INIT_DONE" ) )
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
- **/
-#require_once( PATH_SOURCES . "/Database.php" );
+ */
 class Mysqli extends \Persephone\Database
 {
 	/**
@@ -522,9 +521,10 @@ class Mysqli extends \Persephone\Database
 	/**
 	 * Simple DELETE query
 	 *
-	 * @param      array       array( "do"=>"delete", "table"=>"" , "where"=>array() )
+	 * @param      array                    array( "do"=>"delete", "table"=>"" , "where"=>array() )
 	 *
-	 * @return     mixed       # of affected [deleted] rows on success, FALSE otherwise
+	 * @return     boolean|int              # of affected [deleted] rows on success, FALSE otherwise
+	 * @throws     \Persephone\Exception
 	 */
 	protected final function simple_delete_query ( $sql )
 	{
@@ -552,27 +552,40 @@ class Mysqli extends \Persephone\Database
 				$where = $sql[ 'where' ];
 			}
 		}
+
 		if ( count( $where ) )
 		{
-			try
-			{
-				return $this->sql->delete( $table, $where );
-			}
-			catch ( \Persephone\Exception $e )
-			{
-				return false;
-			}
+			$delete = $this->sql->delete( $table, $where );
+
+			$this->cur_query = $this->sql->getSqlStringForSqlObject( $delete );  // For debug
+
+			$statement = $this->sql->prepareStatementForSqlObject( $delete );
 		}
 		else
 		{
-			try
+			$this->cur_query = "TRUNCATE TABLE " . $table;  // For debug
+
+			$statement = $this->adapter->getDriver()->createStatement( "TRUNCATE TABLE " . $table );
+		}
+
+		\Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" );  // For debug
+
+		try
+		{
+			$result = $statement->execute();
+			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
 			{
-				return $this->adapter->query( "TRUNCATE TABLE " . $table )->count();
+				$resultSet = new \Zend\Db\ResultSet\ResultSet();
+				$return = $resultSet->initialize( $result )->count();
+
+				return $return;
 			}
-			catch ( \Persephone\Exception $e )
-			{
-				return false;
-			}
+
+			return false;
+		}
+		catch ( \Persephone\Exception $e )
+		{
+			return false;
 		}
 	}
 
@@ -915,11 +928,13 @@ class Mysqli extends \Persephone\Database
 			$statement = $this->sql->prepareStatementForSqlObject( $select );
 			$result = $statement->execute();
 
-			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface && $result->isQueryResult() )
+			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
 			{
 				$resultSet = new \Zend\Db\ResultSet\ResultSet();
 				return $resultSet->initialize( $result )->toArray();
 			}
+
+			return false;
 
 		}
 		catch ( \Persephone\Exception $e )
@@ -949,11 +964,7 @@ class Mysqli extends \Persephone\Database
 		// Asset-check
 		//----------------
 
-		if ( !isset( $sql[ 'tables' ] ) )
-		{
-			return false;
-		}
-		if ( !count( $sql[ 'tables' ] ) )
+		if ( !isset( $sql[ 'tables' ] ) or !count( $sql[ 'tables' ] ) )
 		{
 			return false;
 		}
@@ -1061,17 +1072,30 @@ class Mysqli extends \Persephone\Database
 			                   ? " WHERE " . $_where
 			                   : "" );
 
+		\Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" );  // For debug
+
+		/**
+		 * @var $statement \Zend\Db\Adapter\Driver\StatementInterface
+		 */
+		$statement = $this->adapter->getDriver()->createStatement( $this->cur_query );
+
 		//----------------------------------------------------------------
 		// Execute the statement and return the number of affected rows
 		//----------------------------------------------------------------
 
 		try
 		{
-			/**
-			 * @var $statement \Zend\Db\Adapter\Driver\StatementInterface
-			 */
-			$statement = $this->adapter->query( $this->cur_query );
-			return $statement->execute( $sql['set'] )->count();
+			$result = $statement->execute( $sql['set'] )->count();
+
+			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
+			{
+				$resultSet = new \Zend\Db\ResultSet\ResultSet();
+				$return = $resultSet->initialize( $result )->count();
+
+				return $return;
+			}
+
+			return false;
 		}
 		catch ( \Persephone\Exception $e )
 		{

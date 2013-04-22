@@ -448,7 +448,7 @@ class Display
 		$this->smarty->assign( "LOGO", $this->output__parsed[ 'logo' ] );
 		$this->smarty->assign( "HEADER", $this->output__parsed[ 'header' ] );
 		$this->smarty->assign( "NAVIGATION", $this->output__parsed[ 'navigation' ] );
-		$this->smarty->assign( "SEARCH_FORM", $this->output__parsed[ 'search_form' ] );
+		$this->smarty->assign( "SE`ARCH_FORM", $this->output__parsed[ 'search_form' ] );
 		$this->smarty->assign( "MEMBERBAR", $this->output__parsed[ 'memberbar' ] );
 		$this->smarty->assign( "FOOTER", $this->output__parsed[ 'footer' ] );
 		$this->smarty->assign( "COPYRIGHT", $this->output__parsed[ 'copyright' ] );

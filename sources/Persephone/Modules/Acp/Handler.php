@@ -1,8 +1,10 @@
 <?php
+
+namespace Persephone\Modules\Acp;
+
 if ( !defined( "INIT_DONE" ) )
 {
-	print "Improper access! Exiting now...";
-	exit();
+	die( "Improper access! Exiting now..." );
 }
 
 /**
@@ -12,41 +14,46 @@ if ( !defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
  */
-
-class Module_Handler
+class Handler
 {
 	/**
 	 * Registry Reference
-	 * @var Registry
+	 *
+	 * @var \Persephone\Registry
 	 */
 	private $Registry;
 
 	/**
 	 * Main container for retrieved content
+	 *
 	 * @var mixed
 	 */
 	private $content;
 
 	/**
 	 * Default HTTP header set for the module
+	 *
 	 * @var array
 	 */
 	public $http_headers_default = array();
 
 	/**
 	 * Module Processor Map [method access]
+	 *
 	 * @var array
 	 */
 	public $processor_map = array();
 
 	/**
 	 * Module's currently running subroutine
+	 *
 	 * @var array
 	 */
 	private $running_subroutine = array();
 
 	/**
 	 * Module Structural Map
+	 *
 	 * @var array
 	 */
 	public $structural_map = array();
@@ -55,9 +62,9 @@ class Module_Handler
 	/**
 	 * Constructor - Inits Handler
 	 *
-	 * @param    Registry    Registry Object Reference
+	 * @param    \Persephone\Registry Registry object reference
 	 */
-	public function __construct ( Registry $Registry )
+	public function __construct ( \Persephone\Registry $Registry )
 	{
 		//-----------
 		// Prelim
@@ -275,14 +282,10 @@ class Module_Handler
 			),
 		);
 
-		if ( !isset( $this->processor_map[ $this->running_subroutine[ 's_name' ] ] )
-		     or
-		     !isset( $this->processor_map[ $this->running_subroutine[ 's_name' ] ][ $action ] )
+		if ( isset( $this->processor_map[ $this->running_subroutine[ 's_name' ] ] )
+		     and
+		     isset( $this->processor_map[ $this->running_subroutine[ 's_name' ] ][ $action ] )
 		)
-		{
-			header( "HTTP/1.1 400 Bad Request" );
-		}
-		else
 		{
 			$_methods = $this->processor_map[ $this->running_subroutine[ 's_name' ] ][ $action ];
 			$_methods = explode( "|", $_methods );
@@ -292,106 +295,13 @@ class Module_Handler
 				   that altered version (using references) and alters it at the end. */
 				$this->content[ 'content' ] = $this->$_method_name();
 			}
+
 			return $this->content;
 		}
-	}
-
-
-	private function test ()
-	{
-		return true;
-
-
-		set_time_limit( 0 );
-
-		/*
-		$this->Registry->Cache->cache__do_load( array('mimelist') );
-		# DIR to process
-		$_d = PATH_ROOT_VHOST . "/data/monthly_for_2004_04/";
-		# OPEN DIR
-		$_dh = opendir( $_d );
-		# Change DIR
-		chdir( $_d );
-		while ( ($_f = readdir( $_dh ) ) !== FALSE )
+		else
 		{
-			if ( filetype( $_f ) != 'file' )
-			{
-				continue;
-			}
-
-			$this->Registry->Db->cur_query = array(
-					'do'   =>  "select_row",
-					'table' => "media_library",
-					'where'  =>  'f_name=' . $this->Registry->Db->quote( $_f ),
-				);
-			$file_info = $this->Registry->Db->simple_exec_query();
-			if ( rename( $_f , $file_info['f_hash'] . "." . $file_info['f_extension'] ) )
-			{
-				print "SUCCESSFULLY renamed $_f\n<br>";
-			}
+			header( "HTTP/1.1 400 Bad Request" );
 		}
-		closedir(  $_dh );
-		*/
-
-		$this->Registry->Cache->cache__do_load( array( 'mimelist' ) );
-		# DIR to process
-		$_d = PATH_ROOT_VHOST . "/data/";
-		# OPEN DIR
-		$_dh = opendir( $_d );
-		# Change DIR
-		chdir( $_d );
-		while ( ( $_f = readdir( $_dh ) ) !== false )
-		{
-			if ( filetype( $_f ) != 'file' )
-			{
-				continue;
-			}
-			if ( ( $_validation_result = $this->Registry->Input->file__extension__do_validate( $_d . $_f ) ) === true )
-			{
-				// $_image_size = getimagesize( $_f );
-				$_filename_parse                = pathinfo( $_f );
-				$_filename_parse[ 'extension' ] = strtolower( $_filename_parse[ 'extension' ] );
-				$_mtime                         = filemtime( $_f );
-				$this->Registry->Db->cur_query  = array(
-					'do'    => "replace",
-					'table' => "media_library",
-					'set'   => array(
-						'f_hash'      => $_file_hash = hash_file( "md5", $_f ),
-						'f_name'      => $_f,
-						'f_extension' => $_filename_parse[ 'extension' ],
-						'f_size'      => filesize( $_f ),
-						// 'f_dimensions' => $_image_size[0] . "x" . $_image_size[1],
-						'f_mime'      => $this->Registry->Cache->cache[ 'mimelist' ][ 'by_ext' ][ $_filename_parse[ 'extension' ] ][ 'type_mime' ],
-						'f_timestamp' => new Zend_Db_Expr( "UNIX_TIMESTAMP('" . date( "Ymd", $_mtime ) . "')" ),
-
-					),
-				);
-				print "<br />\nV-SUCCESS: " . $_file_hash . " - " . $_f;
-				if ( !$this->Registry->Db->simple_exec_query() )
-				{
-					echo "OOPS! goes for " . $_f;
-				}
-				else
-				{
-					if ( !file_exists( $_dir_to_move_into = "monthly_for_" . date( "Y_m", $_mtime ) ) or !is_dir( $_dir_to_move_into ) )
-					{
-						mkdir( $_dir_to_move_into );
-					}
-					if ( rename( $_f, $_dir_to_move_into . "/" . $_file_hash . "." . $_filename_parse[ 'extension' ] ) )
-					{
-						print " > SUCCESSFULLY renamed $_f\n<br>";
-					}
-				}
-			}
-			else
-			{
-				print "<br />\nV-FAIL: " . $_file_hash . " - " . $_f;
-				$_filename_parse = pathinfo( $_f );
-				print_r( $_filename_parse );
-			}
-		}
-		closedir( $_dh );
-		exit;
 	}
 
 
@@ -419,9 +329,9 @@ class Module_Handler
 
 		$_subqueries                   = array();
 		$_fields_to_fetch              = array_merge( array( 'id', 'tags', 'timestamp', 'submitted_by', 'status_published', 'status_locked' ), array_keys( $m[ 'm_data_definition' ] ) );
-		$this->Registry->Db->cur_query = $this->Registry->Db->db
-			->select()
-			->from( "mod_" . $m[ 'm_unique_id_clean' ] . "_master_repo", $_fields_to_fetch );
+		$this->Registry->Db->cur_query = $this->Registry->Db->sql->select()
+			->from( $this->Registry->Db->attach_prefix( "mod_" . $m[ 'm_unique_id_clean' ] . "_master_repo" ) )
+			->columns( $_fields_to_fetch );
 
 		//---------------------------------------------------------
 		// Execute final fetch query and retrieve requested data
@@ -429,17 +339,26 @@ class Module_Handler
 
 		try
 		{
-			$result = $this->Registry->Db->db
-				->query( $this->Registry->Db->cur_query )
-				->fetchAll();
-			$this->Registry->Db->query_count++;
+			$statement = $this->Registry->Db->sql->prepareStatementForSqlObject( $this->Registry->Db->cur_query );
+			$result = $statement->execute();
+
+			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
+			{
+				$resultSet = new \Zend\Db\ResultSet\ResultSet;
+				$resultSet->initialize( $result )->toArray();
+				$m[ 'running_subroutine' ][ 'content' ][ 'count' ] = $resultSet->count();
+
+				$this->Registry->Db->query_count++;
+			}
+			else
+			{
+				return false;
+			}
 		}
-		catch ( Zend_Db_Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
-			$this->Registry->Db->exception_handler( $e );
 			return false;
 		}
-		$m[ 'running_subroutine' ][ 'content' ][ 'count' ] = count( $result );
 
 		# No content in this page? Redirect to page 1 then...
 		if ( !$m[ 'running_subroutine' ][ 'content' ][ 'count' ] )
@@ -542,10 +461,14 @@ class Module_Handler
 				$return[ 'm_data__others' ] = $this->Registry->Cache->cache[ 'modules' ][ 'by_unique_id' ];
 				unset( $return[ 'm_data__others' ][ $m_unique_id ] ); // Removing 'me'-self from among 'others' :D
 				$return[ '_request' ] = $this->running_subroutine[ 'request' ];
-				$return[ 'c_data' ]   = $this->Registry->Cache->cache__do_get_part( "modules_connectors", $return[ 'm_data__me' ][ 'm_data_definition' ][ $this->running_subroutine[ 'request' ][ 'c_name' ] ][ 'connector_linked' ] );
+				$return[ 'c_data' ]   = $this->Registry->Cache->cache__do_get_part(
+					"modules_connectors",
+					$return[ 'm_data__me' ][ 'm_data_definition' ][ $this->running_subroutine[ 'request' ][ 'c_name' ] ][ 'connector_linked' ]
+				);
 
 				return $return;
 			}
+
 			return false;
 		}
 		else
@@ -610,9 +533,10 @@ class Module_Handler
 				if ( $this->Registry->Db->simple_exec_query() )
 				{
 					# On SUCCESS, update cache and respond
-					$_recache = $this->Registry->loader( "Cache__Recache" );
+					$_recache = new \Persephone\Cache\Recache( $this->Registry );
 					$_recache->main( "modules" );
 					$_recache->main( "modules_connectors" );
+
 					return array( 'responseCode' => 1, 'responseMessage' => "Success! Field-registry successfully added!<br />Refreshing..." );
 				}
 				else
@@ -662,7 +586,10 @@ class Module_Handler
 		{
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid connector provided! Request aborted..." );
 		}
-		$_connector_unit__m_unique_id = $this->Registry->Cache->cache__do_get_part( "modules_connectors", $_m_cache_node[ $m_unique_id ][ 'm_data_definition' ][ $this->running_subroutine[ 'request' ][ 'c_name' ] ][ 'connector_linked' ] . ",m_unique_id" );
+		$_connector_unit__m_unique_id = $this->Registry->Cache->cache__do_get_part(
+			"modules_connectors",
+			$_m_cache_node[ $m_unique_id ][ 'm_data_definition' ][ $this->running_subroutine[ 'request' ][ 'c_name' ] ][ 'connector_linked' ] . ",m_unique_id"
+		);
 
 		//-------------
 		// Continue
@@ -684,9 +611,8 @@ class Module_Handler
 		}
 		if ( $_rows_affected )
 		{
-			$this->Registry
-				->loader( "Cache__Recache" )
-				->main( "modules_connectors" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
+			$_recache->main( "modules_connectors" );
 		}
 
 		return array( 'responseCode' => 1, 'responseMessage' => "Re-order successful! Refreshing in 2 seconds..." );
@@ -699,6 +625,7 @@ class Module_Handler
 	 * @param    string     Module Unique-ID
 	 * @param    array      List of fields to drop
 	 * @param    boolean    Whether to backup the field being dropped, or not
+	 *
 	 * @return   array      Array containing status code pairs (either responseCode-responseMessage (on SUCCESS); or faultCodes-faultMessages (otherwise) )
 	 */
 	private function modules__connector_unit__ddl__do_drop ( $m_unique_id = "", $ddl_checklist = array(), $do_backup_dropped_field = true )
@@ -849,9 +776,10 @@ class Module_Handler
 			// SUCCESS : Still here :) Update cache
 			//-----------------------------------------
 
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
+
 			return array( 'responseCode' => 1, 'responseMessage' => "Success! Field-registry successfully dropped!<br />Refreshing..." );
 		}
 		else
@@ -946,9 +874,10 @@ class Module_Handler
 			// SUCCESS : Update cache and respond
 			//--------------------------------------
 
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
+
 			return array( 'responseCode' => 1, 'responseMessage' => 'Success! Field-registry successfully dropped!<br />Refreshing...' );
 		}
 		else
@@ -1036,9 +965,10 @@ class Module_Handler
 			if ( $this->Registry->Db->simple_exec_query() )
 			{
 				# On SUCCESS, update cache and respond
-				$_recache = $this->Registry->loader( "Cache__Recache" );
+				$_recache = new \Persephone\Cache\Recache( $this->Registry );
 				$_recache->main( "modules" );
 				$_recache->main( "modules_connectors" );
+
 				return array( 'responseCode' => 1, 'responseMessage' => 'Success! Field-registry successfully restored!<br />Refreshing...' );
 			}
 			else
@@ -1058,6 +988,7 @@ class Module_Handler
 	 * [RECOMMENDED FOR INTERNAL USE ONLY!]
 	 *
 	 * @param    array      Module information
+	 *
 	 * @return   boolean    TRUE on success, FALSE otherwise
 	 */
 	private function modules__integrity_diagnostics__do_run ( &$m )
@@ -1086,6 +1017,7 @@ class Module_Handler
 	 * Cleans up Modules Cache, preparing it for INSERT/UPDATE into Modules-DB-Table
 	 *
 	 * @param   array   Module container
+	 *
 	 * @return  void
 	 */
 	private function modules__do_cleanup ( &$m )
@@ -1219,21 +1151,41 @@ class Module_Handler
 		}
 
 		# Calculate module Unique-Id
-		$m_unique_id = "{" . implode( "-", str_split( strtoupper( md5( md5( md5( md5( md5( $m_name ) . $this->Registry->config[ 'general' ][ 'admin_email' ] . UNIX_TIME_NOW ) . $this->Registry->config[ 'general' ][ 'admin_name' ] ) . $this->Registry->config[ 'url' ][ 'hostname' ][ 'http' ][ 'full' ] ) ) ), 8 ) ) . "}";
+		$m_unique_id = "{" .
+		               implode(
+			               "-",
+			               str_split(
+				               strtoupper(
+					               md5(
+						               md5(
+							               md5( md5( md5( $m_name ) . $this->Registry->config[ 'general' ][ 'admin_email' ] . UNIX_TIME_NOW ) . $this->Registry->config[ 'general' ][ 'admin_name' ] ) .
+							               $this->Registry->config[ 'url' ][ 'hostname' ][ 'http' ][ 'full' ]
+						               )
+					               )
+				               ),
+				               8
+			               )
+		               ) . "}";
 
 		# Insert
 		$this->Registry->Db->cur_query = array(
 			"do"    => "insert",
 			"table" => "modules",
 			"set"   => array(
-				'm_name'           => ( $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ] ) ? strtolower( $m_name ) : $m_name,
+				'm_name'           => ( $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ] )
+					? strtolower( $m_name )
+					: $m_name,
 				'm_unique_id'      => $m_unique_id,
 				'm_description'    => $m_description,
 				'm_type'           => "master",
-				'm_enforce_ssl'    => $input[ 'm_enforce_ssl' ] ? 1 : 0,
+				'm_enforce_ssl'    => $input[ 'm_enforce_ssl' ]
+					? 1
+					: 0,
 				'm_extras'         => serialize( $m_extras ),
 				'm_cache_array'    => "a:0:{}",
-				'm_enable_caching' => $input[ 'm_enable_caching' ] ? 1 : 0,
+				'm_enable_caching' => $input[ 'm_enable_caching' ]
+					? 1
+					: 0,
 				'm_is_enabled'     => 0
 			)
 		);
@@ -1254,8 +1206,9 @@ class Module_Handler
 			$this->Registry->Db->simple_exec_create_table_struct( $struct );
 
 			# On SUCCESS, update cache and respond
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
+
 			return array( 'responseCode' => 1, 'responseMessage' => "Module successfully created!", 'responseAction' => "refresh" );
 		}
 		else
@@ -1379,7 +1332,8 @@ class Module_Handler
 			$struct[ 'tables' ][ 'mod_' . $_parent_m_unique_id_clean . '_conn_repo__' . $_connector_field[ 'name' ] ] = $this->Registry->Db->modules__default_table_structure( "connector_repo" );
 
 			# Attaching connector-enabled field's data-definition to _conn_repo table structire
-			$struct[ 'tables' ][ 'mod_' . $_parent_m_unique_id_clean . '_conn_repo__' . $_connector_field[ 'name' ] ][ 'col_info' ][ $_connector_field[ 'name' ] ] = $this->Registry->Db->modules__ddl_column_type_translation( $_connector_field );
+			$struct[ 'tables' ][ 'mod_' . $_parent_m_unique_id_clean . '_conn_repo__' . $_connector_field[ 'name' ] ][ 'col_info' ][ $_connector_field[ 'name' ] ] =
+				$this->Registry->Db->modules__ddl_column_type_translation( $_connector_field );
 
 			# CREATE TABLEs
 			$this->Registry->Db->simple_exec_create_table_struct( $struct );
@@ -1401,7 +1355,7 @@ class Module_Handler
 		}
 
 		# Update cache and respond
-		$_recache = $this->Registry->loader( "Cache__Recache" );
+		$_recache = new \Persephone\Cache\Recache( $this->Registry );
 		$_recache->main( "modules" );
 		$_recache->main( "modules_connectors" );
 
@@ -1414,6 +1368,7 @@ class Module_Handler
 	 *
 	 * @param    string    Module name
 	 * @param    string    Module ID to exclude from this check
+	 *
 	 * @return   boolean   TRUE if module-name is available, FALSE otherwise
 	 */
 	private function modules__do_create__check_availability ( $m_name, $m_unique_id = null )
@@ -1425,6 +1380,7 @@ class Module_Handler
 			{
 				return true;
 			}
+
 			# Otherwise, give error
 			return false;
 		}
@@ -1512,11 +1468,17 @@ class Module_Handler
 			'do'     => "update",
 			'tables' => "modules",
 			'set'    => array(
-				'm_name'           => ( $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ] ) ? strtolower( $m_name ) : $m_name,
+				'm_name'           => ( $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ] )
+					? strtolower( $m_name )
+					: $m_name,
 				'm_description'    => $m_description,
-				'm_enforce_ssl'    => $input[ 'm_enforce_ssl' ] ? 1 : 0,
+				'm_enforce_ssl'    => $input[ 'm_enforce_ssl' ]
+					? 1
+					: 0,
 				'm_extras'         => serialize( $m_extras_new ),
-				'm_enable_caching' => $input[ 'm_enable_caching' ] ? 1 : 0,
+				'm_enable_caching' => $input[ 'm_enable_caching' ]
+					? 1
+					: 0,
 				'm_is_enabled'     => 0
 			),
 			'where'  => "m_unique_id = " . $this->Registry->Db->quote( $m[ 'm_unique_id' ] )
@@ -1572,8 +1534,9 @@ class Module_Handler
 			}
 
 			# On SUCCESS, update cache and respond
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
+
 			return array(
 				'responseCode'    => 1,
 				'responseMessage' => "Module successfully modified! Please note that the module also has been disabled!<br />Refreshing...",
@@ -1695,9 +1658,10 @@ class Module_Handler
 		//------------
 
 		# Update cache
-		$_recache = $this->Registry->loader( "Cache__Recache" );
+		$_recache = new \Persephone\Cache\Recache( $this->Registry );
 		$_recache->main( "modules" );
 		$_recache->main( "modules_connectors" );
+
 		return array( 'responseCode' => 1, 'responseMessage' => "Module (and its subroutines) successfully removed! Skin templates are still remaining in system!", 'responseAction' => "refresh" );
 	}
 
@@ -1763,9 +1727,13 @@ class Module_Handler
 
 			$_list_of_reserved_names = array( "id", "tags", "timestamp", "submitted_by", "status_published", "status_locked" );
 			$ddl_config__validated   = array(
-				'name'        => $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ] ? strtolower( $input[ 'name' ] ) : $input[ 'name' ],
+				'name'        => $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ]
+					? strtolower( $input[ 'name' ] )
+					: $input[ 'name' ],
 				'label'       => $input[ 'label' ],
-				'is_required' => $input[ 'is_required' ] ? 1 : 0,
+				'is_required' => $input[ 'is_required' ]
+					? 1
+					: 0,
 				'position'    => count( $m[ 'm_data_definition' ] ) + 1,
 			);
 
@@ -1834,8 +1802,9 @@ class Module_Handler
 				if ( $this->Registry->Db->simple_exec_query() )
 				{
 					# On SUCCESS, update cache and respond
-					$_recache = $this->Registry->loader( "Cache__Recache" );
+					$_recache = new \Persephone\Cache\Recache( $this->Registry );
 					$_recache->main( "modules" );
+
 					return array( 'responseCode' => 1, 'responseMessage' => 'Success! Field-registry successfully added!<br />Refreshing...', 'responseAction' => 'refresh' );
 				}
 				else
@@ -1924,7 +1893,9 @@ class Module_Handler
 
 			$_list_of_reserved_names = array( "id", "tags", "timestamp", "submitted_by", "status_published", "status_locked" );
 			$ddl_config__validated   = array(
-				'name'  => $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ] ? strtolower( $input[ 'name__old' ] ) : $input[ 'name__old' ],
+				'name'  => $this->Registry->config[ 'modules' ][ 'm_names_strtolower' ]
+					? strtolower( $input[ 'name__old' ] )
+					: $input[ 'name__old' ],
 				'label' => $input[ 'label' ],
 			);
 
@@ -2031,7 +2002,9 @@ class Module_Handler
 			// Database : ALTER *_conn_repo__* table
 			//-----------------------------------------
 
-			if ( $m[ 'm_data_definition' ][ $ddl_config__validated[ 'name' ] ][ 'connector_enabled' ] and !empty( $m[ 'm_data_definition' ][ $ddl_config__validated[ 'name' ] ][ 'connector_linked' ] ) )
+			if (
+				$m[ 'm_data_definition' ][ $ddl_config__validated[ 'name' ] ][ 'connector_enabled' ] and !empty( $m[ 'm_data_definition' ][ $ddl_config__validated[ 'name' ] ][ 'connector_linked' ] )
+			)
 			{
 				$ddl_config__validated__translated_for_conn               = $this->Registry->Db->modules__ddl_column_type_translation( $ddl_config__validated );
 				$ddl_config__validated__translated_for_conn[ 'old_name' ] = $ddl_config__validated__translated_for_conn[ 'name' ]; // For SQL 'ALTER CHANGE' operation
@@ -2052,16 +2025,18 @@ class Module_Handler
 					'do'     => "update",
 					'tables' => "modules_data_definition",
 					'set'    => array_merge( // Updating ...
-						$ddl_config__validated, array(
-						                             'm_unique_id'          => $m[ 'm_data_definition' ][ $ddl_config__validated[ 'name' ] ][ 'connector_linked' ],
-						                             // ... 'm_unique_id' with that of Connector-unit
-						                             'connector_enabled'    => null,
-						                             // for data-fields belonging to a Connector-unit, 'connector_enabled' = NULL
-						                             'connector_linked'     => null,
-						                             // for data-fields belonging to a Connector-unit, 'connector_linked' = NULL
-						                             'connector_length_cap' => null,
-						                             // for data-fields belonging to a Connector-unit, 'connector_length_cap' = NULL
-						                        ) ),
+						$ddl_config__validated,
+						array(
+						     'm_unique_id'          => $m[ 'm_data_definition' ][ $ddl_config__validated[ 'name' ] ][ 'connector_linked' ],
+						     // ... 'm_unique_id' with that of Connector-unit
+						     'connector_enabled'    => null,
+						     // for data-fields belonging to a Connector-unit, 'connector_enabled' = NULL
+						     'connector_linked'     => null,
+						     // for data-fields belonging to a Connector-unit, 'connector_linked' = NULL
+						     'connector_length_cap' => null,
+						     // for data-fields belonging to a Connector-unit, 'connector_length_cap' = NULL
+						)
+					),
 					'where'  => array(
 						"m_unique_id=" . $this->Registry->Db->quote( $m[ 'm_data_definition' ][ $ddl_config__validated[ 'name' ] ][ 'connector_linked' ] ),
 						"name=" . $this->Registry->Db->quote( $ddl_config__validated[ 'name' ] ),
@@ -2069,9 +2044,8 @@ class Module_Handler
 				);
 				$this->Registry->Db->simple_exec_query();
 
-				$this->Registry
-					->loader( "Cache__Recache" )
-					->main( "modules_connectors" );
+				$_recache = new \Persephone\Cache\Recache( $this->Registry );
+				$_recache->main( "modules_connectors" );
 			}
 
 			//------------------------------------------------
@@ -2089,7 +2063,7 @@ class Module_Handler
 			);
 			$this->Registry->Db->simple_exec_query();
 
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
 
 			return array( 'responseCode' => 1, 'responseMessage' => 'Success! Field-registry successfully altered!<br />Refreshing...', 'responseAction' => 'refresh' );
@@ -2112,11 +2086,16 @@ class Module_Handler
 		$_mimelist_cache = $this->Registry->Cache->cache__do_get( "mimelist" );
 
 		# Fetch what we need
-		$_mimelist_cache__subset = ( !is_null( $this->Registry->Input->request( "mimetype" ) ) and in_array( $this->Registry->Input->request( "mimetype" ), array(
-		                                                                                                                                                         "image",
-		                                                                                                                                                         "audio",
-		                                                                                                                                                         "video"
-		                                                                                                                                                    ) ) ) ? array_values( $_mimelist_cache[ 'by_type' ][ $this->Registry->Input->request( "mimetype" ) ] ) : array_values( $_mimelist_cache[ 'by_ext' ] );
+		$_mimelist_cache__subset = ( !is_null( $this->Registry->Input->request( "mimetype" ) ) and in_array(
+			$this->Registry->Input->request( "mimetype" ),
+			array(
+			     "image",
+			     "audio",
+			     "video"
+			)
+		) )
+			? array_values( $_mimelist_cache[ 'by_type' ][ $this->Registry->Input->request( "mimetype" ) ] )
+			: array_values( $_mimelist_cache[ 'by_ext' ] );
 
 		# ... and parse it
 		$_return = array();
@@ -2171,9 +2150,8 @@ class Module_Handler
 		}
 		if ( $_rows_affected )
 		{
-			$this->Registry
-				->loader( "Cache__Recache" )
-				->main( "modules" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
+			$_recache->main( "modules" );
 		}
 
 		return array( 'responseCode' => 1, 'responseMessage' => "Re-order successful! Refreshing in 2 seconds..." );
@@ -2186,6 +2164,7 @@ class Module_Handler
 	 * @param    string     Module Unique-ID
 	 * @param    array      List of fields to drop
 	 * @param    boolean    Whether to backup the field being dropped, or not
+	 *
 	 * @return   array      Array containing status code pairs (either responseCode-responseMessage (on SUCCESS); or faultCodes-faultMessages (otherwise) )
 	 */
 	private function modules__ddl__do_drop ( $m_unique_id = "", $ddl_checklist = array(), $do_backup_dropped_field = true )
@@ -2310,13 +2289,25 @@ class Module_Handler
 			{
 				if ( count( $list_of_c_unique_ids_to_process ) )
 				{
-					$_where_clause = "m_unique_id IN (" . implode( ",", array_map( array(
-					                                                                    $this->Registry->Db->db,
-					                                                                    "quote"
-					                                                               ), $list_of_c_unique_ids_to_process ) ) . ")" . " OR " . "(" . "m_unique_id=" . $this->Registry->Db->quote( $input[ 'm_unique_id' ] ) . " AND " . "name IN (" . implode( ",", array_map( array(
-					                                                                                                                                                                                                                                                             $this->Registry->Db->db,
-					                                                                                                                                                                                                                                                             "quote"
-					                                                                                                                                                                                                                                                        ), $list_of_columns_to_process ) ) . ")" . ")";
+					$_where_clause = "m_unique_id IN (" . implode(
+						",",
+						array_map(
+							array(
+							     $this->Registry->Db->db,
+							     "quote"
+							),
+							$list_of_c_unique_ids_to_process
+						)
+					) . ")" . " OR " . "(" . "m_unique_id=" . $this->Registry->Db->quote( $input[ 'm_unique_id' ] ) . " AND " . "name IN (" . implode(
+						                 ",",
+						                 array_map(
+							                 array(
+							                      $this->Registry->Db->db,
+							                      "quote"
+							                 ),
+							                 $list_of_columns_to_process
+						                 )
+					                 ) . ")" . ")";
 				}
 				else
 				{
@@ -2390,10 +2381,11 @@ class Module_Handler
 			// SUCCESS : Update cache and reorder DDL
 			//------------------------------------------
 
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
 			$this->modules__ddl__do_sort();
+
 			return array( 'responseCode' => 1, 'responseMessage' => "Success! Field-registry successfully dropped!<br />Refreshing...", "responseAction" => "refresh" );
 		}
 		else
@@ -2401,6 +2393,7 @@ class Module_Handler
 			return array( 'faultCode' => 0, 'faultMessage' => "Invalid module-unique-id provided!" );
 		}
 	}
+
 
 	/**
 	 * Drops DDL elements [module data-fields] from DDL Backup Repo
@@ -2479,13 +2472,25 @@ class Module_Handler
 
 			if ( count( $list_of_c_unique_ids_to_process ) )
 			{
-				$_where_clause = "m_unique_id IN (" . implode( ",", array_map( array(
-				                                                                    $this->Registry->Db->db,
-				                                                                    "quote"
-				                                                               ), $list_of_c_unique_ids_to_process ) ) . ")" . " OR " . "(" . "m_unique_id=" . $this->Registry->Db->quote( $input[ 'm_unique_id' ] ) . " AND " . "name IN (" . implode( ",", array_map( array(
-				                                                                                                                                                                                                                                                             $this->Registry->Db->db,
-				                                                                                                                                                                                                                                                             "quote"
-				                                                                                                                                                                                                                                                        ), $list_of_columns_to_process ) ) . ")" . ")";
+				$_where_clause = "m_unique_id IN (" . implode(
+					",",
+					array_map(
+						array(
+						     $this->Registry->Db->db,
+						     "quote"
+						),
+						$list_of_c_unique_ids_to_process
+					)
+				) . ")" . " OR " . "(" . "m_unique_id=" . $this->Registry->Db->quote( $input[ 'm_unique_id' ] ) . " AND " . "name IN (" . implode(
+					                 ",",
+					                 array_map(
+						                 array(
+						                      $this->Registry->Db->db,
+						                      "quote"
+						                 ),
+						                 $list_of_columns_to_process
+					                 )
+				                 ) . ")" . ")";
 			}
 			else
 			{
@@ -2540,9 +2545,10 @@ class Module_Handler
 			// SUCCESS : Update cache and respond
 			//--------------------------------------
 
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
 			$_recache->main( "modules_connectors" );
+
 			return array( 'responseCode' => 1, 'responseMessage' => 'Success! Field-registry successfully dropped!<br />Refreshing...', 'responseAction' => "refresh" );
 		}
 		else
@@ -2632,9 +2638,10 @@ class Module_Handler
 			if ( $this->Registry->Db->simple_exec_query() )
 			{
 				# On SUCCESS, update cache and respond
-				$_recache = $this->Registry->loader( "Cache__Recache" );
+				$_recache = new \Persephone\Cache\Recache( $this->Registry );
 				$_recache->main( "modules" );
 				$_recache->main( "modules_connectors" );
+
 				return array( 'responseCode' => 1, 'responseMessage' => 'Success! Field-registry successfully restored!<br />Refreshing...', 'responseAction' => "refresh" );
 			}
 			else
@@ -2692,8 +2699,9 @@ class Module_Handler
 						if ( $this->Registry->Db->simple_exec_query() )
 						{
 							# On SUCCESS, update cache and respond
-							$_recache = $this->Registry->loader( "Cache__Recache" );
+							$_recache = new \Persephone\Cache\Recache( $this->Registry );
 							$_recache->main( "modules" );
+
 							return array( 'responseCode' => 1, 'responseMessage' => "Success! Field successfully set as Title!<br />Refreshing...", 'responseAction' => "refresh" );
 						}
 						else
@@ -2723,6 +2731,7 @@ class Module_Handler
 	 * Creates a new Module Subroutine
 	 *
 	 * @param    array   Custom subroutine-configuration
+	 *
 	 * @return   array   Array containing status code pairs (either responseCode-responseMessage (on SUCCESS); or faultCodes-faultMessages (otherwise) )
 	 */
 	private function modules__subroutines__do_create ( $input = null )
@@ -2748,10 +2757,7 @@ class Module_Handler
 			$subroutine[ 's_data_source' ] = $input[ 's_data_source' ];
 			$subroutine[ 's_data_target' ] = $input[ 's_data_target' ];
 
-			$faults = $this->Registry
-				->loader( "Data_Sources__" . ucwords( $subroutine[ 's_data_source' ] ) )
-				->modules__subroutines__do_validate( $subroutine, $input );
-
+			$faults = $this->Registry->loader( "Data_Sources__" . ucwords( $subroutine[ 's_data_source' ] ) )->modules__subroutines__do_validate( $subroutine, $input );
 		}
 		else
 		{
@@ -2784,8 +2790,9 @@ class Module_Handler
 
 		if ( $this->Registry->Db->simple_exec_query() )
 		{
-			$_recache = $this->Registry->loader( "Cache__Recache" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
 			$_recache->main( "modules" );
+
 			return array( 'responseCode' => 1, 'responseMessage' => 'Subroutine successfully created!<br />Refreshing...', 'responseAction' => 'refresh' );
 		}
 		else
@@ -2842,9 +2849,8 @@ class Module_Handler
 
 		if ( $this->Registry->Db->simple_exec_query() )
 		{
-			$this->Registry
-				->loader( "Cache__Recache" )
-				->main( "modules" );
+			$_recache = new \Persephone\Cache\Recache( $this->Registry );
+			$_recache->main( "modules" );
 
 			return array( 'responseCode' => 1, 'responseMessage' => "Success! Subroutine successfully removed!<br />Refreshing...", 'responseAction' => "refresh" );
 		}
@@ -2990,7 +2996,9 @@ class Module_Handler
 
 		foreach ( $input[ 'conf_key' ] as $_k => $_v )
 		{
-			$_v                            = is_array( $_v ) ? implode( ",", $_v ) : $_v;
+			$_v                            = is_array( $_v )
+				? implode( ",", $_v )
+				: $_v;
 			$this->Registry->Db->cur_query = array(
 				'do'     => "update",
 				'tables' => array( "conf_settings" ),
@@ -3001,9 +3009,8 @@ class Module_Handler
 		}
 		if ( $_rows_affected )
 		{
-			$this->Registry
-				->loader( "Cache__Recache" )
-				->main( "settings" );
+			$this->Registry->loader( "Cache__Recache" )->main( "settings" );
+
 			return array( 'responseCode' => 1, 'responseMessage' => "Settings successfully updated! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}
 
@@ -3030,9 +3037,7 @@ class Module_Handler
 			);
 			$this->Registry->Db->simple_exec_query();
 
-			$this->Registry
-				->loader( "Cache__Recache" )
-				->main( "settings" );
+			$this->Registry->loader( "Cache__Recache" )->main( "settings" );
 
 			return array( 'responseCode' => 1, 'responseMessage' => "Setting successfully reverted to its default value! Refreshing in 2 seconds...", 'responseAction' => "refresh:2000" );
 		}

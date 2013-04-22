@@ -16,9 +16,6 @@ if ( !defined( "INIT_DONE" ) )
  * @uses     PHP PECL Memcached extension
  * @see      http://pecl.php.net/package/memcached
  **/
-
-//require_once( dirname( __FILE__ ) . "/_interface.php" );
-
 class Memcached implements Iface
 {
 	/**

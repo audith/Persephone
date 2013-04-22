@@ -640,7 +640,7 @@ class Session
 	 */
 	public function add_query_key ( $key, $value, $session_id = "" )
 	{
-		$session_id = ( $session_id ) ? $this->Registry->Input->clean__md5_hash( $session_id ) : $this->session_id;
+		$session_id = ( $session_id ) ? $this->Registry->Input->sanitize__md5_hash( $session_id ) : $this->session_id;
 
 		if ( $key )
 		{
@@ -2152,7 +2152,7 @@ class Session
 		//----------
 
 		$result     = array();
-		$session_id = $this->Registry->Input->clean__md5_hash( $session_id );
+		$session_id = $this->Registry->Input->sanitize__md5_hash( $session_id );
 
 		if ( $session_id )
 		{

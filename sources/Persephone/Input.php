@@ -232,9 +232,9 @@ class Input
 
 		if ( MAGIC_QUOTES_GPC_ON )
 		{
-			$_POST   = $this->clean__stripslashes( $_POST );
-			$_GET    = $this->clean__stripslashes( $_GET );
-			$_COOKIE = $this->clean__stripslashes( $_COOKIE );
+			$_POST   = $this->sanitize__stripslashes( $_POST );
+			$_GET    = $this->sanitize__stripslashes( $_GET );
+			$_COOKIE = $this->sanitize__stripslashes( $_COOKIE );
 		}
 
 		//-----------------------------------------
@@ -376,32 +376,6 @@ class Input
 		return $t;
 	}
 
-
-	/**
-	 * Clean possible javascipt codes
-	 *
-	 * @param   String  Input
-	 *
-	 * @return  String  Cleaned Input
-	 */
-	/*
-	public function clean__evil_tags ( $t )
-	{
-		$t = preg_replace( "/javascript/i" , "j&#097;v&#097;script", $t );
-		$t = preg_replace( "/alert/i"      , "&#097;lert"          , $t );
-		$t = preg_replace( "/about:/i"     , "&#097;bout:"         , $t );
-		$t = preg_replace( "/onmouseover/i", "&#111;nmouseover"    , $t );
-		$t = preg_replace( "/onclick/i"    , "&#111;nclick"        , $t );
-		$t = preg_replace( "/onload/i"     , "&#111;nload"         , $t );
-		$t = preg_replace( "/onsubmit/i"   , "&#111;nsubmit"       , $t );
-		$t = preg_replace( "/<body/i"      , "&lt;body"            , $t );
-		$t = preg_replace( "/<html/i"      , "&lt;html"            , $t );
-		$t = preg_replace( "/document\./i" , "&#100;ocument."      , $t );
-
-		return $t;
-	}
-	*/
-
 	/**
 	 * Cleans excessive leading and trailing + duplicate separator chars from delim-separated-values (such as CSV)
 	 *
@@ -442,7 +416,7 @@ class Input
 	 *
 	 * @return   string   Parsed String
 	 */
-	public function clean__md5_hash ( $t )
+	public function sanitize__md5_hash ( $t )
 	{
 		return preg_replace( "/[^a-zA-Z0-9]/", "", substr( $t, 0, 32 ) );
 	}
@@ -455,10 +429,10 @@ class Input
 	 *
 	 * @return   mixed    Slash-stripped data
 	 */
-	public function clean__stripslashes ( &$i )
+	public function sanitize__stripslashes ( &$i )
 	{
 		is_array( $i )
-			? array_walk( $i, array( $this, "clean__stripslashes" ) )
+			? array_walk( $i, array( $this, "sanitize__stripslashes" ) )
 			: $i = stripslashes( $i );
 
 		return $i;
@@ -472,10 +446,10 @@ class Input
 	 *
 	 * @return mixed $i Clean data
 	 */
-	public function clean__strip_tags ( $i, $tags_to_strip = "" )
+	public function sanitize__strip_tags ( $i, $tags_to_strip = "" )
 	{
 		$i = is_array( $i )
-			? array_map( array( $this, "clean__strip_tags" ), $i )
+			? array_map( array( $this, "sanitize__strip_tags" ), $i )
 			: strip_tags( $i, $tags_to_strip );
 
 		return $i;
