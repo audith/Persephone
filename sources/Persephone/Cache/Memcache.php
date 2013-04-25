@@ -28,29 +28,30 @@ class Memcache implements Iface
 	 *
 	 * @var string
 	 */
-	public $identifier;
+	private $identifier;
 
 	/**
 	 * FLAG - Whether abstraction failed or not
 	 *
-	 * @var integer
+	 * @var boolean
 	 */
-	public $crashed = 0;
+	public $crashed = false;
 
 	/**
 	 * Memcache connection link
 	 *
 	 * @var Memcache
 	 */
-	public $link;
+	private $link;
 
 
 	/**
 	 * Constructor
 	 *
-	 * @param    \Persephone\Registry  Registry reference
-	 * @param    string                Unique-ID used to hash keys
-	 * @return   boolean
+	 * @param       \Persephone\Registry    $Registry
+	 * @param       string                  $identifier       Unique-ID used to hash keys
+	 *
+	 * @return      boolean
 	 */
 	public function __construct ( \Persephone\Registry $Registry, $identifier = "" )
 	{
@@ -58,15 +59,16 @@ class Memcache implements Iface
 		$this->Registry = $Registry;
 
 		# Cont.
-		if ( ! class_exists( "Memcache" ) )
+		if ( !class_exists( "Memcache" ) )
 		{
-			$this->crashed = 1;
+			$this->crashed = true;
+
 			return false;
 		}
 
 		if ( !$identifier )
 		{
-			$this->identifier = $this->Registry->Input->server('SERVER_NAME');
+			$this->identifier = $this->Registry->Input->server( 'SERVER_NAME' );
 		}
 		else
 		{
@@ -76,63 +78,63 @@ class Memcache implements Iface
 		unset( $identifier );
 
 		# Local object instantiation
-		$this->link = new Memcache();
+		$this->link = new \Memcache();
 
 		# Connection
-		$this->_connect( $this->Registry->config['performance']['cache']['memcache']['connection_pool'] );
-
-		return true;
+		return $this->_connect( $this->Registry->config[ 'performance' ][ 'cache' ][ 'memcache' ][ 'connection_pool' ] );
 	}
 
 
 	/**
 	 * Connect to memcache server
 	 *
-	 * @param       array           Connection information
-	 * @return      boolean         Whether connection was established successfully or not - TRUE on success, FALSE otherwise
-	 * @throws      Exception
+	 * @param       array                       $server_info        Connection information
+	 *
+	 * @return      boolean                                         Whether connection was established successfully or not - TRUE on success, FALSE otherwise
+	 * @throws      \Persephone\Exception
 	 */
 	private function _connect ( $server_info = array() )
 	{
 		try
 		{
-			if ( ! count( $server_info ) )
+			if ( !count( $server_info ) )
 			{
 				throw new \Persephone\Exception( "No servers to connect!" );
 			}
 
 			foreach ( $server_info as $_server )
 			{
-				if ( count( $_server ) != 2 or ( ! isset( $_server[0] ) or empty( $_server[0] ) ) or ( ! isset( $_server[1] ) or empty( $_server[1] ) ) )
+				if ( count( $_server ) != 2 or ( !isset( $_server[ 0 ] ) or empty( $_server[ 0 ] ) ) or ( !isset( $_server[ 1 ] ) or empty( $_server[ 1 ] ) ) )
 				{
-					throw new \Persephone\Exception( "Invalid server information!" );
+					throw new \Persephone\Exception( __METHOD__ . " says: Invalid server information!" );
 				}
 
-				if ( ! is_object( $this->link ) )
+				if ( !is_object( $this->link ) )
 				{
-					throw new \Persephone\Exception( "Link not instantiated?!" );
+					throw new \Persephone\Exception( __METHOD__ . " says: Link not instantiated?!" );
 				}
 
-				if ( ! $this->link->addServer( $_server[0], $_server[1] ) )
+				if ( !$this->link->addServer( $_server[ 0 ], $_server[ 1 ] ) )
 				{
-					throw new \Persephone\Exception( "Connection to " . $_server[0] . ":" . $_server[1] . " failed!" );
+					throw new \Persephone\Exception( __METHOD__ . " says: Connection to " . $_server[ 0 ] . ":" . $_server[ 1 ] . " failed!" );
 				}
 			}
 		}
-		catch ( Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
-			$_log_message = "Cache - memcache - _connect():" . $e->getMessage();
-			$this->Registry->logger__do_log( $_log_message , "WARNING" );
+			$_log_message = __METHOD__ . " says:" . $e->getMessage();
+			\Persephone\Registry::logger__do_log( $_log_message, "WARNING" );
 			$this->crashed = 1;
+
 			return false;
 		}
 
-		if ( method_exists( $this->link , "setCompressThreshold" ) )
+		if ( method_exists( $this->link, "setCompressThreshold" ) )
 		{
 			$this->link->setCompressThreshold( 51200, 0.2 );
 		}
 
-		$this->Registry->logger__do_log( "Cache - Memcache - _connect(): Succeeded to ADD servers to the server pool." , "INFO" );
+		\Persephone\Registry::logger__do_log( __METHOD__ . " says: Succeeded to ADD servers to the server pool.", "INFO" );
 
 		return true;
 	}
@@ -149,6 +151,7 @@ class Memcache implements Iface
 		{
 			return $this->link->close();
 		}
+
 		return true;
 	}
 
@@ -156,15 +159,16 @@ class Memcache implements Iface
 	/**
 	 * Put data into remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to add
-	 * @param       integer         [Optional] Time to live
-	 * @param       boolean         [Optional] Whether to log the PUT action or not
-	 * @return      boolean         Whether cache set was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string          $key            Cache unique key
+	 * @param       string          $value          Cache value to add
+	 * @param       integer         $ttl            [Optional] Time to live
+	 * @param       boolean         $_no_logging    [Optional] Whether to log the PUT action or not
+	 *
+	 * @return      boolean                         Whether cache set was successful or not; TRUE on success, FALSE otherwise
 	 */
-	public function do_put ( $key , $value , $ttl = 0 , $_no_logging = FALSE )
+	public function do_put ( $key, $value, $ttl = 0, $_no_logging = false )
 	{
-		if (  in_array( "zlib", $this->Registry->config['runtime']['loaded_extensions'] ) )
+		if ( in_array( "zlib", $this->Registry->config[ 'runtime' ][ 'loaded_extensions' ] ) )
 		{
 			$return = $this->link->set( md5( $this->identifier . $key ), $value, MEMCACHE_COMPRESSED, intval( $ttl ) );
 		}
@@ -173,10 +177,18 @@ class Memcache implements Iface
 			$return = $this->link->set( md5( $this->identifier . $key ), $value, 0, intval( $ttl ) );
 		}
 
-		if ( $_no_logging === FALSE )
+		if ( $_no_logging === false )
 		{
-			$_log_message = "Cache - Memcache - do_put(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to STORE (PUT) item '" . $key . "'.";
-			$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+			$_log_message = __METHOD__ . " says: " .
+			                ( $return == false
+				                ? "Failed"
+				                : "Succeeded" ) . " to STORE (PUT) item '" . $key . "'.";
+			\Persephone\Registry::logger__do_log(
+				$_log_message,
+				$return == false
+					? "WARNING"
+					: "INFO"
+			);
 		}
 
 		return $return;
@@ -186,17 +198,27 @@ class Memcache implements Iface
 	/**
 	 * Update value in remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to set
-	 * @param       integer         [Optional] Time to live
-	 * @return      boolean         Whether cache update was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key      Cache unique key
+	 * @param       string       $value    Cache value to set
+	 * @param       integer      $ttl      [Optional] Time to live
+	 *
+	 * @return      boolean                Whether cache update was successful or not; TRUE on success, FALSE otherwise
 	 */
-	public function do_update ( $key , $value , $ttl = 0 )
+	public function do_update ( $key, $value, $ttl = 0 )
 	{
 		$this->do_remove( $key );
-		$return = $this->do_put( $key , $value, $ttl, TRUE );
-		$_log_message = "Cache - Memcache - do_update(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to REPLACE item '" . $key . "'.";
-		$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+		$return       = $this->do_put( $key, $value, $ttl, true );
+		$_log_message = __METHOD__ . " says: " .
+		                ( $return == false
+			                ? "Failed"
+			                : "Succeeded" ) . " to REPLACE item '" . $key . "'.";
+		\Persephone\Registry::logger__do_log(
+			$_log_message,
+			$return == false
+				? "WARNING"
+				: "INFO"
+		);
+
 		return $return;
 	}
 
@@ -204,14 +226,24 @@ class Memcache implements Iface
 	/**
 	 * Retrieve a value from remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      mixed           Cached value
+	 * @param       string       $key      Cache unique key
+	 *
+	 * @return      mixed                  Cached value
 	 */
 	public function do_get ( $key )
 	{
-		$return = $this->link->get( md5( $this->identifier . $key ) );
-		$_log_message = "Cache - Memcache - do_get(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to GET item '" . $key . "'.";
-		$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+		$return       = $this->link->get( md5( $this->identifier . $key ) );
+		$_log_message = __METHOD__ . " says: " .
+		                ( $return == false
+			                ? "Failed"
+			                : "Succeeded" ) . " to GET item '" . $key . "'.";
+		\Persephone\Registry::logger__do_log(
+			$_log_message,
+			$return == false
+				? "WARNING"
+				: "INFO"
+		);
+
 		return $return;
 	}
 
@@ -219,15 +251,24 @@ class Memcache implements Iface
 	/**
 	 * Remove a value in the remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      boolean         Whether cache removal was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key       Cache unique key
+	 *
+	 * @return      boolean                 Whether cache removal was successful or not; TRUE on success, FALSE otherwise
 	 */
 	public function do_remove ( $key )
 	{
-		$return = $this->link->delete( md5( $this->identifier . $key ) );
-		$_log_message = "Cache - Memcache - do_remove(): " . ( $return == FALSE ? "Failed" : "Succeeded" ) . " to REMOVE item '" . $key . "'.";
-		$this->Registry->logger__do_log( $_log_message , $return == FALSE ? "WARNING" : "INFO" );
+		$return       = $this->link->delete( md5( $this->identifier . $key ) );
+		$_log_message = __METHOD__ . " says: " .
+		                ( $return == false
+			                ? "Failed"
+			                : "Succeeded" ) . " to REMOVE item '" . $key . "'.";
+		\Persephone\Registry::logger__do_log(
+			$_log_message,
+			$return == false
+				? "WARNING"
+				: "INFO"
+		);
+
 		return $return;
 	}
 }
-?>

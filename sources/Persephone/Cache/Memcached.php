@@ -30,29 +30,30 @@ class Memcached implements Iface
 	 *
 	 * @var string
 	 */
-	public $identifier;
+	private $identifier;
 
 	/**
 	 * FLAG - Whether abstraction failed or not
 	 *
-	 * @var integer
+	 * @var boolean
 	 */
-	public $crashed = 0;
+	public $crashed = false;
 
 	/**
 	 * Memcached class object
 	 *
 	 * @var Memcached
 	 */
-	public $link;
+	private $link;
 
 
 	/**
 	 * Constructor
 	 *
-	 * @param    \Persephone\Registry Registry reference
-	 * @param    string               Unique-ID used to hash keys
-	 * @return   boolean
+	 * @param       \Persephone\Registry    $Registry
+	 * @param       string                  $identifier       Unique-ID used to hash keys
+	 *
+	 * @return      boolean
 	 */
 	public function __construct ( \Persephone\Registry $Registry, $identifier = "" )
 	{
@@ -62,7 +63,8 @@ class Memcached implements Iface
 		# Cont.
 		if ( !extension_loaded( "memcached" ) )
 		{
-			$this->crashed = 1;
+			$this->crashed = true;
+
 			return false;
 		}
 
@@ -74,24 +76,22 @@ class Memcached implements Iface
 		{
 			$this->identifier = $identifier;
 		}
-		unset( $identifier );
 
 		# Local object instantiation
-		$this->link = new Memcached( $this->identifier );
+		$this->link = new \Memcached( $this->identifier );
 
 		# Connection
-		$this->_connect( $this->Registry->config[ 'performance' ][ 'cache' ][ 'memcache' ][ 'connection_pool' ] );
-
-		return true;
+		return $this->_connect( $this->Registry->config[ 'performance' ][ 'cache' ][ 'memcache' ][ 'connection_pool' ] );
 	}
 
 
 	/**
 	 * Prepares detailed result/status log message
 	 *
-	 * @param    string   Message to be prepended to a log
-	 * @param    boolean  [Optional] Whether to log the message or not; defaults to FALSE
-	 * @param    string   [Optional] Log priority
+	 * @param    string   $message_to_prepend_to_log     Message to be prepended to a log
+	 * @param    boolean  $do_perform_log                [Optional] Whether to log the message or not; defaults to FALSE
+	 * @param    string   $priority                      [Optional] Log priority
+	 *
 	 * @return   string   Detailed log message
 	 */
 	private function _result_codes__do_log ( $message_to_prepend_to_log = "", $do_perform_log = false, $priority = "WARNING" )
@@ -100,62 +100,62 @@ class Memcached implements Iface
 		$_result_code   = $this->link->getResultCode();
 		switch ( $_result_code )
 		{
-			case Memcached::RES_SUCCESS:
-			case Memcached::RES_FAILURE:
+			case \Memcached::RES_SUCCESS:
+			case \Memcached::RES_FAILURE:
 				break;
-			case Memcached::RES_CONNECTION_SOCKET_CREATE_FAILURE:
+			case \Memcached::RES_CONNECTION_SOCKET_CREATE_FAILURE:
 				$message_to_log .= " Failed to create network socket...";
 				break;
-			case Memcached::RES_HOST_LOOKUP_FAILURE:
+			case \Memcached::RES_HOST_LOOKUP_FAILURE:
 				$message_to_log .= " DNS lookup failed...";
 				break;
-			case Memcached::RES_NO_SERVERS:
+			case \Memcached::RES_NO_SERVERS:
 				$message_to_log .= " Server list is empty...";
 				break;
-			case Memcached::RES_PARTIAL_READ:
+			case \Memcached::RES_PARTIAL_READ:
 				$message_to_log .= " Partial network data read error...";
 				break;
-			case Memcached::RES_CLIENT_ERROR:
+			case \Memcached::RES_CLIENT_ERROR:
 				$message_to_log .= " Error on the client side...";
 				break;
-			case Memcached::RES_SERVER_ERROR:
+			case \Memcached::RES_SERVER_ERROR:
 				$message_to_log .= " Error on the server side...";
 				break;
-			case Memcached::RES_NOTFOUND:
+			case \Memcached::RES_NOTFOUND:
 				$message_to_log .= " Item not found...";
 				break;
-			case Memcached::RES_DATA_EXISTS:
+			case \Memcached::RES_DATA_EXISTS:
 				$message_to_log .= " Failed to do compare-and-swap: item you are trying to store has been modified since you last fetched it...";
 				break;
-			case Memcached::RES_SOME_ERRORS:
+			case \Memcached::RES_SOME_ERRORS:
 				$message_to_log .= " Some errors occurred during multi-get...";
 				break;
-			case Memcached::RES_UNKNOWN_READ_FAILURE:
+			case \Memcached::RES_UNKNOWN_READ_FAILURE:
 				$message_to_log .= " Failed to read network data...";
 				break;
-			case Memcached::RES_PROTOCOL_ERROR:
+			case \Memcached::RES_PROTOCOL_ERROR:
 				$message_to_log .= " Bad command in memcached protocol...";
 				break;
-			case Memcached::RES_WRITE_FAILURE:
+			case \Memcached::RES_WRITE_FAILURE:
 				$message_to_log .= " Failed to write network data...";
 				break;
-			case Memcached::RES_TIMEOUT:
+			case \Memcached::RES_TIMEOUT:
 				$message_to_log .= " Operation timed out...";
 				break;
-			case Memcached::RES_BAD_KEY_PROVIDED:
+			case \Memcached::RES_BAD_KEY_PROVIDED:
 				$message_to_log .= " Bad key detected...";
 				break;
-			case Memcached::RES_PAYLOAD_FAILURE:
+			case \Memcached::RES_PAYLOAD_FAILURE:
 				$message_to_log .= " Payload failure: could not compress/decompress or serialize/unserialize the value...";
 				break;
-			case Memcached::RES_NOTSTORED:
+			case \Memcached::RES_NOTSTORED:
 				$message_to_log .= "; but not because of an error. This normally means that either the condition for an \"add\" or a \"replace\" command wasn't met, or that the item is in a delete queue...";
 				break;
 		}
 
 		if ( $do_perform_log )
 		{
-			$this->Registry->logger__do_log( $message_to_log, $priority );
+			\Persephone\Registry::logger__do_log( $message_to_log, $priority );
 		}
 
 		return $message_to_log;
@@ -165,9 +165,10 @@ class Memcached implements Iface
 	/**
 	 * Connect to memcache server
 	 *
-	 * @param       array           Connection information
-	 * @return      boolean         Whether connection was established successfully or not - TRUE on success, FALSE otherwise
-	 * @throws      Exception
+	 * @param       array                       $server_info      Connection information
+	 *
+	 * @return      boolean                                       Whether connection was established successfully or not - TRUE on success, FALSE otherwise
+	 * @throws      \Persephone\Exception
 	 */
 	private function _connect ( $server_info = array() )
 	{
@@ -180,21 +181,22 @@ class Memcached implements Iface
 
 			if ( ( $return = $this->link->addServers( $server_info ) ) === false )
 			{
-				$_log_message = $this->_result_codes__do_log( "Cache - Memcached - _connect(): Failed to ADD servers to the server pool." );
+				$_log_message = $this->_result_codes__do_log( __METHOD__ . " says: Failed to ADD servers to the server pool." );
 				throw new \Persephone\Exception( $_log_message );
 			}
 		}
-		catch ( Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
-			$this->Registry->logger__do_log( $e->getMessage(), "WARNING" );
+			\Persephone\Registry::logger__do_log( $e->getMessage(), "WARNING" );
 			$this->crashed = 1;
+
 			return false;
 		}
 
-		$this->link->setOption( Memcached::OPT_COMPRESSION, true );
-		$this->link->setOption( Memcached::OPT_TCP_NODELAY, true );
+		$this->link->setOption( \Memcached::OPT_COMPRESSION, true );
+		$this->link->setOption( \Memcached::OPT_TCP_NODELAY, true );
 
-		$this->_result_codes__do_log( "Cache - Memcached - _connect(): Succeeded to ADD servers to the server pool.", true, "INFO" );
+		$this->_result_codes__do_log( __METHOD__ . " says: Succeeded to ADD servers to the server pool.", true, "INFO" );
 
 		return true;
 	}
@@ -219,20 +221,31 @@ class Memcached implements Iface
 	/**
 	 * Put data into remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to add
-	 * @param       integer         [Optional] Time to live
-	 * @param       boolean         [Optional] Whether to log the PUT action or not
-	 * @return      boolean         Whether cache set was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key             Cache unique key
+	 * @param       string       $value           Cache value to add
+	 * @param       integer      $ttl             [Optional] Time to live
+	 * @param       boolean      $_no_logging     [Optional] Whether to log the PUT action or not
+	 *
+	 * @return      boolean                       Whether cache set was successful or not; TRUE on success, FALSE otherwise
 	 */
 	public function do_put ( $key, $value, $ttl = 0, $_no_logging = false )
 	{
 		$return = $this->link->set( md5( $this->identifier . $key ), $value, intval( $ttl ) );
 		if ( $_no_logging === false )
 		{
-			$_log_message = "Cache - Memcached - do_put(): " . ( $return == false ? "Failed" : "Succeeded" ) . " to STORE (PUT) item '" . $key . "'.";
-			$this->_result_codes__do_log( $_log_message, true, $return == false ? "WARNING" : "INFO" );
+			$_log_message = __METHOD__ . " says: " .
+			                ( $return == false
+				                ? "Failed"
+				                : "Succeeded" ) . " to STORE (PUT) item '" . $key . "'.";
+			$this->_result_codes__do_log(
+				$_log_message,
+				true,
+				$return == false
+					? "WARNING"
+					: "INFO"
+			);
 		}
+
 		return $return;
 	}
 
@@ -240,18 +253,29 @@ class Memcached implements Iface
 	/**
 	 * Update value in remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to set
-	 * @param       integer         [Optional] Time to live
-	 * @return      boolean         Whether cache update was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string        $key        Cache unique key
+	 * @param       string        $value      Cache value to set
+	 * @param       integer       $ttl        [Optional] Time to live
+	 *
+	 * @return      boolean                   Whether cache update was successful or not; TRUE on success, FALSE otherwise
 	 */
 	public function do_update ( $key, $value, $ttl = 0 )
 	{
 		$this->do_remove( $key );
 		$return = $this->do_put( $key, $value, $ttl, true );
 		// $return = $this->link->replace( md5( $this->identifier . $key ), $value, $ttl );
-		$_log_message = "Cache - Memcached - do_update(): " . ( $return == false ? "Failed" : "Succeeded" ) . " to REPLACE item '" . $key . "'.";
-		$this->_result_codes__do_log( $_log_message, true, $return == false ? "WARNING" : "INFO" );
+		$_log_message = __METHOD__ . " says: " .
+		                ( $return == false
+			                ? "Failed"
+			                : "Succeeded" ) . " to REPLACE item '" . $key . "'.";
+		$this->_result_codes__do_log(
+			$_log_message,
+			true,
+			$return == false
+				? "WARNING"
+				: "INFO"
+		);
+
 		return $return;
 	}
 
@@ -259,14 +283,25 @@ class Memcached implements Iface
 	/**
 	 * Retrieve a value from remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      mixed           Cached value
+	 * @param       string      $key      Cache unique key
+	 *
+	 * @return      mixed                 Cached value
 	 */
 	public function do_get ( $key )
 	{
 		$return       = $this->link->get( md5( $this->identifier . $key ) );
-		$_log_message = "Cache - Memcached - do_get(): " . ( $return == false ? "Failed" : "Succeeded" ) . " to GET item '" . $key . "'.";
-		$this->_result_codes__do_log( $_log_message, true, $return == false ? "WARNING" : "INFO" );
+		$_log_message = "Cache - Memcached - do_get(): " .
+		                ( $return == false
+			                ? "Failed"
+			                : "Succeeded" ) . " to GET item '" . $key . "'.";
+		$this->_result_codes__do_log(
+			$_log_message,
+			true,
+			$return == false
+				? "WARNING"
+				: "INFO"
+		);
+
 		return $return;
 	}
 
@@ -274,15 +309,25 @@ class Memcached implements Iface
 	/**
 	 * Remove a value in the remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      boolean         Whether cache removal was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key     Cache unique key
+	 *
+	 * @return      boolean               Whether cache removal was successful or not; TRUE on success, FALSE otherwise
 	 */
 	public function do_remove ( $key )
 	{
 		$return       = $this->link->delete( md5( $this->identifier . $key ) );
-		$_log_message = "Cache - Memcached - do_remove(): " . ( $return == false ? "Failed" : "Succeeded" ) . " to REMOVE item '" . $key . "'.";
-		$this->_result_codes__do_log( $_log_message, true, $return == false ? "WARNING" : "INFO" );
+		$_log_message = "Cache - Memcached - do_remove(): " .
+		                ( $return == false
+			                ? "Failed"
+			                : "Succeeded" ) . " to REMOVE item '" . $key . "'.";
+		$this->_result_codes__do_log(
+			$_log_message,
+			true,
+			$return == false
+				? "WARNING"
+				: "INFO"
+		);
+
 		return $return;
 	}
 }
-?>

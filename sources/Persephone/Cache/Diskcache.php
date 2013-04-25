@@ -8,7 +8,7 @@ if ( !defined( "INIT_DONE" ) )
 }
 
 /**
- * Cache > Drivers > File-system
+ * Cache > Drivers > Diskcache
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
@@ -28,46 +28,43 @@ class Diskcache implements Iface
 	 *
 	 * @var string
 	 */
-	public $identifier;
+	private $identifier;
 
 	/**
 	 * FLAG - Whether abstraction failed or not
 	 *
-	 * @var integer
+	 * @var boolean
 	 */
-	public $crashed = 0;
+	public $crashed = false;
 
 
 	/**
 	 * Constructor
 	 *
-	 * @param    \Persephone\Registry  Registry reference
-	 * @param    string                Unique-ID used to hash keys
-	 * @return   boolean
+	 * @param       \Persephone\Registry    $Registry
+	 * @param       string                  $identifier       Unique-ID used to hash keys
+	 *
+	 * @return      boolean
 	 */
-	public function __construct ( \Persephone\Registry $Registry , $identifier = "" )
+	public function __construct ( \Persephone\Registry $Registry, $identifier = "" )
 	{
 		$this->Registry = $Registry;
 
-		if ( ! is_writeable( PATH_CACHE ) )
+		if ( !is_writeable( PATH_CACHE ) )
 		{
-			$this->crashed = 1;
+			$this->crashed = true;
+
 			return false;
 		}
 
-		if ( ! $identifier )
+		if ( !$identifier )
 		{
-			$this->identifier = $this->Registry->Input->server('SERVER_NAME');
+			$this->identifier = $this->Registry->Input->server( 'SERVER_NAME' );
 		}
 		else
 		{
 			$this->identifier = $identifier;
 		}
-
-		# Logging
-		$this->Registry->logger__do_performance_log( "Cache-Abstraction - Diskcache Identifier: " . $this->identifier , "INFO" );
-
-		unset( $identifier );
 
 		return true;
 	}
@@ -76,44 +73,56 @@ class Diskcache implements Iface
 	/**
 	 * Disconnect from remote cache store
 	 *
-	 * @return   boolean    Whether or not the disconnect attempt was successful - TRUE on success, FALSE otherwise
+	 * @return    boolean    Whether or not the disconnect attempt was successful - TRUE on success, FALSE otherwise
 	 */
 	public function disconnect ()
 	{
-		return TRUE;
+		return true;
 	}
 
 
 	/**
 	 * Put data into remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to add
-	 * @param       integer         [Optional] Time to live
-	 * @return      boolean         Whether cache set was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key      Cache unique key
+	 * @param       string       $value    Cache value to add
+	 * @param       integer      $ttl      [Optional] Time to live
+	 *
+	 * @return      boolean                Whether cache set was successful or not; TRUE on success, FALSE otherwise
+	 * @throws      \Persephone\Exception
 	 */
-	public function do_put ( $key , $value , $ttl = 0 )
+	public function do_put ( $key, $value, $ttl = 0 )
 	{
 		//--------------
 		// Cache file
 		//--------------
 
 		# Check possibly existing cache file - we ignore TTL
-		$_cache_file_path = PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php";
-		if ( file_exists(  $_cache_file_path ) and is_file( $_cache_file_path ) and ! is_writable( $_cache_file_path ) )
+		try
 		{
-			throw new \Persephone\Exception( "Cache Abstraction - Diskcache: Cache file for key '" . $key . "' is NOT WRITABLE!" );
+			$_cache_file_path = PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php";
+			if ( file_exists( $_cache_file_path ) and is_file( $_cache_file_path ) and !is_writable( $_cache_file_path ) )
+			{
+				throw new \Persephone\Exception( __METHOD__ . " says: Cache file for key '" . $key . "' is NOT WRITABLE!" );
+			}
+		}
+		catch ( \Persephone\Exception $e )
+		{
+			return false;
 		}
 
 		# Open file for writing
-		$fh = fopen( $_cache_file_path , "wb" );
-		$this->Registry->logger__do_log(
-				"Cache Abstraction - Diskcache: FOPEN "
-					. ( $fh === FALSE ? "failed" : "succeeded" )
-					. " for key '" . $key . "'" ,
-				$fh === FALSE ? "ERROR" : "INFO"
-			);
-		if ( ! $fh )
+		$fh = fopen( $_cache_file_path, "wb" );
+		\Persephone\Registry::logger__do_log(
+			__METHOD__ . " says: FOPEN " .
+			( $fh === false
+				? "failed"
+				: "succeeded" ) . " for key '" . $key . "'",
+			$fh === false
+				? "ERROR"
+				: "INFO"
+		);
+		if ( $fh === false )
 		{
 			return false;
 		}
@@ -131,67 +140,60 @@ class Diskcache implements Iface
 		}
 
 		$extra_flag .= "\n" . '$ttl = ' . $ttl . ";\n\n";
-		// $value = "'" . addslashes( $value ) . "'";
-		// $file_content = "<" . "?php\n\n" . '$value = ' . $value . ";\n" . $extra_flag . "\n?" . ">";
-		$file_content = "<" . "?php\n\n" . '$value' . " = <<<" . strtoupper( $key ) . "\n" . $value . "\n" . strtoupper( $key ) . ";\n" . $extra_flag . "\n?" . ">";
+		$file_content = "<" . "?php\n\n" . '$value' . " = <<<'" . strtoupper( $key ) . "'\n" . $value . "\n" . strtoupper( $key ) . ";\n" . $extra_flag . "\n?" . ">";
 
 		//-----------------------
 		// Write cache to file
 		//-----------------------
 
 		# LOCK
-		$_flock = flock( $fh, LOCK_EX );
-		if ( $_flock === false )
+		if ( ( $_flock = flock( $fh, LOCK_EX ) ) === false )
 		{
-			throw new \Persephone\Exception( "Cache Abstraction - Diskcache: FLOCK failed for key '" . $key . "'" );
+			throw new \Persephone\Exception( __METHOD__ . " says: FLOCK failed for key '" . $key . "'" );
 		}
 		else
 		{
-			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FLOCK succeeded for key '" . $key . "'" , "INFO" );
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FLOCK succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# Write
-		$_fwrite = fwrite( $fh, $file_content );
-		if ( $_fwrite === false )
+		if ( ( $_fwrite = fwrite( $fh, $file_content ) ) === false )
 		{
-			throw new \Persephone\Exception( "Cache Abstraction - Diskcache: FWRITE failed for key '" . $key . "'" );
+			throw new \Persephone\Exception( __METHOD__ . " says: FWRITE failed for key '" . $key . "'" );
 		}
 		else
 		{
-			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FWRITE succeeded for key '" . $key . "'" , "INFO" );
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FWRITE succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# Unlock
-		$_flock = flock( $fh, LOCK_UN );
-		if ( $_flock === false )
+		if ( ( $_flock = flock( $fh, LOCK_UN ) ) === false )
 		{
-			throw new \Persephone\Exception( "Cache Abstraction - Diskcache: FUNLOCK failed for key '" . $key . "'" );
+			throw new \Persephone\Exception( __METHOD__ . " says: FUNLOCK failed for key '" . $key . "'" );
 		}
 		else
 		{
-			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FUNLOCK succeeded for key '" . $key . "'" , "INFO" );
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FUNLOCK succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# Close file handler
-		$_fclose = fclose( $fh );
-		if ( $_fclose === false )
+		if ( ( $_fclose = fclose( $fh ) ) === false )
 		{
-			throw new \Persephone\Exception( "Cache Abstraction - Diskcache: FCLOSE failed for key '" . $key . "'" );
+			throw new \Persephone\Exception( __METHOD__ . " says: FCLOSE failed for key '" . $key . "'" );
 		}
 		else
 		{
-			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: FCLOSE succeeded for key '" . $key . "'" , "INFO" );
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FCLOSE succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# chmod
-		$_chmod = chmod( $_cache_file_path , 0777 );
-		if ( $_chmod === false )
+		if ( ( $_chmod = chmod( $_cache_file_path, 0777 ) ) === false )
 		{
-			throw new \Persephone\Exception( "Cache Abstraction - Diskcache: CHMOD failed for key '" . $key . "'" );
+			throw new \Persephone\Exception( __METHOD__ . " says: CHMOD failed for key '" . $key . "'" );
 		}
 		else
 		{
-			$this->Registry->logger__do_log( "Cache Abstraction - Diskcache: CHMOD succeeded for key '" . $key . "'" , "INFO" );
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: CHMOD succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		return true;
@@ -201,12 +203,13 @@ class Diskcache implements Iface
 	/**
 	 * Update value in remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to set
-	 * @param       integer         [Optional] Time to live
-	 * @return      boolean         Whether cache update was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key      Cache unique key
+	 * @param       string       $value    Cache value to set
+	 * @param       integer      $ttl      [Optional] Time to live
+	 *
+	 * @return      boolean                Whether cache update was successful or not; TRUE on success, FALSE otherwise
 	 */
-	public function do_update ( $key , $value , $ttl = 0 )
+	public function do_update ( $key, $value, $ttl = 0 )
 	{
 		$this->do_remove( $key );
 		return $this->do_put( $key, $value, $ttl );
@@ -216,32 +219,31 @@ class Diskcache implements Iface
 	/**
 	 * Retrieve a value from remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      mixed           Cached value
+	 * @param       string     $key     Cache unique key
+	 *
+	 * @return      mixed               Cached value
 	 */
 	public function do_get ( $key )
 	{
 		$return_val = "";
 
-		if ( file_exists( PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php" ) )
+		if ( file_exists( $_cache_file_location = PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php" ) )
 		{
-			require PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php";
+			require $_cache_file_location;
 
-			// $return_val = stripslashes( $value );
 			$return_val = $value;
-
-			if ( isset( $is_array ) AND $is_array == 1 )
+			if ( isset( $is_array ) and $is_array == 1 )
 			{
 				$return_val = unserialize( $return_val );
 			}
 
-			if ( isset( $ttl ) AND $ttl > 0 )
+			if ( isset( $ttl ) and $ttl > 0 )
 			{
-				if ( $mtime = filemtime( PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php" ) )
+				if ( $mtime = filemtime( $_cache_file_location ) )
 				{
 					if ( time() - $mtime > $ttl )
 					{
-						return FALSE;
+						return false;
 					}
 				}
 			}
@@ -254,14 +256,17 @@ class Diskcache implements Iface
 	/**
 	 * Remove a value in the remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      boolean         Whether cache removal was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string      $key    Cache unique key
+	 *
+	 * @return      boolean             Whether cache removal was successful or not; TRUE on success, FALSE otherwise
 	 */
 	public function do_remove ( $key )
 	{
 		if ( file_exists( PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php" ) )
 		{
-			@unlink( PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php" );
+			return unlink( PATH_CACHE . "/" . md5( $this->identifier . $key ) . ".php" );
 		}
+
+		return true;
 	}
 }

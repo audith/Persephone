@@ -14,4 +14,3 @@ require_once( "./init.php" );
 
 $Registry = \Persephone\Registry::init();
 $Registry->Display->do_display();
-exit();

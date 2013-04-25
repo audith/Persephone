@@ -1,7 +1,6 @@
 <?php
 
 namespace Persephone;
-use \Persephone\Input as Input;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -14,47 +13,56 @@ if ( !defined( "INIT_DONE" ) )
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
-**/
+ */
 final class Registry
 {
 	/**
 	 * Self-Instance [Singleton implementation]
+	 *
 	 * @var Registry
 	 */
 	private static $_instance;
 
+	public static $_is_config_file_read = false;
+
 	/**
 	 * Configuration data
+	 *
 	 * @var array
 	 */
 	public $API_Server;
 
 	/**
 	 * Registered Classes
+	 *
 	 * @var array
 	 */
 	public $classes = array();
 
 	/**
 	 * Configuration data
+	 *
 	 * @var array
 	 */
-	public $config  = array();
+	public $config = array();
 
 	/**
 	 * Instance of DB class
+	 *
 	 * @var Database
 	 */
 	public $Db;
 
 	/**
 	 * Instance of Display class
+	 *
 	 * @var Display
 	 */
 	public $Display;
 
 	/**
 	 * Instance of Input class
+	 *
 	 * @var Input
 	 */
 	public $Input;
@@ -66,60 +74,69 @@ final class Registry
 
 	/**
 	 * Current member data
+	 *
 	 * @var array
 	 */
 	public $member = array();
 
 	/**
 	 * Instance of Modules class
+	 *
 	 * @var Modules
 	 */
 	public $Modules;
 
 	/**
 	 * Output buffering - Is compression turned on?
+	 *
 	 * @var boolean
 	 */
 	public $ob_compression = false;
 
 	/**
 	 * Output buffering - Is the topmost buffer active?
+	 *
 	 * @var boolean
 	 */
 	public $ob_status = false;
 
 	/**
 	 * FLAG: Don't output anything from now on (on shutdown, OB is clean-end'ed)
+	 *
 	 * @var boolean
 	 */
 	public $ob_no_output = false;
 
 	/**
 	 * Instance of Session class
+	 *
 	 * @var Session
 	 */
 	public $Session;
 
 	/**
 	 * Debug variables
+	 *
 	 * @var mixed
 	 */
 	static public $starttime;
+
 	static public $totaltime;
+
 	static public $time_delta = array();
 
 
 	/**
 	 * Constructor - [Singleton implementation - cannot be accessed directly]
-	**/
-	private function __construct ( )
+	 **/
+	private function __construct ()
 	{
 		//------------------------------------
 		// Start Exception handlers & Debug
 		//------------------------------------
 
 		# First log
-		self::logger__do_log( "Script start-up." );
+		self::logger__do_log( __METHOD__ . " says: Script start-up." );
 
 		# Start timer
 		self::$starttime = self::debug__timer_start();
@@ -129,29 +146,28 @@ final class Registry
 		//--------------------
 
 		# Loaded PHP extensions
-		$this->config['runtime']['loaded_extensions'] = get_loaded_extensions();
+		$this->config[ 'runtime' ][ 'loaded_extensions' ] = get_loaded_extensions();
 
 		# Fetch primary configuration settings from config-file
-		$this->config = array_merge( $this->config__file_read(), $this->config );
-
+		$this->config               = array_merge( $_config = $this->config__file_read(), $this->config );
+		self::$_is_config_file_read = true;
 		//---------------------------
 		// Instantiate Db Driver
 		//---------------------------
 
-		$_db_class_name = '\Persephone\Database\Drivers\\' . ucwords( $this->config['sql']['driver'] );
-		$this->Db = new $_db_class_name( $this );
-
+		$_db_class_name = '\Persephone\Database\Drivers\\' . ucwords( $this->config[ 'sql' ][ 'driver' ] );
+		$this->Db       = new $_db_class_name( $this );
 		//------------------------
 		// Instantiate Input class
 		//------------------------
 
-		$this->Input = new \Persephone\Input( $this );
+		$this->Input = new Input( $this );
 
 		//----------------------------------------
 		// Instantiate Caching Storage Management
 		//----------------------------------------
 
-		$this->Cache = new \Persephone\Cache( $this );
+		$this->Cache = new Cache( $this );
 
 		//------------------
 		// Cache::init()
@@ -166,48 +182,48 @@ final class Registry
 		// Instantiate Session class
 		//-----------------------------
 
-		$this->Session = new \Persephone\Session( $this );
+		$this->Session = new Session( $this );
 
 		//-------------------------------------------------
 		// Fetch additional configuration settings...
 		//-------------------------------------------------
 
-		foreach ( $this->Cache->cache['settings']['by_key'] as $_k=>$_v )
+		foreach ( $this->Cache->cache[ 'settings' ][ 'by_key' ] as $_k => $_v )
 		{
-			foreach ( $_v as $__k=>$__v )
+			foreach ( $_v as $__k => $__v )
 			{
-				if ( ! is_array( $__v ) )
+				if ( !is_array( $__v ) )
 				{
 					continue;
 				}
 				$_conf_value = null;
-				switch ( $__v['conf_type'] )
+				switch ( $__v[ 'conf_type' ] )
 				{
 					case 'yes_no':
-						if ( $__v['conf_value'] == '1' )
+						if ( $__v[ 'conf_value' ] == '1' )
 						{
 							(int) $_conf_value = 1;
 						}
-						elseif ( $__v['conf_value'] == '0' )
+						elseif ( $__v[ 'conf_value' ] == '0' )
 						{
 							(int) $_conf_value = 0;
 						}
 						else
 						{
-							(int) $_conf_value = $__v['conf_default'];
+							(int) $_conf_value = $__v[ 'conf_default' ];
 						}
 						break;
 
 					case 'input':
 					case 'textarea':
 					case 'dropdown':
-						if ( strval( $__v['conf_value'] ) == '' )
+						if ( strval( $__v[ 'conf_value' ] ) == '' )
 						{
-							(string) $_conf_value = $__v['conf_default'];
+							(string) $_conf_value = $__v[ 'conf_default' ];
 						}
 						else
 						{
-							(string) $_conf_value = $__v['conf_value'];
+							(string) $_conf_value = $__v[ 'conf_value' ];
 						}
 						break;
 				}
@@ -235,7 +251,7 @@ final class Registry
 		// Instantiate Module class
 		//--------------------------------
 
-		$this->Modules = new \Persephone\Modules( $this );
+		$this->Modules = new Modules( $this );
 
 		//--------------------
 		// Session::init()
@@ -247,7 +263,7 @@ final class Registry
 		// Instantiate Display class
 		//------------------------------
 
-		$this->Display = new \Persephone\Display( $this );
+		$this->Display = new Display( $this );
 
 		//------------------
 		// Module::init()
@@ -258,9 +274,9 @@ final class Registry
 			$this->Modules->init();
 
 			# Load cache required by the working module
-			if ( is_array( $this->Modules->cur_module['m_cache_array'] ) and count( $this->Modules->cur_module['m_cache_array'] ) )
+			if ( is_array( $this->Modules->cur_module[ 'm_cache_array' ] ) and count( $this->Modules->cur_module[ 'm_cache_array' ] ) )
 			{
-				$this->Cache->cache__do_load( $this->Modules->cur_module['m_cache_array'] );
+				$this->Cache->cache__do_load( $this->Modules->cur_module[ 'm_cache_array' ] );
 			}
 		}
 
@@ -272,9 +288,9 @@ final class Registry
 		register_shutdown_function( array( $this->Display, "_my_destruct" ) );
 		register_shutdown_function( array( $this->Modules, "_my_destruct" ) );
 		register_shutdown_function( array( $this->Session, "_my_destruct" ) );
-		register_shutdown_function( array( $this->Input  , "_my_destruct" ) );
-		register_shutdown_function( array( $this->Cache  , "_my_destruct" ) );
-		register_shutdown_function( array( $this->Db     , "_my_destruct" ) );
+		register_shutdown_function( array( $this->Input, "_my_destruct" ) );
+		register_shutdown_function( array( $this->Cache, "_my_destruct" ) );
+		register_shutdown_function( array( $this->Db, "_my_destruct" ) );
 	}
 
 
@@ -291,20 +307,21 @@ final class Registry
 	 *
 	 * @return    object    Registry Object
 	 */
-	public static function init ( $disabled_classes = array() )
+	public static function init ()
 	{
-		if ( self::$_instance === null )
+		if ( is_null( self::$_instance ) )
 		{
-			self::$_instance = new self( $disabled_classes );
+			self::$_instance = new self;
 		}
+
 		return self::$_instance;
 	}
 
 
 	/**
 	 * Destructor
-	**/
-	public function __destruct()
+	 **/
+	public function __destruct ()
 	{
 		# Debug: Stop timer
 		self::$totaltime = self::debug__timer_stop();
@@ -313,7 +330,7 @@ final class Registry
 		$this->logger__do_performance_log();
 
 		# Flush only if ZLib-Output-Handler is OFF
-		if ( $this->ob_status and ! $this->ob_compression )
+		if ( $this->ob_status and !$this->ob_compression )
 		{
 			if ( $this->ob_no_output )
 			{
@@ -331,7 +348,7 @@ final class Registry
 	 * Read configuration file
 	 *
 	 * @return  array  Primary configuration settings
-	**/
+	 **/
 	private function config__file_read ()
 	{
 		# Read configuration file
@@ -342,7 +359,7 @@ final class Registry
 		}
 		else
 		{
-			$this->logger__do_log( "Could not open configuration file (<strong>" . $_path_to_config_file . "</strong>): File not found!" , "ERROR" );
+			self::logger__do_log( __METHOD__ . " says: Could not open configuration file (<strong>" . $_path_to_config_file . "</strong>): File not found!", "ERROR" );
 			exit;
 		}
 	}
@@ -355,11 +372,13 @@ final class Registry
 	 */
 	static public function debug__timer_start ()
 	{
-		$_starttime  = microtime();
-		$_starttime  = explode( ' ', $_starttime );
-		$_starttime  = $_starttime[1] + $_starttime[0];
+		$_starttime = microtime();
+		$_starttime = explode( ' ', $_starttime );
+		$_starttime = $_starttime[ 1 ] + $_starttime[ 0 ];
+
 		return $_starttime;
 	}
+
 
 	/**
 	 * Stops timer
@@ -382,6 +401,7 @@ final class Registry
 
 		$return[ 'stoptime' ] = $stoptime;
 		$return[ 'delta' ]    = round( ( $stoptime - $starttime ), 5 );
+
 		return $return;
 	}
 
@@ -400,19 +420,19 @@ final class Registry
 
 		$url = str_replace( "&amp;", "&", $url );
 
-		if ( $this->config['serverenvironment']['header_redirect'] == 'refresh' )
+		if ( $this->config[ 'serverenvironment' ][ 'header_redirect' ] == 'refresh' )
 		{
 			# @todo : Do we need session id prepended to redir url in case session.use_trans_sid is in effect ?!
 
 			header( "Refresh: 0;url=" . $url );
 			exit();
 		}
-		elseif ( $this->config['serverenvironment']['header_redirect'] == 'html' )
+		elseif ( $this->config[ 'serverenvironment' ][ 'header_redirect' ] == 'html' )
 		{
 			## @todo : Do we need session id prepended to redir url in case session.use_trans_sid is in effect ?!
 
 			$url = str_replace( '&amp;', '&', $url );
-			echo("<html><head><meta http-equiv='refresh' content='0; url=$url'></head><body></body></html>");
+			echo( "<html><head><meta http-equiv='refresh' content='0; url=$url'></head><body></body></html>" );
 			exit();
 		}
 		else
@@ -421,7 +441,7 @@ final class Registry
 			// Is Redirect URI absolute? HTTP/1.1 requires it to be so!!!
 			//--------------------------------------------------------------
 
-			if ( ! preg_match( '#^https?:\/\/#', $url ) )
+			if ( !preg_match( '#^https?:\/\/#', $url ) )
 			{
 				trigger_error( "Redirect URI is not an absolute URL (as required by HTTP/1.1 specs for Location header)!", E_USER_ERROR );
 			}
@@ -432,7 +452,9 @@ final class Registry
 			// Redirect with appropriate status code
 			//----------------------------------------------
 
-			$http_status_code ? header( "Location: " . $url, true, $http_status_code ) : header( "Location: " . $url );
+			$http_status_code
+				? header( "Location: " . $url, true, $http_status_code )
+				: header( "Location: " . $url );
 			exit();
 		}
 	}
@@ -453,14 +475,17 @@ final class Registry
 		//-----------------------
 
 		$_method_map = array(
-			'EMERG'   => \Zend\Log\Logger::EMERG,
-			'ALERT'   => \Zend\Log\Logger::ALERT,
-			'CRIT'    => \Zend\Log\Logger::CRIT,
-			'ERROR'   => \Zend\Log\Logger::ERR,
-			'WARNING' => \Zend\Log\Logger::WARN,
-			'NOTICE'  => \Zend\Log\Logger::NOTICE,
-			'INFO'    => \Zend\Log\Logger::INFO,
-			'DEBUG'   => \Zend\Log\Logger::DEBUG
+			'EMERG'    => \Zend\Log\Logger::EMERG,
+			'ALERT'    => \Zend\Log\Logger::ALERT,
+			'CRIT'     => \Zend\Log\Logger::CRIT,
+			'CRITICAL' => \Zend\Log\Logger::CRIT,
+			'ERR'      => \Zend\Log\Logger::ERR,
+			'ERROR'    => \Zend\Log\Logger::ERR,
+			'WARN'     => \Zend\Log\Logger::WARN,
+			'WARNING'  => \Zend\Log\Logger::WARN,
+			'NOTICE'   => \Zend\Log\Logger::NOTICE,
+			'INFO'     => \Zend\Log\Logger::INFO,
+			'DEBUG'    => \Zend\Log\Logger::DEBUG
 		);
 
 		if ( !array_key_exists( $priority, $_method_map ) )
@@ -472,7 +497,7 @@ final class Registry
 		// Instantiate Zend_Log object if not done so already
 		//------------------------------------------------------
 
-		if ( ! is_object( self::$logger ) )
+		if ( !is_object( self::$logger ) )
 		{
 			self::$logger = new \Zend\Log\Logger();
 
@@ -483,7 +508,7 @@ final class Registry
 			# stdout
 			if ( ini_get( "display_errors" ) != '0' )
 			{
-				self::$logger->addWriter( $_writer__stdout = new \Zend\Log\Writer\Stream('php://output') );
+				self::$logger->addWriter( $_writer__stdout = new \Zend\Log\Writer\Stream( 'php://output' ) );
 				if ( !IN_DEV )
 				{
 					$_filter__stdout = new \Zend\Log\Filter\Priority( \Zend\Log\Logger::ERR );
@@ -508,7 +533,6 @@ final class Registry
 				require_once PATH_LIBS . "/FirePHPCore/fb.php";
 				self::$logger->addWriter( new \Zend\Log\Writer\FirePhp );
 			}
-
 			# Registering logger object as our main PHP error-logger
 			#\Zend\Log\Logger::registerErrorHandler( self::$logger );
 			#\Zend\Log\Logger::registerExceptionHandler( self::$logger );
@@ -527,7 +551,12 @@ final class Registry
 			}
 
 			# Log event
-			self::$logger->log( ( $_method_map[ $priority ] ? $_method_map[ $priority ] : \Zend\Log\Logger::DEBUG ), $message );
+			self::$logger->log(
+				( $_method_map[ $priority ]
+					? $_method_map[ $priority ]
+					: \Zend\Log\Logger::DEBUG ),
+				$message
+			);
 		}
 		catch ( \Persephone\Exception $e )
 		{
@@ -546,19 +575,21 @@ final class Registry
 	 *
 	 * @return                  void
 	 */
-	static public function logger__do_performance_log ( $location = "" , $time_only = false )
+	static public function logger__do_performance_log ( $location = "", $time_only = false )
 	{
 		if ( IN_DEV )
 		{
 			$_log_message = "";
-			$location = ( $location ) ? " - " . $location : "";
-			if ( ! $time_only )
+			$location     = ( $location )
+				? " - " . $location
+				: "";
+			if ( !$time_only )
 			{
 				$_log_message .= "\n\tMemory Usage" . $location . ": " . ( memory_get_usage( true ) - MEMORY_START ) . " bytes";
 			}
 			$_timer = self::debug__timer_stop();
-			$_log_message .= "\n\tTimedelta" . $location . ": " . $_timer['delta'] . " secs";
-			self::logger__do_log( $_log_message , "INFO" );
+			$_log_message .= "\n\tTimedelta" . $location . ": " . $_timer[ 'delta' ] . " secs";
+			self::logger__do_log( $_log_message, "INFO" );
 		}
 	}
 
@@ -568,10 +599,10 @@ final class Registry
 	 */
 	public function ob_start ()
 	{
-		if ( ! $this->config['serverenvironment']['disable_gzip'] and in_array( "zlib", $this->config['runtime']['loaded_extensions'] ) )
+		if ( !$this->config[ 'serverenvironment' ][ 'disable_gzip' ] and in_array( "zlib", $this->config[ 'runtime' ][ 'loaded_extensions' ] ) )
 		{
-			ini_set( "zlib.output_handler"     , "" );
-			ini_set( "zlib.output_compression" , "1" );
+			ini_set( "zlib.output_handler", "" );
+			ini_set( "zlib.output_compression", "1" );
 			$this->ob_compression = true;
 			if ( ob_start( /* "ob_gzhandler" */ ) )
 			{
@@ -581,7 +612,7 @@ final class Registry
 		}
 		else
 		{
-			ini_set( "zlib.output_handler" , "" );
+			ini_set( "zlib.output_handler", "" );
 			$this->ob_compression = false;
 			if ( ob_start() )
 			{

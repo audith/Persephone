@@ -46,13 +46,14 @@ class Cache
 
 
 	/**
-	 * Constructor - Loads and instantiates necessary libraries
+	 * Constructor
 	 *
-	 * @param    \Persephone\Registry    Registry Object Reference
-	 **/
-	public function __construct ( Registry $Registry )
+	 * @param   \Persephone\Registry    $Registry
+	 *
+	 * @return  void
+	 */
+	public function __construct ( \Persephone\Registry $Registry )
 	{
-		# Registry object reference
 		$this->Registry = $Registry;
 	}
 
@@ -62,15 +63,15 @@ class Cache
 	 */
 	public function _my_destruct ()
 	{
-		$this->Registry->logger__do_log( __CLASS__ . "::__destruct: Destroying class", "INFO" );
+		\Persephone\Registry::logger__do_log( __METHOD__ . " says: Destroying class", "INFO" );
 	}
 
 
 	public function init ()
 	{
-		//---------------------
-		// Set up cache path
-		//---------------------
+		//------------------------------
+		// Set up path for diskcache
+		//------------------------------
 
 		if ( !defined( 'PATH_CACHE' ) )
 		{
@@ -97,13 +98,13 @@ class Cache
 					$this->cachelib = new \Persephone\Cache\Memcached( $this->Registry );
 					if ( $this->cachelib->crashed )
 					{
-						throw new \Persephone\Exception( "Cache: Memcached failed to connect!" );
+						throw new \Persephone\Exception( __METHOD__ . " says: Memcached failed to connect!" );
 					}
 				}
 				else
 				{
 					$this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] = "diskcache";
-					$this->Registry->logger__do_log( "Cache: PHP-Memcached not found! Reverting to Disk-cache...", "WARNING" );
+					\Persephone\Registry::logger__do_log( __METHOD__ . " says: PHP-Memcached not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -118,13 +119,13 @@ class Cache
 					$this->cachelib = new \Persephone\Cache\Memcache( $this->Registry );
 					if ( $this->cachelib->crashed )
 					{
-						throw new \Persephone\Exception( "Cache: Memcache failed to connect!" );
+						throw new \Persephone\Exception( __METHOD__ . " says: Memcache failed to connect!" );
 					}
 				}
 				else
 				{
 					$this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] = "diskcache";
-					$this->Registry->logger__do_log( "Cache: PHP-Memcache not found! Reverting to Disk-cache...", "WARNING" );
+					\Persephone\Registry::logger__do_log( __METHOD__ . " says: PHP-Memcache not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -141,7 +142,7 @@ class Cache
 				else
 				{
 					$this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] = "diskcache";
-					$this->Registry->logger__do_log( "Cache: PHP-APC not found! Reverting to Disk-cache...", "WARNING" );
+					\Persephone\Registry::logger__do_log( __METHOD__ . " says: PHP-APC not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -156,7 +157,7 @@ class Cache
 		}
 		catch ( Exception $e )
 		{
-			$this->Registry->logger__do_log( "Cache - init() : " . $e->getMessage(), "WARNING" );
+			$this->Registry->logger__do_log( "XXXCache - init() : " . $e->getMessage(), "WARNING" );
 		}
 
 		//-----------------
@@ -167,7 +168,7 @@ class Cache
 		{
 			unset( $this->cachelib );
 			$this->cachelib = null;
-			$this->Registry->logger__do_log( "Cache - All available caching mechanisms CRASHED!", "ERROR" );
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: All available caching mechanisms CRASHED!", "ERROR" );
 		}
 
 		//----------------------
@@ -176,6 +177,13 @@ class Cache
 
 		$this->cache__init_load();
 	}
+
+
+	public function __isset ( $key )
+	{
+
+	}
+
 
 
 	/**

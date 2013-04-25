@@ -132,14 +132,10 @@ class Input
 	/**
 	 * Constructor
 	 *
-	 * @param array  Registry object reference
+	 * @param   \Persephone\Registry    Registry object reference
 	 */
 	public function __construct ( \Persephone\Registry $Registry )
 	{
-		//----------
-		// Prelim
-		//----------
-
 		$this->Registry = $Registry;
 	}
 
@@ -147,11 +143,11 @@ class Input
 	/**
 	 * Method overloading for Input class - gets value from within requested superglobal
 	 *
-	 * @param     string      The name of the method being called.
-	 * @param     array       Enumerated array containing the parameters passed to the $name'd method.
+	 * @param     string      $name         The name of the method being called.
+	 * @param     array       $arguments    Enumerated array containing the parameters passed to the $name'd method.
 	 *
-	 * @return    mixed       Value gotten from super-global
-	 * @throws    Exception   In case, if method is not one of the pre-defined Six.
+	 * @return    mixed                     Value gotten from super-global
+	 * @throws    \Persephone\Exception     In case, if method is not one of the pre-defined Six.
 	 */
 	public function __call ( $name, $arguments )
 	{
@@ -286,7 +282,7 @@ class Input
 	/**
 	 * Check email address to see if it seems valid
 	 *
-	 * @param    string     Email address to be validated
+	 * @param    string     $email      Email address to be validated
 	 *
 	 * @return   boolean
 	 */
@@ -301,9 +297,9 @@ class Input
 	/**
 	 * Checks enclosing parentheses, matching opening and closing ones
 	 *
-	 * @param    string    String to check
+	 * @param    string    $t   String to check
 	 *
-	 * @return   boolean   TRUE if successful, FALSE otherwise
+	 * @return   boolean        TRUE if successful, FALSE otherwise
 	 */
 	public function validate__check_enclosing_parentheses_pairs__medium ( $t )
 	{
@@ -338,13 +334,9 @@ class Input
 	/**
 	 * Removes control characters (hidden spaces)
 	 *
-	 * @param    string    Input string
+	 * @param    string    $t   Input string
 	 *
-	 * @return   integer   Parsed String
-	 * @author         $Author: matt $
-	 * @copyright      (c) 2001 - 2009 Invision Power Services, Inc.
-	 * @license        http://www.invisionpower.com/community/board/license.html
-	 * @package        Invision Power Board
+	 * @return   integer        Parsed String
 	 */
 	public function sanitize__clean_control_characters__low ( $t )
 	{
@@ -379,10 +371,10 @@ class Input
 	/**
 	 * Cleans excessive leading and trailing + duplicate separator chars from delim-separated-values (such as CSV)
 	 *
-	 * @param    mixed    Data to clean
-	 * @param    string   RegEx-compatible separator-character (e.g., comma (,) in CSV)
+	 * @param    mixed    $i        Data to clean
+	 * @param    string   $sep      RegEx-compatible separator-character (e.g., comma (,) in CSV)
 	 *
-	 * @return   mixed    Output
+	 * @return   mixed              Output
 	 */
 	public function clean__excessive_separators ( $i, $sep = "," )
 	{
@@ -425,9 +417,9 @@ class Input
 	/**
 	 * Strip slashes recursively
 	 *
-	 * @param    mixed    REFERENCE: Data to strip slashes from (a reference-argument for array_walk to work)
+	 * @param    mixed    $i    REFERENCE: Data to strip slashes from (a reference-argument for array_walk to work)
 	 *
-	 * @return   mixed    Slash-stripped data
+	 * @return   mixed          Slash-stripped data
 	 */
 	public function sanitize__stripslashes ( &$i )
 	{
@@ -459,11 +451,12 @@ class Input
 	/**
 	 * Makesafe
 	 *
-	 * @param   mixed          REFERENCE: Data to be made safe
-	 * @param   string         KEY [used as parameter-2 in the callback function of array_walk()
-	 * @param   array          Additional functions to filter the value through, prior to cleaning
+	 * @param   mixed          $val         REFERENCE: Data to be made safe
+	 * @param   string         $key         KEY [used as parameter-2 in the callback function of array_walk()
+	 * @param   array          $filters     Additional functions to filter the value through, prior to cleaning
 	 *
 	 * @return  void|mixed     VOID if $_output_flag = false; MIXED otherwise.
+	 * @throws  \Persephone\Exception
 	 */
 	public function _sanitize__clean_raw_value__medium ( &$val, $key, $filters = array() )
 	{
@@ -487,7 +480,7 @@ class Input
 				}
 				else
 				{
-					throw new \Persephone\Exception ( "Parameter-2 of Input::_sanitize__clean_raw_value__medium() must be a valid function/method callback!" );
+					throw new \Persephone\Exception( "Parameter-2 of Input::_sanitize__clean_raw_value__medium() must be a valid function/method callback!" );
 				}
 			}
 		}
@@ -526,8 +519,8 @@ class Input
 	/**
 	 * Queries the entity given and seeks its HTML-encoded version, or vice versa
 	 *
-	 * @param   string   Entity to query
-	 * @param   bool     Whether to flip the map and seek the other way around, or not
+	 * @param   string   $matches       Entity to query
+	 * @param   bool     $_do_flip      Whether to flip the map and seek the other way around, or not
 	 *
 	 * @return  string
 	 */
@@ -804,8 +797,8 @@ class Input
 	/**
 	 * Performs basic cleaning (Null characters, etc) on globals
 	 *
-	 * @param   array     Incoming data to clean
-	 * @param   integer   Incoming data array depth
+	 * @param   array     $data         Incoming data to clean
+	 * @param   integer   $iteration    Incoming data array depth
 	 *
 	 * @return  void
 	 * @author  concept by Matthew Mecham @ IPS; adapted by Shahriyar Imanov @ Audith
@@ -848,9 +841,11 @@ class Input
 	/**
 	 * Recursively cleans keys and values and inserts them into the input array [Build 20090120]
 	 *
-	 * @param   array     Incoming data to clean
-	 * @param   integer   Incoming data array depth
-	 * @param   array     Additional functions to filter the value through, prior to cleaning
+	 * @param   array     $data         Incoming data to clean
+	 * @param   integer   $iteration    Incoming data array depth
+	 * @param   array     $filters      Additional functions to filter the value through, prior to cleaning
+	 *
+	 * @return  mixed
 	 *
 	 * @author concept by Matthew Mecham @ IPS; adapted by Shahriyar Imanov @ Audith
 	 */

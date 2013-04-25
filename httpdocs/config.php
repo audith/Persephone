@@ -45,5 +45,3 @@ $CONFIG['performance']['cache'] = array(
 );
 
 return $CONFIG;
-
-?>

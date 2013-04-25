@@ -19,9 +19,10 @@ interface Iface
 	/**
 	 * Constructor
 	 *
-	 * @param    \Persephone\Registry  Registry reference
-	 * @param    string                Unique-ID used to hash keys
-	 * @return   boolean
+	 * @param       \Persephone\Registry    $Registry
+	 * @param       string                  $identifier       Unique-ID used to hash keys
+	 *
+	 * @return      boolean
 	 */
 	public function __construct ( \Persephone\Registry $Registry, $identifier = "" );
 
@@ -37,10 +38,12 @@ interface Iface
 	/**
 	 * Put data into remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to add
-	 * @param       integer         [Optional] Time to live
-	 * @return      boolean         Whether cache set was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key      Cache unique key
+	 * @param       string       $value    Cache value to add
+	 * @param       integer      $ttl      [Optional] Time to live
+	 *
+	 * @return      boolean                Whether cache set was successful or not; TRUE on success, FALSE otherwise
+	 * @throws      \Persephone\Exception
 	 */
 	public function do_put ( $key, $value, $ttl = 0 );
 
@@ -48,10 +51,11 @@ interface Iface
 	/**
 	 * Update value in remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @param       string          Cache value to set
-	 * @param       integer         [Optional] Time to live
-	 * @return      boolean         Whether cache update was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string       $key      Cache unique key
+	 * @param       string       $value    Cache value to set
+	 * @param       integer      $ttl      [Optional] Time to live
+	 *
+	 * @return      boolean                Whether cache update was successful or not; TRUE on success, FALSE otherwise
 	 */
 	public function do_update ( $key, $value, $ttl = 0 );
 
@@ -59,8 +63,9 @@ interface Iface
 	/**
 	 * Retrieve a value from remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      mixed           Cached value
+	 * @param       string     $key     Cache unique key
+	 *
+	 * @return      mixed               Cached value
 	 */
 	public function do_get ( $key );
 
@@ -68,8 +73,9 @@ interface Iface
 	/**
 	 * Remove a value in the remote cache store
 	 *
-	 * @param       string          Cache unique key
-	 * @return      boolean         Whether cache removal was successful or not; TRUE on success, FALSE otherwise
+	 * @param       string      $key    Cache unique key
+	 *
+	 * @return      boolean             Whether cache removal was successful or not; TRUE on success, FALSE otherwise
 	 */
 	public function do_remove ( $key );
 }
