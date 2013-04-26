@@ -334,9 +334,9 @@ abstract class Database
 		# Query counter
 		if ( !$this->is_shutdown )
 		{
-			$this->query_count++;
 			if ( IN_DEV )
 			{
+				$this->query_count++;
 				$this->query_list[ ] = $this->cur_query;
 			}
 		}
@@ -551,9 +551,9 @@ abstract class Database
 	/**
 	 * Drops table(s)
 	 *
-	 * @param       $tables     string[]            List of tables to be dropped
+	 * @param       string[]            $tables     List of tables to be dropped
 	 *
-	 * @return                  integer|boolean     # of affected rows on success, FALSE otherwise
+	 * @return      integer|boolean                 # of affected rows on success, FALSE otherwise
 	 */
 	abstract public function simple_exec_drop_table ( $tables );
 
@@ -561,9 +561,9 @@ abstract class Database
 	/**
 	 * Builds "CREATE TABLE ..." query from Table-Structure Array and executes it
 	 *
-	 * @param       $struct     array       Struct array
+	 * @param       array       $struct     Struct array
 	 *
-	 * @return                  integer     # of queries executed
+	 * @return      integer                 # of queries executed
 	 */
 	abstract public function simple_exec_create_table_struct ( $struct );
 }

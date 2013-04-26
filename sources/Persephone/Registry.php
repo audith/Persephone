@@ -23,15 +23,6 @@ final class Registry
 	 */
 	private static $_instance;
 
-	public static $_is_config_file_read = false;
-
-	/**
-	 * Configuration data
-	 *
-	 * @var array
-	 */
-	public $API_Server;
-
 	/**
 	 * Registered Classes
 	 *
@@ -40,8 +31,6 @@ final class Registry
 	public $classes = array();
 
 	/**
-	 * Configuration data
-	 *
 	 * @var array
 	 */
 	public $config = array();
@@ -54,15 +43,11 @@ final class Registry
 	public $Db;
 
 	/**
-	 * Instance of Display class
-	 *
 	 * @var Display
 	 */
 	public $Display;
 
 	/**
-	 * Instance of Input class
-	 *
 	 * @var Input
 	 */
 	public $Input;
@@ -80,8 +65,6 @@ final class Registry
 	public $member = array();
 
 	/**
-	 * Instance of Modules class
-	 *
 	 * @var Modules
 	 */
 	public $Modules;
@@ -108,21 +91,23 @@ final class Registry
 	public $ob_no_output = false;
 
 	/**
-	 * Instance of Session class
-	 *
 	 * @var Session
 	 */
 	public $Session;
 
 	/**
-	 * Debug variables
-	 *
-	 * @var mixed
+	 * @var float
 	 */
 	static public $starttime;
 
+	/**
+	 * @var float
+	 */
 	static public $totaltime;
 
+	/**
+	 * @var array
+	 */
 	static public $time_delta = array();
 
 
@@ -145,18 +130,19 @@ final class Registry
 		// Read config file
 		//--------------------
 
-		# Loaded PHP extensions
-		$this->config[ 'runtime' ][ 'loaded_extensions' ] = get_loaded_extensions();
+		# Initial build of configuration information
+		if ( $this->configuration() === false )
+		{
+			header("HTTP/1.1 500");
+			exit;
+		}
 
-		# Fetch primary configuration settings from config-file
-		$this->config               = array_merge( $_config = $this->config__file_read(), $this->config );
-		self::$_is_config_file_read = true;
 		//---------------------------
 		// Instantiate Db Driver
 		//---------------------------
 
 		$_db_class_name = '\Persephone\Database\Drivers\\' . ucwords( $this->config[ 'sql' ][ 'driver' ] );
-		$this->Db       = new $_db_class_name( $this );
+		$this->Db = new $_db_class_name( $this );
 		//------------------------
 		// Instantiate Input class
 		//------------------------
@@ -345,23 +331,34 @@ final class Registry
 
 
 	/**
-	 * Read configuration file
+	 * Parses and builds configuration information
 	 *
-	 * @return  array  Primary configuration settings
+	 * @return  boolean
 	 **/
-	private function config__file_read ()
+	private function configuration ()
 	{
 		# Read configuration file
 		$_path_to_config_file = PATH_ROOT_WEB . "/config.php";
-		if ( is_file( $_path_to_config_file ) and is_readable( $_path_to_config_file ) )
+		try
 		{
-			return require_once( $_path_to_config_file );
+			if ( is_file( $_path_to_config_file ) and is_readable( $_path_to_config_file ) )
+			{
+				$this->config = require_once( $_path_to_config_file );
+			}
+			else
+			{
+				throw new \Persephone\Exception( __METHOD__ . " says: Could not open configuration file (<strong>" . $_path_to_config_file . "</strong>): File not found or not readable!" );
+			}
 		}
-		else
+		catch ( \Persephone\Exception $e )
 		{
-			self::logger__do_log( __METHOD__ . " says: Could not open configuration file (<strong>" . $_path_to_config_file . "</strong>): File not found!", "ERROR" );
-			exit;
+			return false;
 		}
+
+		# Loaded PHP extensions
+		$this->config[ 'runtime' ][ 'loaded_extensions' ] = get_loaded_extensions();
+
+		return true;
 	}
 
 
@@ -370,7 +367,7 @@ final class Registry
 	 *
 	 * @return integer
 	 */
-	static public function debug__timer_start ()
+	public static function debug__timer_start ()
 	{
 		$_starttime = microtime();
 		$_starttime = explode( ' ', $_starttime );
@@ -383,11 +380,11 @@ final class Registry
 	/**
 	 * Stops timer
 	 *
-	 * @param   integer   Starting-time, T-0
+	 * @param   integer   $starttime    Starting-time, T-0
 	 *
-	 * @return  array     Array containing Stop-time and Time-delta
+	 * @return  array                   Array containing Stop-time and Time-delta
 	 */
-	static public function debug__timer_stop ( $starttime = 0 )
+	public static function debug__timer_stop ( $starttime = 0 )
 	{
 		if ( !$starttime )
 		{
@@ -528,11 +525,13 @@ final class Registry
 			}
 
 			# Fire-PHP
+			/*
 			if ( IN_DEV )
 			{
 				require_once PATH_LIBS . "/FirePHPCore/fb.php";
 				self::$logger->addWriter( new \Zend\Log\Writer\FirePhp );
 			}
+			*/
 			# Registering logger object as our main PHP error-logger
 			#\Zend\Log\Logger::registerErrorHandler( self::$logger );
 			#\Zend\Log\Logger::registerExceptionHandler( self::$logger );
@@ -555,7 +554,7 @@ final class Registry
 				( $_method_map[ $priority ]
 					? $_method_map[ $priority ]
 					: \Zend\Log\Logger::DEBUG ),
-				$message
+				$message . "\n"
 			);
 		}
 		catch ( \Persephone\Exception $e )

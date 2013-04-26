@@ -1,7 +1,6 @@
 <?php
 
 namespace Persephone\Database\Drivers;
-
 use \Persephone\Database;
 use \Zend\Db\Adapter\Adapter;
 use \Zend\Db\Sql\Sql;
@@ -18,8 +17,7 @@ if ( !defined( "INIT_DONE" ) )
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
- **/
-#require_once( PATH_SOURCES . "/Database.php" );
+ */
 class Pdo_mysql extends \Persephone\Database
 {
 	/**
@@ -70,7 +68,11 @@ class Pdo_mysql extends \Persephone\Database
 	 * @param       $referenced_table_name      string      Referenced table name
 	 * @param       $_params                    array       Parameters containing information for querying referenced data statistics
 	 *
-	 * @usage       array( '_do_count' => true|false, 'referenced_column_name' => '<column_name>', 'value_to_check' => <key_to_check_against> )
+	 * @usage       array(
+	 *                  '_do_count' => true|false,
+	 *                  'referenced_column_name' => '<column_name>',
+	 *                  'value_to_check' => <key_to_check_against>
+	 *              )
 	 * @return                                  array       Reference and possibly, data statistics information (row-count)
 	 */
 	public function check_for_references ( $referenced_table_name, $_params = array() )
@@ -164,7 +166,7 @@ class Pdo_mysql extends \Persephone\Database
 							$_default_value = "";
 							$_is_null       = false;
 						}
-						if ( !$df_data[ 'is_required' ] )
+						else
 						{
 							$_default_value = null;
 							$_is_null       = true;
@@ -230,7 +232,7 @@ class Pdo_mysql extends \Persephone\Database
 							$_default_value = 0;
 							$_is_null       = false;
 						}
-						if ( !$df_data[ 'is_required' ] )
+						else
 						{
 							$_default_value = null;
 							$_is_null       = true;
@@ -290,7 +292,7 @@ class Pdo_mysql extends \Persephone\Database
 							$_default_value = 0.00;
 							$_is_null       = false;
 						}
-						if ( !$df_data[ 'is_required' ] )
+						else
 						{
 							$_default_value = null;
 							$_is_null       = true;
@@ -524,9 +526,10 @@ class Pdo_mysql extends \Persephone\Database
 	/**
 	 * Simple DELETE query
 	 *
-	 * @param      array       array( "do"=>"delete", "table"=>"" , "where"=>array() )
+	 * @param      array                    $sql    array( "do"=>"delete", "table"=>"" , "where"=>array() )
 	 *
-	 * @return     mixed       # of affected [deleted] rows on success, FALSE otherwise
+	 * @return     boolean|int                      # of affected [deleted] rows on success, FALSE otherwise
+	 * @throws     \Persephone\Exception
 	 */
 	protected final function simple_delete_query ( $sql )
 	{
@@ -554,28 +557,34 @@ class Pdo_mysql extends \Persephone\Database
 				$where = $sql[ 'where' ];
 			}
 		}
+
 		if ( count( $where ) )
 		{
-			try
-			{
-				return $this->sql->delete( $table, $where );
-			}
-			catch ( \Persephone\Exception $e )
-			{
-				return false;
-			}
+			$delete = $this->sql->delete( $table, $where );
+
+			( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $delete ) );  // For debug
+
+			$statement = $this->sql->prepareStatementForSqlObject( $delete );
 		}
 		else
 		{
-			try
-			{
-				return $this->adapter->query( "TRUNCATE TABLE " . $table )->count();
-			}
-			catch ( \Persephone\Exception $e )
-			{
-				return false;
-			}
+			( IN_DEV and $this->cur_query = "TRUNCATE TABLE " . $table );  // For debug
+
+			$statement = $this->adapter->getDriver()->createStatement( "TRUNCATE TABLE " . $table );
 		}
+
+		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+
+		$result = $statement->execute();
+		if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
+		{
+			$resultSet = new \Zend\Db\ResultSet\ResultSet();
+			$return = $resultSet->initialize( $result )->count();
+
+			return $return;
+		}
+
+		return $result;
 	}
 
 
@@ -595,7 +604,7 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		else
 		{
-			throw new \Persephone\Exception( "No or bad table references specified for INSERT query" );
+			throw new \Persephone\Exception( __METHOD__ . " says: No or bad table references specified for INSERT query!" );
 		}
 
 		# Data
@@ -605,11 +614,12 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		else
 		{
-			throw new \Persephone\Exception( "No data specified for SETting in INSERT query" );
+			throw new \Persephone\Exception( __METHOD__ . " says: No data specified for INSERT query!" );
 		}
 
 		# EXEC
-		$this->sql->insert( $table, $data );
+		$insert = $this->sql->insert( $table, $data );
+		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $insert ) and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
 		return $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
 	}
@@ -632,13 +642,13 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		else
 		{
-			throw new \Persephone\Exception( "No or bad table references specified for REPLACE query" );
+			throw new \Persephone\Exception( __METHOD__ . " says: No or bad table references specified for REPLACE query!" );
 		}
 
 		# "SET"
 		if ( !isset( $sql[ 'set' ] ) or !is_array( $sql[ 'set' ] ) or !count( $sql[ 'set' ] ) )
 		{
-			throw new \Persephone\Exception( "No data specified for SETting in REPLACE query" );
+			throw new \Persephone\Exception( __METHOD__ . " says: No data specified for REPLACE query!" );
 		}
 		$_set = array();
 		foreach ( $sql[ 'set' ] as $_col => $_val )
@@ -660,6 +670,7 @@ class Pdo_mysql extends \Persephone\Database
 		//------------------------------
 
 		$this->cur_query = "REPLACE INTO " . $table . " SET " . implode( ", ", $_set );
+		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
 
 		//----------------------------------------------------------------
 		// Execute the statement and return the number of affected rows
@@ -678,27 +689,27 @@ class Pdo_mysql extends \Persephone\Database
 	 * @param       array
 	 *
 	 * @usage       array(
-						"do"          => "select",
-						"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
-						"fields"      => array(),
-						"table"       => array() [when correlation names are used] | string,
-						"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
-						"add_join"    => array(
+                        "do"          => "select",
+                        "distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
+                        "fields"      => array(),
+                        "table"       => array() [when correlation names are used] | string,
+                        "where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
+                        "add_join"    => array(
 							0 => array (
 								"fields"      => array(),
 								"table"       => array(),    - where count = 1
 								"conditions"  => "",
 								"join_type"   => "INNER|LEFT|RIGHT"
-							),
-							1 => array()
-						),
-						"group"       => array(),
-						"having"      => array(),
-						"order"       => array(),
-						"limit"       => array(offset, count)
+                        	),
+                        	1 => array()
+                        ),
+                        "group"       => array(),
+                        "having"      => array(),
+                        "order"       => array(),
+                        "limit"       => array(offset, count)
 					)
 	 * @throws      \Persephone\Exception
-	 * @return      \Zend\Db\ResultSet\ResultSet|boolean
+	 * @return      array|boolean
 	 */
 	protected final function simple_select_query ( $sql )
 	{
@@ -723,7 +734,7 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		if ( count( $fields ) )
 		{
-			$select = $select->columns( $fields );
+			$select->columns( $fields );
 		}
 
 		# "From"
@@ -733,13 +744,13 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		else
 		{
-			throw new \Persephone\Exception( "None or bad table references specified for SELECT query" );
+			throw new \Persephone\Exception( __METHOD__ . " says: No or bad table references specified for SELECT query!" );
 		}
 		if ( isset( $sql[ 'distinct' ] ) and $sql[ 'distinct' ] === true )
 		{
-			$select = $select->quantifier( "DISTINCT" );
+			$select->quantifier( "DISTINCT" );
 		}
-		$select = $select->from( $tables );
+		$select->from( $tables );
 
 		# "Where"
 		$where = array();
@@ -757,7 +768,7 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		if ( count( $where ) ) // Apply only if there is a need
 		{
-			$select = $select->where( $where );
+			$select->where( $where );
 		}
 
 		# "Join"
@@ -782,7 +793,7 @@ class Pdo_mysql extends \Persephone\Database
 				}
 				else
 				{
-					throw new \Persephone\Exception( "No table references specified for JOIN clause in SELECT query" );
+					throw new \Persephone\Exception( __METHOD__ . " says: No table references specified for JOIN clause in SELECT query" );
 					continue; // Failed "Join", continue to the next one...
 				}
 
@@ -795,7 +806,7 @@ class Pdo_mysql extends \Persephone\Database
 				{
 					if ( $add_join[ 'join_type' ] != 'CROSS' and $add_join[ 'join_type' ] != 'NATURAL' )
 					{
-						throw new \Persephone\Exception( "No conditions specified for JOIN clause in SELECT query" );
+						throw new \Persephone\Exception( __METHOD__ . " says: No conditions specified for JOIN clause in SELECT query" );
 						continue; // Failed "Join", continue to the next one...
 					}
 				}
@@ -826,19 +837,19 @@ class Pdo_mysql extends \Persephone\Database
 				switch ( $add_join[ 'join_type' ] )
 				{
 					case 'INNER':
-						$select = $select->join( $join_table, $join_conditions, $join_fields, $select::JOIN_INNER );
+						$select->join( $join_table, $join_conditions, $join_fields, $select::JOIN_INNER );
 						break;
 
 					case 'LEFT':
-						$select = $select->join( $join_table, $join_conditions, $join_fields, $select::JOIN_LEFT );
+						$select->join( $join_table, $join_conditions, $join_fields, $select::JOIN_LEFT );
 						break;
 
 					case 'RIGHT':
-						$select = $select->join( $join_table, $join_conditions, $join_fields, $select::JOIN_RIGHT );
+						$select->join( $join_table, $join_conditions, $join_fields, $select::JOIN_RIGHT );
 						break;
 
 					default:
-						$select = $select->join( $join_table, $join_conditions, $join_fields );
+						$select->join( $join_table, $join_conditions, $join_fields );
 						break;
 				}
 			}
@@ -873,11 +884,11 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		if ( count( $group ) ) // Apply only if there is a need
 		{
-			$select = $select->group( $group );
+			$select->group( $group );
 		}
 		if ( count( $having ) ) // Apply only if there is a need
 		{
-			$select = $select->having( $having );
+			$select->having( $having );
 		}
 
 		# "Order By"
@@ -895,31 +906,33 @@ class Pdo_mysql extends \Persephone\Database
 		}
 		if ( count( $order ) ) // Apply only if there is a need
 		{
-			$select = $select->order( $order );
+			$select->order( $order );
 		}
 
 		# "Limit"
 		if ( $sql[ 'do' ] == 'select_row' )
 		{
-			$select = $select->limit( 1 )->offset( 0 );
+			$select->limit( 1 )->offset( 0 );
 		}
 		elseif ( isset( $sql[ 'limit' ] ) and is_array( $sql[ 'limit' ] ) and count( $sql[ 'limit' ] ) == 2 )
 		{
-			$select = $select->limit( intval( $sql[ 'limit' ][ 1 ] ) )->offset( intval( $sql[ 'limit' ][ 0 ] ) );
+			$select->limit( intval( $sql[ 'limit' ][ 1 ] ) )->offset( intval( $sql[ 'limit' ][ 0 ] ) );
 		}
 
 		# EXEC
-		$this->cur_query = $this->sql->getSqlStringForSqlObject( $select );
-		try
-		{
-			$statement = $this->sql->prepareStatementForSqlObject( $select );
 
-			return $statement->execute();
-		}
-		catch ( \Persephone\Exception $e )
+		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $select ) and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
+
+		$statement = $this->sql->prepareStatementForSqlObject( $select );
+		$result = $statement->execute();
+
+		if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
 		{
-			return false;
+			$resultSet = new \Zend\Db\ResultSet\ResultSet();
+			return $resultSet->initialize( $result )->toArray();
 		}
+
+		return $result;
 	}
 
 
@@ -943,11 +956,7 @@ class Pdo_mysql extends \Persephone\Database
 		// Asset-check
 		//----------------
 
-		if ( !isset( $sql[ 'tables' ] ) )
-		{
-			return false;
-		}
-		if ( !count( $sql[ 'tables' ] ) )
+		if ( !isset( $sql[ 'tables' ] ) or !count( $sql[ 'tables' ] ) )
 		{
 			return false;
 		}
@@ -1038,7 +1047,7 @@ class Pdo_mysql extends \Persephone\Database
 				}
 				else
 				{
-					throw new \Persephone\Exception("Database::simple_update_query() - Invalid condition struct in WHERE clause, couldn't parse the query!... ");
+					throw new \Persephone\Exception( __METHOD__ . " says: Invalid condition struct in WHERE clause, couldn't parse the query! ");
 				}
 			}
 			$_term = '(' . $_term . ')';
@@ -1055,22 +1064,28 @@ class Pdo_mysql extends \Persephone\Database
 			                   ? " WHERE " . $_where
 			                   : "" );
 
+		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+
+		/**
+		 * @var $statement \Zend\Db\Adapter\Driver\StatementInterface
+		 */
+		$statement = $this->adapter->getDriver()->createStatement( $this->cur_query );
+
 		//----------------------------------------------------------------
 		// Execute the statement and return the number of affected rows
 		//----------------------------------------------------------------
 
-		try
+		$result = $statement->execute( $sql['set'] );
+
+		if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
 		{
-			/**
-			 * @var $statement \Zend\Db\Adapter\Driver\StatementInterface
-			 */
-			$statement = $this->adapter->query( $this->cur_query );
-			return $statement->execute( $sql['set'] )->count();
+			$resultSet = new \Zend\Db\ResultSet\ResultSet();
+			$return = $resultSet->initialize( $result )->count();
+
+			return $return;
 		}
-		catch ( \Persephone\Exception $e )
-		{
-			return false;
-		}
+
+		return $result;
 	}
 
 
@@ -1084,7 +1099,6 @@ class Pdo_mysql extends \Persephone\Database
 					"action"      => "add_column"|"drop_column"|"change_column"|"add_key"
 					"col_info"    => column info to parse
 				)
-	 *
 	 *
 	 * @return              mixed      # of affected rows on success, FALSE otherwise
 	 *
@@ -1310,30 +1324,29 @@ class Pdo_mysql extends \Persephone\Database
 				break;
 		}
 
-		try
-		{
-			if ( IN_DEV )
-			{
-				$this->query_count++;
-			}
+		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
-			$statement = $this->adapter->query( $this->cur_query );
+		$statement = $this->adapter->query( $this->cur_query );
+		$result = $statement->execute();
 
-			return $statement->execute();
-		}
-		catch ( \Persephone\Exception $e )
+		if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
 		{
-			return false;
+			$resultSet = new \Zend\Db\ResultSet\ResultSet();
+			$return = $resultSet->initialize( $result )->count();
+
+			return $return;
 		}
+
+		return $result;
 	}
 
 
 	/**
 	 * Drops table(s)
 	 *
-	 * @param       $tables     string[]            List of tables to be dropped
+	 * @param       string[]            $tables     List of tables to be dropped
 	 *
-	 * @return                  integer|boolean     # of affected rows on success, FALSE otherwise
+	 * @return      integer|boolean                 # of affected rows on success, FALSE otherwise
 	 */
 	public function simple_exec_drop_table ( $tables )
 	{
@@ -1362,30 +1375,29 @@ class Pdo_mysql extends \Persephone\Database
 			}
 		}
 
-		try
-		{
-			if ( IN_DEV )
-			{
-				$this->query_count++;
-			}
+		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
-			$statement = $this->adapter->query( $this->cur_query );
+		$statement = $this->adapter->query( $this->cur_query );
+		$result = $statement->execute();
 
-			return $statement->execute();
-		}
-		catch ( \Persephone\Exception $e )
+		if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
 		{
-			return false;
+			$resultSet = new \Zend\Db\ResultSet\ResultSet();
+			$return = $resultSet->initialize( $result )->count();
+
+			return $return;
 		}
+
+		return $result;
 	}
 
 
 	/**
 	 * Builds "CREATE TABLE ..." query from Table-Structure Array and executes it
 	 *
-	 * @param       $struct     array       Struct array
+	 * @param       array       $struct     Struct array
 	 *
-	 * @return                  integer     # of queries executed
+	 * @return      integer                 # of queries executed
 	 */
 	public function simple_exec_create_table_struct ( $struct )
 	{
@@ -1519,21 +1531,18 @@ class Pdo_mysql extends \Persephone\Database
 				") ENGINE=" . $data[ 'storage_engine' ] . " DEFAULT CHARACTER SET=" . $data[ 'charset' ] . " COLLATE=" . $data[ 'collate' ] . " COMMENT='" . $data[ 'comment' ] . "';\n\n";
 
 			# Execute
-			try
-			{
-				if ( IN_DEV )
-				{
-					$this->query_count++;
-				}
+			( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
-				$statement = $this->adapter->query( $this->cur_query );
+			$statement = $this->adapter->query( $this->cur_query );
+			$result = $statement->execute();
 
-				return $statement->execute();
-			}
-			catch ( \Persephone\Exception $e )
+			if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
 			{
-				return false;
+				$resultSet = new \Zend\Db\ResultSet\ResultSet();
+				$return += $resultSet->initialize( $result )->count();
 			}
+
+			$return++;
 		}
 
 		return $return;
