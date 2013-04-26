@@ -1,0 +1,4 @@
+Audith CMS codename Persephone is double licensed under GNU General Public License v3 and MIT license:
+
+GNU GPL v3: http://opensource.org/licenses/GPL-3.0
+MIT: http://opensource.org/licenses/MIT
