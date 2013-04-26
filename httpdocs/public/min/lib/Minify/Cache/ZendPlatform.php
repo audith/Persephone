@@ -1,23 +1,24 @@
 <?php
 /**
- * Class Minify_Cache_APC
+ * Class Minify_Cache_ZendPlatform
  *
  * @package Minify
  */
 
 /**
- * APC-based cache class for Minify
+ * ZendPlatform-based cache class for Minify
+ * Based on Minify_Cache_APC, uses output_cache_get/put (currently deprecated)
  * <code>
- * Minify::setCache(new Minify_Cache_APC());
+ * Minify::setCache(new Minify_Cache_ZendPlatform());
  * </code>
  *
  * @package Minify
- * @author  Chris Edwards
- **/
-class Minify_Cache_APC
+ * @author  Patrick van Dissel
+ */
+class Minify_Cache_ZendPlatform
 {
 	/**
-	 * Create a Minify_Cache_APC object, to be passed to
+	 * Create a Minify_Cache_ZendPlatform object, to be passed to
 	 * Minify::setCache().
 	 *
 	 * @param int $expire seconds until expiration (default = 0
@@ -41,7 +42,7 @@ class Minify_Cache_APC
 	 */
 	public function store ( $id, $data )
 	{
-		return apc_store( $id, "{$_SERVER[ 'REQUEST_TIME' ]}|{$data}", $this->_exp );
+		return output_cache_put( $id, "{$_SERVER[ 'REQUEST_TIME' ]}|{$data}" );
 	}
 
 
@@ -54,14 +55,9 @@ class Minify_Cache_APC
 	 */
 	public function getSize ( $id )
 	{
-		if ( !$this->_fetch( $id ) )
-		{
-			return false;
-		}
-
-		return ( function_exists( 'mb_strlen' ) && ( (int) ini_get( 'mbstring.func_overload' ) & 2 ) )
-			? mb_strlen( $this->_data, '8bit' )
-			: strlen( $this->_data );
+		return $this->_fetch( $id )
+			? strlen( $this->_data )
+			: false;
 	}
 
 
@@ -75,7 +71,9 @@ class Minify_Cache_APC
 	 */
 	public function isValid ( $id, $srcMtime )
 	{
-		return ( $this->_fetch( $id ) && ( $this->_lm >= $srcMtime ) );
+		$ret = ( $this->_fetch( $id ) && ( $this->_lm >= $srcMtime ) );
+
+		return $ret;
 	}
 
 
@@ -118,7 +116,7 @@ class Minify_Cache_APC
 
 
 	/**
-	 * Fetch data and timestamp from apc, store in instance
+	 * Fetch data and timestamp from ZendPlatform, store in instance
 	 *
 	 * @param string $id
 	 *
@@ -130,7 +128,7 @@ class Minify_Cache_APC
 		{
 			return true;
 		}
-		$ret = apc_fetch( $id );
+		$ret = output_cache_get( $id, $this->_exp );
 		if ( false === $ret )
 		{
 			$this->_id = null;
