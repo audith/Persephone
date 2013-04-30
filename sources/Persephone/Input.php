@@ -14,8 +14,32 @@ if ( !defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
  */
-class Input
+class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 {
+	/**
+	 * Whether value setting allowed or not (Disabled by default)
+	 */
+	const ALLOW_SET = 1;
+
+	/**
+	 * Whether value getting allowed or not (Enabled by default)
+	 */
+	const ALLOW_GET = 2;
+
+	const ALLOW_NONE = 4;
+
+	private $data = array();
+
+	private $ignore = array();
+
+	private $offsetFilter = array();
+
+	private $flags;
+
+	private $filter = null;
+
+
+
 	/**
 	 * Registry reference
 	 *
@@ -24,109 +48,11 @@ class Input
 	private $Registry;
 
 	/**
-	 * Safe version of $_COOKIE
-	 *
-	 * @var array
-	 */
-	public $cookie = array();
-
-	/**
-	 * Internal cookie set for faster retrieval
-	 *
-	 * @var array
-	 */
-	private $_cookie_set = array();
-
-	/**
-	 * Object used for character encoding conversions
-	 *
-	 * @var object
-	 */
-	public $encoding_converter;
-
-	/**
-	 * Safe version of $_ENV
-	 *
-	 * @var array
-	 */
-	public $env = array();
-
-	/**
-	 * Safe version of $_GET
-	 *
-	 * @var array
-	 */
-	public $get = array();
-
-	/**
 	 * HTTP Headers
 	 *
 	 * @var array
 	 */
 	public $headers = array( 'request' => array( '_is_ajax' => false ) );
-
-	/**
-	 * Whether or not, Input::clean_makesafe_recursively() was applied to the selected Superglobal.
-	 *
-	 * @var array
-	 */
-	private $_is_cleanup_done_for = array(
-		'post'    => false,
-		'get'     => false,
-		'request' => false,
-		'cookie'  => false,
-		'server'  => false,
-		'env'     => false
-	);
-
-	/**
-	 * Safe version of $_POST
-	 *
-	 * @var array
-	 */
-	public $post = array();
-
-	/**
-	 * QUERY_STRING (formatted)
-	 *
-	 * @var string
-	 */
-	public $query_string_formatted = "";
-
-	/**
-	 * QUERY_STRING (real)
-	 *
-	 * @var string
-	 */
-	public $query_string_real = "";
-
-	/**
-	 * QUERY_STRING (safe)
-	 *
-	 * @var string
-	 */
-	public $query_string_safe = "";
-
-	/**
-	 * Safe version of $_REQUEST
-	 *
-	 * @var array
-	 */
-	public $request = array();
-
-	/**
-	 * Safe version of $_SERVER
-	 *
-	 * @var array
-	 */
-	public $server = array();
-
-	/**
-	 * Session cookies of high priority, sensitivity and importance - Only managed through $_SESSION superglobal
-	 *
-	 * @var array
-	 */
-	public $sensitive_cookies = array();
 
 
 	/**
@@ -143,11 +69,11 @@ class Input
 	/**
 	 * Method overloading for Input class - gets value from within requested superglobal
 	 *
-	 * @param     string      $name         The name of the method being called.
-	 * @param     array       $arguments    Enumerated array containing the parameters passed to the $name'd method.
+	 * @param     string                    $name         The name of the method being called.
+	 * @param     array                     $arguments    Enumerated array containing the parameters passed to the $name'd method.
 	 *
-	 * @return    mixed                     Value gotten from super-global
-	 * @throws    \Persephone\Exception     In case, if method is not one of the pre-defined Six.
+	 * @return    mixed                                   Value gotten from super-global
+	 * @throws    \Persephone\Exception                   In case, if method is not one of the pre-defined Six.
 	 */
 	public function __call ( $name, $arguments )
 	{
@@ -264,255 +190,6 @@ class Input
 		//----------------
 
 		$this->query_string_formatted = preg_replace( "#s=([a-z0-9]){32}#", '', $this->query_string_safe );
-	}
-
-
-	/**
-	 * Resource-efficient array_unshift() function
-	 */
-	public function array_unshift_ref ( &$array, &$value )
-	{
-		$return     = array_unshift( $array, "" );
-		$array[ 0 ] =& $value;
-
-		return $return;
-	}
-
-
-	/**
-	 * Check email address to see if it seems valid
-	 *
-	 * @param    string     $email      Email address to be validated
-	 *
-	 * @return   boolean
-	 */
-	public function validate__check_email_address__medium ( $email )
-	{
-		return filter_var( trim( $email ), FILTER_VALIDATE_EMAIL ) === false
-			? false
-			: true;
-	}
-
-
-	/**
-	 * Checks enclosing parentheses, matching opening and closing ones
-	 *
-	 * @param    string    $t   String to check
-	 *
-	 * @return   boolean        TRUE if successful, FALSE otherwise
-	 */
-	public function validate__check_enclosing_parentheses_pairs__medium ( $t )
-	{
-		$t = "(" . $t . ")";
-		preg_match_all(
-			'/
-						\(
-							(?:
-								(?:
-									(?>
-										[^()]+
-									)
-									|
-									(?R)
-								)*
-							)
-						\)
-						/xi',
-			$t,
-			$_parentheses_check_matches
-		);
-
-		if ( $t != @$_parentheses_check_matches[ 0 ][ 0 ] )
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * Removes control characters (hidden spaces)
-	 *
-	 * @param    string    $t   Input string
-	 *
-	 * @return   integer        Parsed String
-	 */
-	public function sanitize__clean_control_characters__low ( $t )
-	{
-		if ( isset( $this->Registry->config[ 'security' ][ 'strip_space_chr' ] ) and $this->Registry->config[ 'security' ][ 'strip_space_chr' ] )
-		{
-			/**
-			 * @see    http://en.wikipedia.org/wiki/Space_(punctuation)
-			 * @see    http://www.ascii.cl/htmlcodes.htm
-			 */
-			$t = str_replace( chr( 160 ), ' ', $t );
-			$t = str_replace( chr( 173 ), ' ', $t );
-			//$t = str_replace( chr( 240 ), ' ', $t ); // Latin small letter eth
-
-			//$t = str_replace( chr( 0xA0 ), "", $t ); // Remove sneaky spaces	Same as chr 160
-			//$t = str_replace( chr( 0x2004 ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x2005 ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x2006 ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x2009 ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x200A ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x200B ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x200C ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x200D ), " ", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x202F ), " ", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x205F ), " ", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0x2060 ), "", $t ); // Remove sneaky spaces
-			//$t = str_replace( chr( 0xFEFF ), "", $t ); // Remove sneaky spaces
-		}
-
-		return $t;
-	}
-
-	/**
-	 * Cleans excessive leading and trailing + duplicate separator chars from delim-separated-values (such as CSV)
-	 *
-	 * @param    mixed    $i        Data to clean
-	 * @param    string   $sep      RegEx-compatible separator-character (e.g., comma (,) in CSV)
-	 *
-	 * @return   mixed              Output
-	 */
-	public function clean__excessive_separators ( $i, $sep = "," )
-	{
-		if ( is_array( $i ) )
-		{
-			foreach ( $i as $_k => $_v )
-			{
-				$i[ $_k ] = $this->clean__excessive_separators( $_v, $sep );
-			}
-		}
-		else
-		{
-			# Clean duplicates
-			$i = preg_replace( "/" . preg_quote( $sep ) . "{2,}/", $sep, $i );
-
-			# Clean leading and trailing separators, i.e. trim those
-			// Doesn't work if separator is not a char but a string of chars.
-			// $i = trim( $i, $sep );
-			$i = preg_replace( "/^" . preg_quote( $sep ) . "/", "", $i );
-			$i = preg_replace( "/" . preg_quote( $sep ) . "$/", "", $i );
-		}
-
-		return $i;
-	}
-
-
-	/**
-	 * Returns a cleaned MD5 hash
-	 *
-	 * @param    string   Input String
-	 *
-	 * @return   string   Parsed String
-	 */
-	public function sanitize__md5_hash ( $t )
-	{
-		return preg_replace( "/[^a-zA-Z0-9]/", "", substr( $t, 0, 32 ) );
-	}
-
-
-	/**
-	 * Strip slashes recursively
-	 *
-	 * @param    mixed    $i    REFERENCE: Data to strip slashes from (a reference-argument for array_walk to work)
-	 *
-	 * @return   mixed          Slash-stripped data
-	 */
-	public function sanitize__stripslashes ( &$i )
-	{
-		is_array( $i )
-			? array_walk( $i, array( $this, "sanitize__stripslashes" ) )
-			: $i = stripslashes( $i );
-
-		return $i;
-	}
-
-
-	/**
-	 * Strip tags
-	 *
-	 * @param  mixed $i Data to strip (X)HTML tags from
-	 *
-	 * @return mixed $i Clean data
-	 */
-	public function sanitize__strip_tags ( $i, $tags_to_strip = "" )
-	{
-		$i = is_array( $i )
-			? array_map( array( $this, "sanitize__strip_tags" ), $i )
-			: strip_tags( $i, $tags_to_strip );
-
-		return $i;
-	}
-
-
-	/**
-	 * Makesafe
-	 *
-	 * @param   mixed          $val         REFERENCE: Data to be made safe
-	 * @param   string         $key         KEY [used as parameter-2 in the callback function of array_walk()
-	 * @param   array          $filters     Additional functions to filter the value through, prior to cleaning
-	 *
-	 * @return  void|mixed     VOID if $_output_flag = false; MIXED otherwise.
-	 * @throws  \Persephone\Exception
-	 */
-	public function _sanitize__clean_raw_value__medium ( &$val, $key, $filters = array() )
-	{
-		if ( $val === '' ) // Literally empty string, integer 0 excluded
-		{
-			return true;
-		}
-
-		# Let's apply additional functions, if any, to clean further
-		if ( isset( $filters ) and is_array( $filters ) and count( $filters ) )
-		{
-			foreach ( $filters as $_filter )
-			{
-				if ( is_array( $_filter ) and is_object( $_filter[ 0 ] ) and method_exists( $_filter[ 0 ], $_filter[ 1 ] ) )
-				{
-					$val = & $_filter[ 0 ]->$_filter[ 1 ]( $val );
-				}
-				elseif ( !is_array( $_filter ) and function_exists( $_filter ) )
-				{
-					$val = $_filter( $val );
-				}
-				else
-				{
-					throw new \Persephone\Exception( "Parameter-2 of Input::_sanitize__clean_raw_value__medium() must be a valid function/method callback!" );
-				}
-			}
-		}
-
-		$val = trim( $val );
-		// $val = $this->clean__stripslashes( $val );
-		$val = str_replace( "&#032;", " ", $val );
-
-		# Convert all carriage return combos
-		$val = str_replace( array( '\r\n', '\n\r', '\r' ), "\n", $val );
-
-		# Continue with cleaning...
-
-		$val = str_replace( "&", "&amp;", $val );
-		$val = str_replace( "<!--", "&#60;&#33;--", $val );
-		$val = str_replace( "-->", "--&#62;", $val );
-		$val = str_ireplace( "<script", "&#60;script", $val );
-		$val = str_replace( ">", "&gt;", $val );
-		$val = str_replace( "<", "&lt;", $val );
-		$val = str_replace( '"', "&quot;", $val );
-		$val = str_replace( '\n', "<br />", $val ); // Convert literal newlines
-		$val = str_replace( '$', "&#36;", $val );
-		$val = str_replace( "!", "&#33;", $val );
-		$val = str_replace( "'", "&#39;", $val ); // IMPORTANT: It helps to increase sql query safety.
-
-		# Ensure unicode chars are OK
-		$val = preg_replace( "/&amp;#([0-9]+);/s", "&#\\1;", $val );
-
-		# Try and fix up HTML entities with missing ;
-		$val = preg_replace( '/&#(\d+?)([^\d;])/i', "&#\\1;\\2", $val );
-
-		return true;
 	}
 
 
@@ -835,86 +512,6 @@ class Input
 				$data[ $k ] = $v;
 			}
 		}
-	}
-
-
-	/**
-	 * Recursively cleans keys and values and inserts them into the input array [Build 20090120]
-	 *
-	 * @param   array     $data         Incoming data to clean
-	 * @param   integer   $iteration    Incoming data array depth
-	 * @param   array     $filters      Additional functions to filter the value through, prior to cleaning
-	 *
-	 * @return  mixed
-	 *
-	 * @author concept by Matthew Mecham @ IPS; adapted by Shahriyar Imanov @ Audith
-	 */
-	public function sanitize__clean_raw_value_recursive__high ( $data, $iteration = 0, $filters = array() )
-	{
-		# Crafty hacker could send something like &foo[][][][][][]....to kill Apache process
-		# We should never have an input array deeper than 20...
-		if ( $iteration >= 20 )
-		{
-			return $data;
-		}
-
-		if ( is_array( $data ) and count( $data ) )
-		{
-			$_cleaned_data = array();
-			foreach ( $data as $k => $v )
-			{
-				# Recursion
-				if ( is_array( $v ) )
-				{
-					$_cleaned_data[ $this->sanitize__clean_raw_key__low( $k ) ] = $this->sanitize__clean_raw_value_recursive__high( $v, $iteration + 1, $filters );
-				}
-				# Actual cleanup
-				else
-				{
-					$this->_sanitize__clean_raw_value__medium( $v, null, $filters );
-					$_cleaned_data[ $this->sanitize__clean_raw_key__low( $k ) ] = $v; // We need output
-				}
-			}
-		}
-		else
-		{
-			$this->_sanitize__clean_raw_value__medium( $data, null, $filters );
-			$_cleaned_data = $data;
-		}
-
-		return $_cleaned_data;
-	}
-
-
-	/**
-	 * WRAPPER for _sanitize__clean_raw_value__medium(): Clean's incoming values (usually _GET, _POST)
-	 *
-	 * @param    string|array Value                   to parse (either string or array)
-	 * @param    array                   Additional functions to filter the value through, prior to cleaning
-	 * @param    boolean                 Whether to return the result or not, defaults to "not" :)
-	 *
-	 * @return   boolean|string|array    Cleaned value, if last parameter is On; BOOLEAN otherwise
-	 */
-	public function sanitize__clean_raw_value__medium ( &$val, $filters = array(), $do_output = false )
-	{
-		# If its an array, 'walk-through-it' recursively with Input::_sanitize__clean_raw_value__medium() ...
-		if ( is_array( $val ) )
-		{
-			array_walk_recursive( $val, array( $this, "_sanitize__clean_raw_value__medium" ), $filters );
-		}
-		# ... otherwise, just apply Input::clean__makesafe() to it.
-		else
-		{
-			$this->_sanitize__clean_raw_value__medium( $val, null, $filters );
-		}
-
-		# If explicit return is requested, comply - otherwise go Boolean.
-		if ( $do_output )
-		{
-			return $val;
-		}
-
-		return true;
 	}
 
 

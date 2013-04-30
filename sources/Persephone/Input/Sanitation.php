@@ -12,29 +12,35 @@ if ( !defined( "INIT_DONE" ) )
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
+ * @author   Oleku Konko
+ * @see      http://stackoverflow.com/questions/13906822/php-illegal-string-offset/15034807
  * @version  1.0
  */
 class Sanitation
 {
-	const SANITIZE_XSS = 1;
+	const FILTER_NONE = 1;
 
-	const SANITIZE_SQL = 2;
+	const FILTER_XSS = 2;
 
-	const SANITIZE_FILTER_HIGH = 4;
+	const FILTER_SQL = 4;
 
-	const SANITIZE_FILTER_LOW = 8;
+	const FILTER_HIGH = 8;
 
-	const SANITIZE_FILTER = 16;
+	const FILTER_LOW = 16;
 
-	const SANITIZE_CONTROL_CHARACTERS = 32;
+	const FILTER_HIGH_LOW = 24;
 
-	const SANITIZE_CRLF = 64;
+	const FILTER_CONTROL_CHARACTERS = 32;
 
-	const SANITIZE_MD5 = 128;
+	const FILTER_CRLF = 64;
 
-	const SANITIZE_EXCESSIVE_SEPARATORS = 256;
+	const FILTER_MD5 = 128;
 
-	const SANITIZE_CUSTOM = 2048;
+	const FILTER_EXCESSIVE_SEPARATORS = 256;
+
+	const FILTER_CUSTOM = 2048;
+
+	const FILTER_ALL = 4095;
 
 	/**
 	 * @var \Persephone\Registry
@@ -49,12 +55,7 @@ class Sanitation
 	/**
 	 * @var int
 	 */
-	private $options;
-
-	/**
-	 * @var string
-	 */
-	private $custom_function = "";
+	private $flags;
 
 	/**
 	 * @var string
@@ -62,15 +63,12 @@ class Sanitation
 	private $separator = ",";
 
 
-	public function __construct ( $options, $custom_function = "", $custom_parameter = null )
+	public function __construct ( $flags, $custom_parameter = null )
 	{
 		$this->Registry = \Persephone\Registry::init();
-		$this->options  = $options;
-		if ( $this->options & self::SANITIZE_CUSTOM and function_exists( $custom_function ) )
-		{
-			$this->custom_function = $custom_function;
-		}
-		if ( $this->options & self::SANITIZE_EXCESSIVE_SEPARATORS and isset( $custom_parameter[ 'separator' ] ) and !empty( $custom_parameter[ 'separator' ] ) )
+		$this->flags  = $flags;
+
+		if ( $this->flags & self::FILTER_EXCESSIVE_SEPARATORS and isset( $custom_parameter[ 'separator' ] ) and !empty( $custom_parameter[ 'separator' ] ) )
 		{
 			$this->separator = $custom_parameter[ 'separator' ];
 		}
@@ -89,15 +87,15 @@ class Sanitation
 
 		if ( is_string( $mixed ) )
 		{
-			$this->options & self::SANITIZE_XSS and $mixed = htmlspecialchars( $mixed, ENT_QUOTES, 'UTF-8' );
-			$this->options & self::SANITIZE_SQL and $mixed = $this->clean_for_sql_injection( $mixed );
-			$this->options & self::SANITIZE_FILTER_HIGH and $mixed = filter_var( $mixed, FILTER_SANITIZE_STRING, FILTER_FLAG_ENCODE_HIGH );
-			$this->options & self::SANITIZE_FILTER_LOW and $mixed = filter_var( $mixed, FILTER_SANITIZE_STRING, FILTER_FLAG_ENCODE_LOW );
-			$this->options & self::SANITIZE_FILTER and $mixed = filter_var( $mixed, FILTER_SANITIZE_STRING, FILTER_FLAG_ENCODE_HIGH | FILTER_FLAG_ENCODE_LOW );
-			$this->options & self::SANITIZE_CONTROL_CHARACTERS and $mixed = $this->clean_control_characters( $mixed );
-			$this->options & self::SANITIZE_MD5 and $mixed = $this->clean_md5_hash( $mixed );
-			$this->options & self::SANITIZE_EXCESSIVE_SEPARATORS and $mixed = $this->clean_excessive_separators( $mixed );
-			$this->options & self::SANITIZE_CRLF and $mixed = $this->convert_line_delimiters_to_unix( $mixed );
+			$this->flags & self::FILTER_XSS and $mixed = htmlspecialchars( $mixed, ENT_QUOTES, 'UTF-8' );
+			$this->flags & self::FILTER_SQL and $mixed = $this->clean_for_sql_injection( $mixed );
+			$this->flags & self::FILTER_HIGH and $mixed = filter_var( $mixed, FILTER_SANITIZE_STRING, FILTER_FLAG_ENCODE_HIGH );
+			$this->flags & self::FILTER_LOW and $mixed = filter_var( $mixed, FILTER_SANITIZE_STRING, FILTER_FLAG_ENCODE_LOW );
+			$this->flags & self::FILTER_HIGH_LOW and $mixed = filter_var( $mixed, FILTER_SANITIZE_STRING, FILTER_FLAG_ENCODE_HIGH | FILTER_FLAG_ENCODE_LOW );
+			$this->flags & self::FILTER_CONTROL_CHARACTERS and $mixed = $this->clean_control_characters( $mixed );
+			$this->flags & self::FILTER_MD5 and $mixed = $this->clean_md5_hash( $mixed );
+			$this->flags & self::FILTER_EXCESSIVE_SEPARATORS and $mixed = $this->clean_excessive_separators( $mixed );
+			$this->flags & self::FILTER_CRLF and $mixed = $this->convert_line_delimiters_to_unix( $mixed );
 		}
 
 		if ( is_array( $mixed ) or is_object( $mixed ) )
@@ -215,5 +213,46 @@ class Sanitation
 		$string = preg_replace( "/" . preg_quote( $this->separator ) . "$/", "", $string );
 
 		return $string;
+	}
+
+
+	/**
+	 * Clean a string to remove all non-arithmetic characters [non- numericals, arithmetic operators and parentheses] and then
+	 * makes sure the final expression is a valid mathematical/arithmetic expression, PHP-wise. Usually for eval()'s...
+	 * IMPORTANT NOTE: PHP math functions are not supported!
+	 *
+	 * @param   string    $val                              Input String
+	 * @param   boolean   $allow_decimal_point              Whether to allow decimal-point in regex control or not
+	 * @param   boolean   $check_enclosing_parentheses      Whether to perform enclosing parentheses check or not
+	 *
+	 * @return  mixed     Parsed String on success; FALSE otherwise
+	 */
+	public function clean_non_arithmetic_characters ( $val, $allow_decimal_point = false, $check_enclosing_parentheses = false )
+	{
+		if ( $check_enclosing_parentheses )
+		{
+			if ( !Validation::check_enclosing_parentheses_pairs( $val ) )
+			{
+				return false;
+			}
+		}
+
+		$val = preg_replace( "/&(?:#[0-9]+|[a-z]+);/i", "", $val ); // Getting rid of all HTML entities
+		if ( $allow_decimal_point )
+		{
+			$val = preg_replace( '#[^0-9\-\+\*\/\(\)\.]+#', "", $val ); // Remove non numericals, leave decimal-point
+			$val = preg_replace( '#(?<=\d)\.(?!\d)#', "", $val ); // Remove trailing decimal points (e.g. "0." )
+			$val = preg_replace( '#(?<!\d)\.(?=\d)#', "", $val ); // Remove leader decimal points (e.g. ".0" )
+		}
+		else
+		{
+			$val = preg_replace( '#[^0-9\-\+\*\/\(\)]+#', "", $val ); // Remove non numericals
+		}
+		$val = preg_replace( '#^[\+\*\/]+#', "", $val ); // Remove leading arithmetics, leave leading (-) for signs
+		$val = preg_replace( '#[\-\+\*\/]+$#', "", $val ); // Remove trailing arithmetics
+		$val = preg_replace( '#(?<=\()[^0-9\-]+(?=\d)#', "", $val ); // Remove leading arithmetics [within parentheses], leave leading (-) for signs
+		$val = preg_replace( '#(?<=\d)[^0-9]+(?=\))#', "", $val ); // Remove trailing arithmetics [within parentheses]
+
+		return $val;
 	}
 }

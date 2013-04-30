@@ -1,11 +1,7 @@
-2013-04-12T12:38:16+00:00 INFO (6): Script start-up.
-2013-04-12T12:38:16+00:00 WARN (4): Cache: PHP-Memcache not found! Reverting to Disk-cache...
-2013-04-12T12:38:16+00:00 INFO (6): 
-	Timedelta - Cache-Abstraction - Diskcache Identifier: persephone: 0.01611 secs
-[12-Apr-2013 12:38:17 UTC] PHP Fatal error:  Uncaught exception 'Zend\Db\Adapter\Exception\ErrorException' with message 'You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'AS `c.*` FROM `conf_settings_groups` AS `g` INNER JOIN `conf_settings` AS `c` ON' at line 1' in X:\XAMPP\htdocs\persephone\libraries\Zend\Db\Adapter\Driver\Mysqli\Statement.php:212
-Stack trace:
-#0 X:\XAMPP\htdocs\persephone\libraries\Zend\Db\Adapter\Adapter.php(181): Zend\Db\Adapter\Driver\Mysqli\Statement->prepare()
-#1 X:\XAMPP\htdocs\persephone\sources\Persephone\Database\Drivers\Mysqli.php(913): Zend\Db\Adapter\Adapter->query('SELECT `g`.`g.*...')
-#2 X:\XAMPP\htdocs\persephone\sources\Persephone\Database.php(390): Persephone\Database\Drivers\Mysqli->simple_select_query(Array)
-#3 X:\XAMPP\htdocs\persephone\sources\Persephone\Cache\Recache.php(849): Persephone\Database->simple_exec_query()
-#4 X:\XAMPP\htdocs\persephone\sources\Persephone\Cache\Recache.php(82): Persephone\Cache\Recache->settings__do_re in X:\XAMPP\htdocs\persephone\libraries\Zend\Db\Adapter\Driver\Mysqli\Statement.php on line 209
+2013-04-26T14:41:10+00:00 INFO (6): Persephone\Registry::__construct says: Script start-up.
+
+2013-04-26T14:41:10+00:00 INFO (6): Persephone\Registry::__construct says: Script start-up.
+
+[26-Apr-2013 14:41:10 UTC] PHP Warning:  Cannot use a scalar value as an array in X:\XAMPP\htdocs\persephone\sources\Persephone\Registry.php on line 359
+[26-Apr-2013 14:41:10 UTC] PHP Warning:  require(X:/XAMPP/htdocs/persephone/sources\Persephone\Database\Drivers\.php): failed to open stream: No such file or directory in X:\XAMPP\htdocs\persephone\libraries\Doctrine\Common\ClassLoader.php on line 164
+[26-Apr-2013 14:41:10 UTC] PHP Fatal error:  require(): Failed opening required 'X:/XAMPP/htdocs/persephone/sources\Persephone\Database\Drivers\.php' (include_path='X:/XAMPP/htdocs/persephone/libraries;X:/XAMPP/htdocs/persephone/sources') in X:\XAMPP\htdocs\persephone\libraries\Doctrine\Common\ClassLoader.php on line 164

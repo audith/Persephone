@@ -16,9 +16,9 @@ if ( !defined( "INIT_DONE" ) )
  */
 class Validation
 {
-	const VALIDATE_EMAIL = 1;
+	const FILTER_EMAIL = 1;
 
-	const VALIDATE_CHARACTER_ENCODING = 2;
+	const FILTER_CHARACTER_ENCODING = 2;
 
 	/**
 	 * @var \Persephone\Registry
@@ -33,7 +33,7 @@ class Validation
 	/**
 	 * @var int
 	 */
-	private $options;
+	private $flags;
 
 	/**
 	 * Encoding to check against
@@ -50,10 +50,10 @@ class Validation
 	private $secondary_character_encoding = "";
 
 
-	public function __construct ( $options, $custom_function = "", $custom_parameter = null )
+	public function __construct ( $options, $custom_parameter = null )
 	{
-		$this->options = $options;
-		if ( $this->options & self::VALIDATE_CHARACTER_ENCODING and isset( $custom_parameter[ 'target_character_encoding' ] ) )
+		$this->flags = $options;
+		if ( $this->flags & self::FILTER_CHARACTER_ENCODING and isset( $custom_parameter[ 'target_character_encoding' ] ) )
 		{
 			$this->target_character_encoding = $custom_parameter[ 'target_character_encoding' ];
 			if ( isset( $custom_parameter[ 'secondary_character_encoding' ] ) )
@@ -64,9 +64,44 @@ class Validation
 	}
 
 
-	function escape ( $value )
+	/**
+	 * @param       mixed           $mixed      Stuff to clean
+	 *
+	 * @return      mixed|null
+	 */
+	public static function init ( $mixed )
 	{
-		if ( $value = @mysql_real_escape_string( $value ) )
+		# Crafty hacker could send something like &foo[][][][][][]....to kill Apache process
+		# We should never have an globals array deeper than 10..
+		if ( $this->iteration > 10 )
+		{
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: Iteration counter exceeded its max of 10, thus Validation has been halted!", "WARN" );
+			return null;
+		}
+
+		if ( is_string( $mixed ) )
+		{
+			$this->flags & self::FILTER_EMAIL and $mixed = filter_var( trim( $mixed ), FILTER_VALIDATE_EMAIL );
+			$this->flags & self::FILTER_CHARACTER_ENCODING and $mixed = $this->check_character_encoding( $mixed );
+			self::$flags & self::FILTER_ENCLOSING_PARENTHESES_PAIRS and $mixed = self::check_enclosing_parentheses_pairs( $mixed );
+		}
+
+		if ( is_array( $mixed ) or is_object( $mixed ) )
+		{
+			$this->iteration++;
+			foreach ( $mixed as &$data )
+			{
+				$data = $this->init( $data );
+			}
+		}
+
+		return $mixed;
+	}
+
+
+	public function escape ( $value )
+	{
+		if ( $value = mysql_real_escape_string( $value ) )
 		{
 			return $value;
 		}
@@ -91,40 +126,6 @@ class Validation
 
 
 	/**
-	 * @param       mixed           $mixed      Stuff to clean
-	 *
-	 * @return      mixed|null
-	 */
-	public function init ( $mixed )
-	{
-		# Crafty hacker could send something like &foo[][][][][][]....to kill Apache process
-		# We should never have an globals array deeper than 10..
-		if ( $this->iteration > 10 )
-		{
-			\Persephone\Registry::logger__do_log( __CLASS__ . "::init() - iteration counter exceeded its max of 10, thus Validation has been halted!", "WARN" );
-			return null;
-		}
-
-		if ( is_string( $mixed ) )
-		{
-			$this->options & self::VALIDATE_EMAIL and $mixed = filter_var( trim( $mixed ), FILTER_VALIDATE_EMAIL );
-			$this->options & self::VALIDATE_CHARACTER_ENCODING and $mixed = $this->check_character_encoding( $mixed );
-		}
-
-		if ( is_array( $mixed ) or is_object( $mixed ) )
-		{
-			$this->iteration++;
-			foreach ( $mixed as &$data )
-			{
-				$data = $this->init( $data );
-			}
-		}
-
-		return $mixed;
-	}
-
-
-	/**
 	 * Check if the string is valid for the specified encoding
 	 *
 	 * @param   string          $string        Byte stream to check
@@ -142,7 +143,7 @@ class Validation
 		# Do we have php-mbstring set? If not, issue error and return
 		if ( !in_array( "mbstring", $this->Registry->config[ 'runtime' ][ 'loaded_extensions' ] ) or empty( $this->target_character_encoding ) )
 		{
-			$this->Registry->logger__do_log( __CLASS__ . "::check_character_encoding() - php-mbstring not found or missing parameter!", "ERROR" );
+			$this->Registry->logger__do_log( __METHOD__ . " says: php-mbstring not found or method-call is missing a parameter!", "ERROR" );
 
 			return null;
 		}
@@ -179,6 +180,44 @@ class Validation
 		}
 	}
 
+
+	/**
+	 * Checks enclosing parentheses, matching opening and closing ones
+	 *
+	 * @param    string    $string      String to check
+	 *
+	 * @return   boolean                TRUE if successful, FALSE otherwise
+	 */
+	public function check_enclosing_parentheses_pairs ( $string )
+	{
+		$string = "(" . $string . ")";
+		preg_match_all(
+			'/
+				\(
+					(?:
+						(?:
+							(?>
+								[^()]+
+							)
+							|
+							(?R)
+						)*
+					)
+				\)
+			/xi',
+			$string,
+			$_parentheses_check_matches
+		);
+
+		if ( $string != $_parentheses_check_matches[ 0 ][ 0 ] )
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
 	/**
 	 * Validates file extension by checking its contents in a BINARY level
 	 *
@@ -207,7 +246,7 @@ class Validation
 		{
 			if ( IN_DEV )
 			{
-				$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - " . $full_path_to_file . " is NOT a REGULAR FILE or does NOT EXIST at all!", "ERROR" );
+				$this->Registry->logger__do_log( __METHOD__ . " says: " . $full_path_to_file . " is NOT a REGULAR FILE or does NOT EXIST at all!", "ERROR" );
 			}
 
 			return "IS_NOT_FILE";
@@ -216,10 +255,7 @@ class Validation
 		# Is it readable?
 		if ( is_readable( $full_path_to_file ) !== true )
 		{
-			if ( IN_DEV )
-			{
-				$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - Cannot READ file: " . $full_path_to_file, "ERROR" );
-			}
+			$this->Registry->logger__do_log( __METHOD__ . " says: Cannot READ file: " . $full_path_to_file, "ERROR" );
 
 			return "IS_NOT_READABLE";
 		}
@@ -237,10 +273,7 @@ class Validation
 
 		if ( !isset( $_mimelist_cache[ $_file_path__parsed[ 'extension' ] ] ) )
 		{
-			if ( IN_DEV )
-			{
-				$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - " . $_file_path__parsed[ 'extension' ] . " - NO SUCH FILETYPE IN our MIMELIST records!", "ERROR" );
-			}
+			$this->Registry->logger__do_log( __METHOD__ . " says: '" . $_file_path__parsed[ 'extension' ] . "', NO SUCH FILETYPE IN our MIMELIST records!", "ERROR" );
 
 			return "FILETYPE_INVALID";
 		}
@@ -265,10 +298,7 @@ class Validation
 			return true;
 		}
 
-		if ( IN_DEV )
-		{
-			$this->Registry->logger__do_log( __CLASS__ . "::" . __METHOD__ . " - File: " . $full_path_to_file . " FAILED VALIDATION!", "ERROR" );
-		}
+		$this->Registry->logger__do_log( __METHOD__ . " says: File '" . $full_path_to_file . "' FAILED validation!", "ERROR" );
 
 		return false;
 	}
