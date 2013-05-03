@@ -94,7 +94,7 @@ class Validation implements Parsable
 			$this->iteration++;
 			foreach ( $mixed as &$data )
 			{
-				$data = $this->parse( $data );
+				$data = $this->parse( null, $data );
 			}
 		}
 

@@ -220,10 +220,11 @@ final class Registry
 		$this->config = array_merge( $this->config, $_config );
 
 		//------------------
-		// INPUT::init()
+		// URI parsing
 		//------------------
 
-		$this->Input->init();
+		$this->parse_request_uri();
+		self::logger__do_log( __METHOD__ . " says: Request-path = '" . $this->config[ 'page' ][ 'request' ][ 'path' ] . "'", "INFO" );
 
 		//-------------------------------------------------------
 		// Output buffering with GZip compression
@@ -454,6 +455,45 @@ final class Registry
 				: header( "Location: " . $url );
 			exit();
 		}
+	}
+
+
+	/**
+	 * My parse_url() that parses current REQUEST_URI; additionally, it makes sure that working domain is valid - redirects to valid one otherwise
+	 *
+	 * @return   mixed   Array of parsed URL or FALSE on failure
+	 */
+	private function parse_request_uri ()
+	{
+		$_url = ( empty( $_SERVER[ 'HTTPS' ] ) or $_SERVER[ 'HTTPS' ] == 'off' )
+			? "http://"
+			: "https://";
+		$_url .= $_SERVER[ 'HTTP_HOST' ]
+			? $_SERVER[ 'HTTP_HOST' ]
+			: $_SERVER[ 'SERVER_NAME' ];
+		$_url .= $_SERVER[ 'REQUEST_URI' ];
+
+		$_parsed_url                    = parse_url( $_url );
+		$_parsed_url[ 'path' ]          = trim( $_parsed_url[ 'path' ], '\/' );
+		$_parsed_url[ 'path_exploded' ] = explode( "/", $_parsed_url[ 'path' ] );
+		$_parsed_url[ 'path' ]          = "/" . $_parsed_url[ 'path' ];
+
+		$_parsed_url[ 'request_uri' ] = $_parsed_url[ 'scheme' ] . "://" .
+		                                ( ( isset( $_parsed_url[ 'user' ] ) and isset( $_parsed_url[ 'pass' ] ) )
+			                                ? $_parsed_url[ 'user' ] . ":" . $_parsed_url[ 'pass' ] . "@"
+			                                : "" ) . $this->config[ 'url' ][ 'hostname' ][ $_parsed_url[ 'scheme' ] ] . $_parsed_url[ 'path' ] .
+		                                ( $_parsed_url[ 'query' ]
+			                                ? "?" . $_parsed_url[ 'query' ]
+			                                : "" );
+
+		# @todo Redirect to default domain-name if request was sent to different domain
+		if ( $_parsed_url[ 'host' ] != $this->config[ 'url' ][ 'hostname' ][ $_parsed_url[ 'scheme' ] ] )
+		{
+			self::logger__do_log( "Registry: Request redirection to location: " . $_parsed_url[ 'request_uri' ], "INFO" );
+			// $this->Registry->http_redirect( $_parsed_url['request_uri'] , 301 );
+		}
+
+		$this->config[ 'page' ][ 'request' ] = $_parsed_url;
 	}
 
 

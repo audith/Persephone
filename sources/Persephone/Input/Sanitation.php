@@ -38,7 +38,11 @@ class Sanitation implements Parsable
 
 	const FILTER_EXCESSIVE_SEPARATORS = 256;
 
-	const FILTER_CUSTOM = 2048;
+	const FILTER_ANSI = 512;
+
+	const FILTER_BASE64_ENCODE_URLSAFE = 1024;
+
+	const FILTER_BASE64_DECODE_URLSAFE = 2048;
 
 	const FILTER_ALL = 4095;
 
@@ -102,6 +106,9 @@ class Sanitation implements Parsable
 			$this->flags & self::FILTER_MD5 and $mixed = $this->clean_md5_hash( $mixed );
 			$this->flags & self::FILTER_EXCESSIVE_SEPARATORS and $mixed = $this->clean_excessive_separators( $mixed );
 			$this->flags & self::FILTER_CRLF and $mixed = $this->convert_line_delimiters_to_unix( $mixed );
+			$this->flags & self::FILTER_ANSI and $mixed = $this->clean_non_ansi_characters( $mixed );
+			$this->flags & self::FILTER_BASE64_ENCODE_URLSAFE and $mixed = $this->base64_encode_urlsafe( $mixed );
+			$this->flags & self::FILTER_BASE64_DECODE_URLSAFE and $mixed = $this->base64_decode_urlsafe( $mixed );
 		}
 
 		if ( is_array( $mixed ) or is_object( $mixed ) )
@@ -109,7 +116,7 @@ class Sanitation implements Parsable
 			$this->iteration++;
 			foreach ( $mixed as &$data )
 			{
-				$data = $this->parse( $data );
+				$data = $this->parse( null, $data );
 			}
 		}
 
@@ -260,5 +267,51 @@ class Sanitation implements Parsable
 		$val = preg_replace( '#(?<=\d)[^0-9]+(?=\))#', "", $val ); // Remove trailing arithmetics [within parentheses]
 
 		return $val;
+	}
+
+
+	/**
+	 * Removes all non US-ANSI characters
+	 *
+	 * @param   string   $string                    Input string
+	 * @param   string   $_characters_to_preserve   Additional characters to preserve
+	 *
+	 * @return  string                              Parsed string
+	 */
+	private function clean_non_ansi_characters ( $string, $_characters_to_preserve = "" )
+	{
+		if ( !empty( $_characters_to_preserve ) )
+		{
+			$_characters_to_preserve = preg_quote( $_characters_to_preserve, "/" );
+		}
+
+		$string = preg_replace( '/&(?:#[0-9]+|[a-z]+);/i', "", $string );
+		return preg_replace( '/[^a-z0-9\-\_' . $_characters_to_preserve . ']/i', "", $string );
+	}
+
+
+	/**
+	 * Base64 encode for URLs
+	 *
+	 * @param   string
+	 *
+	 * @return  string
+	 */
+	public function base64_encode_urlsafe ( $string )
+	{
+		return strtr( base64_encode( $string ), '+/=', '-_,' );
+	}
+
+
+	/**
+	 * Base64 decode for URLs
+	 *
+	 * @param    string
+	 *
+	 * @return   string
+	 */
+	public function base64_decode_urlsafe ( $string )
+	{
+		return base64_decode( strtr( $string, '-_,', '+/=' ) );
 	}
 }
