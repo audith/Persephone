@@ -14,11 +14,13 @@ if ( !defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
  */
-class Validation
+class Validation implements Parsable
 {
 	const FILTER_EMAIL = 1;
 
 	const FILTER_CHARACTER_ENCODING = 2;
+
+	const FILTER_ENCLOSING_PARENTHESES_PAIRS = 4;
 
 	/**
 	 * @var \Persephone\Registry
@@ -65,11 +67,12 @@ class Validation
 
 
 	/**
-	 * @param       mixed           $mixed      Stuff to clean
+	 * @param       mixed           $key        Index/offset etc to parse
+	 * @param       mixed           $mixed      Value to parse
 	 *
 	 * @return      mixed|null
 	 */
-	public static function init ( $mixed )
+	public function parse ( $key, $mixed )
 	{
 		# Crafty hacker could send something like &foo[][][][][][]....to kill Apache process
 		# We should never have an globals array deeper than 10..
@@ -83,7 +86,7 @@ class Validation
 		{
 			$this->flags & self::FILTER_EMAIL and $mixed = filter_var( trim( $mixed ), FILTER_VALIDATE_EMAIL );
 			$this->flags & self::FILTER_CHARACTER_ENCODING and $mixed = $this->check_character_encoding( $mixed );
-			self::$flags & self::FILTER_ENCLOSING_PARENTHESES_PAIRS and $mixed = self::check_enclosing_parentheses_pairs( $mixed );
+			$this->flags & self::FILTER_ENCLOSING_PARENTHESES_PAIRS and $mixed = $this->check_enclosing_parentheses_pairs( $mixed );
 		}
 
 		if ( is_array( $mixed ) or is_object( $mixed ) )
@@ -91,7 +94,7 @@ class Validation
 			$this->iteration++;
 			foreach ( $mixed as &$data )
 			{
-				$data = $this->init( $data );
+				$data = $this->parse( $data );
 			}
 		}
 

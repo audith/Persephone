@@ -16,7 +16,7 @@ if ( !defined( "INIT_DONE" ) )
  * @see      http://stackoverflow.com/questions/13906822/php-illegal-string-offset/15034807
  * @version  1.0
  */
-class Sanitation
+class Sanitation implements Parsable
 {
 	const FILTER_NONE = 1;
 
@@ -75,13 +75,19 @@ class Sanitation
 	}
 
 
-	public function init ( $mixed )
+	/**
+	 * @param       mixed           $key        Index/offset etc to parse
+	 * @param       mixed           $mixed      Value to parse
+	 *
+	 * @return      mixed|null
+	 */
+	public function parse ( $key, $mixed )
 	{
 		# Crafty hacker could send something like &foo[][][][][][]....to kill Apache process
 		# We should never have an globals array deeper than 10..
 		if ( $this->iteration > 10 )
 		{
-			\Persephone\Registry::logger__do_log( __CLASS__ . "::init() - iteration counter exceeded its max of 10, thus Sanitation has been halted!", "WARN" );
+			\Persephone\Registry::logger__do_log( __METHOD__ . " says: Iteration counter exceeded its max of 10, thus Sanitation has been halted!", "WARN" );
 			return null;
 		}
 
@@ -103,7 +109,7 @@ class Sanitation
 			$this->iteration++;
 			foreach ( $mixed as &$data )
 			{
-				$data = $this->init( $data );
+				$data = $this->parse( $data );
 			}
 		}
 
@@ -227,7 +233,7 @@ class Sanitation
 	 *
 	 * @return  mixed     Parsed String on success; FALSE otherwise
 	 */
-	public function clean_non_arithmetic_characters ( $val, $allow_decimal_point = false, $check_enclosing_parentheses = false )
+	private function clean_non_arithmetic_characters ( $val, $allow_decimal_point = false, $check_enclosing_parentheses = false )
 	{
 		if ( $check_enclosing_parentheses )
 		{

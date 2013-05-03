@@ -2,6 +2,8 @@
 
 namespace Persephone;
 
+use Persephone\Input\Parsable;
+
 if ( !defined( "INIT_DONE" ) )
 {
 	die( "Improper access! Exiting now..." );
@@ -17,28 +19,55 @@ if ( !defined( "INIT_DONE" ) )
 class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 {
 	/**
-	 * Whether value setting allowed or not (Disabled by default)
+	 * Flag which allows "manipulating values" (Disabled by default)
+	 *
+	 * @var int
 	 */
 	const ALLOW_SET = 1;
 
 	/**
-	 * Whether value getting allowed or not (Enabled by default)
+	 * Flag which allows "retrieval of values" (Enabled by default)
+	 *
+	 * @var int
 	 */
 	const ALLOW_GET = 2;
 
+	/**
+	 * Flag which disables both ALLOW_SET and ALLOW_GET flags
+	 *
+	 * @var int
+	 */
 	const ALLOW_NONE = 4;
 
+	/**
+	 * Container that carries manipulated/requested aggregate data
+	 *
+	 * @var array
+	 */
 	private $data = array();
 
+	/**
+	 * List of components to ignore while traversing through the aggregate
+	 *
+	 * @var array
+	 */
 	private $ignore = array();
 
 	private $offsetFilter = array();
 
+	/**
+	 * Access flags
+	 *
+	 * @var int
+	 */
 	private $flags;
 
+	/**
+	 * Filters to be applied on aggregate container
+	 *
+	 * @var null|Input\Parsable
+	 */
 	private $filter = null;
-
-
 
 	/**
 	 * Registry reference
@@ -58,12 +87,312 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * Constructor
 	 *
-	 * @param   \Persephone\Registry    Registry object reference
+	 * @param   array|\Traversable      $data       Aggregate data.
+	 * @param   int                     $flags      Access flags, defaults to self::ALLOW_GET being set.
+	 * @param   \Persephone\Registry    $Registry   Registry object reference
+	 *
+	 * @throws \Persephone\Exception
 	 */
-	public function __construct ( \Persephone\Registry $Registry )
+	public function __construct ( $data, Parsable $filter = null, $flags = Input::ALLOW_GET )
 	{
-		$this->Registry = $Registry;
+		/**
+		 * Whether $data parameter is \Traversable or not.
+		 *
+		 * @var boolean
+		 */
+		$_is_data_traversable = $data instanceof \Traversable;
+
+		if ( !is_array( $data ) and !$_is_data_traversable )
+		{
+			throw new \Persephone\Exception( __METHOD__ . " says: Incoming data-container is neither an Array, or \\Traversable!" );
+		}
+
+		$this->data  = !$_is_data_traversable
+			? iterator_to_array( $data )
+			: $data;
+		$this->filter = $filter;
+		$this->flags = $flags;
 	}
+
+
+	/**
+	 * Create a new iterator from an ArrayObject instance
+	 * @see  IteratorAggregate::getIterator()
+	 * @link http://php.net/manual/en/arrayobject.getiterator.php
+	 */
+	public function getIterator ()
+	{
+		return new \ArrayIterator( $this->data );
+	}
+
+
+	/**
+	 * This iterator allows to unset and modify values and keys while iterating over Arrays and Objects in the same way as the ArrayIterator. Additionally it is possible to iterate over the current iterator entry.
+	 *
+	 * @link http://php.net/manual/en/class.recursivearrayiterator.php
+	 */
+	public function getRecursiveIterator ()
+	{
+		return new \RecursiveArrayIterator( $this->data );
+	}
+
+
+	/**
+	 * Specify data which should be serialized to JSON
+	 * @see         JsonSerializable::jsonSerialize()
+	 * @link        http://php.net/manual/en/jsonserializable.jsonserialize.php
+	 *
+	 * @return      mixed
+	 */
+	public function jsonSerialize ()
+	{
+		return $this->data;
+	}
+
+
+	/**
+	 * Magic method allows a class to decide how it will react when it is treated like a string.
+	 * @link http://www.php.net/manual/en/language.oop5.magic.php#object.tostring
+	 *
+	 * @return string
+	 */
+	public function __toString ()
+	{
+		return json_encode( $this->jsonSerialize() );
+	}
+
+
+	/**
+	 * Magic method, riggered by calling isset() or empty() on inaccessible properties.
+	 * @link http://www.php.net/manual/en/language.oop5.overloading.php#object.isset
+	 *
+	 * @param   mixed   $offset
+	 *
+	 * @return  boolean
+	 */
+	public function __isset ( $offset )
+	{
+		return $this->offsetExists( $offset );
+	}
+
+
+	/**
+	 * Returns whether the requested index exists or not	 *
+	 * @see     ArrayAccess::offsetExists()
+	 * @link    http://www.php.net/manual/en/arrayobject.offsetexists.php
+	 *
+	 * @param   mixed       $offset
+	 *
+	 * @return  boolean
+	 */
+	public function offsetExists ( $offset )
+	{
+		return isset( $this->data[ $offset ] );
+	}
+
+
+	/**
+	 * Unsets the value at the specified index
+	 * @see     ArrayAccess::offsetUnset()
+	 * @link    http://www.php.net/manual/en/arrayobject.offsetunset.php
+	 *
+	 * @param   mixed   $offset
+	 */
+	public function offsetUnset ( $offset )
+	{
+		unset( $this->data[ $offset ] );
+	}
+
+
+	/**
+	 * Setter overloader
+	 *
+	 * @param   mixed   $offset
+	 * @param   mixed   $value
+	 */
+	public function __set ( $offset, $value )
+	{
+		$this->offsetSet( $offset, $value );
+	}
+
+
+	/**
+	 * Builds ignore list to be used by Parsable filters. Keys listed in this list, will be ignored and *not* filtered, when the aggregate is traversed.
+	 */
+	public function ignore ()
+	{
+		$this->ignore = array_fill_keys( func_get_args(), true );
+	}
+
+
+	/**
+	 * Assigns a value to the specified offset.
+	 * @see     ArrayAccess::offsetSet()
+	 * @link    http://php.net/manual/en/arrayobject.offsetset.php
+	 * @throws  \Persephone\Exception
+	 *
+	 * @param   mixed                       $offset
+	 * @param   mixed                       $value
+	 */
+	public function offsetSet ( $offset, $value )
+	{
+		if ( $this->flags ^ self::ALLOW_SET )
+		{
+			throw new \Persephone\Exception( __METHOD__ . " says: Offset assignment disabled!" );
+		}
+
+		$this->data[ $offset ] = $value;
+	}
+
+
+	/**
+	 * Magic method, triggered when invoking inaccessible methods in an object context.
+	 * @link    http://www.php.net/manual/en/language.oop5.overloading.php#object.call
+	 *
+	 * @param   mixed           $offset
+	 * @param   mixed           $value
+	 *
+	 * @return  mixed|null|void
+	 *
+	 */
+	public function __call ( $offset, $value )
+	{
+		if ( !empty( $value ) > 0 )
+		{
+			return $this->offsetSet( $offset, $value );
+		}
+
+		return $this->offsetGet( $offset );
+	}
+
+
+	/**
+	 * Magic method, called when a script tries to call an object as a function.	 *
+	 * @link http://www.php.net/manual/en/language.oop5.magic.php#object.invoke
+	 *
+	 * @param       string          $offset
+	 *
+	 * @return      mixed|null
+	 */
+	public function __invoke ( $offset )
+	{
+		return $this->offsetGet( $offset );
+	}
+
+
+	/**
+	 * Set a filter for a particular offset
+	 * @throws \Persephone\Exception
+	 *
+	 * @param   mixed                       $offset
+	 * @param   Parsable                    $filter
+	 */
+	public function offsetFilter ( $offset, Parsable $filter )
+	{
+		if ( !$filter instanceof Parsable )
+		{
+			throw new \Persephone\Exception( __METHOD__ . " says: Invalid filter added to list!" );
+		}
+		$this->offsetFilter[ $offset ] = $filter;
+	}
+
+
+	/**
+	 * Returns the value at the specified index
+	 *
+	 * @see     ArrayAccess::offsetGet()
+	 * @link    http://www.php.net/manual/en/arrayobject.offsetget.php
+	 * @throws  \Persephone\Exception
+	 *
+	 * @param   mixed   $offset
+	 *
+	 * @return  mixed
+	 */
+	public function offsetGet ( $offset )
+	{
+		# is ALLOW_GET flag on?
+		if ( $this->flags ^ self::ALLOW_GET )
+		{
+			throw new \Persephone\Exception( __METHOD__ . " says: Offset retrieval disabled!" );
+		}
+
+		# Filter to use
+		$filter = isset( $this->offsetFilter[ $offset ] )
+			? $this->offsetFilter[ $offset ]
+			: $this->filter;
+
+		# Add ignore rule
+		isset( $this->ignore[ $offset ] ) and $filter = null;
+
+		# Illegal string-offset Fix
+		return $this->offsetExists( $offset )
+			? ( $filter
+				? $filter->parse( $offset, $this->data[ $offset ] )
+				: $this->data[ $offset ] )
+			: null;
+	}
+
+
+	/**
+	 * triggered when invoking inaccessible methods in an object context.
+	 *
+	 * @param   string      $path
+	 *
+	 * @return  mixed
+	 */
+	public function find ( $path )
+	{
+		$path = explode( ".", $path );
+		if ( $var = $this->offsetGet( array_shift( $path ) ) )
+		{
+			return $this->getValue( $path, $var );
+		}
+
+		return $var;
+	}
+
+
+	/**
+	 * Fetches "paths" value from "data" container
+	 *
+	 * @param   array   $paths
+	 * @param   array   $data
+	 *
+	 * @return  mixed|null
+	 */
+	private function getValue ( array $paths, array $data )
+	{
+		$temp = $data;
+		foreach ( $paths as $index )
+		{
+			$temp = isset( $temp[ $index ] )
+				? $temp[ $index ]
+				: null;
+		}
+
+		return $temp;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	/**
@@ -624,8 +953,7 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	 */
 	public function base64_encode_urlsafe ( $data )
 	{
-		return strtr( base64_encode( $data ), '+/=', '-_,' );
-		;
+		return strtr( base64_encode( $data ), '+/=', '-_,' );;
 	}
 
 

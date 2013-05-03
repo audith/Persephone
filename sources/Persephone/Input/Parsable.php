@@ -1,21 +1,15 @@
 <?php
 namespace Persephone\Input;
 
-if ( !defined( "INIT_DONE" ) )
-{
-	die( "Improper access! Exiting now..." );
-}
-
 /**
- * Unicode class - Manages all kinds of Unicode multi-byte text manipulation
+ * Parsable - interface to make sure a class is parse()'able
  *
  * @package  Audith CMS codename Persephone
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @author   Oleku Konko <https://github.com/olekukonko/>
  * @version  1.0
  */
-
-class Unicode implements Parsable
+interface Parsable
 {
 	/**
 	 * @param       mixed           $key        Index/offset etc to parse
@@ -23,8 +17,5 @@ class Unicode implements Parsable
 	 *
 	 * @return      mixed|null
 	 */
-	public function parse ( $key, $mixed )
-	{
-
-	}
+	public function parse ( $key, $mixed );
 }
