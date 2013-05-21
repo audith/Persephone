@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone\Cache;
+namespace Persephone\Core\Cache;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -19,7 +19,7 @@ class Diskcache implements Iface
 	/**
 	 * Registry Reference
 	 *
-	 * @var \Persephone\Registry
+	 * @var \Persephone\Core\Registry
 	 */
 	private $Registry;
 
@@ -41,12 +41,12 @@ class Diskcache implements Iface
 	/**
 	 * Constructor
 	 *
-	 * @param       \Persephone\Registry    $Registry
-	 * @param       string                  $identifier       Unique-ID used to hash keys
+	 * @param       \Persephone\Core\Registry    $Registry
+	 * @param       string                       $identifier       Unique-ID used to hash keys
 	 *
 	 * @return      boolean
 	 */
-	public function __construct ( \Persephone\Registry $Registry, $identifier = "" )
+	public function __construct ( \Persephone\Core\Registry $Registry, $identifier = "" )
 	{
 		$this->Registry = $Registry;
 
@@ -113,7 +113,7 @@ class Diskcache implements Iface
 
 		# Open file for writing
 		$fh = fopen( $_cache_file_path, "wb" );
-		\Persephone\Registry::logger__do_log(
+		\Persephone\Core\Registry::logger__do_log(
 			__METHOD__ . " says: FOPEN " .
 			( $fh === false
 				? "failed"
@@ -153,7 +153,7 @@ class Diskcache implements Iface
 		}
 		else
 		{
-			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FLOCK succeeded for key '" . $key . "'", "INFO" );
+			\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: FLOCK succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# Write
@@ -163,7 +163,7 @@ class Diskcache implements Iface
 		}
 		else
 		{
-			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FWRITE succeeded for key '" . $key . "'", "INFO" );
+			\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: FWRITE succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# Unlock
@@ -173,7 +173,7 @@ class Diskcache implements Iface
 		}
 		else
 		{
-			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FUNLOCK succeeded for key '" . $key . "'", "INFO" );
+			\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: FUNLOCK succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# Close file handler
@@ -183,7 +183,7 @@ class Diskcache implements Iface
 		}
 		else
 		{
-			\Persephone\Registry::logger__do_log( __METHOD__ . " says: FCLOSE succeeded for key '" . $key . "'", "INFO" );
+			\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: FCLOSE succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		# chmod
@@ -193,7 +193,7 @@ class Diskcache implements Iface
 		}
 		else
 		{
-			\Persephone\Registry::logger__do_log( __METHOD__ . " says: CHMOD succeeded for key '" . $key . "'", "INFO" );
+			\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: CHMOD succeeded for key '" . $key . "'", "INFO" );
 		}
 
 		return true;

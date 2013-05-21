@@ -1,8 +1,8 @@
 <?php
 
-namespace Persephone;
+namespace Persephone\Core;
 
-use Persephone\Input\Parsable;
+use Persephone\Core\Input\Parsable;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -72,7 +72,7 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * Registry reference
 	 *
-	 * @var \Persephone\Registry
+	 * @var \Persephone\Core\Registry
 	 */
 	private $Registry;
 
@@ -87,13 +87,15 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * Constructor
 	 *
-	 * @param   array|\Traversable      $data       Aggregate data.
-	 * @param   int                     $flags      Access flags, defaults to self::ALLOW_GET being set.
-	 * @param   \Persephone\Registry    $Registry   Registry object reference
+	 * @param   array|\Traversable           $data       Aggregate data
+	 * @param   Input\Parsable               $filter
+	 * @param   int                          $flags      Access flags, defaults to self::ALLOW_GET being set
 	 *
 	 * @throws \Persephone\Exception
+	 *
+	 * @param   Parsable                     $filter
 	 */
-	public function __construct ( $data, Parsable $filter = null, $flags = Input::ALLOW_GET )
+	public function __construct ( $data, Input\Parsable $filter = null, $flags = Input::ALLOW_GET )
 	{
 		/**
 		 * Whether $data parameter is \Traversable or not.
@@ -231,8 +233,8 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	 * @link    http://php.net/manual/en/arrayobject.offsetset.php
 	 * @throws  \Persephone\Exception
 	 *
-	 * @param   mixed                       $offset
-	 * @param   mixed                       $value
+	 * @param   mixed                 $offset
+	 * @param   mixed                 $value
 	 */
 	public function offsetSet ( $offset, $value )
 	{
@@ -252,17 +254,16 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	 * @param   mixed           $offset
 	 * @param   mixed           $value
 	 *
-	 * @return  mixed|null|void
-	 *
+	 * @return  mixed|void
 	 */
 	public function __call ( $offset, $value )
 	{
-		if ( !empty( $value ) > 0 )
+		if ( empty( $value ) )
 		{
-			return $this->offsetSet( $offset, $value );
+			return $this->offsetGet( $offset );
 		}
 
-		return $this->offsetGet( $offset );
+		return $this->offsetSet( $offset, $value );
 	}
 
 

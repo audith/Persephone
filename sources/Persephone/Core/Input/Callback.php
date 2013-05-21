@@ -1,5 +1,5 @@
 <?php
-namespace Persephone\Input;
+namespace Persephone\Core\Input;
 
 if ( !defined( "INIT_DONE" ) )
 {

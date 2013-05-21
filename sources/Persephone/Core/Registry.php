@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone;
+namespace Persephone\Core;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -141,7 +141,7 @@ final class Registry
 		// Instantiate Db Driver
 		//---------------------------
 
-		$_db_class_name = '\Persephone\Database\Drivers\\' . ucwords( $this->config[ 'sql' ][ 'driver' ] );
+		$_db_class_name = '\Persephone\Core\Database\Drivers\\' . ucwords( $this->config[ 'sql' ][ 'driver' ] );
 		$this->Db = new $_db_class_name( $this );
 		//------------------------
 		// Instantiate Input class

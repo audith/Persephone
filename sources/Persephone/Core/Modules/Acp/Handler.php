@@ -19,7 +19,7 @@ class Handler
 	/**
 	 * Registry Reference
 	 *
-	 * @var \Persephone\Registry
+	 * @var \Persephone\Core\Registry
 	 */
 	private $Registry;
 
@@ -62,9 +62,9 @@ class Handler
 	/**
 	 * Constructor - Inits Handler
 	 *
-	 * @param    \Persephone\Registry Registry object reference
+	 * @param    \Persephone\Core\Registry Registry object reference
 	 */
-	public function __construct ( \Persephone\Registry $Registry )
+	public function __construct ( \Persephone\Core\Registry $Registry )
 	{
 		//-----------
 		// Prelim
@@ -448,10 +448,7 @@ class Handler
 	 */
 	private function modules__connector_unit__do_view ()
 	{
-		if ( isset( $this->running_subroutine[ 'request' ][ 'm_unique_id_clean' ] ) and !empty( $this->running_subroutine[ 'request' ][ 'm_unique_id_clean' ] ) )
-		{
-			$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine[ 'request' ][ 'm_unique_id_clean' ] ), 8 ) ) . "}";
-		}
+		$m_unique_id = "{" . implode( "-", str_split( strtoupper( $this->running_subroutine[ 'request' ][ 'm_unique_id_clean' ] ), 8 ) ) . "}";
 
 		if ( array_key_exists( $m_unique_id, $this->Registry->Cache->cache[ 'modules' ][ 'by_unique_id' ] ) )
 		{

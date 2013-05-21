@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone\Cache;
+namespace Persephone\Core\Cache;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -21,7 +21,7 @@ class Memcached implements Iface
 	/**
 	 * Registry reference
 	 *
-	 * @var \Persephone\Registry
+	 * @var \Persephone\Core\Registry
 	 */
 	private $Registry;
 
@@ -55,7 +55,7 @@ class Memcached implements Iface
 	 *
 	 * @return      boolean
 	 */
-	public function __construct ( \Persephone\Registry $Registry, $identifier = "" )
+	public function __construct ( \Persephone\Core\Registry $Registry, $identifier = "" )
 	{
 		# Prelim
 		$this->Registry = $Registry;
@@ -155,7 +155,7 @@ class Memcached implements Iface
 
 		if ( $do_perform_log )
 		{
-			\Persephone\Registry::logger__do_log( $message_to_log, $priority );
+			\Persephone\Core\Registry::logger__do_log( $message_to_log, $priority );
 		}
 
 		return $message_to_log;
@@ -187,7 +187,7 @@ class Memcached implements Iface
 		}
 		catch ( \Persephone\Exception $e )
 		{
-			\Persephone\Registry::logger__do_log( $e->getMessage(), "WARNING" );
+			\Persephone\Core\Registry::logger__do_log( $e->getMessage(), "WARNING" );
 			$this->crashed = 1;
 
 			return false;

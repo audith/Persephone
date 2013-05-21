@@ -1,7 +1,7 @@
 <?php
 
-namespace Persephone\Database\Drivers;
-use \Persephone\Database;
+namespace Persephone\Core\Database\Drivers;
+use \Persephone\Core\Database;
 use \Zend\Db\Adapter\Adapter;
 use \Zend\Db\Sql\Sql;
 use \Zend\Db\Sql\Expression;
@@ -18,7 +18,7 @@ if ( !defined( "INIT_DONE" ) )
  * @author   Shahriyar Imanov <shehi@imanov.name>
  * @version  1.0
  */
-class Mysqli extends \Persephone\Database
+class Pdo_mysql extends \Persephone\Core\Database
 {
 	/**
 	 * Options specific to this driver
@@ -26,7 +26,8 @@ class Mysqli extends \Persephone\Database
 	 * @var array
 	 */
 	public $driver_options = array(
-		'buffer_results' => true
+		\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+		\PDO::MYSQL_ATTR_INIT_COMMAND       => "SET NAMES UTF8;"
 	);
 
 	/**
@@ -40,14 +41,14 @@ class Mysqli extends \Persephone\Database
 	/**
 	 * Constructor
 	 *
-	 * @param    \Persephone\Registry Registry Object Reference
+	 * @param    \Persephone\Core\Registry Registry Object Reference
 	 */
-	public function __construct ( \Persephone\Registry $Registry )
+	public function __construct ( \Persephone\Core\Registry $Registry )
 	{
 		$this->Registry = $Registry;
 
 		$_driver = array(
-			'driver'   => "Mysqli",
+			'driver'   => "Pdo_mysql",
 			'host'     => &$this->Registry->config[ 'sql' ][ 'host' ],
 			'username' => &$this->Registry->config[ 'sql' ][ 'user' ],
 			'password' => &$this->Registry->config[ 'sql' ][ 'passwd' ],
@@ -539,7 +540,7 @@ class Mysqli extends \Persephone\Database
 		}
 		else
 		{
-			throw new \Persephone\Exception( "No or bad table references specified for DELETE query" );
+			throw new \Persephone\Exception( __METHOD__ . " says: No or bad table references specified for DELETE query" );
 		}
 
 		# "Where"
@@ -572,7 +573,7 @@ class Mysqli extends \Persephone\Database
 			$statement = $this->adapter->getDriver()->createStatement( "TRUNCATE TABLE " . $table );
 		}
 
-		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
 		$result = $statement->execute();
 		if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
@@ -618,7 +619,7 @@ class Mysqli extends \Persephone\Database
 
 		# EXEC
 		$insert = $this->sql->insert( $table, $data );
-		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $insert ) and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $insert ) and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
 		return $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
 	}
@@ -669,7 +670,7 @@ class Mysqli extends \Persephone\Database
 		//------------------------------
 
 		$this->cur_query = "REPLACE INTO " . $table . " SET " . implode( ", ", $_set );
-		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
+		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
 
 		//----------------------------------------------------------------
 		// Execute the statement and return the number of affected rows
@@ -688,24 +689,24 @@ class Mysqli extends \Persephone\Database
 	 * @param       array
 	 *
 	 * @usage       array(
-						"do"          => "select",
-						"distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
-						"fields"      => array(),
-						"table"       => array() [when correlation names are used] | string,
-						"where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
-						"add_join"    => array(
+                        "do"          => "select",
+                        "distinct"    => TRUE | FALSE,           - enables you to add the DISTINCT  keyword to your SQL query
+                        "fields"      => array(),
+                        "table"       => array() [when correlation names are used] | string,
+                        "where"       => "" | array( array() ),  - multidimensional array, containing conditions and possible parameters for placeholders
+                        "add_join"    => array(
 							0 => array (
 								"fields"      => array(),
 								"table"       => array(),    - where count = 1
 								"conditions"  => "",
 								"join_type"   => "INNER|LEFT|RIGHT"
-							),
-							1 => array()
-						),
-						"group"       => array(),
-						"having"      => array(),
-						"order"       => array(),
-						"limit"       => array(offset, count)
+                        	),
+                        	1 => array()
+                        ),
+                        "group"       => array(),
+                        "having"      => array(),
+                        "order"       => array(),
+                        "limit"       => array(offset, count)
 					)
 	 * @throws      \Persephone\Exception
 	 * @return      array|boolean
@@ -920,7 +921,7 @@ class Mysqli extends \Persephone\Database
 
 		# EXEC
 
-		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $select ) and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
+		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $select ) and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
 
 		$statement = $this->sql->prepareStatementForSqlObject( $select );
 		$result = $statement->execute();
@@ -1063,7 +1064,7 @@ class Mysqli extends \Persephone\Database
 			                   ? " WHERE " . $_where
 			                   : "" );
 
-		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
 		/**
 		 * @var $statement \Zend\Db\Adapter\Driver\StatementInterface
@@ -1323,7 +1324,7 @@ class Mysqli extends \Persephone\Database
 				break;
 		}
 
-		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
 		$statement = $this->adapter->query( $this->cur_query );
 		$result = $statement->execute();
@@ -1374,7 +1375,7 @@ class Mysqli extends \Persephone\Database
 			}
 		}
 
-		( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
 		$statement = $this->adapter->query( $this->cur_query );
 		$result = $statement->execute();
@@ -1530,7 +1531,7 @@ class Mysqli extends \Persephone\Database
 				") ENGINE=" . $data[ 'storage_engine' ] . " DEFAULT CHARACTER SET=" . $data[ 'charset' ] . " COLLATE=" . $data[ 'collate' ] . " COMMENT='" . $data[ 'comment' ] . "';\n\n";
 
 			# Execute
-			( IN_DEV and \Persephone\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+			( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
 
 			$statement = $this->adapter->query( $this->cur_query );
 			$result = $statement->execute();

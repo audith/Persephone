@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone\Cache;
+namespace Persephone\Core\Cache;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -19,7 +19,7 @@ class Recache
 	/**
 	 * Registry reference
 	 *
-	 * @var \Persephone\Registry
+	 * @var \Persephone\Core\Registry
 	 */
 	private $Registry;
 
@@ -27,7 +27,7 @@ class Recache
 	/**
 	 * Constructor
 	 */
-	public function __construct ( \Persephone\Registry $Registry )
+	public function __construct ( \Persephone\Core\Registry $Registry )
 	{
 		//-----------
 		// Prelim

@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone;
+namespace Persephone\Core;
 
 use \Zend\Db\Adapter\Adapter;
 use \Zend\Db\Adapter\Driver\ConnectionInterface;
@@ -24,7 +24,7 @@ abstract class Database
 	/**
 	 * Registry reference
 	 *
-	 * @var \Persephone\Registry
+	 * @var \Persephone\Core\Registry
 	 */
 	protected $Registry;
 
@@ -109,7 +109,7 @@ abstract class Database
 	{
 		if ( !IN_DEV )
 		{
-			throw new Exception ( "Can't dump SQL queries outside Development mode! Please activate Development mode [/init.php - IN_DEV setting]..." );
+			throw new \Persephone\Exception ( "Can't dump SQL queries outside Development mode! Please activate Development mode [/init.php - IN_DEV setting]..." );
 		}
 
 		if ( $this->cur_query instanceof SqlInterface )
@@ -147,7 +147,7 @@ abstract class Database
 	/**
 	 * Attaches DB table name prefix to the default table name
 	 *
-	 * @param     string|array Table name(s) as string (array)
+	 * @param     string|array    Table name(s) as string (array)
 	 *
 	 * @return    string|array    New names with an attached prefix
 	 */
@@ -204,7 +204,7 @@ abstract class Database
 	{
 		if ( !is_object( $this->adapter ) or !( $this->adapter instanceof Adapter ) )
 		{
-			throw new Exception( "Database - last_insert_id(): Database adapter not initialized!" );
+			throw new \Persephone\Exception( __METHOD__ . " says: Database adapter not initialized!" );
 		}
 
 		return $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
@@ -250,13 +250,13 @@ abstract class Database
 	 * @param       $identifier     string|string[]
 	 *
 	 * @return                      string
-	 * @throws                      Exception
+	 * @throws                      \Persephone\Exception
 	 */
 	public function quoteIdentifier ( $identifier )
 	{
 		if ( !is_object( $this->adapter ) or !( $this->adapter instanceof Adapter ) )
 		{
-			throw new Exception( "Database - quoteIdentifier(): Database adapter not initialized!" );
+			throw new \Persephone\Exception( __METHOD__ . " says: Database adapter not initialized!" );
 		}
 
 		if ( is_array( $identifier ) )
@@ -276,13 +276,13 @@ abstract class Database
 	 * @param       $value      string|string[]
 	 *
 	 * @return                  string
-	 * @throws                  Exception
+	 * @throws                  \Persephone\Exception
 	 */
 	public function quoteValue ( $value )
 	{
 		if ( !is_object( $this->adapter ) or !( $this->adapter instanceof Adapter ) )
 		{
-			throw new Exception( "Database - quoteValue(): Database adapter not initialized!" );
+			throw new \Persephone\Exception( __METHOD__ . " says: Database adapter not initialized!" );
 		}
 
 		if ( is_array( $value ) )
@@ -302,7 +302,7 @@ abstract class Database
 	 * @param       $value      string|string[]
 	 *
 	 * @return                  string
-	 * @throws                  Exception
+	 * @throws                  \Persephone\Exception
 	 * @deprecated
 	 */
 	public function quote ( $value )
@@ -325,9 +325,7 @@ abstract class Database
 	/**
 	 * Simple query
 	 *
-	 * @param   mixed $params   Scalar or vectoral data parameter for PEAR query prepare() and exec()
-	 *
-	 * @return  mixed    $result   Result set for data retrieval queries; # of affected rows for data manipulation queries
+	 * @return  mixed   $result   Result set for data retrieval queries; # of affected rows for data manipulation queries
 	 */
 	public function simple_exec_query ()
 	{

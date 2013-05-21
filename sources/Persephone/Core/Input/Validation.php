@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone\Input;
+namespace Persephone\Core\Input;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -138,9 +138,9 @@ class Validation implements Parsable
 	private function check_character_encoding ( $string )
 	{
 		# Do we have Registry object set? If not, let's set it.
-		if ( !( $this->Registry instanceof \Persephone\Registry ) )
+		if ( !( $this->Registry instanceof \Persephone\Core\Registry ) )
 		{
-			$this->Registry = \Persephone\Registry::init();
+			$this->Registry = \Persephone\Core\Registry::init();
 		}
 
 		# Do we have php-mbstring set? If not, issue error and return
@@ -239,9 +239,9 @@ class Validation implements Parsable
 		//----------
 
 		# Do we have Registry object set? If not, let's set it.
-		if ( !( $this->Registry instanceof \Persephone\Registry ) )
+		if ( !( $this->Registry instanceof \Persephone\Core\Registry ) )
 		{
-			$this->Registry = \Persephone\Registry::init();
+			$this->Registry = \Persephone\Core\Registry::init();
 		}
 
 		# Does it exist and is it a regular file?

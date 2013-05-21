@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone\Cache;
+namespace Persephone\Core\Cache;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -19,12 +19,12 @@ interface Iface
 	/**
 	 * Constructor
 	 *
-	 * @param       \Persephone\Registry    $Registry
+	 * @param       \Persephone\Core\Registry    $Registry
 	 * @param       string                  $identifier       Unique-ID used to hash keys
 	 *
 	 * @return      boolean
 	 */
-	public function __construct ( \Persephone\Registry $Registry, $identifier = "" );
+	public function __construct ( \Persephone\Core\Registry $Registry, $identifier = "" );
 
 
 	/**
@@ -79,5 +79,3 @@ interface Iface
 	 */
 	public function do_remove ( $key );
 }
-
-?>

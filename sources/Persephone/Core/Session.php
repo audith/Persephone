@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone;
+namespace Persephone\Core;
 
 if ( ! defined( "INIT_DONE" ) )
 {

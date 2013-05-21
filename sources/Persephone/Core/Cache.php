@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone;
+namespace Persephone\Core;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -48,11 +48,11 @@ class Cache
 	/**
 	 * Constructor
 	 *
-	 * @param   \Persephone\Registry    $Registry
+	 * @param   \Persephone\Core\Registry    $Registry
 	 *
 	 * @return  void
 	 */
-	public function __construct ( \Persephone\Registry $Registry )
+	public function __construct ( \Persephone\Core\Registry $Registry )
 	{
 		$this->Registry = $Registry;
 	}
@@ -63,7 +63,7 @@ class Cache
 	 */
 	public function _my_destruct ()
 	{
-		\Persephone\Registry::logger__do_log( __METHOD__ . " says: Destroying class", "INFO" );
+		\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: Destroying class", "INFO" );
 	}
 
 
@@ -95,7 +95,7 @@ class Cache
 			{
 				if ( extension_loaded( "memcached" ) )
 				{
-					$this->cachelib = new \Persephone\Cache\Memcached( $this->Registry );
+					$this->cachelib = new \Persephone\Core\Cache\Memcached( $this->Registry );
 					if ( $this->cachelib->crashed )
 					{
 						throw new \Persephone\Exception( __METHOD__ . " says: Memcached failed to connect!" );
@@ -104,7 +104,7 @@ class Cache
 				else
 				{
 					$this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] = "diskcache";
-					\Persephone\Registry::logger__do_log( __METHOD__ . " says: PHP-Memcached not found! Reverting to Disk-cache...", "WARNING" );
+					\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: PHP-Memcached not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -116,7 +116,7 @@ class Cache
 			{
 				if ( class_exists( "Memcache" ) )
 				{
-					$this->cachelib = new \Persephone\Cache\Memcache( $this->Registry );
+					$this->cachelib = new \Persephone\Core\Cache\Memcache( $this->Registry );
 					if ( $this->cachelib->crashed )
 					{
 						throw new \Persephone\Exception( __METHOD__ . " says: Memcache failed to connect!" );
@@ -125,24 +125,7 @@ class Cache
 				else
 				{
 					$this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] = "diskcache";
-					\Persephone\Registry::logger__do_log( __METHOD__ . " says: PHP-Memcache not found! Reverting to Disk-cache...", "WARNING" );
-				}
-			}
-
-			//-------
-			// APC
-			//-------
-
-			elseif ( $this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] == 'apc' )
-			{
-				if ( function_exists( "apc_fetch" ) )
-				{
-					$this->cachelib = new \Persephone\Cache\Apc( $this->Registry );
-				}
-				else
-				{
-					$this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] = "diskcache";
-					\Persephone\Registry::logger__do_log( __METHOD__ . " says: PHP-APC not found! Reverting to Disk-cache...", "WARNING" );
+					\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: PHP-Memcache not found! Reverting to Disk-cache...", "WARNING" );
 				}
 			}
 
@@ -152,10 +135,10 @@ class Cache
 
 			if ( $this->Registry->config[ 'performance' ][ 'cache' ][ '_method' ] == 'diskcache' )
 			{
-				$this->cachelib = new \Persephone\Cache\Diskcache( $this->Registry );
+				$this->cachelib = new \Persephone\Core\Cache\Diskcache( $this->Registry );
 			}
 		}
-		catch ( Exception $e )
+		catch ( \Persephone\Exception $e )
 		{
 			$this->Registry->logger__do_log( "XXXCache - init() : " . $e->getMessage(), "WARNING" );
 		}
@@ -168,7 +151,7 @@ class Cache
 		{
 			unset( $this->cachelib );
 			$this->cachelib = null;
-			\Persephone\Registry::logger__do_log( __METHOD__ . " says: All available caching mechanisms CRASHED!", "ERROR" );
+			\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: All available caching mechanisms CRASHED!", "ERROR" );
 		}
 
 		//----------------------
@@ -461,7 +444,7 @@ class Cache
 		}
 
 		$_problematic_keys = array();
-		$_recache_obj      = new \Persephone\Cache\Recache( $this->Registry );
+		$_recache_obj      = new \Persephone\Core\Cache\Recache( $this->Registry );
 
 		if ( is_array( $key ) )
 		{
@@ -619,8 +602,10 @@ class Cache
 		else
 		{
 			# Log
-			throw new Exception( "Cache: UPDATE failed; no key provided! - " . var_export( $v, true ), "ERROR" );
+			throw new \Persephone\Exception( __METHOD__ . " says: UPDATE failed; no key provided! - " . var_export( $v, true ), "ERROR" );
 		}
+
+		return false;
 	}
 
 

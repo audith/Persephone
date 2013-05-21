@@ -1,6 +1,6 @@
 <?php
 
-namespace Persephone\Cache;
+namespace Persephone\Core\Cache;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -19,7 +19,7 @@ class Memcache implements Iface
 	/**
 	 * Registry reference
 	 *
-	 * @var \Persephone\Registry
+	 * @var \Persephone\Core\Registry
 	 */
 	private $Registry;
 
@@ -48,12 +48,12 @@ class Memcache implements Iface
 	/**
 	 * Constructor
 	 *
-	 * @param       \Persephone\Registry    $Registry
-	 * @param       string                  $identifier       Unique-ID used to hash keys
+	 * @param       \Persephone\Core\Registry    $Registry
+	 * @param       string                       $identifier       Unique-ID used to hash keys
 	 *
 	 * @return      boolean
 	 */
-	public function __construct ( \Persephone\Registry $Registry, $identifier = "" )
+	public function __construct ( \Persephone\Core\Registry $Registry, $identifier = "" )
 	{
 		# Prelim
 		$this->Registry = $Registry;
@@ -123,7 +123,7 @@ class Memcache implements Iface
 		catch ( \Persephone\Exception $e )
 		{
 			$_log_message = __METHOD__ . " says:" . $e->getMessage();
-			\Persephone\Registry::logger__do_log( $_log_message, "WARNING" );
+			\Persephone\Core\Registry::logger__do_log( $_log_message, "WARNING" );
 			$this->crashed = 1;
 
 			return false;
@@ -134,7 +134,7 @@ class Memcache implements Iface
 			$this->link->setCompressThreshold( 51200, 0.2 );
 		}
 
-		\Persephone\Registry::logger__do_log( __METHOD__ . " says: Succeeded to ADD servers to the server pool.", "INFO" );
+		\Persephone\Core\Registry::logger__do_log( __METHOD__ . " says: Succeeded to ADD servers to the server pool.", "INFO" );
 
 		return true;
 	}
@@ -183,7 +183,7 @@ class Memcache implements Iface
 			                ( $return == false
 				                ? "Failed"
 				                : "Succeeded" ) . " to STORE (PUT) item '" . $key . "'.";
-			\Persephone\Registry::logger__do_log(
+			\Persephone\Core\Registry::logger__do_log(
 				$_log_message,
 				$return == false
 					? "WARNING"
@@ -212,7 +212,7 @@ class Memcache implements Iface
 		                ( $return == false
 			                ? "Failed"
 			                : "Succeeded" ) . " to REPLACE item '" . $key . "'.";
-		\Persephone\Registry::logger__do_log(
+		\Persephone\Core\Registry::logger__do_log(
 			$_log_message,
 			$return == false
 				? "WARNING"
@@ -237,7 +237,7 @@ class Memcache implements Iface
 		                ( $return == false
 			                ? "Failed"
 			                : "Succeeded" ) . " to GET item '" . $key . "'.";
-		\Persephone\Registry::logger__do_log(
+		\Persephone\Core\Registry::logger__do_log(
 			$_log_message,
 			$return == false
 				? "WARNING"
@@ -262,7 +262,7 @@ class Memcache implements Iface
 		                ( $return == false
 			                ? "Failed"
 			                : "Succeeded" ) . " to REMOVE item '" . $key . "'.";
-		\Persephone\Registry::logger__do_log(
+		\Persephone\Core\Registry::logger__do_log(
 			$_log_message,
 			$return == false
 				? "WARNING"
