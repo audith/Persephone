@@ -33,7 +33,7 @@ final class Registry
 	/**
 	 * @var array
 	 */
-	public $config = array();
+	public static $config = array();
 
 	/**
 	 * Instance of DB class
@@ -74,17 +74,17 @@ final class Registry
 	 *
 	 * @var boolean
 	 */
-	public $ob_compression = false;
+	public static $ob_compression = false;
 
 	/**
 	 * Output buffering - Is the topmost buffer active?
 	 *
 	 * @var boolean
 	 */
-	public $ob_status = false;
+	public static $ob_status = false;
 
 	/**
-	 * FLAG: Don't output anything from now on (on shutdown, OB is clean-end'ed)
+	 * FLAG: Don't output anything from now on - on shutdown phase, output-buffer is ob_end_clean()'ed...
 	 *
 	 * @var boolean
 	 */
@@ -121,27 +121,32 @@ final class Registry
 		//------------------------------------
 
 		# First log
-		self::logger__do_log( __METHOD__ . " says: Script start-up." );
+		static::logger__do_log( __METHOD__ . " says: Script start-up." );
 
 		# Start timer
-		self::$starttime = self::debug__timer_start();
+		static::$starttime = static::debug__timer_start();
 
 		//--------------------
 		// Read config file
 		//--------------------
 
 		# Initial build of configuration information
-		if ( $this->configuration() === false )
+		if ( static::configuration() === false )
 		{
 			header("HTTP/1.1 500");
 			exit;
 		}
 
+
+		//-----------------------------
+		// Registering Destructors
+		//-----------------------------
+		/*
 		//---------------------------
 		// Instantiate Db Driver
 		//---------------------------
 
-		$_db_class_name = '\Persephone\Core\Database\Drivers\\' . ucwords( $this->config[ 'sql' ][ 'driver' ] );
+		$_db_class_name = '\Persephone\Core\Database\Drivers\\' . ucwords( static::$config[ 'sql' ][ 'driver' ] );
 		$this->Db = new $_db_class_name( $this );
 		//------------------------
 		// Instantiate Input class
@@ -217,14 +222,14 @@ final class Registry
 			}
 		}
 
-		$this->config = array_merge( $this->config, $_config );
+		static::$config = array_merge( static::$config, $_config );
 
 		//------------------
 		// URI parsing
 		//------------------
 
-		$this->parse_request_uri();
-		self::logger__do_log( __METHOD__ . " says: Request-path = '" . $this->config[ 'page' ][ 'request' ][ 'path' ] . "'", "INFO" );
+		static::parse_request_uri();
+		static::logger__do_log( __METHOD__ . " says: Request-path = '" . static::$config[ 'page' ][ 'request' ][ 'path' ] . "'", "INFO" );
 
 		//-------------------------------------------------------
 		// Output buffering with GZip compression
@@ -267,10 +272,6 @@ final class Registry
 			}
 		}
 
-		//-----------------------------
-		// Registering Destructors
-		//-----------------------------
-
 		# Destroy in reverse order of creation, to avoid problems of dependency-failures, during shutdown operations
 		register_shutdown_function( array( $this->Display, "_my_destruct" ) );
 		register_shutdown_function( array( $this->Modules, "_my_destruct" ) );
@@ -278,6 +279,8 @@ final class Registry
 		register_shutdown_function( array( $this->Input, "_my_destruct" ) );
 		register_shutdown_function( array( $this->Cache, "_my_destruct" ) );
 		register_shutdown_function( array( $this->Db, "_my_destruct" ) );
+
+		*/
 	}
 
 
@@ -296,12 +299,12 @@ final class Registry
 	 */
 	public static function init ()
 	{
-		if ( is_null( self::$_instance ) )
+		if ( is_null( static::$_instance ) )
 		{
-			self::$_instance = new self;
+			static::$_instance = new static;
 		}
 
-		return self::$_instance;
+		return static::$_instance;
 	}
 
 
@@ -311,21 +314,18 @@ final class Registry
 	public function __destruct ()
 	{
 		# Debug: Stop timer
-		self::$totaltime = self::debug__timer_stop();
-
-		# Performance log
-		$this->logger__do_performance_log();
+		static::$totaltime = static::debug__timer_stop();
 
 		# Flush only if ZLib-Output-Handler is OFF
-		if ( $this->ob_status and !$this->ob_compression )
+		if ( static::$ob_status and !static::$ob_compression )
 		{
 			if ( $this->ob_no_output )
 			{
-				ob_end_clean();
+				ob_end_clean();  // ob_no_output flag has engaged, we don't need any buffer, thus sending its content to abyss :P
 			}
 			else
 			{
-				ob_end_flush();
+				ob_end_flush();  // we still need the content of buffer, thus flushing it to client-side...
 			}
 		}
 	}
@@ -336,7 +336,7 @@ final class Registry
 	 *
 	 * @return  boolean
 	 **/
-	private function configuration ()
+	private static function configuration ()
 	{
 		# Read configuration file
 		$_path_to_config_file = PATH_ROOT_WEB . "/config.php";
@@ -344,7 +344,7 @@ final class Registry
 		{
 			if ( is_file( $_path_to_config_file ) and is_readable( $_path_to_config_file ) )
 			{
-				$this->config = require_once( $_path_to_config_file );
+				static::$config = require_once( $_path_to_config_file );
 			}
 			else
 			{
@@ -357,7 +357,7 @@ final class Registry
 		}
 
 		# Loaded PHP extensions
-		$this->config[ 'runtime' ][ 'loaded_extensions' ] = get_loaded_extensions();
+		static::$config[ 'runtime' ][ 'loaded_extensions' ] = get_loaded_extensions();
 
 		return true;
 	}
@@ -366,7 +366,8 @@ final class Registry
 	/**
 	 * Starts timer
 	 *
-	 * @return integer
+	 * @return      int
+	 * @todo                To be migrated to Registry\Debug class
 	 */
 	public static function debug__timer_start ()
 	{
@@ -381,15 +382,16 @@ final class Registry
 	/**
 	 * Stops timer
 	 *
-	 * @param   integer   $starttime    Starting-time, T-0
+	 * @param   integer   $starttime    Starting-time, t(0)
 	 *
 	 * @return  array                   Array containing Stop-time and Time-delta
+	 * @todo                            To be migrated to Registry\Debug class
 	 */
 	public static function debug__timer_stop ( $starttime = 0 )
 	{
 		if ( !$starttime )
 		{
-			$starttime = self::$starttime;
+			$starttime = static::$starttime;
 		}
 
 		$mtime    = microtime();
@@ -411,21 +413,22 @@ final class Registry
 	 * @param   int        $http_status_code        Status code to deploy with, defaults to 302
 	 *
 	 * @return  void
+	 * @todo                                        To be migrated to Controller class
 	 */
-	public function http_redirect ( $url, $http_status_code = 302 )
+	public static function http_redirect ( $url, $http_status_code = 302 )
 	{
 		# Ensure &amp;s are taken care of
 
 		$url = str_replace( "&amp;", "&", $url );
 
-		if ( $this->config[ 'serverenvironment' ][ 'header_redirect' ] == 'refresh' )
+		if ( static::$config[ 'serverenvironment' ][ 'header_redirect' ] == 'refresh' )
 		{
 			# @todo : Do we need session id prepended to redir url in case session.use_trans_sid is in effect ?!
 
 			header( "Refresh: 0;url=" . $url );
 			exit();
 		}
-		elseif ( $this->config[ 'serverenvironment' ][ 'header_redirect' ] == 'html' )
+		elseif ( static::$config[ 'serverenvironment' ][ 'header_redirect' ] == 'html' )
 		{
 			## @todo : Do we need session id prepended to redir url in case session.use_trans_sid is in effect ?!
 
@@ -444,8 +447,6 @@ final class Registry
 				trigger_error( "Redirect URI is not an absolute URL (as required by HTTP/1.1 specs for Location header)!", E_USER_ERROR );
 			}
 
-			// @todo : Do we need session id prepended to redir url in case session.use_trans_sid is in effect ?!
-
 			//----------------------------------------------
 			// Redirect with appropriate status code
 			//----------------------------------------------
@@ -462,8 +463,9 @@ final class Registry
 	 * My parse_url() that parses current REQUEST_URI; additionally, it makes sure that working domain is valid - redirects to valid one otherwise
 	 *
 	 * @return   mixed   Array of parsed URL or FALSE on failure
+	 * @todo             To be migrated to Controller class
 	 */
-	private function parse_request_uri ()
+	private static function parse_request_uri ()
 	{
 		$_url = ( empty( $_SERVER[ 'HTTPS' ] ) or $_SERVER[ 'HTTPS' ] == 'off' )
 			? "http://"
@@ -481,19 +483,18 @@ final class Registry
 		$_parsed_url[ 'request_uri' ] = $_parsed_url[ 'scheme' ] . "://" .
 		                                ( ( isset( $_parsed_url[ 'user' ] ) and isset( $_parsed_url[ 'pass' ] ) )
 			                                ? $_parsed_url[ 'user' ] . ":" . $_parsed_url[ 'pass' ] . "@"
-			                                : "" ) . $this->config[ 'url' ][ 'hostname' ][ $_parsed_url[ 'scheme' ] ] . $_parsed_url[ 'path' ] .
+			                                : "" ) . static::$config[ 'url' ][ 'hostname' ][ $_parsed_url[ 'scheme' ] ] . $_parsed_url[ 'path' ] .
 		                                ( $_parsed_url[ 'query' ]
 			                                ? "?" . $_parsed_url[ 'query' ]
 			                                : "" );
 
-		# @todo Redirect to default domain-name if request was sent to different domain
-		if ( $_parsed_url[ 'host' ] != $this->config[ 'url' ][ 'hostname' ][ $_parsed_url[ 'scheme' ] ] )
+		if ( $_parsed_url[ 'host' ] != static::$config[ 'url' ][ 'hostname' ][ $_parsed_url[ 'scheme' ] ] )
 		{
-			self::logger__do_log( "Registry: Request redirection to location: " . $_parsed_url[ 'request_uri' ], "INFO" );
-			// $this->Registry->http_redirect( $_parsed_url['request_uri'] , 301 );
+			static::logger__do_log( "Registry: Request redirection to location: " . $_parsed_url[ 'request_uri' ], "INFO" );
+			// \Persephone\Core\Registry::http_redirect( $_parsed_url['request_uri'] , 301 );
 		}
 
-		$this->config[ 'page' ][ 'request' ] = $_parsed_url;
+		static::$config[ 'page' ][ 'request' ] = $_parsed_url;
 	}
 
 
@@ -505,7 +506,7 @@ final class Registry
 	 *
 	 * @return                  boolean   TRUE on success, FALSE otherwise
 	 */
-	static public function logger__do_log ( $message, $priority = "INFO" )
+	public static function logger__do_log ( $message, $priority = "INFO" )
 	{
 		//-----------------------
 		// Priority method map
@@ -534,9 +535,9 @@ final class Registry
 		// Instantiate Zend_Log object if not done so already
 		//------------------------------------------------------
 
-		if ( !is_object( self::$logger ) )
+		if ( !is_object( static::$logger ) )
 		{
-			self::$logger = new \Zend\Log\Logger();
+			static::$logger = new \Zend\Log\Logger();
 
 			//-----------------
 			// Set "Writers"
@@ -545,7 +546,7 @@ final class Registry
 			# stdout
 			if ( ini_get( "display_errors" ) != '0' )
 			{
-				self::$logger->addWriter( $_writer__stdout = new \Zend\Log\Writer\Stream( 'php://output' ) );
+				static::$logger->addWriter( $_writer__stdout = new \Zend\Log\Writer\Stream( 'php://output' ) );
 				if ( !IN_DEV )
 				{
 					$_filter__stdout = new \Zend\Log\Filter\Priority( \Zend\Log\Logger::ERR );
@@ -556,7 +557,7 @@ final class Registry
 			# error_log
 			if ( file_exists( $log_file = ini_get( "error_log" ) ) and is_file( $log_file ) and is_writable( $log_file ) )
 			{
-				self::$logger->addWriter( $_writer__logfile = new \Zend\Log\Writer\Stream( $log_file ) );
+				static::$logger->addWriter( $_writer__logfile = new \Zend\Log\Writer\Stream( $log_file ) );
 				if ( !IN_DEV )
 				{
 					$_filter__logfile = new \Zend\Log\Filter\Priority( \Zend\Log\Logger::ERR );
@@ -569,12 +570,12 @@ final class Registry
 			if ( IN_DEV )
 			{
 				require_once PATH_LIBS . "/FirePHPCore/fb.php";
-				self::$logger->addWriter( new \Zend\Log\Writer\FirePhp );
+				static::$logger->addWriter( new \Zend\Log\Writer\FirePhp );
 			}
 			*/
 			# Registering logger object as our main PHP error-logger
-			#\Zend\Log\Logger::registerErrorHandler( self::$logger );
-			#\Zend\Log\Logger::registerExceptionHandler( self::$logger );
+			#\Zend\Log\Logger::registerErrorHandler( static::$logger );
+			#\Zend\Log\Logger::registerExceptionHandler( static::$logger );
 		}
 
 		//---------------
@@ -590,7 +591,7 @@ final class Registry
 			}
 
 			# Log event
-			self::$logger->log(
+			static::$logger->log(
 				( $_method_map[ $priority ]
 					? $_method_map[ $priority ]
 					: \Zend\Log\Logger::DEBUG ),
@@ -607,59 +608,25 @@ final class Registry
 
 
 	/**
-	 * Debug : Logs the memory usage and timedelta
-	 *
-	 * @param    $location      string     Marker
-	 * @param    $time_only     boolean    Whether to log timedelta ONLY, or not - defaults to FALSE
-	 *
-	 * @return                  void
-	 */
-	static public function logger__do_performance_log ( $location = "", $time_only = false )
-	{
-		if ( IN_DEV )
-		{
-			$_log_message = "";
-			$location     = ( $location )
-				? " - " . $location
-				: "";
-			if ( !$time_only )
-			{
-				$_log_message .= "\n\tMemory Usage" . $location . ": " . ( memory_get_usage( true ) - MEMORY_START ) . " bytes";
-			}
-			$_timer = self::debug__timer_stop();
-			$_log_message .= "\n\tTimedelta" . $location . ": " . $_timer[ 'delta' ] . " secs";
-			self::logger__do_log( $_log_message, "INFO" );
-		}
-	}
-
-
-	/**
 	 * Turn on output buffering
 	 */
 	public function ob_start ()
 	{
-		if ( !$this->config[ 'serverenvironment' ][ 'disable_gzip' ] and in_array( "zlib", $this->config[ 'runtime' ][ 'loaded_extensions' ] ) )
+		if ( !static::$config[ 'serverenvironment' ][ 'disable_gzip' ] and in_array( "zlib", static::$config[ 'runtime' ][ 'loaded_extensions' ] ) )
 		{
-			ini_set( "zlib.output_handler", "" );
-			ini_set( "zlib.output_compression", "1" );
-			$this->ob_compression = true;
-			if ( ob_start( /* "ob_gzhandler" */ ) )
-			{
-				$this->ob_status = true;
-				// ini_set( "zlib.output_compression", "0" );
-			}
+			ini_set( "zlib.output_handler", "" ) and ini_set( "zlib.output_compression", "1" ) and static::$ob_compression = true;
+			( ob_start() === true ) and static::$ob_status = true;
+			( static::$ob_compression === true ) and static::logger__do_log( __METHOD__ . " says: Failed to set output-buffer compression!" );
+			( static::$ob_status === true ) and static::logger__do_log( __METHOD__ . " says: Failed to activate output-buffering!" );
 		}
 		else
 		{
-			ini_set( "zlib.output_handler", "" );
-			$this->ob_compression = false;
-			if ( ob_start() )
-			{
-				$this->ob_status = true;
-			}
+			ini_set( "zlib.output_compression", "0" ) and static::$ob_compression = false;
+			( ob_start() === true ) and $this->ob_status = true;
+			( static::$ob_compression === false ) and static::logger__do_log( __METHOD__ . " says: Failed to set output-buffer compression!" );
+			( static::$ob_status === true ) and static::logger__do_log( __METHOD__ . " says: Failed to activate output-buffering!" );
 		}
 
-		# Performance log
-		$this->logger__do_performance_log( "OB Start" );
+		static::logger__do_log( __METHOD__ . " says: Output-buffering initialized!" );
 	}
 }
