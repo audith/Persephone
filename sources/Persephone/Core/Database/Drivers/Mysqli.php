@@ -48,10 +48,10 @@ class Mysqli extends \Persephone\Core\Database
 
 		$_driver = array(
 			'driver'   => "Mysqli",
-			'host'     => &$this->Registry->config[ 'sql' ][ 'host' ],
-			'username' => &$this->Registry->config[ 'sql' ][ 'user' ],
-			'password' => &$this->Registry->config[ 'sql' ][ 'passwd' ],
-			'dbname'   => &$this->Registry->config[ 'sql' ][ 'dbname' ],
+			'host'     => &\Persephone\Core\Registry::$config[ 'sql' ][ 'host' ],
+			'username' => &\Persephone\Core\Registry::$config[ 'sql' ][ 'user' ],
+			'password' => &\Persephone\Core\Registry::$config[ 'sql' ][ 'passwd' ],
+			'dbname'   => &\Persephone\Core\Registry::$config[ 'sql' ][ 'dbname' ],
 			'options'  => $this->driver_options,
 		);
 
@@ -85,7 +85,7 @@ class Mysqli extends \Persephone\Core\Database
 			'fields' => array( "table_name", "column_name", "referenced_column_name" ),
 			'table'  => array( "information_schema.KEY_COLUMN_USAGE" ),
 			'where'  => array(
-				array( 'table_schema = ' . $this->platform->quoteValue( $this->Registry->config[ 'sql' ][ 'dbname' ] ) ),
+				array( 'table_schema = ' . $this->platform->quoteValue( \Persephone\Core\Registry::$config[ 'sql' ][ 'dbname' ] ) ),
 				array( 'referenced_table_name = ' . $this->platform->quoteValue( $referenced_table_name ) ),
 			)
 		);
@@ -572,7 +572,7 @@ class Mysqli extends \Persephone\Core\Database
 			$statement = $this->adapter->getDriver()->createStatement( "TRUNCATE TABLE " . $table );
 		}
 
-		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		\Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" );
 
 		$result = $statement->execute();
 		if ( $result instanceof \Zend\Db\Adapter\Driver\ResultInterface and $result->isQueryResult() )
@@ -618,7 +618,7 @@ class Mysqli extends \Persephone\Core\Database
 
 		# EXEC
 		$insert = $this->sql->insert( $table, $data );
-		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $insert ) and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		\Persephone\Core\Registry::logger__do_log( $this->cur_query = $this->sql->getSqlStringForSqlObject( $insert ), "DEBUG" );
 
 		return $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
 	}
@@ -669,7 +669,7 @@ class Mysqli extends \Persephone\Core\Database
 		//------------------------------
 
 		$this->cur_query = "REPLACE INTO " . $table . " SET " . implode( ", ", $_set );
-		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
+		\Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" );
 
 		//----------------------------------------------------------------
 		// Execute the statement and return the number of affected rows
@@ -920,7 +920,7 @@ class Mysqli extends \Persephone\Core\Database
 
 		# EXEC
 
-		( IN_DEV and $this->cur_query = $this->sql->getSqlStringForSqlObject( $select ) and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );
+		\Persephone\Core\Registry::logger__do_log( $this->cur_query = $this->sql->getSqlStringForSqlObject( $select ), "DEBUG" );
 
 		$statement = $this->sql->prepareStatementForSqlObject( $select );
 		$result = $statement->execute();
@@ -1063,7 +1063,7 @@ class Mysqli extends \Persephone\Core\Database
 			                   ? " WHERE " . $_where
 			                   : "" );
 
-		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		\Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" );
 
 		/**
 		 * @var $statement \Zend\Db\Adapter\Driver\StatementInterface
@@ -1323,7 +1323,7 @@ class Mysqli extends \Persephone\Core\Database
 				break;
 		}
 
-		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		\Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" );
 
 		$statement = $this->adapter->query( $this->cur_query );
 		$result = $statement->execute();
@@ -1374,7 +1374,7 @@ class Mysqli extends \Persephone\Core\Database
 			}
 		}
 
-		( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+		\Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" );
 
 		$statement = $this->adapter->query( $this->cur_query );
 		$result = $statement->execute();
@@ -1530,7 +1530,7 @@ class Mysqli extends \Persephone\Core\Database
 				") ENGINE=" . $data[ 'storage_engine' ] . " DEFAULT CHARACTER SET=" . $data[ 'charset' ] . " COLLATE=" . $data[ 'collate' ] . " COMMENT='" . $data[ 'comment' ] . "';\n\n";
 
 			# Execute
-			( IN_DEV and \Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" ) );  // For debug
+			\Persephone\Core\Registry::logger__do_log( $this->cur_query, "DEBUG" );
 
 			$statement = $this->adapter->query( $this->cur_query );
 			$result = $statement->execute();

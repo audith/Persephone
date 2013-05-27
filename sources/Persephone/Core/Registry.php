@@ -137,17 +137,14 @@ final class Registry
 			exit;
 		}
 
-
-		//-----------------------------
-		// Registering Destructors
-		//-----------------------------
-		/*
 		//---------------------------
 		// Instantiate Db Driver
 		//---------------------------
 
 		$_db_class_name = '\Persephone\Core\Database\Drivers\\' . ucwords( static::$config[ 'sql' ][ 'driver' ] );
 		$this->Db = new $_db_class_name( $this );
+
+		/*
 		//------------------------
 		// Instantiate Input class
 		//------------------------
@@ -271,6 +268,11 @@ final class Registry
 				$this->Cache->cache__do_load( $this->Modules->cur_module[ 'm_cache_array' ] );
 			}
 		}
+
+
+		//-----------------------------
+		// Registering Destructors
+		//-----------------------------
 
 		# Destroy in reverse order of creation, to avoid problems of dependency-failures, during shutdown operations
 		register_shutdown_function( array( $this->Display, "_my_destruct" ) );

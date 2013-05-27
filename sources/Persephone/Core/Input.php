@@ -87,13 +87,13 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * Constructor
 	 *
-	 * @param   array|\Traversable           $data       Aggregate data
-	 * @param   Input\Parsable               $filter
-	 * @param   int                          $flags      Access flags, defaults to self::ALLOW_GET being set
+	 * @param   array|\Traversable $data       Aggregate data
+	 * @param   Input\Parsable     $filter
+	 * @param   int                $flags      Access flags, defaults to self::ALLOW_GET being set
 	 *
 	 * @throws \Persephone\Exception
 	 *
-	 * @param   Parsable                     $filter
+	 * @param   Parsable           $filter
 	 */
 	public function __construct ( $data, Input\Parsable $filter = null, $flags = Input::ALLOW_GET )
 	{
@@ -109,16 +109,17 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 			throw new \Persephone\Exception( __METHOD__ . " says: Incoming data-container is neither an Array, or \\Traversable!" );
 		}
 
-		$this->data  = !$_is_data_traversable
+		$this->data   = !$_is_data_traversable
 			? iterator_to_array( $data )
 			: $data;
 		$this->filter = $filter;
-		$this->flags = $flags;
+		$this->flags  = $flags;
 	}
 
 
 	/**
 	 * Create a new iterator from an ArrayObject instance
+	 *
 	 * @see  IteratorAggregate::getIterator()
 	 * @link http://php.net/manual/en/arrayobject.getiterator.php
 	 */
@@ -141,9 +142,9 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 	/**
 	 * Specify data which should be serialized to JSON
+	 *
 	 * @see         JsonSerializable::jsonSerialize()
 	 * @link        http://php.net/manual/en/jsonserializable.jsonserialize.php
-	 *
 	 * @return      mixed
 	 */
 	public function jsonSerialize ()
@@ -154,8 +155,8 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 	/**
 	 * Magic method allows a class to decide how it will react when it is treated like a string.
-	 * @link http://www.php.net/manual/en/language.oop5.magic.php#object.tostring
 	 *
+	 * @link http://www.php.net/manual/en/language.oop5.magic.php#object.tostring
 	 * @return string
 	 */
 	public function __toString ()
@@ -166,9 +167,10 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 	/**
 	 * Magic method, riggered by calling isset() or empty() on inaccessible properties.
+	 *
 	 * @link http://www.php.net/manual/en/language.oop5.overloading.php#object.isset
 	 *
-	 * @param   mixed   $offset
+	 * @param   mixed $offset
 	 *
 	 * @return  boolean
 	 */
@@ -179,11 +181,12 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 
 	/**
-	 * Returns whether the requested index exists or not	 *
+	 * Returns whether the requested index exists or not     *
+	 *
 	 * @see     ArrayAccess::offsetExists()
 	 * @link    http://www.php.net/manual/en/arrayobject.offsetexists.php
 	 *
-	 * @param   mixed       $offset
+	 * @param   mixed $offset
 	 *
 	 * @return  boolean
 	 */
@@ -195,10 +198,11 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 	/**
 	 * Unsets the value at the specified index
+	 *
 	 * @see     ArrayAccess::offsetUnset()
 	 * @link    http://www.php.net/manual/en/arrayobject.offsetunset.php
 	 *
-	 * @param   mixed   $offset
+	 * @param   mixed $offset
 	 */
 	public function offsetUnset ( $offset )
 	{
@@ -209,8 +213,8 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * Setter overloader
 	 *
-	 * @param   mixed   $offset
-	 * @param   mixed   $value
+	 * @param   mixed $offset
+	 * @param   mixed $value
 	 */
 	public function __set ( $offset, $value )
 	{
@@ -229,12 +233,13 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 	/**
 	 * Assigns a value to the specified offset.
+	 *
 	 * @see     ArrayAccess::offsetSet()
 	 * @link    http://php.net/manual/en/arrayobject.offsetset.php
 	 * @throws  \Persephone\Exception
 	 *
-	 * @param   mixed                 $offset
-	 * @param   mixed                 $value
+	 * @param   mixed $offset
+	 * @param   mixed $value
 	 */
 	public function offsetSet ( $offset, $value )
 	{
@@ -249,10 +254,11 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 	/**
 	 * Magic method, triggered when invoking inaccessible methods in an object context.
+	 *
 	 * @link    http://www.php.net/manual/en/language.oop5.overloading.php#object.call
 	 *
-	 * @param   mixed           $offset
-	 * @param   mixed           $value
+	 * @param   mixed $offset
+	 * @param   mixed $value
 	 *
 	 * @return  mixed|void
 	 */
@@ -268,10 +274,11 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 
 	/**
-	 * Magic method, called when a script tries to call an object as a function.	 *
+	 * Magic method, called when a script tries to call an object as a function.     *
+	 *
 	 * @link http://www.php.net/manual/en/language.oop5.magic.php#object.invoke
 	 *
-	 * @param       string          $offset
+	 * @param       string $offset
 	 *
 	 * @return      mixed|null
 	 */
@@ -283,10 +290,11 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 	/**
 	 * Set a filter for a particular offset
+	 *
 	 * @throws \Persephone\Exception
 	 *
-	 * @param   mixed                       $offset
-	 * @param   Parsable                    $filter
+	 * @param   mixed    $offset
+	 * @param   Parsable $filter
 	 */
 	public function offsetFilter ( $offset, Parsable $filter )
 	{
@@ -305,7 +313,7 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	 * @link    http://www.php.net/manual/en/arrayobject.offsetget.php
 	 * @throws  \Persephone\Exception
 	 *
-	 * @param   mixed   $offset
+	 * @param   mixed $offset
 	 *
 	 * @return  mixed
 	 */
@@ -337,7 +345,7 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * triggered when invoking inaccessible methods in an object context.
 	 *
-	 * @param   string      $path
+	 * @param   string $path
 	 *
 	 * @return  mixed
 	 */
@@ -356,8 +364,8 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * Fetches "paths" value from "data" container
 	 *
-	 * @param   array   $paths
-	 * @param   array   $data
+	 * @param   array $paths
+	 * @param   array $data
 	 *
 	 * @return  mixed|null
 	 */
@@ -375,27 +383,6 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/**
 	 * Destructor
 	 */
@@ -410,11 +397,11 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	 * makes sure the final expression is a valid mathematical/arithmetic expression, PHP-wise. Usually for eval()'s...
 	 * IMPORTANT NOTE: PHP math functions are not supported!
 	 *
-	 * @param   string    Input String
-	 * @param   boolean   Whether to allow decimal-point in regex control or not
-	 * @param   boolean   Whether to perform enclosing parentheses check or not
+	 * @param   string    $val                              Input String
+	 * @param   boolean   $allow_decimal_point              Whether to allow decimal-point in regex control or not
+	 * @param   boolean   $check_enclosing_parentheses      Whether to perform enclosing parentheses check or not
 	 *
-	 * @return  mixed     Parsed String on success; FALSE otherwise
+	 * @return  mixed                                       Parsed String on success; FALSE otherwise
 	 */
 	public function clean__makesafe_mathematical ( $val, $allow_decimal_point = false, $check_enclosing_parentheses = false )
 	{
@@ -465,9 +452,9 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 	/**
 	 * Converts accented characters into their plain alphabetic counterparts
 	 *
-	 * @param   string   Text
+	 * @param   string   $s     Text
 	 *
-	 * @return  string   Cleaned text
+	 * @return  string          Cleaned text
 	 */
 	public function parse__convert_accents_to_english__high ( $s )
 	{
@@ -675,11 +662,75 @@ class Input implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
 
 			/* We assume ISO-8859-1 if not UTF-8 */
 			$_chr[ 'in' ] =
-				chr( 128 ) . chr( 131 ) . chr( 138 ) . chr( 142 ) . chr( 154 ) . chr( 158 ) . chr( 159 ) . chr( 162 ) . chr( 165 ) . chr( 181 ) . chr( 192 ) . chr( 193 ) . chr( 194 ) . chr( 195 ) .
-				chr( 199 ) . chr( 200 ) . chr( 201 ) . chr( 202 ) . chr( 203 ) . chr( 204 ) . chr( 205 ) . chr( 206 ) . chr( 207 ) . chr( 209 ) . chr( 210 ) . chr( 211 ) . chr( 212 ) . chr( 213 ) .
-				chr( 217 ) . chr( 218 ) . chr( 219 ) . chr( 220 ) . chr( 221 ) . chr( 224 ) . chr( 225 ) . chr( 226 ) . chr( 227 ) . chr( 231 ) . chr( 232 ) . chr( 233 ) . chr( 234 ) . chr( 235 ) .
-				chr( 236 ) . chr( 237 ) . chr( 238 ) . chr( 239 ) . chr( 241 ) . chr( 242 ) . chr( 243 ) . chr( 244 ) . chr( 245 ) . chr( 249 ) . chr( 250 ) . chr( 251 ) . chr( 252 ) . chr( 253 ) .
-				chr( 255 ) . chr( 191 ) . chr( 182 ) . chr( 179 ) . chr( 166 ) . chr( 230 ) . chr( 198 ) . chr( 175 ) . chr( 172 ) . chr( 188 ) . chr( 163 ) . chr( 161 ) . chr( 177 );
+				chr( 128 ) .
+				chr( 131 ) .
+				chr( 138 ) .
+				chr( 142 ) .
+				chr( 154 ) .
+				chr( 158 ) .
+				chr( 159 ) .
+				chr( 162 ) .
+				chr( 165 ) .
+				chr( 181 ) .
+				chr( 192 ) .
+				chr( 193 ) .
+				chr( 194 ) .
+				chr( 195 ) .
+				chr( 199 ) .
+				chr( 200 ) .
+				chr( 201 ) .
+				chr( 202 ) .
+				chr( 203 ) .
+				chr( 204 ) .
+				chr( 205 ) .
+				chr( 206 ) .
+				chr( 207 ) .
+				chr( 209 ) .
+				chr( 210 ) .
+				chr( 211 ) .
+				chr( 212 ) .
+				chr( 213 ) .
+				chr( 217 ) .
+				chr( 218 ) .
+				chr( 219 ) .
+				chr( 220 ) .
+				chr( 221 ) .
+				chr( 224 ) .
+				chr( 225 ) .
+				chr( 226 ) .
+				chr( 227 ) .
+				chr( 231 ) .
+				chr( 232 ) .
+				chr( 233 ) .
+				chr( 234 ) .
+				chr( 235 ) .
+				chr( 236 ) .
+				chr( 237 ) .
+				chr( 238 ) .
+				chr( 239 ) .
+				chr( 241 ) .
+				chr( 242 ) .
+				chr( 243 ) .
+				chr( 244 ) .
+				chr( 245 ) .
+				chr( 249 ) .
+				chr( 250 ) .
+				chr( 251 ) .
+				chr( 252 ) .
+				chr( 253 ) .
+				chr( 255 ) .
+				chr( 191 ) .
+				chr( 182 ) .
+				chr( 179 ) .
+				chr( 166 ) .
+				chr( 230 ) .
+				chr( 198 ) .
+				chr( 175 ) .
+				chr( 172 ) .
+				chr( 188 ) .
+				chr( 163 ) .
+				chr( 161 ) .
+				chr( 177 );
 
 			$_chr[ 'out' ] = "EfSZszYcYuAAAACEEEEIIIINOOOOUUUUYaaaaceeeeiiiinoooouuuuyyzslScCZZzLAa";
 

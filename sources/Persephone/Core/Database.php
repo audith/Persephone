@@ -5,7 +5,7 @@ namespace Persephone\Core;
 use \Zend\Db\Adapter\Adapter;
 use \Zend\Db\Adapter\Driver\ConnectionInterface;
 use \Zend\Db\Sql\Expression;
-use Zend\Db\Sql\SqlInterface;
+use \Zend\Db\Sql\SqlInterface;
 
 if ( !defined( "INIT_DONE" ) )
 {
@@ -102,8 +102,8 @@ abstract class Database
 	/**
 	 * Magic method __toString()
 	 *
-	 * @return                       string|null                 String-ifyed query
-	 * @throws                       \Persephone\Exception
+	 * @return     string|null                 String-ifyed query
+	 * @throws     \Persephone\Exception
 	 */
 	public function __toString ()
 	{
@@ -131,7 +131,7 @@ abstract class Database
 	public function _my_destruct ()
 	{
 		# Run shutdown queries
-		$this->use_shutdown                                     = false;
+		$this->use_shutdown   = false;
 		$_problematic_queries_during_simple_exec_query_shutdown = $this->simple_exec_query_shutdown();
 		if ( count( $_problematic_queries_during_simple_exec_query_shutdown ) )
 		{
@@ -155,7 +155,7 @@ abstract class Database
 	{
 		is_array( $t )
 			? array_walk( $t, array( $this, "attach_prefix" ) )
-			: $t = $this->Registry->config[ 'sql' ][ 'table_prefix' ] . $t;
+			: $t = Registry::$config[ 'sql' ][ 'table_prefix' ] . $t;
 
 		return $t;
 	}
